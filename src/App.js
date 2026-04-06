@@ -1,24 +1,41 @@
-import logo from './logo.svg';
-import './App.css';
+// src/App.js
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+
+// 기존 import 유지
+import Main from "./pages/Main/Main";
+import Search from "./pages/Search/Search";
+import Login from "./pages/Login/Login";
+import Cart from "./pages/Cart/Cart";
+import Wishlist from "./pages/Wishlist/Wishlist";
+import ProductDetail from "./pages/ProductDetail/ProductDetail";
+import Payment from "./pages/Payment/Payment";
+import MyPage from "./pages/MyPage/MyPage";
+import Header from "./components/Header/Header";
+
+// 🌟 새로 추가된 페이지 import
+import Category from "./pages/Category/Category";
+import PcAssembly from "./pages/PcAssembly/PcAssembly";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Header />
+      <Routes>
+        <Route path="/" element={<Main />} />
+        <Route path="/search" element={<Search />} />
+
+        <Route path="/category" element={<Category />} />
+        <Route path="/pc-assembly" element={<PcAssembly />} />
+
+        <Route path="/login" element={<Login />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/payment" element={<Payment />} />
+        <Route path="/mypage" element={<MyPage />} />
+      </Routes>
+    </>
   );
 }
 
