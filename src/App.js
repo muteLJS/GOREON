@@ -11,7 +11,8 @@ import Wishlist from "./pages/Wishlist/Wishlist";
 import ProductDetail from "./pages/ProductDetail/ProductDetail";
 import Payment from "./pages/Payment/Payment";
 import MyPage from "./pages/MyPage/MyPage";
-import Header from "./components/Header/Header";
+import Header from "./components/pc/Header/Header";
+import Footer from "./components/pc/Footer/Footer";
 
 // 🌟 새로 추가된 페이지 import
 import Category from "./pages/Category/Category";
@@ -35,6 +36,7 @@ function App() {
         <Route path="/payment" element={<Payment />} />
         <Route path="/mypage" element={<MyPage />} />
       </Routes>
+      <Footer />
     </>
   );
 }

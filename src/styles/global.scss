@@ -3,8 +3,12 @@
 /* 프로젝트 전체에 깔리는 기본 배경색, 메인 폰트, 공통 레이아웃을 정의합니다. */
 /* -------------------------------------------------------------------------- */
 
+html {
+  font-size: 16px; // 기준
+}
+
 body {
-  background-color: $color-bg;
-  color: $color-text-main;
   font-family: $font-main;
+  font-size: $font-md;
+  color: $color-text-main;
 }
