@@ -1,91 +1,143 @@
 import "./Header.scss";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import LogoIcon from "assets/logo/logo/icon.svg";
-import LogoFull from "assets/logo/logo/logo.svg";
+import LogoFull from "assets/logo/logo/icon&text.svg";
 import Cart from "assets/header/header-icons/cart.svg";
 import Like from "assets/header/header-icons/like.svg";
 import Search from "assets/header/header-icons/search.svg";
 import User from "assets/header/header-icons/user.svg";
+import ChevronDown from "assets/icons/chevron-down.svg";
 
-import Apple from "assets/header/nav/Apple.svg";
-import Samsung from "assets/header/nav/Samsung.svg";
-import Lg from "assets/header/nav/LG.svg";
-import Hp from "assets/header/nav/Hp.svg";
-import Lenovo from "assets/header/nav/Lenovo.svg";
-import Dell from "assets/header/nav/Dell.svg";
-import Msi from "assets/header/nav/Msi.svg";
-import Asus from "assets/header/nav/Asus.svg";
-import Acer from "assets/header/nav/Acer.svg";
+const categoryMenu = [
+  {
+    id: 1,
+    key: "pc",
+    title: "PC",
+    items: ["노트북", "데스크탑", "모니터", "키보드", "마우스", "PC 주변기기", "PC 부품"],
+  },
+  {
+    id: 2,
+    key: "mobile",
+    title: "모바일",
+    items: ["스마트폰"],
+  },
+  {
+    id: 3,
+    key: "tablet",
+    title: "테블릿",
+    items: ["테블릿", "데스크탑", "모니터", "키보드", "마우스", "PC 주변기기", "PC 부품"],
+  },
+  {
+    id: 4,
+    key: "accessory",
+    title: "스마트 액세서리",
+    items: ["무선 이어폰", "스마트워치", "스마트링", "보조배터리"],
+  },
+];
+
+const brandMenu = [
+  {
+    id: 1,
+    key: "premium",
+    title: "프리미엄",
+    items: ["애플", "삼성", "LG"],
+  },
+  {
+    id: 2,
+    key: "value",
+    title: "가성비 / 일반",
+    items: ["HP", "레노버", "델"],
+  },
+  {
+    id: 3,
+    key: "gaming",
+    title: "게이밍 / 특화",
+    items: ["MSI", "ASUS", "Acer"],
+  },
+];
+
+const mobileTabs = [
+  { key: "category", label: "품목별" },
+  { key: "brand", label: "브랜드별" },
+  { key: "pc-build", label: "PC조립" },
+];
+
+const createExpandedState = (items) =>
+  items.reduce((acc, item) => {
+    acc[item.key] = true;
+    return acc;
+  }, {});
 
 function Header() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeMobileTab, setActiveMobileTab] = useState("category");
+  const [expandedCategories, setExpandedCategories] = useState(() => createExpandedState(categoryMenu));
+  const [expandedBrands, setExpandedBrands] = useState(() => createExpandedState(brandMenu));
+
   const headerIcons = [
-    { id: 1, name: "search", src: Search, alt: "search" },
-    { id: 2, name: "cart", src: Cart, alt: "cart" },
-    { id: 3, name: "like", src: Like, alt: "like" },
-    { id: 4, name: "user", src: User, alt: "user" },
+    { id: 1, name: "search", src: Search, alt: "검색" },
+    { id: 2, name: "cart", src: Cart, alt: "장바구니" },
+    { id: 3, name: "like", src: Like, alt: "좋아요" },
+    { id: 4, name: "user", src: User, alt: "마이페이지" },
   ];
 
-  const categoryMenu = [
-    {
-      id: 1,
-      title: "PC",
-      items: ["노트북", "데스크탑", "모니터", "키보드", "마우스", "PC 주변기기", "PC 부품"],
-    },
-    {
-      id: 2,
-      title: "모바일",
-      items: ["스마트폰"],
-    },
-    {
-      id: 3,
-      title: "태블릿",
-      items: ["태블릿", "데스크탑", "모니터", "키보드", "마우스", "PC 주변기기", "PC 부품"],
-    },
-    {
-      id: 4,
-      title: "스마트 액세서리",
-      items: ["무선 이어폰", "스마트워치", "스마트링", "보조배터리"],
-    },
-  ];
+  useEffect(() => {
+    const handleToggleMenu = () => {
+      setIsMobileMenuOpen((prev) => !prev);
+    };
 
-  const brandMenu = [
-    {
-      id: 1,
-      title: "프리미엄",
-      items: [
-        { id: 1, name: "애플", logo: Apple, alt: "apple" },
-        { id: 2, name: "삼성", logo: Samsung, alt: "samsung" },
-        { id: 3, name: "LG", logo: Lg, alt: "lg" },
-      ],
-    },
-    {
-      id: 2,
-      title: "가성비 / 일반",
-      items: [
-        { id: 1, name: "HP", logo: Hp, alt: "hp" },
-        { id: 2, name: "레노버", logo: Lenovo, alt: "lenovo" },
-        { id: 3, name: "델", logo: Dell, alt: "dell" },
-      ],
-    },
-    {
-      id: 3,
-      title: "게이밍 / 특화",
-      items: [
-        { id: 1, name: "MSI", logo: Msi, alt: "msi" },
-        { id: 2, name: "ASUS", logo: Asus, alt: "asus" },
-        { id: 3, name: "Acer", logo: Acer, alt: "acer" },
-      ],
-    },
-  ];
+    const handleCloseMenu = () => {
+      setIsMobileMenuOpen(false);
+    };
+
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("toggle-mobile-menu", handleToggleMenu);
+    window.addEventListener("close-mobile-menu", handleCloseMenu);
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("toggle-mobile-menu", handleToggleMenu);
+      window.removeEventListener("close-mobile-menu", handleCloseMenu);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle("mobile-menu-open", isMobileMenuOpen);
+
+    return () => {
+      document.body.classList.remove("mobile-menu-open");
+    };
+  }, [isMobileMenuOpen]);
+
+  const toggleCategorySection = (sectionKey) => {
+    setExpandedCategories((prev) => ({
+      ...prev,
+      [sectionKey]: !prev[sectionKey],
+    }));
+  };
+
+  const toggleBrandSection = (sectionKey) => {
+    setExpandedBrands((prev) => ({
+      ...prev,
+      [sectionKey]: !prev[sectionKey],
+    }));
+  };
 
   return (
     <header className="header">
       <div className="header__top">
         <h1 className="header__logo">
-          <Link to="/" aria-label="GOREON home">
-            <img src={LogoIcon} alt="GOREON icon" className="header__logo-icon" />
-            <img src={LogoFull} alt="GOREON logo" className="header__logo-full" />
+          <Link to="/" aria-label="GOREON 홈">
+            <img src={LogoIcon} alt="GOREON 아이콘" className="header__logo-icon" />
+            <img src={LogoFull} alt="GOREON 로고" className="header__logo-full" />
           </Link>
         </h1>
 
@@ -108,55 +160,60 @@ function Header() {
             <button type="button">로그인</button>
           </div>
         </div>
+
+        <button type="button" className="header__mobile-user" aria-label="마이페이지">
+          <img src={User} alt="마이페이지" />
+        </button>
       </div>
 
-      <nav className="header__nav">
+      <nav className="header__nav" aria-label="메인 메뉴">
         <ul className="gnb">
-          <li className="gnb__item">
-            <button type="button" className="gnb__button is-active">
+          <li className="gnb__item gnb__item--with-dropdown">
+            <button type="button" className="gnb__button">
               품목별
             </button>
 
-            <div className="dropdown">
-              <div className="dropdown__inner">
-                {categoryMenu.map((category) => (
-                  <div className="dropdown__column" key={category.id}>
-                    <div className="dropdown__title">{category.title}</div>
-                    <ul className="dropdown__list">
-                      {category.items.map((item) => (
-                        <li className="dropdown__list-item" key={item}>
-                          <Link to="/">{item}</Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+            <div className="dropdown dropdown--category">
+              <div className="dropdown__panel">
+                <div className="dropdown__inner dropdown__inner--category">
+                  {categoryMenu.map((category) => (
+                    <div className="dropdown__column" key={category.id}>
+                      <div className="dropdown__title">{category.title}</div>
+                      <ul className="dropdown__list">
+                        {category.items.map((item) => (
+                          <li className="dropdown__list-item" key={item}>
+                            <Link to="/">{item}</Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </li>
 
-          <li className="gnb__item">
+          <li className="gnb__item gnb__item--with-dropdown">
             <button type="button" className="gnb__button">
               브랜드별
             </button>
 
-            <div className="dropdown">
-              <div className="dropdown__inner dropdown__inner--brand">
-                {brandMenu.map((group) => (
-                  <div className="dropdown__column" key={group.id}>
-                    <div className="dropdown__title">{group.title}</div>
-                    <ul className="dropdown__list">
-                      {group.items.map((brand) => (
-                        <li className="dropdown__list-item dropdown__brand-item" key={brand.id}>
-                          <Link to="/">
-                            <img src={brand.logo} alt={brand.alt} />
-                            <span>{brand.name}</span>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+            <div className="dropdown dropdown--brand">
+              <div className="dropdown__panel">
+                <div className="dropdown__inner dropdown__inner--brand">
+                  {brandMenu.map((group) => (
+                    <div className="dropdown__column" key={group.id}>
+                      <div className="dropdown__title">{group.title}</div>
+                      <ul className="dropdown__list dropdown__list--brand">
+                        {group.items.map((brand) => (
+                          <li className="dropdown__list-item dropdown__brand-item" key={brand}>
+                            <Link to="/">{brand}</Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </li>
@@ -168,6 +225,111 @@ function Header() {
           </li>
         </ul>
       </nav>
+
+      <div className={`mobile-menu ${isMobileMenuOpen ? "is-open" : ""}`}>
+        <div className="mobile-menu__tabs" role="tablist" aria-label="모바일 카테고리 메뉴">
+          {mobileTabs.map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              role="tab"
+              aria-selected={activeMobileTab === tab.key}
+              className={`mobile-menu__tab ${activeMobileTab === tab.key ? "is-active" : ""}`}
+              onClick={() => setActiveMobileTab(tab.key)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="mobile-menu__content">
+          {activeMobileTab === "category" && (
+            <div className="mobile-menu__section-group">
+              {categoryMenu.map((section) => (
+                <section className="mobile-menu__section" key={section.key}>
+                  <button
+                    type="button"
+                    className="mobile-menu__section-button"
+                    onClick={() => toggleCategorySection(section.key)}
+                    aria-expanded={expandedCategories[section.key]}
+                  >
+                    <span>{section.title}</span>
+                    <img
+                      src={ChevronDown}
+                      alt=""
+                      className={`mobile-menu__chevron ${
+                        expandedCategories[section.key] ? "is-open" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {expandedCategories[section.key] && (
+                    <ul className="mobile-menu__list">
+                      {section.items.map((item) => (
+                        <li key={item} className="mobile-menu__list-item">
+                          <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
+                            {item}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </section>
+              ))}
+            </div>
+          )}
+
+          {activeMobileTab === "brand" && (
+            <div className="mobile-menu__section-group">
+              {brandMenu.map((section) => (
+                <section className="mobile-menu__section" key={section.key}>
+                  <button
+                    type="button"
+                    className="mobile-menu__section-button"
+                    onClick={() => toggleBrandSection(section.key)}
+                    aria-expanded={expandedBrands[section.key]}
+                  >
+                    <span>{section.title}</span>
+                    <img
+                      src={ChevronDown}
+                      alt=""
+                      className={`mobile-menu__chevron ${
+                        expandedBrands[section.key] ? "is-open" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {expandedBrands[section.key] && (
+                    <ul className="mobile-menu__list mobile-menu__list--brand-text">
+                      {section.items.map((item) => (
+                        <li key={item} className="mobile-menu__list-item">
+                          <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
+                            {item}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </section>
+              ))}
+            </div>
+          )}
+
+          {activeMobileTab === "pc-build" && (
+            <div className="mobile-menu__cta">
+              <p className="mobile-menu__cta-title">PC조립</p>
+              <p className="mobile-menu__cta-text">
+                원하는 사양에 맞는 조립 PC 페이지로 바로 이동할 수 있어요.
+              </p>
+              <Link to="/" className="mobile-menu__cta-link" onClick={() => setIsMobileMenuOpen(false)}>
+                PC 조립 페이지로 이동
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* TODO: 모바일 메뉴 상단에 별도 닫기 아이콘이나 장식 그래픽이 필요해지면 SVG 또는 PNG를 추가해서 연결하면 됩니다. */}
     </header>
   );
 }

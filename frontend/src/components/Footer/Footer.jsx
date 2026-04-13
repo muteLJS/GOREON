@@ -41,8 +41,11 @@ function Footer() {
     { id: 1, name: "home", src: HomeIcon, link: "/" },
     { id: 2, name: "search", src: SearchIcon, link: "/search" },
     { id: 3, name: "cart", src: CartIcon, link: "/cart" },
-    { id: 4, name: "menu", src: HamburgerIcon, link: "/category" },
   ];
+
+  const handleMobileMenuToggle = () => {
+    window.dispatchEvent(new Event("toggle-mobile-menu"));
+  };
 
   return (
     <footer className="footer">
@@ -137,7 +140,11 @@ function Footer() {
 
         <div className="footer__social footer__social--mobile">
           {socialIcons.map((icon) => (
-            <a href={icon.link} key={icon.id} className="footer__social-link footer__social-link--mobile">
+            <a
+              href={icon.link}
+              key={icon.id}
+              className="footer__social-link footer__social-link--mobile"
+            >
               <img src={icon.src} alt={icon.name} />
             </a>
           ))}
@@ -150,6 +157,15 @@ function Footer() {
             <img src={item.src} alt={item.name} />
           </a>
         ))}
+
+        <button
+          type="button"
+          className="footer__mobile-link footer__mobile-link--menu"
+          aria-label="menu"
+          onClick={handleMobileMenuToggle}
+        >
+          <img src={HamburgerIcon} alt="menu" />
+        </button>
       </div>
     </footer>
   );
