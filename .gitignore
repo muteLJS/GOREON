@@ -15,17 +15,14 @@ backend/uploads/*
 
 # environment files
 .env
-.env.*
 frontend/.env
-frontend/.env.*
 backend/.env
-backend/.env.*
 
 # editor settings
-.vscode/
 .idea/
 
 # OS files
+
 .DS_Store
 Thumbs.db
 
