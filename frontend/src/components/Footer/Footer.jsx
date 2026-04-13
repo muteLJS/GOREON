@@ -41,17 +41,66 @@ function Footer() {
     { id: 1, name: "home", src: HomeIcon, link: "/" },
     { id: 2, name: "search", src: SearchIcon, link: "/search" },
     { id: 3, name: "cart", src: CartIcon, link: "/cart" },
-    { id: 4, name: "menu", src: HamburgerIcon, link: "/category" },
   ];
+
+  const handleMobileMenuToggle = () => {
+    window.dispatchEvent(new Event("toggle-mobile-menu"));
+  };
 
   return (
     <footer className="footer">
-      <div className="footer__box1">
-        <div className="top-1">
-          <div className="footer__policy">
-            <p href="/">정책</p>
-            <span>/</span>
-            <p href="/">법적 정보</p>
+      <div className="footer__desktop">
+        <div className="footer__desktop-top">
+          <div className="footer__desktop-columns">
+            {desktopColumns.map((column) => (
+              <div key={column.title} className="footer__desktop-column">
+                <p className="footer__title">{column.title}</p>
+                <div className="footer__desktop-links">
+                  {column.items.map((item) => (
+                    <p key={item}>{item}</p>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            <div className="footer__desktop-column footer__desktop-column--message">
+              <p className="footer__title">브랜드 메시지</p>
+              <p className="footer__message">
+                조건만 입력하세요.
+                <br />
+                가장 적합한 선택을 찾아드립니다.
+              </p>
+            </div>
+          </div>
+
+          <a href="/" className="footer__support footer__support--desktop">
+            <strong className="footer__support-number">1577-1577</strong>
+            <div className="footer__support-link">
+              <span>고객센터 바로가기</span>
+              <img src={ArrowRightIcon} alt="고객센터 바로가기" />
+            </div>
+          </a>
+        </div>
+
+        <div className="footer__divider" />
+
+        <div className="footer__desktop-bottom">
+          <div className="footer__brand">
+            <div className="footer__brand-icon">
+              <img src={FooterLogoIcon} alt="GOREON 로고" />
+            </div>
+            <div className="footer__brand-copy">
+              <p>COPYRIGHT © GOREON. ALL RIGHTS RESERVED.</p>
+              <p>본 프로젝트는 포트폴리오용으로 제작된 사이트입니다.</p>
+            </div>
+          </div>
+
+          <div className="footer__social">
+            {socialIcons.map((icon) => (
+              <a href={icon.link} key={icon.id} className="footer__social-link">
+                <img src={icon.src} alt={icon.name} />
+              </a>
+            ))}
           </div>
         </div>
       </div>
@@ -84,14 +133,18 @@ function Footer() {
           </div>
         </a>
 
-        <div className="copyright">
-          <p className="footer__copyright">COPYRIGHT © GOREON. ALL RIGHTS RESERVED.</p>
-          <p className="footer__notice">본 플랫폼은 상품중개 역할만을 지원합니다.</p>
+        <div className="footer__mobile-copy">
+          <p>COPYRIGHT © GOREON. ALL RIGHTS RESERVED.</p>
+          <p>본 프로젝트는 포트폴리오용으로 제작된 사이트입니다.</p>
         </div>
 
-        <div className="footer__social">
+        <div className="footer__social footer__social--mobile">
           {socialIcons.map((icon) => (
-            <a href={icon.link} key={icon.id} className="footer__social-link">
+            <a
+              href={icon.link}
+              key={icon.id}
+              className="footer__social-link footer__social-link--mobile"
+            >
               <img src={icon.src} alt={icon.name} />
             </a>
           ))}
@@ -104,6 +157,15 @@ function Footer() {
             <img src={item.src} alt={item.name} />
           </a>
         ))}
+
+        <button
+          type="button"
+          className="footer__mobile-link footer__mobile-link--menu"
+          aria-label="menu"
+          onClick={handleMobileMenuToggle}
+        >
+          <img src={HamburgerIcon} alt="menu" />
+        </button>
       </div>
     </footer>
   );
