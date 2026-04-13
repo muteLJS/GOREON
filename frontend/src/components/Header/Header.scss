@@ -32,7 +32,7 @@
 }
 
 .header__logo-icon {
-  display: block;
+  display: block !important;
   width: 41px;
   height: 41px;
 }
@@ -84,6 +84,15 @@
 }
 
 @include tablet-up {
+  .header__logo-icon {
+    display: none !important;
+  }
+
+  .header__logo-full {
+    display: block !important;
+    height: 45px;
+  }
+
   .header__icon-btn--search,
   .header__icon-btn--cart,
   .header__icon-btn--like {
@@ -97,18 +106,6 @@
     max-width: $layout-desktop-max-width;
     margin: 0 auto;
     padding: 0 16px;
-  }
-
-  /* PC에서만 icon + text 둘 다 보임 */
-  .header__logo-icon {
-    display: block;
-    width: 32px;
-    height: 32px;
-  }
-
-  .header__logo-full {
-    display: block !important;
-    height: 22px;
   }
 
   .header__auth {
@@ -161,38 +158,4 @@
 
 .dropdown {
   display: none;
-}
-
-@include tablet-up {
-  .header__icon-btn--search,
-  .header__icon-btn--cart,
-  .header__icon-btn--like {
-    display: flex;
-  }
-}
-
-@include desktop-up {
-  .header__top {
-    height: 70px;
-    max-width: 1320px;
-    margin: 0 auto;
-    padding: 0 16px;
-  }
-
-  /* 핵심: PC에서는 icon + logo 둘 다 보이게 */
-  .header__logo-icon {
-    display: block;
-  }
-
-  .header__logo-full {
-    display: block;
-  }
-
-  .header__auth {
-    display: flex;
-  }
-
-  .header__nav {
-    display: block;
-  }
 }

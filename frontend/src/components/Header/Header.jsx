@@ -2,7 +2,7 @@ import "./Header.scss";
 import { Link } from "react-router-dom";
 
 import LogoIcon from "assets/logo/logo/icon.svg";
-import LogoFull from "assets/logo/logo/logo.svg";
+import LogoFull from "assets/logo/logo/icon&text.svg";
 import Cart from "assets/header/header-icons/cart.svg";
 import Like from "assets/header/header-icons/like.svg";
 import Search from "assets/header/header-icons/search.svg";
