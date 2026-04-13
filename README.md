@@ -1,70 +1,132 @@
-# Getting Started with Create React App
+# GOREON
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+AI 기반 전자기기 쇼핑 및 추천 서비스 프로젝트입니다.
 
-## Available Scripts
+## 프로젝트 개요
 
-In the project directory, you can run:
+GOREON은 사용자의 예산, 성능, 용도에 맞는 전자기기를 더 쉽게 탐색하고 비교할 수 있도록 돕는 서비스를 목표로 합니다.
 
-### `npm start`
+- 조건 기반 상품 검색 및 필터링
+- 상품 비교 및 추천
+- 직관적인 UI/UX
+- 추후 AI 추천 기능 확장 예정
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 폴더 구조
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```bash
+GOREON/
+├─ frontend/
+│  ├─ public/
+│  ├─ src/
+│  │  ├─ assets/
+│  │  ├─ components/
+│  │  ├─ pages/
+│  │  ├─ layouts/
+│  │  ├─ styles/
+│  │  ├─ store/
+│  │  ├─ api/
+│  │  ├─ utils/
+│  │  ├─ App.jsx
+│  │  ├─ main.jsx
+│  │  └─ index.scss
+│  ├─ .env
+│  ├─ jsconfig.json
+│  ├─ package.json
+│  └─ package-lock.json
+├─ backend/
+│  ├─ src/
+│  │  ├─ config/
+│  │  │  └─ db.js
+│  │  ├─ controllers/
+│  │  │  ├─ productController.js
+│  │  │  ├─ userController.js
+│  │  │  ├─ cartController.js
+│  │  │  └─ reviewController.js
+│  │  ├─ models/
+│  │  │  ├─ Product.js
+│  │  │  ├─ User.js
+│  │  │  ├─ Cart.js
+│  │  │  └─ Review.js
+│  │  ├─ routes/
+│  │  │  ├─ productRoutes.js
+│  │  │  ├─ userRoutes.js
+│  │  │  ├─ cartRoutes.js
+│  │  │  └─ reviewRoutes.js
+│  │  ├─ middleware/
+│  │  │  ├─ auth.js
+│  │  │  ├─ errorHandler.js
+│  │  │  └─ upload.js
+│  │  ├─ utils/
+│  │  ├─ app.js
+│  │  └─ server.js
+│  ├─ uploads/
+│  ├─ .env
+│  └─ package.json
+├─ .gitignore
+└─ README.md
+```
 
-### `npm test`
+## 환경 변수 관리
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+환경 변수는 서비스별로 분리합니다.
 
-### `npm run build`
+- `frontend/.env`
+- `backend/.env`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+주의사항:
+- 프론트엔드에는 공개 가능한 값만 둡니다.
+- 비밀키, DB 연결 정보, 토큰 시크릿은 `backend/.env`에만 둡니다.
+- `.gitignore`는 루트에서 통합 관리합니다.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 프론트엔드 실행
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-### `npm run eject`
+브라우저에서 `http://localhost:3000`으로 접속합니다.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 백엔드 실행
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+현재는 기본 골격만 생성된 상태입니다.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```bash
+cd backend
+npm install
+npm run dev
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 협업 환경
 
-## Learn More
+프론트엔드 작업 전 아래 두 VS Code 확장을 설치하는 것을 권장합니다.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- `Prettier - Code formatter`
+- `ESLint`
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+프론트엔드 공통 작업 명령:
 
-### Code Splitting
+```bash
+cd frontend
+npm run lint
+npm run format
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+협업 기준:
+- 저장 시 자동 포맷이 적용됩니다.
+- 탭 크기는 2칸입니다.
+- alias import는 `jsconfig.json`과 `vite.config.js` 기준으로 사용합니다.
 
-### Analyzing the Bundle Size
+예시:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```jsx
+import Header from "components/pc/Header/Header";
+import Logo from "assets/img/logo/logo.svg";
+import store from "store/store";
+```
 
-### Making a Progressive Web App
+## 권장 실행 환경
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Node.js 18 이상
+- npm 9 이상

@@ -1,0 +1,157 @@
+/* -------------------------------------------------------------------------- */
+/* [스타일] 믹스인 (_mixins.scss)                                             */
+/* 정렬(Flex), 버튼, 카드, 반응형 등 자주 쓰는 CSS를 모아둔 파일입니다.       */
+/* -------------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------------- */
+/* [1] flex 정렬                                                              */
+/* display:flex 관련 속성을 한 번에 작성할 때 사용합니다.                     */
+/* -------------------------------------------------------------------------- */
+/* 사용 예시
+   .header {
+     @include flex(center, space-between);
+   }
+
+   .menu {
+     @include flex(center, flex-start, column);
+   }
+*/
+@mixin flex($align: center, $justify: center, $direction: row) {
+  display: flex;
+  align-items: $align;
+  justify-content: $justify;
+  flex-direction: $direction;
+}
+
+/* -------------------------------------------------------------------------- */
+/* [2] 중앙 정렬                                                              */
+/* 가로/세로 중앙 정렬이 필요할 때 사용합니다.                                */
+/* -------------------------------------------------------------------------- */
+/* 사용 예시
+   .login-box {
+     @include flex-center;
+   }
+*/
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* -------------------------------------------------------------------------- */
+/* [3] 한 줄 말줄임                                                           */
+/* 텍스트가 길 때 한 줄만 보이고 ... 처리됩니다.                              */
+/* -------------------------------------------------------------------------- */
+/* 사용 예시
+   .product-title {
+     width: 200px;
+     @include ellipsis;
+   }
+*/
+@mixin ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* -------------------------------------------------------------------------- */
+/* [4] 여러 줄 말줄임                                                         */
+/* 지정한 줄 수까지만 보이고 나머지는 잘립니다.                               */
+/* -------------------------------------------------------------------------- */
+/* 사용 예시
+   .product-desc {
+     @include ellipsis-multi(2);
+   }
+*/
+@mixin ellipsis-multi($line: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $line;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* -------------------------------------------------------------------------- */
+/* [5] 버튼 기본형                                                            */
+/* 버튼 공통 스타일을 묶어서 재사용할 때 사용합니다.                          */
+/* -------------------------------------------------------------------------- */
+/* 사용 예시
+   .login-btn {
+     @include button-base($color-text-sub, $color-white);
+   }
+*/
+@mixin button-base($bg, $color, $radius: 8px, $padding: 12px 20px) {
+  background-color: $bg;
+  color: $color;
+  border: none;
+  border-radius: $radius;
+  padding: $padding;
+  cursor: pointer;
+}
+
+/* -------------------------------------------------------------------------- */
+/* [6] 카드 기본형                                                            */
+/* 상품 카드, 박스, 패널 UI에 공통으로 사용합니다.                            */
+/* -------------------------------------------------------------------------- */
+/* 사용 예시
+   .product-card {
+     @include card;
+   }
+*/
+@mixin card($bg: $color-white, $radius: $radius-lg, $shadow: $shadow-soft) {
+  background: $bg;
+  border-radius: $radius;
+  box-shadow: $shadow;
+}
+
+/* -------------------------------------------------------------------------- */
+/* [7] hover 확대 효과                                                        */
+/* 마우스를 올렸을 때 요소가 살짝 커집니다.                                   */
+/* -------------------------------------------------------------------------- */
+/* 사용 예시
+   .product-card {
+     @include hover-scale;
+   }
+*/
+@mixin hover-scale($scale: 1.03, $transition: $transition-base) {
+  transition: transform $transition;
+
+  &:hover {
+    transform: scale($scale);
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* [8] 모바일 반응형                                                          */
+/* 모바일 화면에서만 다른 스타일을 적용할 때 사용합니다.                      */
+/* -------------------------------------------------------------------------- */
+/* 사용 예시
+   .container {
+     width: 1200px;
+
+     @include mobile {
+       width: 100%;
+     }
+   }
+*/
+@mixin mobile {
+  @media (max-width: 767px) {
+    @content;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* [9] 태블릿 반응형                                                          */
+/* 태블릿 이하 화면에서 스타일을 변경할 때 사용합니다.                        */
+/* -------------------------------------------------------------------------- */
+/* 사용 예시
+   .container {
+     @include tablet {
+       padding: 0 16px;
+     }
+   }
+*/
+@mixin tablet {
+  @media (max-width: 1023px) {
+    @content;
+  }
+}
