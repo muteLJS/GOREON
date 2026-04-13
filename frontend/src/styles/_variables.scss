@@ -1,0 +1,107 @@
+/* -------------------------------------------------------------------------- */
+/* [스타일] 디자인 토큰 (_variables.scss)                                     */
+/* 프로젝트 전체에서 공통으로 사용할 컬러, 폰트, 간격 등을 정의합니다.        */
+/* -------------------------------------------------------------------------- */
+
+// 필요한 건 추가하셔도 됩니다.
+
+// ==========================================
+// 1. 컬러 팔레트 (Color Palette)
+// ==========================================
+
+$color-bg: #f4fffe; // 배경
+$color-text-main: #004e5a; // 메인 텍스트
+$color-layout: #d1d4dc; // 카드/레이아웃
+$color-text-sub: #0aa5a5; // 서브 텍스트
+$color-btn: #7ae0d4; // 버튼/보조
+
+// 기본 컬러
+$color-white: #ffffff;
+$color-black: #000000;
+
+// 상태 컬러
+$color-success: #22c55e; // 성공
+$color-warning: #facc15; // 경고
+$color-error: #ef4444; // 에러
+
+// 그레이 스케일
+$color-gray-100: #f5f5f5;
+$color-gray-200: #e5e7eb;
+$color-gray-300: #d1d5db;
+$color-gray-400: #9ca3af;
+$color-gray-500: #6b7280;
+
+// ==========================================
+// 2. 타이포그래피 (Typography)
+// ==========================================
+
+$font-main: "Google Sans Flex", sans-serif;
+$font-logo: "Tmoney RoundWind", sans-serif;
+
+// Font Weight
+$font-regular: 400;
+$font-medium: 500;
+$font-semibold: 600;
+$font-bold: 700;
+$font-black: 900;
+
+// Line Height
+$line-height-base: 1.5;
+$line-height-tight: 1.2;
+
+// ==========================================
+// 3. Font Size System
+// ==========================================
+
+$font-xs: 12px;
+$font-sm: 14px;
+$font-md: 16px;
+$font-lg: 18px;
+$font-xl: 24px;
+$font-xxl: 32px;
+$font-display: 48px;
+
+// ==========================================
+// 4. Spacing System
+// ==========================================
+
+$space-xxs: 4px;
+$space-xs: 8px;
+$space-sm: 12px;
+$space-md: 16px;
+$space-lg: 24px;
+$space-xl: 32px;
+
+// ==========================================
+// 5. Border Radius
+// ==========================================
+
+$radius-sm: 6px;
+$radius-md: 12px;
+$radius-lg: 20px;
+$radius-full: 9999px;
+
+// ==========================================
+// 6. Shadow System
+// ==========================================
+
+$shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08);
+$shadow-medium: 0 8px 20px rgba(0, 0, 0, 0.12);
+$shadow-strong: 0 12px 30px rgba(0, 0, 0, 0.2);
+
+// ==========================================
+// 7. Z-index System
+// ==========================================
+
+$z-header: 100;
+$z-dropdown: 200;
+$z-modal: 1000;
+$z-toast: 1100;
+
+// ==========================================
+// 8. Transition System
+// ==========================================
+
+$transition-fast: 0.15s ease;
+$transition-base: 0.3s ease;
+$transition-slow: 0.5s ease;
