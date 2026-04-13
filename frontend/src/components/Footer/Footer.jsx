@@ -5,6 +5,8 @@ import YoutubeIcon from "assets/footer/pc/youtube.svg";
 import InstagramIcon from "assets/footer/pc/instagram.svg";
 import ArrowRightIcon from "assets/footer/pc/arrow-right.svg";
 
+import LogoIcon from "assets/logo/logo/icon.svg";
+
 import HomeIcon from "assets/footer/mobile/home.svg";
 import SearchIcon from "assets/footer/mobile/search.svg";
 import CartIcon from "assets/footer/mobile/cart.svg";
@@ -29,9 +31,7 @@ function Footer() {
       <div className="footer__box1">
         <div className="top-1">
           <div className="footer__policy">
-            <p href="/">정책</p>
-            <span>/</span>
-            <p href="/">법적 정보</p>
+            <p href="/">정책 / 법적 정보</p>
           </div>
           <div className="footer__links">
             <p href="/">이용약관</p>
@@ -57,16 +57,22 @@ function Footer() {
         </a>
 
         <div className="copyright">
-          <p className="footer__copyright">COPYRIGHT © GOREON. ALL RIGHTS RESERVED.</p>
-          <p className="footer__notice">본 플랫폼은 상품중개 역할만을 지원합니다.</p>
-        </div>
+          <div className="footer__bottom-left">
+            <img src={LogoIcon} alt="GOREON logo" className="footer__bottom-logo" />
 
-        <div className="footer__social">
-          {socialIcons.map((icon) => (
-            <a href={icon.link} key={icon.id} className="footer__social-link">
-              <img src={icon.src} alt={icon.name} />
-            </a>
-          ))}
+            <div className="footer__copyright-wrap">
+              <p className="footer__copyright">COPYRIGHT © GOREON. ALL RIGHTS RESERVED.</p>
+              <p className="footer__notice">본 프로젝트는 포트폴리오용으로 제작된 사이트입니다.</p>
+            </div>
+          </div>
+
+          <div className="footer__social">
+            {socialIcons.map((icon) => (
+              <a href={icon.link} key={icon.id} className="footer__social-link">
+                <img src={icon.src} alt={icon.name} />
+              </a>
+            ))}
+          </div>
         </div>
       </div>
 

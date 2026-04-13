@@ -162,7 +162,7 @@ function Header() {
           </li>
 
           <li className="gnb__item">
-            <Link to="/" className="gnb__link">
+            <Link to="/" className="gnb__link gnb__button">
               PC 조립
             </Link>
           </li>

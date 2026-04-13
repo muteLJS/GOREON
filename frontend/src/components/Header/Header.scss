@@ -1,198 +1,100 @@
 @import "../../styles/variables";
 @import "../../styles/mixins";
 
+/* mobile 기본 */
 .header {
-  position: relative;
-  z-index: $z-header;
   width: 100%;
-  background-color: $color-white;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.05);
 }
 
-.header__top {
-  @include flex(center, space-between);
-  width: 100%;
-  height: 56px;
-  padding: 0 16px;
-}
-
-.header__logo {
-  margin: 0;
-  flex-shrink: 0;
-
-  a {
-    @include flex(center, flex-start);
-    gap: 8px;
-    text-decoration: none;
-  }
-
-  img {
-    display: block;
-  }
-}
-
-.header__logo-icon {
-  display: block;
-  width: 41px;
-  height: 41px;
-}
-
-.header__logo-full {
-  display: none !important;
-  width: auto;
-  height: 20px;
-}
-
-.header__right {
-  @include flex(center, flex-end);
-  gap: $space-md;
-}
-
-.header__icons {
-  @include flex(center, flex-end);
-  gap: $space-xs;
-}
-
-.header__icon-btn {
-  @include flex-center;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  background: transparent;
-  border: 0;
-  border-radius: $radius-full;
-  cursor: pointer;
-
-  img {
-    width: 26px;
-    height: 26px;
-  }
-}
-
-/* 모바일에서는 오른쪽 유저 아이콘만 */
-.header__icon-btn--search,
-.header__icon-btn--cart,
-.header__icon-btn--like {
-  display: none;
-}
-
-.header__auth,
-.header__nav,
-.gnb,
-.dropdown {
-  display: none;
-}
-
+/* tablet */
 @include tablet-up {
-  .header__icon-btn--search,
-  .header__icon-btn--cart,
-  .header__icon-btn--like {
-    display: flex;
+  .header {
   }
 }
 
+/* desktop */
 @include desktop-up {
+  .header {
+    padding: 0 300px;
+    border-bottom: 1px solid rgba($color: #000000, $alpha: 0.2);
+  }
+
   .header__top {
     height: 70px;
-    max-width: $layout-desktop-max-width;
-    margin: 0 auto;
-    padding: 0 16px;
-  }
+    @include flex(center, space-between);
 
-  /* PC에서만 icon + text 둘 다 보임 */
-  .header__logo-icon {
-    display: block;
-    width: 32px;
-    height: 32px;
-  }
+    .header__logo-icon {
+      display: none;
+    }
 
-  .header__logo-full {
-    display: block !important;
-    height: 22px;
-  }
+    .header__right {
+      @include flex(center, space-between);
+      gap: 20px;
 
-  .header__auth {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+      .header__icons {
+        @include flex(center, space-between);
+        gap: 20px;
+      }
 
+      .header__auth {
+        @include flex(center, space-between);
+        gap: 12px;
+        button {
+          background-color: $color-text-sub;
+          color: $color-white;
+          font-weight: $font-bold;
+          border-radius: $radius-btn;
+          padding: $space-xs $space-sm;
+        }
+      }
+    }
+  }
   .header__nav {
-    display: block;
-  }
-}
-.gnb {
-  @include flex(center, flex-start);
-  gap: 40px;
-  width: 100%;
-  max-width: 1320px;
-  margin: 0 auto;
-  padding: 0 16px;
-  height: 58px;
-  list-style: none;
-}
+    width: 100%;
+    height: 55px;
+    position: relative;
 
-.gnb__item {
-  position: relative;
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
+    .gnb {
+      @include flex(center, center);
+      width: 100%;
+      padding: $space-xs;
+      gap: 230px;
+    }
 
-.gnb__button,
-.gnb__link {
-  @include flex-center;
-  height: 100%;
-  background: transparent;
-  border: 0;
-  padding: 0;
-  font-size: 16px;
-  font-weight: 700;
-  color: $color-text;
-  text-decoration: none;
-  cursor: pointer;
-}
+    .gnb__button {
+      font-weight: $font-bold;
+      color: $color-text-sub;
+      font-size: $font-lg;
+      padding: $space-10;
+    }
+    .gnb__button:hover {
+      border-bottom: 2px solid $color-text-sub;
+    }
+    .gnb__item {
+    }
+    .dropdown {
+      @include flex(center, center);
+      gap: 230px;
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      min-width: 100%;
 
-.gnb__button.is-active,
-.gnb__button:hover,
-.gnb__link:hover {
-  color: $color-primary;
-}
+      .dropdown__inner {
+        min-width: 100%;
+        @include flex(center, space-between);
 
-.dropdown {
-  display: none;
-}
-
-@include tablet-up {
-  .header__icon-btn--search,
-  .header__icon-btn--cart,
-  .header__icon-btn--like {
-    display: flex;
-  }
-}
-
-@include desktop-up {
-  .header__top {
-    height: 70px;
-    max-width: 1320px;
-    margin: 0 auto;
-    padding: 0 16px;
-  }
-
-  /* 핵심: PC에서는 icon + logo 둘 다 보이게 */
-  .header__logo-icon {
-    display: block;
-  }
-
-  .header__logo-full {
-    display: block;
-  }
-
-  .header__auth {
-    display: flex;
-  }
-
-  .header__nav {
-    display: block;
+        .dropdown__column {
+          background-color: green;
+          .dropdown__title {
+            background-color: blue;
+          }
+          .dropdown__list {
+            background-color: purple;
+          }
+        }
+      }
+    }
   }
 }
