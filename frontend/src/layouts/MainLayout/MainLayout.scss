@@ -1,0 +1,28 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+
+.main-layout {
+  width: 100%;
+  min-height: 100vh;
+  padding: 40px 16px;
+}
+
+.main-layout__inner {
+  width: 100%;
+  min-height: 100vh;
+  padding: 0 $layout-mobile-padding;
+}
+
+@include tablet-up {
+  .main-layout__inner {
+    padding: 0 $layout-tablet-padding;
+  }
+}
+
+@include desktop-up {
+  .main-layout__inner {
+    max-width: $layout-desktop-max-width;
+    margin: 0 auto;
+    padding: 0 $layout-desktop-padding;
+  }
+}

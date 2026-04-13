@@ -32,6 +32,20 @@ $color-gray-400: #9ca3af;
 $color-gray-500: #6b7280;
 
 // ==========================================
+// 1-1. 공통 사용 alias 컬러
+// 기존 컴포넌트(Header/Footer 등)에서 자주 쓰는 이름들
+// ==========================================
+
+$color-primary: $color-text-sub; // 메인 포인트 컬러
+$color-primary-light: $color-btn; // 밝은 포인트 컬러
+$color-primary-dark: $color-text-main; // 진한 포인트 컬러
+
+$color-text: $color-text-main; // 기본 텍스트
+$color-text-muted: $color-gray-500; // 보조 텍스트
+$color-border: $color-gray-200; // 기본 보더
+$color-surface: $color-white; // 카드/박스 배경
+
+// ==========================================
 // 2. 타이포그래피 (Typography)
 // ==========================================
 
@@ -71,6 +85,20 @@ $space-sm: 12px;
 $space-md: 16px;
 $space-lg: 24px;
 $space-xl: 32px;
+$space-xxl: 40px;
+
+// ==========================================
+// 4-1. Breakpoints / Layout
+// ==========================================
+
+$breakpoint-tablet: 768px;
+$breakpoint-desktop: 1024px;
+$breakpoint-desktop-lg: 1280px;
+
+$layout-mobile-padding: 16px;
+$layout-tablet-padding: 24px;
+$layout-desktop-padding: 32px;
+$layout-desktop-max-width: 1280px;
 
 // ==========================================
 // 5. Border Radius
@@ -79,6 +107,7 @@ $space-xl: 32px;
 $radius-sm: 6px;
 $radius-md: 12px;
 $radius-lg: 20px;
+$radius-xl: 24px;
 $radius-full: 9999px;
 
 // ==========================================
@@ -93,6 +122,7 @@ $shadow-strong: 0 12px 30px rgba(0, 0, 0, 0.2);
 // 7. Z-index System
 // ==========================================
 
+$z-base: 1;
 $z-header: 100;
 $z-dropdown: 200;
 $z-modal: 1000;

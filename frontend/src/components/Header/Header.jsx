@@ -1,12 +1,8 @@
-/* -------------------------------------------------------------------------- */
-/* [컴포넌트] 헤더 (Header)                                                   */
-/* 헤더: 전역 상단 네비게이션바 (로고, 메뉴, 검색창, 마이페이지 링크)         */
-/* -------------------------------------------------------------------------- */
-
 import "./Header.scss";
 import { Link } from "react-router-dom";
 
-import Logo from "assets/img/logo/logo.svg";
+import LogoIcon from "assets/logo/logo/icon.svg";
+import LogoFull from "assets/logo/logo/logo.svg";
 import Cart from "assets/header/header-icons/cart.svg";
 import Like from "assets/header/header-icons/like.svg";
 import Search from "assets/header/header-icons/search.svg";
@@ -24,10 +20,10 @@ import Acer from "assets/header/nav/Acer.svg";
 
 function Header() {
   const headerIcons = [
-    { id: 1, src: Search, alt: "search" },
-    { id: 2, src: Cart, alt: "cart" },
-    { id: 3, src: Like, alt: "like" },
-    { id: 4, src: User, alt: "user" },
+    { id: 1, name: "search", src: Search, alt: "search" },
+    { id: 2, name: "cart", src: Cart, alt: "cart" },
+    { id: 3, name: "like", src: Like, alt: "like" },
+    { id: 4, name: "user", src: User, alt: "user" },
   ];
 
   const categoryMenu = [
@@ -87,15 +83,21 @@ function Header() {
     <header className="header">
       <div className="header__top">
         <h1 className="header__logo">
-          <Link to="/">
-            <img src={Logo} alt="GOREON 로고" />
+          <Link to="/" aria-label="GOREON home">
+            <img src={LogoIcon} alt="GOREON icon" className="header__logo-icon" />
+            <img src={LogoFull} alt="GOREON logo" className="header__logo-full" />
           </Link>
         </h1>
 
         <div className="header__right">
           <div className="header__icons">
             {headerIcons.map((icon) => (
-              <button type="button" className="header__icon-btn" key={icon.id}>
+              <button
+                type="button"
+                className={`header__icon-btn header__icon-btn--${icon.name}`}
+                key={icon.id}
+                aria-label={icon.alt}
+              >
                 <img src={icon.src} alt={icon.alt} />
               </button>
             ))}
