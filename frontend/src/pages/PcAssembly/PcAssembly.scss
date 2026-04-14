@@ -1,0 +1,38 @@
+.pc-assembly {
+  .pc-assembly__banner {
+    img {
+      width: 100%;
+    }
+  }
+
+  .pc-assembly__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .pc-assembly__title {
+      font-size: 1.25rem;
+    }
+
+    .filter-button {
+      display: flex;
+      border: 1px solid #60606024;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      gap: 8px;
+      padding: 4px 8px;
+
+      img {
+        width: 0.75rem;
+      }
+    }
+  }
+
+  .pc-assembly__content {
+    .pc-assembly__product-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+  }
+}

@@ -1,0 +1,14 @@
+.product-card-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-radius: 16px;
+  border: 1px solid #60606024;
+  font-size: 0.75rem;
+
+  &__bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
