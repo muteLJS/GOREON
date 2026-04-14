@@ -12,6 +12,7 @@ import CartIcon from "assets/footer/mobile/cart.svg";
 import HamburgerIcon from "assets/footer/mobile/hamburger.svg";
 
 function Footer() {
+  console.log("Footer rendering");
   const desktopColumns = [
     {
       title: "서비스 정보",

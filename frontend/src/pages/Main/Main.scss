@@ -18,41 +18,92 @@
 
 .section__AI {
   padding: 20px 16px;
-  background: url(@/assets/pc/Main/AISection.svg);
-  @include flex(center, space-between);
-}
-
-.AI_description {
-  @include flex(flex-start, space-between, column);
-  gap: $space-sm;
-  button {
-    padding: 5px;
-    @include flex(center, space-between);
-    color: $color-text-sub;
-    border: 1px solid $color-text-sub;
-    border-radius: 25.5px;
-    font-weight: $font-bold;
-    font-size: $font-xxs;
-    gap: 5px;
-    .circle {
-      width: 6px;
-      height: 6px;
-      border-radius: $radius-full;
-      background-color: $color-text-sub;
+  // background: url(@/assets/pc/Main/AISection.svg);
+  background-color: $color-bg;
+  @include flex(center, space-between, column);
+  gap: 12px;
+  .AI_container {
+    width: 100%;
+    @include flex(flex-start, space-between);
+    .AI_description {
+      @include flex(flex-start, space-between, column);
+      gap: $space-sm;
+      button {
+        padding: 5px;
+        @include flex(center, space-between);
+        color: $color-text-sub;
+        background-color: $color-button;
+        border: 1px solid $color-text-sub;
+        border-radius: 25.5px;
+        font-weight: $font-bold;
+        font-size: $font-xxs;
+        gap: 5px;
+        .circle {
+          width: 6px;
+          height: 6px;
+          border-radius: $radius-full;
+          background-color: $color-text-sub;
+        }
+      }
+      .Main_text {
+        color: $color-text-main;
+        font-size: $font-xl;
+        font-weight: $font-black;
+        span {
+          color: $color-text-sub;
+        }
+      }
+      .sub_text {
+        display: none;
+      }
+      .AI_Chat_row_2 {
+        @include flex(flex-start, space-between, column);
+        gap: 12px;
+        button {
+          padding: 4.5px 6.5px;
+          background-color: inherit;
+          color: $color-text-main;
+          border: 1px solid $color-button-outline;
+          font-size: $font-xs;
+        }
+      }
+    }
+    .AI_logo {
+      width: 124px;
     }
   }
-  .Main_text {
-    color: $color-text-main;
-    font-size: $font-xl;
-    font-weight: $font-black;
-  }
-  .sub_text {
-    display: none;
-  }
 }
 
-.AI_logo {
-  width: 124px;
+.AI_chat_container {
+  width: 100%;
+  background-color: $color-white;
+  margin-top: 18px;
+  .AI_Chat_row_1 {
+    input {
+      width: 100%;
+      border: 1px solid $color-text-sub;
+      border-radius: $radius-ai;
+      padding: 15px 25px;
+      color: $color-text-main;
+      &:focus {
+        outline: none;
+        border-color: $color-text-sub;
+        box-shadow: none;
+      }
+    }
+    input::placeholder {
+      color: $color-text-main;
+      font-size: $font-md;
+      font-weight: $font-bold;
+    }
+
+    button {
+      width: 100%;
+    }
+  }
+  .AI_Chat_row_2 {
+    display: none;
+  }
 }
 
 .test-icons {
