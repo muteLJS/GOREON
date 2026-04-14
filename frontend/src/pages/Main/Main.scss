@@ -13,12 +13,50 @@
 }
 
 .sections {
-  padding: 120px 300px;
+  padding: 20px 20px;
 }
 
-.input {
-  @include input();
-}
 .section__AI {
+  padding: 20px 16px;
   background: url(@/assets/pc/Main/AISection.svg);
+  @include flex(center, space-between);
+}
+
+.AI_description {
+  @include flex(flex-start, space-between, column);
+  gap: $space-sm;
+  button {
+    padding: 5px;
+    @include flex(center, space-between);
+    color: $color-text-sub;
+    border: 1px solid $color-text-sub;
+    border-radius: 25.5px;
+    font-weight: $font-bold;
+    font-size: $font-xxs;
+    gap: 5px;
+    .circle {
+      width: 6px;
+      height: 6px;
+      border-radius: $radius-full;
+      background-color: $color-text-sub;
+    }
+  }
+  .Main_text {
+    color: $color-text-main;
+    font-size: $font-xl;
+    font-weight: $font-black;
+  }
+  .sub_text {
+    display: none;
+  }
+}
+
+.AI_logo {
+  width: 124px;
+}
+
+.test-icons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
 }

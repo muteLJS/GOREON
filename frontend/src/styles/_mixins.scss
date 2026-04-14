@@ -124,7 +124,7 @@
 /* -------------------------------------------------------------------------- */
 /* 사용 예시
    .product-card {
-     @include card;
+     @include input();
    }
 */
 @mixin input($bg: $color-white, $radius: $radius-lg, $shadow: $shadow-soft) {
