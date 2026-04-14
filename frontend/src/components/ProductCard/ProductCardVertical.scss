@@ -1,10 +1,26 @@
+@import "styles/variables";
+@import "styles/mixins";
+
 .product-card-vertical {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: $space-sm;
   border-radius: 16px;
   border: 1px solid #60606024;
-  font-size: 0.75rem;
+  font-size: $font-xs;
+  padding: $space-md;
+  font-weight: $font-bold;
+
+  &__thumbnail {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+  }
+
+  &__title {
+    @include ellipsis-multi(2);
+    min-height: $font-xs * $line-height-base * 2;
+  }
 
   &__bottom {
     display: flex;

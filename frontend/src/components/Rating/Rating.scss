@@ -1,9 +1,11 @@
+@import "styles/variables";
+
 .rating {
   display: flex;
-  gap: 4px;
+  gap: $space-xxs;
 
   img {
-    width: 0.75rem;
-    height: 0.75rem;
+    width: $font-xs;
+    height: $font-xs;
   }
 }
