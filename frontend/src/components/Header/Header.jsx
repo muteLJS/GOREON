@@ -13,27 +13,27 @@ import ChevronDown from "assets/icons/chevron-down.svg";
 const categoryMenu = [
   {
     id: 1,
-    key: "pc",
-    title: "PC",
+    key: "computer",
+    title: "컴퓨터",
     items: ["노트북", "데스크탑", "모니터", "키보드", "마우스", "PC 주변기기", "PC 부품"],
   },
   {
     id: 2,
     key: "mobile",
     title: "모바일",
-    items: ["스마트폰"],
+    items: ["스마트폰", "스마트워치", "이어폰"],
   },
   {
     id: 3,
     key: "tablet",
-    title: "테블릿",
-    items: ["테블릿", "데스크탑", "모니터", "키보드", "마우스", "PC 주변기기", "PC 부품"],
+    title: "태블릿",
+    items: ["태블릿", "태블릿 액세서리", "펜슬", "키보드 케이스"],
   },
   {
     id: 4,
     key: "accessory",
-    title: "스마트 액세서리",
-    items: ["무선 이어폰", "스마트워치", "스마트링", "보조배터리"],
+    title: "생활가전",
+    items: ["프린터", "공유기", "웹캠", "보조배터리"],
   },
 ];
 
@@ -42,18 +42,18 @@ const brandMenu = [
     id: 1,
     key: "premium",
     title: "프리미엄",
-    items: ["애플", "삼성", "LG"],
+    items: ["Apple", "Samsung", "LG"],
   },
   {
     id: 2,
     key: "value",
-    title: "가성비 / 일반",
-    items: ["HP", "레노버", "델"],
+    title: "가성비",
+    items: ["HP", "Lenovo", "Dell"],
   },
   {
     id: 3,
     key: "gaming",
-    title: "게이밍 / 특화",
+    title: "게이밍",
     items: ["MSI", "ASUS", "Acer"],
   },
 ];
@@ -61,7 +61,7 @@ const brandMenu = [
 const mobileTabs = [
   { key: "category", label: "품목별" },
   { key: "brand", label: "브랜드별" },
-  { key: "pc-build", label: "PC조립" },
+  { key: "pc-build", label: "PC 조립" },
 ];
 
 const createExpandedState = (items) =>
@@ -79,7 +79,7 @@ function Header() {
   const headerIcons = [
     { id: 1, name: "search", src: Search, alt: "검색" },
     { id: 2, name: "cart", src: Cart, alt: "장바구니" },
-    { id: 3, name: "like", src: Like, alt: "좋아요" },
+    { id: 3, name: "like", src: Like, alt: "찜 목록" },
     { id: 4, name: "user", src: User, alt: "마이페이지" },
   ];
 
@@ -150,19 +150,19 @@ function Header() {
                 key={icon.id}
                 aria-label={icon.alt}
               >
-                <img src={icon.src} alt={icon.alt} />
+                <img src={icon.src} alt="" />
               </button>
             ))}
           </div>
 
           <div className="header__auth">
-            <button type="button">로그아웃</button>
             <button type="button">로그인</button>
+            <button type="button">회원가입</button>
           </div>
         </div>
 
         <button type="button" className="header__mobile-user" aria-label="마이페이지">
-          <img src={User} alt="마이페이지" />
+          <img src={User} alt="" />
         </button>
       </div>
 
@@ -182,7 +182,7 @@ function Header() {
                       <ul className="dropdown__list">
                         {category.items.map((item) => (
                           <li className="dropdown__list-item" key={item}>
-                            <Link to="/">{item}</Link>
+                            <Link to="/category">{item}</Link>
                           </li>
                         ))}
                       </ul>
@@ -207,7 +207,7 @@ function Header() {
                       <ul className="dropdown__list dropdown__list--brand">
                         {group.items.map((brand) => (
                           <li className="dropdown__list-item dropdown__brand-item" key={brand}>
-                            <Link to="/">{brand}</Link>
+                            <Link to="/category">{brand}</Link>
                           </li>
                         ))}
                       </ul>
@@ -219,7 +219,7 @@ function Header() {
           </li>
 
           <li className="gnb__item">
-            <Link to="/" className="gnb__link">
+            <Link to="/pc-assembly" className="gnb__link">
               PC 조립
             </Link>
           </li>
@@ -227,7 +227,7 @@ function Header() {
       </nav>
 
       <div className={`mobile-menu ${isMobileMenuOpen ? "is-open" : ""}`}>
-        <div className="mobile-menu__tabs" role="tablist" aria-label="모바일 카테고리 메뉴">
+        <div className="mobile-menu__tabs" role="tablist" aria-label="모바일 메뉴">
           {mobileTabs.map((tab) => (
             <button
               key={tab.key}
@@ -267,7 +267,7 @@ function Header() {
                     <ul className="mobile-menu__list">
                       {section.items.map((item) => (
                         <li key={item} className="mobile-menu__list-item">
-                          <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Link to="/category" onClick={() => setIsMobileMenuOpen(false)}>
                             {item}
                           </Link>
                         </li>
@@ -303,7 +303,7 @@ function Header() {
                     <ul className="mobile-menu__list mobile-menu__list--brand-text">
                       {section.items.map((item) => (
                         <li key={item} className="mobile-menu__list-item">
-                          <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Link to="/category" onClick={() => setIsMobileMenuOpen(false)}>
                             {item}
                           </Link>
                         </li>
@@ -317,19 +317,21 @@ function Header() {
 
           {activeMobileTab === "pc-build" && (
             <div className="mobile-menu__cta">
-              <p className="mobile-menu__cta-title">PC조립</p>
+              <p className="mobile-menu__cta-title">PC 조립</p>
               <p className="mobile-menu__cta-text">
-                원하는 사양에 맞는 조립 PC 페이지로 바로 이동할 수 있어요.
+                원하는 사양과 예산에 맞는 조립 PC 페이지로 바로 이동할 수 있어요.
               </p>
-              <Link to="/" className="mobile-menu__cta-link" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link
+                to="/pc-assembly"
+                className="mobile-menu__cta-link"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
                 PC 조립 페이지로 이동
               </Link>
             </div>
           )}
         </div>
       </div>
-
-      {/* TODO: 모바일 메뉴 상단에 별도 닫기 아이콘이나 장식 그래픽이 필요해지면 SVG 또는 PNG를 추가해서 연결하면 됩니다. */}
     </header>
   );
 }
