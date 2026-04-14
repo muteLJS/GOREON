@@ -1,6 +1,5 @@
-@use "sass:color";
-@import "../../styles/variables";
-@import "../../styles/mixins";
+@import "styles/variables";
+@import "styles/mixins";
 
 .header {
   --mobile-header-height: 76px;
@@ -73,7 +72,6 @@
     transform $transition-fast,
     visibility $transition-fast;
   overflow-y: auto;
-  border-top: 1px solid rgba($color-black, 0.06);
 }
 
 .mobile-menu.is-open {
@@ -247,7 +245,7 @@ body.mobile-menu-open {
 
   .header__top {
     max-width: $layout-desktop-max-width;
-    height: 102px;
+    height: 86px;
     margin: 0 auto;
     padding: 0 18px;
   }
@@ -265,13 +263,13 @@ body.mobile-menu-open {
 
   .header__icons {
     @include flex(center, flex-start);
-    gap: 28px;
+    gap: 24px;
   }
 
   .header__icon-btn {
     @include flex-center;
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     padding: 0;
     border: 0;
     background: transparent;
@@ -286,17 +284,17 @@ body.mobile-menu-open {
 
   .header__auth {
     @include flex(center, flex-start);
-    gap: 12px;
+    gap: 10px;
 
     button {
-      min-width: 84px;
-      height: 38px;
+      min-width: 78px;
+      height: 34px;
       padding: 0 16px;
       border: 0;
-      border-radius: 12px;
+      border-radius: 10px;
       background: $color-text-sub;
       color: $color-white;
-      font-size: $font-md;
+      font-size: 14px;
       font-weight: $font-bold;
       cursor: pointer;
       transition:
@@ -304,7 +302,7 @@ body.mobile-menu-open {
         transform $transition-fast;
 
       &:hover {
-        background: color.adjust($color-text-sub, $lightness: -5%);
+        background: #089999;
         transform: translateY(-1px);
       }
     }
@@ -318,9 +316,9 @@ body.mobile-menu-open {
 
   .gnb {
     @include flex(center, center);
-    gap: 190px;
+    gap: 220px;
     max-width: $layout-desktop-max-width;
-    height: 72px;
+    height: 54px;
     margin: 0 auto;
     padding: 0 18px;
   }
@@ -330,14 +328,27 @@ body.mobile-menu-open {
     height: 100%;
   }
 
-  .gnb__item--with-dropdown .gnb__button {
+  .gnb__button,
+  .gnb__link {
+    @include flex-center;
     position: relative;
+    height: 100%;
+    padding: 0 6px;
+    border: 0;
+    background: transparent;
+    color: $color-text-sub;
+    font-size: 15px;
+    font-weight: $font-bold;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    text-decoration: none;
 
     &::after {
       content: "";
       position: absolute;
       left: 50%;
-      bottom: -18px;
+      bottom: -1px;
       width: 0;
       height: 2px;
       background: $color-text-sub;
@@ -346,14 +357,11 @@ body.mobile-menu-open {
     }
   }
 
-  .gnb__item--with-dropdown:hover,
-  .gnb__item--with-dropdown:focus-within {
-    .gnb__button {
-      color: $color-text-sub;
-
-      &::after {
-        width: 140px;
-      }
+  .gnb__item:hover,
+  .gnb__item:focus-within {
+    .gnb__button::after,
+    .gnb__link::after {
+      width: calc(100% + 18px);
     }
 
     .dropdown {
@@ -364,38 +372,18 @@ body.mobile-menu-open {
     }
   }
 
-  .gnb__button,
-  .gnb__link {
-    @include flex-center;
-    position: relative;
-    height: 100%;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: $color-text-sub;
-    font-size: 22px;
-    font-weight: $font-bold;
-    line-height: 1;
-    white-space: nowrap;
-    cursor: pointer;
-  }
-
-  .gnb__link {
-    text-decoration: none;
-  }
-
   .dropdown {
     position: absolute;
     top: 100%;
     left: 0;
     width: 100%;
     background: $color-white;
-    border-top: 1px solid rgba($color-black, 0.08);
-    box-shadow: 0 12px 22px rgba($color-black, 0.06);
+    border-top: 1px solid rgba($color-black, 0.05);
+    box-shadow: 0 14px 30px rgba($color-black, 0.07);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transform: translateY(-8px);
+    transform: translateY(-6px);
     transition:
       opacity $transition-fast,
       transform $transition-fast,
@@ -430,7 +418,7 @@ body.mobile-menu-open {
     @include flex-center;
     min-height: 88px;
     padding: 0 24px;
-    border: 2px solid rgba($color-black, 0.14);
+    border: 2px solid rgba($color-black, 0.12);
     border-radius: 14px;
     color: $color-text-main;
     font-size: 22px;
