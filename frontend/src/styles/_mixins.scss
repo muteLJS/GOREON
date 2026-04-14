@@ -75,32 +75,74 @@
 /* 버튼 공통 스타일을 묶어서 재사용할 때 사용합니다.                          */
 /* -------------------------------------------------------------------------- */
 /* 사용 예시
-   .login-btn {
-     @include button-base($color-text-sub, $color-white);
-   }
+   button {
+      @include button-gray();
+    }
 */
-@mixin button-base($bg, $color, $radius: 8px, $padding: 12px 20px) {
-  background-color: $bg;
-  color: $color;
-  border: none;
-  border-radius: $radius;
+@mixin button-base($bg: $color-text-sub, $color: $color-white, $radius: 10px, $padding: 0 16px) {
+  min-width: 78px;
+  height: 34px;
   padding: $padding;
+  border: 0;
+  border-radius: $radius;
+  background: $bg;
+  color: $color;
+  font-size: $font-sm;
+  font-weight: $font-bold;
+  cursor: pointer;
+}
+
+@mixin button-reverse($bg: $color-white, $color: $color-text-sub, $radius: 10px, $padding: 0 16px) {
+  min-width: 78px;
+  height: 34px;
+  padding: $padding;
+  border: 1px solid $color-text-sub;
+  border-radius: $radius;
+  background: $bg;
+  color: $color;
+  font-size: $font-sm;
+  font-weight: $font-bold;
+  cursor: pointer;
+}
+
+@mixin button-gray($bg: $color-layout, $color: $color-gray-600, $radius: 10px, $padding: 0 16px) {
+  min-width: 78px;
+  height: 34px;
+  padding: $padding;
+  border: 0;
+  border-radius: $radius;
+  background: $bg;
+  color: $color;
+  font-size: $font-sm;
+  font-weight: $font-bold;
   cursor: pointer;
 }
 
 /* -------------------------------------------------------------------------- */
-/* [6] 카드 기본형                                                            */
-/* 상품 카드, 박스, 패널 UI에 공통으로 사용합니다.                            */
+/* [6] 인풋참                                                                 */
+/* 로그인, 회원가입 등 인풋창 레이아웃                                        */
 /* -------------------------------------------------------------------------- */
 /* 사용 예시
    .product-card {
      @include card;
    }
 */
-@mixin card($bg: $color-white, $radius: $radius-lg, $shadow: $shadow-soft) {
-  background: $bg;
-  border-radius: $radius;
-  box-shadow: $shadow;
+@mixin input($bg: $color-white, $radius: $radius-lg, $shadow: $shadow-soft) {
+  @include flex(center, start, row);
+  width: 100%;
+  background-color: #ffffff;
+  padding: 17px 26px;
+  border-radius: $radius-lg;
+  border: 1px solid $color-text-sub;
+  gap: 20px;
+  input {
+    border: none;
+    background-color: transparent;
+    color: $color-placeholder;
+    &:focus {
+      outline: none;
+    }
+  }
 }
 
 /* -------------------------------------------------------------------------- */
