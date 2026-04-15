@@ -3,8 +3,9 @@
 /* 설명: 사용 목적과 예산에 맞는 PC 견적을 안내하는 페이지입니다.             */
 /* -------------------------------------------------------------------------- */
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./PcAssembly.scss";
+import Modal from "@/components/Modal/Modal";
 import banner1 from "@/assets/banner/banner-1.jpg";
 import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
 import CheckIcon from "@/assets/icons/check.svg";
@@ -59,6 +60,8 @@ const productList = [
 
 function PcAssembly() {
   const [totalPrice, setTotalPrice] = useState(400000);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+
   return (
     <main className="pc-assembly">
       <section className="pc-assembly__banner">
@@ -67,7 +70,7 @@ function PcAssembly() {
 
       <section className="pc-assembly__top">
         <h2 className="pc-assembly__title">PC 조립</h2>
-        <button className="filter-button">
+        <button className="filter-button" onClick={() => setIsFilterOpen(true)}>
           필터 <img src={ChevronDownIcon} alt="down" />
         </button>
       </section>
@@ -103,6 +106,12 @@ function PcAssembly() {
           </div>
         </section>
       </section>
+
+      {isFilterOpen && (
+        <Modal title="필터" onClose={() => setIsFilterOpen(false)}>
+          필터 내용
+        </Modal>
+      )}
     </main>
   );
 }
