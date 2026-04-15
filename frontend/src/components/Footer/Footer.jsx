@@ -1,5 +1,4 @@
-import styles from "./Footer.module.scss";
-import { registerModuleStyles } from "styles/registerModuleStyles";
+﻿import "./Footer.scss";
 
 import FacebookIcon from "assets/footer/pc/facebook.svg";
 import YoutubeIcon from "assets/footer/pc/youtube.svg";
@@ -11,8 +10,6 @@ import HomeIcon from "assets/footer/mobile/home.svg";
 import SearchIcon from "assets/footer/mobile/search.svg";
 import CartIcon from "assets/footer/mobile/cart.svg";
 import HamburgerIcon from "assets/footer/mobile/hamburger.svg";
-
-registerModuleStyles(styles);
 
 function Footer() {
   const desktopColumns = [

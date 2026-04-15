@@ -1,9 +1,6 @@
-import styles from "./Main.module.scss";
-import { registerModuleStyles } from "styles/registerModuleStyles";
+﻿import "./Main.scss";
 import AI_Logo from "assets/logo/ai/character.svg";
 import Review_user from "assets/Icons/review_user.svg";
-
-registerModuleStyles(styles);
 
 function Main() {
   const handleInput = (e) => {
@@ -84,7 +81,7 @@ function Main() {
             <h4>고르미의 추천을 받고 구매한 고객들의 생생한 리뷰입니다.</h4>
           </div>
           <div className="review_main">
-            <div className="">
+            <div className="AI_box">
               <div className="user_info">
                 <img src={Review_user} alt="review_user_img" />
                 <p className="user_name">User**6*</p>

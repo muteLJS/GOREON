@@ -1,0 +1,103 @@
+﻿@import "styles/variables";
+@import "styles/mixins";
+
+.pc-assembly {
+  &__banner {
+    img {
+      width: 100%;
+    }
+  }
+
+  &__top {
+    display: flex;
+    margin-top: $space-md;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: $font-bold;
+  }
+
+  .filter-button {
+    display: flex;
+    border: 1px solid #60606024;
+    border-radius: 999px;
+    font-size: $font-xs;
+    gap: $space-xs;
+    padding: $space-xxs $space-xs;
+
+    img {
+      width: $font-xs;
+    }
+  }
+
+  &__content {
+    margin-top: $space-md;
+  }
+
+  &__product-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-md;
+  }
+
+  &__add-button {
+    background-color: $color-text-sub;
+    color: $color-white;
+    border-radius: $radius-md;
+    padding: 0 $space-xs;
+  }
+
+  &__bottom {
+    margin-top: $space-md;
+    margin-bottom: $space-md;
+  }
+
+  &__summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $space-md;
+  }
+
+  &__total {
+    @include button-gray();
+    background-color: $color-gray-100;
+    color: $color-text-main;
+  }
+
+  &__list-button {
+    @include button-base();
+  }
+
+  &__compatibility {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-md;
+    margin-top: $space-md;
+    background-color: #0aa5a515;
+    border-radius: $radius-md;
+  }
+
+  &__compatibility-count,
+  &__compatibility-status {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: $space-xs;
+  }
+
+  &__compatibility-count {
+    display: flex;
+    gap: $space-xs;
+    font-weight: $font-bold;
+    font-size: $font-sm;
+  }
+
+  &__compatibility-status {
+    font-size: $font-xs;
+    color: $color-text-sub;
+  }
+}
+

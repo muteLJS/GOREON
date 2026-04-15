@@ -1,0 +1,398 @@
+﻿@import "styles/mixins";
+@import "styles/variables"; // input 박스 컴포넌트 스타일
+
+// Mobile (로그인/회원가입 공통)
+.mobile-login,
+.mobile-register {
+  // 섹션 기본 레이아웃
+  @include flex(center, center, column);
+  width: 100%;
+  padding-top: 40px;
+  padding-bottom: 135px;
+  gap: 50px;
+
+  h2 {
+    font-size: 26px;
+    font-weight: $font-bold;
+  }
+
+  form {
+    // 폼 전체 세로 배치
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 40px;
+
+    & > div:first-child {
+      // 입력 영역 묶음
+      @include flex(center, center, column);
+      gap: 12px;
+
+      .inputBox {
+        // 공통 input mixin 사용
+        @include input();
+        font-size: $font-xs;
+      }
+    }
+  }
+
+  // 로그인/회원가입 버튼 영역
+  .button-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    gap: 12px;
+
+    .button-reverse {
+      @include button-reverse();
+      height: auto;
+      padding-top: 12.5px;
+      padding-bottom: 12.5px;
+      font-size: $font-md;
+    }
+
+    .button-base {
+      @include button-base();
+      width: 100%;
+      height: auto;
+      padding-top: 12.5px;
+      padding-bottom: 12.5px;
+      font-size: $font-md;
+    }
+
+    p {
+      text-align: center;
+      font-size: $font-xs;
+      color: $color-text-sub;
+      font-weight: $font-medium;
+    }
+  }
+
+  // 소셜 로그인 영역
+  .social-container {
+    @include flex(center, center, column);
+    width: 100%;
+    gap: 12px;
+
+    .social {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+
+      p {
+        width: 30%;
+        text-align: center;
+        font-size: 8px;
+      }
+
+      hr {
+        width: 50%;
+        height: 1px;
+        border: none;
+        background-color: $color-text-sub;
+      }
+    }
+
+    .social-icons {
+      @include flex(center, center);
+      gap: 50px;
+    }
+  }
+}
+
+// PC 로그인/회원가입
+
+.pc {
+  // 데스크탑에서 중앙 정렬
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+
+  // 좌/우 패널을 감싸는 메인 카드
+  .container {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow:
+      0 14px 28px rgba(0, 0, 0, 0.25),
+      0 10px 10px rgba(0, 0, 0, 0.22);
+    position: relative;
+    overflow: hidden;
+    width: 1318px;
+    max-width: 100%;
+    min-height: 745px;
+
+    // 회원가입 패널 활성화 상태
+    &.right-panel-active {
+      .sign-in-container {
+        transform: translateX(100%);
+      }
+
+      .sign-up-container {
+        transform: translateX(100%);
+        opacity: 1;
+        z-index: 5;
+        animation: show 0.6s;
+      }
+
+      .overlay-container {
+        transform: translateX(-100%);
+      }
+
+      .overlay {
+        transform: translateX(50%);
+      }
+
+      .overlay-left {
+        transform: translateX(0);
+      }
+
+      .overlay-right {
+        transform: translateX(20%);
+      }
+    }
+  }
+
+  h2 {
+    text-align: center;
+  }
+
+  p {
+    font-size: 20px;
+    font-weight: $font-bold;
+  }
+
+  span {
+    font-size: 12px;
+  }
+
+  a {
+    color: #333;
+    font-size: 14px;
+    text-decoration: none;
+    margin: 0;
+  }
+
+  button {
+    @include button-base();
+    width: 100%;
+    height: auto;
+    padding: 18px;
+  }
+
+  form {
+    // 폼 콘텐츠 수직 중앙 정렬
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 65px;
+    padding: 0 50px;
+    height: 100%;
+    text-align: center;
+
+    // 폼 제목
+    .form-title {
+      font-size: 40px;
+      font-weight: bold;
+    }
+
+    // 이메일/비밀번호 입력 영역
+    .input-container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      gap: 12px;
+
+      .inputBox {
+        @include input();
+        width: 100%;
+        font-size: $font-xs;
+      }
+    }
+
+    // 폼 내부 버튼/링크 묶음
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      gap: 12px;
+    }
+
+    // 폼 내부 소셜 로그인 묶음
+    .social-container {
+      @include flex(center, center, column);
+      width: 100%;
+      gap: 12px;
+
+      .social {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+
+        p {
+          width: 30%;
+          text-align: center;
+          font-size: 8px;
+        }
+
+        hr {
+          width: 50%;
+          height: 1px;
+          border: none;
+          background-color: $color-text-sub;
+        }
+      }
+
+      .social-icons {
+        @include flex(center, center);
+        gap: 50px;
+      }
+    }
+  }
+
+  // 좌/우 슬라이드되는 폼 패널 공통
+  .form-container {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    transition: all 0.6s ease-in-out;
+  }
+
+  // 기본 로그인 폼 위치
+  .sign-in-container {
+    left: 0;
+    width: 50%;
+    z-index: 2;
+  }
+
+  // 기본 회원가입 폼 위치(초기 숨김)
+  .sign-up-container {
+    left: 0;
+    width: 50%;
+    opacity: 0;
+    z-index: 1;
+  }
+
+  // 오버레이(우측 컬러 패널) 컨테이너
+  .overlay-container {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    transition: transform 0.6s ease-in-out;
+    z-index: 100;
+  }
+
+  // 오버레이 배경 및 슬라이드 영역
+  .overlay {
+    background-image: url("../../assets/pc/login/login-side-back.svg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 0 0;
+    color: #fff;
+    position: relative;
+    left: -100%;
+    height: 100%;
+    width: 200%;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+  }
+
+  // 오버레이 좌/우 패널 공통
+  .overlay-panel {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 40px;
+    text-align: center;
+    top: 0;
+    height: 100%;
+    width: 50%;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+    gap: 75px;
+
+    // 오버레이 타이틀 묶음
+    .overlay-title {
+      display: flex;
+      flex-direction: column;
+      gap: 37px;
+
+      h1 {
+        font-size: 40px;
+        font-weight: bold;
+      }
+    }
+
+    // 오버레이 버튼 스타일
+    .button-reverse {
+      @include button-reverse();
+      height: auto;
+      padding: 18px 0;
+      font-size: $font-md;
+      border: none;
+    }
+  }
+
+  // 오버레이 좌측 패널 초기 위치
+  .overlay-left {
+    transform: translateX(-20%);
+  }
+
+  // 오버레이 우측 패널 초기 위치
+  .overlay-right {
+    right: 0;
+    transform: translateX(0);
+  }
+}
+
+// 패널 전환 시 회원가입 폼 표시용 애니메이션
+@keyframes show {
+  0%,
+  49.99% {
+    opacity: 0;
+    z-index: 1;
+  }
+
+  50%,
+  100% {
+    opacity: 1;
+    z-index: 5;
+  }
+}
+
+// 반응형 표시 제어
+.mobile-only {
+  @include mobile {
+    display: flex;
+  }
+  @include tablet-up {
+    display: flex;
+  }
+  @include desktop-up {
+    display: none;
+  }
+}
+
+.pc {
+  @include mobile {
+    display: none;
+  }
+  @include tablet-up {
+    display: none;
+  }
+  @include desktop-up {
+    display: flex;
+  }
+}
+
