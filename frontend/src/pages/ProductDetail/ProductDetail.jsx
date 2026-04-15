@@ -1,5 +1,4 @@
-import styles from "./ProductDetail.module.scss";
-import { registerModuleStyles } from "styles/registerModuleStyles";
+﻿import "./ProductDetail.scss";
 import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -13,8 +12,6 @@ import DetailImage from "assets/img/intel-core-ultra5-250kf-plus-detail-descript
 import LifestyleImage from "assets/img/amd-ryzen5-7400f-raphael-detail-description.jpg";
 import LikeBefore from "assets/icons/like-before.svg";
 import LikeAfter from "assets/icons/like-after.svg";
-
-registerModuleStyles(styles);
 
 const productCatalog = {
   default: {

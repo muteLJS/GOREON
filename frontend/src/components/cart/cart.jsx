@@ -1,12 +1,7 @@
-/* -------------------------------------------------------------------------- */
+﻿/* -------------------------------------------------------------------------- */
 /* [컴포넌트] 장바구니 버튼                                                   */
 /* -------------------------------------------------------------------------- */
-import styles from "./cart.module.scss";
-
-
-import { registerModuleStyles } from "styles/registerModuleStyles";
-
-registerModuleStyles(styles);
+import "./cart.scss";
 
 function Cart({ active = false, onClick }) {
   return (
