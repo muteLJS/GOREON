@@ -1,12 +1,12 @@
-﻿import "./Main.scss";
-import AI_Logo from "assets/logo/ai/character.svg";
-import Review_user from "assets/Icons/review_user.svg";
+import "./Main.scss";
+import AI_Logo from "../../assets/logo/ai/character.svg";
+import ReviewUser from "../../assets/icons/review_user.svg";
 
 function Main() {
   const handleInput = (e) => {
     const el = e.target;
     el.style.height = "auto";
-    el.style.height = el.scrollHeight + "px";
+    el.style.height = `${el.scrollHeight}px`;
   };
 
   return (
@@ -83,7 +83,7 @@ function Main() {
           <div className="review_main">
             <div className="AI_box">
               <div className="user_info">
-                <img src={Review_user} alt="review_user_img" />
+                <img src={ReviewUser} alt="review_user_img" />
                 <p className="user_name">User**6*</p>
               </div>
             </div>

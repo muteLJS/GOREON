@@ -1,18 +1,18 @@
 ﻿import React from "react";
 import { Route, Routes } from "react-router-dom";
 
-import MainLayout from "layouts/MainLayout/MainLayout";
-import Main from "pages/Main/Main";
-import Search from "pages/Search/Search";
-import Login from "pages/Login/Login";
-import Cart from "pages/Cart/Cart";
-import Wishlist from "pages/Wishlist/Wishlist";
-import ProductDetail from "pages/ProductDetail/ProductDetail";
-import Payment from "pages/Payment/Payment";
-import MyPage from "pages/MyPage/MyPage";
-import Category from "pages/Category/Category";
-import PcAssembly from "pages/PcAssembly/PcAssembly";
-import Register from "pages/Register/Register";
+import MainLayout from "./layouts/MainLayout/MainLayout";
+import Main from "./pages/Main/Main";
+import Search from "./pages/Search/Search";
+import Login from "./pages/Login/Login";
+import Cart from "./pages/Cart/Cart";
+import Wishlist from "./pages/Wishlist/Wishlist";
+import ProductDetail from "./pages/ProductDetail/ProductDetail";
+import Payment from "./pages/Payment/Payment";
+import MyPage from "./pages/MyPage/MyPage";
+import Category from "./pages/Category/Category";
+import PcAssembly from "./pages/PcAssembly/PcAssembly";
+import Register from "./pages/Register/Register";
 
 function App() {
   return (
