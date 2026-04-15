@@ -52,6 +52,7 @@
 
   &__bottom {
     margin-top: $space-md;
+    margin-bottom: $space-md;
   }
 
   &__summary-grid {
@@ -62,7 +63,7 @@
 
   &__total {
     @include button-gray();
-    background-color: $color-gray-200;
+    background-color: $color-gray-100;
     color: $color-text-main;
   }
 
