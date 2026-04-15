@@ -1,8 +1,5 @@
-import styles from "./ReviewSection.module.scss";
-import { registerModuleStyles } from "styles/registerModuleStyles";
+﻿import "./ReviewSection.scss";
 import { useState } from "react";
-
-registerModuleStyles(styles);
 
 function ReviewSection({ rating, reviewCount, photoCount, gallery, reviews }) {
   const [isExpanded, setIsExpanded] = useState(false);

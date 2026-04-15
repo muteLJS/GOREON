@@ -1,8 +1,4 @@
-import styles from "./More.module.scss";
-
-import { registerModuleStyles } from "styles/registerModuleStyles";
-
-registerModuleStyles(styles);
+﻿import "./More.scss";
 
 function More() {
   return <section className="more"></section>;

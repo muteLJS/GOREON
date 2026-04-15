@@ -1,18 +1,15 @@
-/* -------------------------------------------------------------------------- */
+﻿/* -------------------------------------------------------------------------- */
 /* [페이지] PC 맞춤 견적 (PcAssembly)                                           */
 /* 설명: 사용 목적과 예산에 맞는 PC 견적을 안내하는 페이지입니다.             */
 /* -------------------------------------------------------------------------- */
 
 import { useState } from "react";
-import styles from "./PcAssembly.module.scss";
-import { registerModuleStyles } from "styles/registerModuleStyles";
+import "./PcAssembly.scss";
 import banner1 from "@/assets/banner/banner-1.jpg";
 import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
 import CheckIcon from "@/assets/icons/check.svg";
 import ProductCardVertical from "@/components/ProductCard/ProductCardVertical";
 import ProductImage from "@/assets/products/product-example.jpg";
-
-registerModuleStyles(styles);
 
 /* productList 더미데이터 */
 const productList = [

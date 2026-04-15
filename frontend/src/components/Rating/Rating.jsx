@@ -1,10 +1,6 @@
-import RatingEmpty from "@/assets/icons/rating-empty.svg";
+﻿import RatingEmpty from "@/assets/icons/rating-empty.svg";
 import RatingFull from "@/assets/icons/rating-full.svg";
-import styles from "./Rating.module.scss";
-
-import { registerModuleStyles } from "styles/registerModuleStyles";
-
-registerModuleStyles(styles);
+import "./Rating.scss";
 
 function Rating({ rating = 5 }) {
   const roundedRating = Math.max(0, Math.min(5, Math.round(Number(rating) || 0)));

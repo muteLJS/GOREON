@@ -1,5 +1,4 @@
-import styles from "./Payment.module.scss";
-import { registerModuleStyles } from "styles/registerModuleStyles";
+﻿import "./Payment.scss";
 
 import { useMemo, useState } from "react";
 
@@ -8,8 +7,6 @@ import KakaoPayIcon from "assets/icons/kakaopay.svg";
 import SamsungPayIcon from "assets/icons/samsungpay.svg";
 import UserIcon from "assets/icons/user.svg";
 import VisaIcon from "assets/icons/visa.svg";
-
-registerModuleStyles(styles);
 
 const PAYMENT_METHODS = [
   {
