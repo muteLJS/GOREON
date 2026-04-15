@@ -39,6 +39,10 @@ $color-button: #d9f4f3;
 // 메인 AI 버튼 외곽선 색
 $color-button-outline: #c5eded;
 
+// 메인 카테고리 텍스트 컬러
+$color-category-text: #003a43;
+$color-sub-category-text: #606060;
+
 // ==========================================
 // 1-1. 공통 사용 alias 컬러
 // 기존 컴포넌트(Header/Footer 등)에서 자주 쓰는 이름들
@@ -80,7 +84,10 @@ $font-xs: 12px;
 $font-sm: 14px;
 $font-md: 16px;
 $font-lg: 18px;
+$font-lg-2: 20px;
+$font-lg-3: 22px;
 $font-xl: 24px;
+$font-xl-2: 28px;
 $font-xxl: 32px;
 $font-display: 48px;
 

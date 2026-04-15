@@ -1,7 +1,11 @@
 /* -------------------------------------------------------------------------- */
 /* [컴포넌트] 찜버튼                                                          */
 /* -------------------------------------------------------------------------- */
-import "./like.scss";
+import styles from "./like.module.scss";
+
+import { registerModuleStyles } from "styles/registerModuleStyles";
+
+registerModuleStyles(styles);
 
 function like() {
   return (

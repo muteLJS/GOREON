@@ -1,4 +1,5 @@
-import "./Header.scss";
+import styles from "./Header.module.scss";
+import { registerModuleStyles } from "styles/registerModuleStyles";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -9,6 +10,8 @@ import Like from "assets/header/header-icons/like.svg";
 import Search from "assets/header/header-icons/search.svg";
 import User from "assets/header/header-icons/user.svg";
 import ChevronDown from "assets/icons/chevron-down.svg";
+
+registerModuleStyles(styles);
 
 const categoryMenu = [
   {

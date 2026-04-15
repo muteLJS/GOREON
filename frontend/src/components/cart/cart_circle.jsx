@@ -1,5 +1,10 @@
 import React from "react";
-import "./cart.scss";
+import styles from "./cart.module.scss";
+
+
+import { registerModuleStyles } from "styles/registerModuleStyles";
+
+registerModuleStyles(styles);
 
 const Cart = () => {
   return (

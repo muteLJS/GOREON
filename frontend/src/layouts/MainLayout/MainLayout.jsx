@@ -1,7 +1,10 @@
-import "./MainLayout.scss";
+import styles from "./MainLayout.module.scss";
+import { registerModuleStyles } from "styles/registerModuleStyles";
 import Header from "components/Header/Header";
 import Footer from "components/Footer/Footer";
 import { Outlet } from "react-router-dom";
+
+registerModuleStyles(styles);
 
 function MainLayout() {
   return (

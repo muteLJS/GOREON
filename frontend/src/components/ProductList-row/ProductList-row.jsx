@@ -3,13 +3,16 @@
 /* 설명: 장바구니에서 사용하는 가로형 상품 카드 UI 컴포넌트입니다.              */
 /* -------------------------------------------------------------------------- */
 
-import "./ProductList-row.scss";
+import styles from "./ProductList-row.module.scss";
+import { registerModuleStyles } from "styles/registerModuleStyles";
 
 import { Link } from "react-router-dom";
 
 import CartIcon from "assets/icons/cart-straight.svg";
 import LikeAfterIcon from "assets/icons/like-after.svg";
 import ProductListNamePrice from "components/ProductList-name,price/ProductList-name,price";
+
+registerModuleStyles(styles);
 
 function formatPrice(price) {
   return `₩ ${price.toLocaleString("ko-KR")}`;
