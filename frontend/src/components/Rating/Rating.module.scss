@@ -1,0 +1,14 @@
+@import "styles/variables";
+
+:global {
+  .rating {
+    display: flex;
+    gap: $space-xxs;
+
+    img {
+      width: $font-xs;
+      height: $font-xs;
+    }
+  }
+
+}

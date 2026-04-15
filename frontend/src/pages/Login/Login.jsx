@@ -1,11 +1,14 @@
 import "../../styles/_mixins.scss";
-import "./Login.scss";
+import styles from "./Login.module.scss";
+import { registerModuleStyles } from "styles/registerModuleStyles";
 import user from "assets/icons/user.svg";
 import lock from "assets/icons/lock.svg";
 import kakao from "assets/icons/kakao.svg";
 import naver from "assets/icons/naver.svg";
 import google from "assets/icons/google.svg";
 import { useState } from "react";
+
+registerModuleStyles(styles);
 
 const MobileLogin = ({ onShowRegister }) => {
   return (
