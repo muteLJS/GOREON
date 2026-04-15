@@ -13,6 +13,7 @@ import MyPage from "pages/MyPage/MyPage";
 import Category from "pages/Category/Category";
 import PcAssembly from "pages/PcAssembly/PcAssembly";
 import Register from "pages/Register/Register";
+import List from "./pages/List/List";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/payment" element={<Payment />} />
         <Route path="/mypage" element={<MyPage />} />
+        <Route path="/list" element={<List />} />
       </Route>
     </Routes>
   );

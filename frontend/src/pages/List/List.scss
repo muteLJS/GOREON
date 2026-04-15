@@ -1,0 +1,30 @@
+@import "styles/variables";
+@import "styles/mixins";
+main {
+  padding: 40px 0;
+}
+.filter-container {
+  display: flex;
+  gap: 6px;
+}
+.pc-assembly__top {
+  span {
+    font-size: $font-xs;
+    margin-left: 4px;
+    font-width: $font-bold;
+  }
+}
+.button-container {
+  display: flex;
+  gap: 5px;
+  .cart-add-button {
+    padding: 5px;
+    background-color: #ffffff;
+    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.25);
+    border-radius: $radius-full;
+    img {
+      width: 10px;
+      height: 11px;
+    }
+  }
+}
