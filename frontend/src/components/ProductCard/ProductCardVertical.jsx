@@ -1,4 +1,4 @@
-import "./ProductCardVertical.scss";
+﻿import "./ProductCardVertical.scss";
 import { useNavigate } from "react-router-dom";
 import Rating from "@/components/Rating/Rating";
 

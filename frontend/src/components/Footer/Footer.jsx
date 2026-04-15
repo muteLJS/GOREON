@@ -1,4 +1,4 @@
-import "./Footer.scss";
+﻿import "./Footer.scss";
 
 import FacebookIcon from "assets/footer/pc/facebook.svg";
 import YoutubeIcon from "assets/footer/pc/youtube.svg";

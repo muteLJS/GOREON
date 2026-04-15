@@ -1,4 +1,4 @@
-import "./ReviewSection.scss";
+﻿import "./ReviewSection.scss";
 import { useState } from "react";
 
 function ReviewSection({ rating, reviewCount, photoCount, gallery, reviews }) {

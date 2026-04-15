@@ -1,4 +1,4 @@
-import "./Payment.scss";
+﻿import "./Payment.scss";
 
 import { useMemo, useState } from "react";
 

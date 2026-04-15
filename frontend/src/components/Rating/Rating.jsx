@@ -1,4 +1,4 @@
-import RatingEmpty from "@/assets/icons/rating-empty.svg";
+﻿import RatingEmpty from "@/assets/icons/rating-empty.svg";
 import RatingFull from "@/assets/icons/rating-full.svg";
 import "./Rating.scss";
 

@@ -1,9 +1,23 @@
-@import "styles/variables";
+﻿@import "styles/variables";
 @import "styles/mixins";
 
 .main-page {
   width: 100%;
   min-height: 100vh;
+  @include flex(center, center, column);
+  gap: 12px;
+
+  h2 {
+    font-weight: $font-bold;
+    font-size: $font-xl-2;
+    color: $color-category-text;
+  }
+
+  h4 {
+    font-weight: $font-medium;
+    font-size: $font-sm;
+    color: $color-sub-category-text;
+  }
 }
 
 .main-page__section {
@@ -14,6 +28,10 @@
 
 .sections {
   padding: 20px 20px;
+}
+
+.hidden {
+  display: none;
 }
 
 .section__AI {
@@ -45,15 +63,16 @@
           background-color: $color-text-sub;
         }
       }
-      .Main_text {
+      .AI_Main_text {
         color: $color-text-main;
         font-size: $font-xl;
         font-weight: $font-black;
-        span {
+
+        .input {
           color: $color-text-sub;
         }
       }
-      .sub_text {
+      .AI_sub_text {
         display: none;
       }
       .AI_Chat_row_2 {
@@ -69,7 +88,7 @@
       }
     }
     .AI_logo {
-      width: 124px;
+      width: 144px;
     }
   }
 }
@@ -78,27 +97,49 @@
   width: 100%;
   background-color: $color-white;
   margin-top: 18px;
+
   .AI_Chat_row_1 {
-    input {
-      width: 100%;
-      border: 1px solid $color-text-sub;
-      border-radius: $radius-ai;
-      padding: 15px 25px;
+    @include flex(flex-start, space-between);
+    width: 100%;
+    border: 1px solid $color-text-sub;
+    border-radius: $radius-ai;
+    padding: 15px 25px;
+    color: $color-text-main;
+
+    textarea {
+      background-color: $color-white;
+      border: none;
       color: $color-text-main;
+      flex: 1;
+      padding: 0;
+      overflow: hidden;
+      color: $color-text-main;
+      font-size: $font-md;
+      font-weight: $font-bold;
+
       &:focus {
         outline: none;
         border-color: $color-text-sub;
         box-shadow: none;
       }
     }
-    input::placeholder {
+    textarea::placeholder {
       color: $color-text-main;
       font-size: $font-md;
       font-weight: $font-bold;
     }
 
     button {
-      width: 100%;
+      width: 22px;
+      height: 22px;
+      padding: 0;
+      @include flex();
+      cursor: pointer;
+
+      svg {
+        width: 100%;
+        height: 100%;
+      }
     }
   }
   .AI_Chat_row_2 {
@@ -106,8 +147,45 @@
   }
 }
 
-.test-icons {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
+.section__AI_Review {
+  background-color: $color-white;
+  @include flex(flex-start, center, column);
+  gap: 12px;
+  .text_box {
+    @include flex(flex-start, center, column);
+    gap: 8px;
+  }
+  .review_main {
+    padding: 34px 20px;
+    @include flex(flex-start, center, column);
+    gap: 17px;
+    border: 1px solid $color-sub-category-text;
+
+    .AI_box {
+    }
+    .user_info {
+      @include flex();
+      gap: 8px;
+      img {
+        width: 34px;
+      }
+
+      .user_name {
+        font-weight: $font-bold;
+        font-size: $font-lg-3;
+        color: $color-category-text;
+      }
+    }
+
+    .item_name,
+    .description {
+      color: inherit;
+    }
+  }
+}
+
+.section__Set_Category,
+.section__Collarborates,
+.section__New_Update {
+  display: block;
 }
