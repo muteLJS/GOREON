@@ -1,6 +1,9 @@
-import "./ProductCardVertical.scss";
+import styles from "./ProductCardVertical.module.scss";
+import { registerModuleStyles } from "styles/registerModuleStyles";
 import { useNavigate } from "react-router-dom";
 import Rating from "@/components/Rating/Rating";
+
+registerModuleStyles(styles);
 
 function ProductCardVertical({ product, action }) {
   const navigate = useNavigate();

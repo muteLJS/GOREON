@@ -3,9 +3,12 @@
 /* 설명: 상품 카드 배열을 받아 반복 렌더링하는 리스트 컴포넌트입니다.           */
 /* -------------------------------------------------------------------------- */
 
-import "./ProductList.scss";
+import styles from "./ProductList.module.scss";
+import { registerModuleStyles } from "styles/registerModuleStyles";
 
 import ProductListRow from "components/ProductList-row/ProductList-row";
+
+registerModuleStyles(styles);
 
 function ProductList({
   items,

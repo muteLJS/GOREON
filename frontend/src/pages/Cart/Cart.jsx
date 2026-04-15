@@ -3,13 +3,16 @@
 /* 설명: 장바구니 상품 목록, 배송지 입력, 결제 금액 UI를 보여주는 페이지입니다. */
 /* -------------------------------------------------------------------------- */
 
-import "./Cart.scss";
+import styles from "./Cart.module.scss";
+import { registerModuleStyles } from "styles/registerModuleStyles";
 
 import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 import ProductList from "components/ProductList/ProductList";
+
+registerModuleStyles(styles);
 
 const FALLBACK_CART_ITEMS = Array.from({ length: 6 }, (_, index) => ({
   id: `fallback-cart-item-${index + 1}`,
