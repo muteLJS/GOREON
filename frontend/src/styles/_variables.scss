@@ -33,6 +33,12 @@ $color-gray-500: #6b7280;
 $color-gray-600: #575757;
 $color-placeholder: #aeaeae;
 
+// 메인 버튼 배경색
+$color-button: #d9f4f3;
+
+// 메인 AI 버튼 외곽선 색
+$color-button-outline: #c5eded;
+
 // ==========================================
 // 1-1. 공통 사용 alias 컬러
 // 기존 컴포넌트(Header/Footer 등)에서 자주 쓰는 이름들
@@ -122,6 +128,7 @@ $radius-lg: 20px;
 $radius-xl: 24px;
 $radius-full: 9999px;
 
+$radius-ai: 40px;
 // Button
 $radius-btn: 10px;
 
