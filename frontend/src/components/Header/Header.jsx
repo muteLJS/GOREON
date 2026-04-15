@@ -71,10 +71,11 @@ const createExpandedState = (items) =>
   }, {});
 
 function Header() {
-  console.log("Header rendering");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMobileTab, setActiveMobileTab] = useState("category");
-  const [expandedCategories, setExpandedCategories] = useState(() => createExpandedState(categoryMenu));
+  const [expandedCategories, setExpandedCategories] = useState(() =>
+    createExpandedState(categoryMenu),
+  );
   const [expandedBrands, setExpandedBrands] = useState(() => createExpandedState(brandMenu));
 
   const headerIcons = [
