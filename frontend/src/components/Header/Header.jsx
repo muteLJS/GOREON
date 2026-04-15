@@ -1,4 +1,4 @@
-import "./Header.scss";
+﻿import "./Header.scss";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -73,7 +73,9 @@ const createExpandedState = (items) =>
 function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMobileTab, setActiveMobileTab] = useState("category");
-  const [expandedCategories, setExpandedCategories] = useState(() => createExpandedState(categoryMenu));
+  const [expandedCategories, setExpandedCategories] = useState(() =>
+    createExpandedState(categoryMenu),
+  );
   const [expandedBrands, setExpandedBrands] = useState(() => createExpandedState(brandMenu));
 
   const headerIcons = [

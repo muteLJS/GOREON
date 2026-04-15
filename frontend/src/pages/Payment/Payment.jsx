@@ -1,4 +1,4 @@
-import "./Payment.scss";
+﻿import "./Payment.scss";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
