@@ -1,43 +1,65 @@
-﻿.icon-btn {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: none;
-  background: #fff;
+@import "styles/variables";
+@import "styles/mixins";
+
+.like-circle {
+  display: inline-flex;
   cursor: pointer;
+  background-color: $color-gray-100;
+  box-shadow: 0 0 2px $color-black;
+  border-radius: $radius-full;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  /* 원형 그림자 */
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
-
-  transition: all 0.2s ease;
-
-  .icon {
-    width: 22px;
-    height: 22px;
+  &__input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
 
-  .icon__stroke {
-    fill: none;
-    stroke: #333;
+  &__button {
+    @include flex-center;
+    width: 30px;
+    height: 30px;
+    border-radius: $radius-full;
+    background-color: $color-white;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    transition: box-shadow $transition-fast;
+  }
+
+  &__icon {
+    width: 20px;
+    height: 20px;
+    display: block;
+  }
+
+  &__heart {
+    fill: transparent;
+    stroke: $color-text-main;
     stroke-width: 1.8;
-    transition: all 0.2s ease;
+    stroke-linejoin: round;
+    transition: fill $transition-fast;
   }
 
-  /* hover */
-  &:hover .icon__stroke {
-    fill: #ff4d4f;
-    stroke: #ff4d4f;
+  &:hover &__button,
+  &__input:focus-visible + &__button {
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
   }
 
-  /* active */
-  &:active .icon__stroke {
-    fill: #d9363e;
-    stroke: #d9363e;
-    transform: scale(0.95);
+  &__input:checked + &__button &__heart {
+    fill: $color-text-main;
+  }
+
+  &--sm,
+  &.icon_like {
+    .like-circle__button {
+      width: 24px;
+      height: 24px;
+    }
+
+    .like-circle__icon {
+      width: 14px;
+      height: 14px;
+    }
   }
 }
-
