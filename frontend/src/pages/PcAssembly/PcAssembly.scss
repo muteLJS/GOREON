@@ -116,4 +116,86 @@
       font-weight: $font-bold;
     }
   }
+
+  &__desktop {
+    display: none;
+  }
+}
+
+@include desktop-up {
+  .pc-assembly {
+    &__title {
+      margin: 0 auto;
+      font-size: $font-xxl;
+      font-weight: $font-bold;
+    }
+
+    &__content {
+      display: none;
+    }
+
+    &__desktop {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 24px;
+      margin-top: $space-lg;
+      margin-bottom: $space-lg;
+    }
+
+    &__sidebar {
+      grid-column: span 3;
+      display: flex;
+      flex-direction: column;
+      gap: $space-md;
+    }
+
+    &__desktop-filter {
+      border-radius: 16px;
+      border: 1px solid #60606024;
+      overflow: hidden;
+    }
+
+    &__desktop-filter-title {
+      font-weight: $font-bold;
+      background-color: $color-gray-100;
+      padding: $space-md;
+      font-size: $font-lg;
+    }
+
+    &__desktop-filter-list {
+      padding: $space-md;
+      .pc-assembly__filter-category {
+        font-size: $font-md;
+        padding-left: 0;
+      }
+    }
+
+    &__main {
+      grid-column: span 9;
+      display: flex;
+      flex-direction: column;
+      gap: $space-md;
+    }
+
+    &__desktop-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: $space-md;
+    }
+
+    &__compatibility {
+      margin-top: 0;
+      flex: 1;
+    }
+
+    &__desktop-list {
+      display: flex;
+      flex-direction: column;
+      gap: $space-md;
+    }
+    .filter-button {
+      display: none;
+    }
+  }
 }

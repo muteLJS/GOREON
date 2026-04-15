@@ -5,11 +5,14 @@
 
 import { useState } from "react";
 import "./PcAssembly.scss";
+
+import ProductCardVertical from "@/components/ProductCard/ProductCardVertical";
+import ProductCardHorizontal from "@/components/ProductCard/ProductCardHorizontal";
 import Modal from "@/components/Modal/Modal";
+
 import banner1 from "@/assets/banner/banner-1.jpg";
 import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
 import CheckIcon from "@/assets/icons/check.svg";
-import ProductCardVertical from "@/components/ProductCard/ProductCardVertical";
 import ProductImage from "@/assets/products/product-example.jpg";
 
 /* productList 더미데이터 */
@@ -66,6 +69,21 @@ function PcAssembly() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("CPU");
 
+  const filterContent = (
+    <div className="pc-assembly__filter">
+      {categories.map((category) => (
+        <button
+          key={category}
+          type="button"
+          className={`pc-assembly__filter-category ${selectedCategory === category ? "is-active" : ""}`}
+          onClick={() => setSelectedCategory(category)}
+        >
+          {category}
+        </button>
+      ))}
+    </div>
+  );
+
   return (
     <main className="pc-assembly">
       <section className="pc-assembly__banner">
@@ -111,20 +129,50 @@ function PcAssembly() {
         </section>
       </section>
 
-      {isFilterOpen && (
-        <Modal title="필터" onClose={() => setIsFilterOpen(false)}>
-          <div className="pc-assembly__filter">
-            {categories.map((category) => (
-              <button
-                key={category}
-                type="button"
-                className={`pc-assembly__filter-category ${selectedCategory === category ? "is-active" : ""}`}
-                onClick={() => setSelectedCategory(category)}
-              >
-                {category}
-              </button>
+      <section className="pc-assembly__desktop">
+        <aside className="pc-assembly__sidebar">
+          <button className="pc-assembly__total">
+            TOTAL : ₩{totalPrice.toLocaleString("ko-KR")}
+          </button>
+
+          <div className="pc-assembly__desktop-filter">
+            <div className="pc-assembly__desktop-filter-title">카테고리</div>
+            <div className="pc-assembly__desktop-filter-list">{filterContent}</div>
+          </div>
+        </aside>
+
+        <div className="pc-assembly__main">
+          <section className="pc-assembly__desktop-top">
+            <div className="pc-assembly__compatibility">
+              <div className="pc-assembly__compatibility-count">
+                <img src={CheckIcon} alt="체크" />
+                부품 6개 선택
+              </div>
+              <div className="pc-assembly__compatibility-status">호환성 모두 이상 없음</div>
+            </div>
+
+            <button className="pc-assembly__list-button">견적 리스트</button>
+          </section>
+
+          <div className="pc-assembly__desktop-list">
+            {productList.map((product) => (
+              <ProductCardHorizontal
+                key={product.id}
+                product={product}
+                action={
+                  <button className="pc-assembly__add-button" type="button">
+                    담기
+                  </button>
+                }
+              />
             ))}
           </div>
+        </div>
+      </section>
+
+      {isFilterOpen && (
+        <Modal title="필터" onClose={() => setIsFilterOpen(false)}>
+          {filterContent}
         </Modal>
       )}
     </main>
