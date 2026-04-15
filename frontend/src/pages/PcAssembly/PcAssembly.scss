@@ -99,5 +99,21 @@
     font-size: $font-xs;
     color: $color-text-sub;
   }
-}
 
+  &__filter {
+    display: flex;
+    flex-direction: column;
+    gap: $space-xs;
+    align-items: start;
+    font-size: $font-sm;
+  }
+
+  &__filter-category {
+    color: $color-text-muted;
+
+    &.is-active {
+      color: $color-text-main;
+      font-weight: $font-bold;
+    }
+  }
+}

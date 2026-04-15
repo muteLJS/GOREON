@@ -58,9 +58,13 @@ const productList = [
   },
 ];
 
+/* 필터 더미데이터 */
+const categories = ["CPU", "램", "메인보드", "그래픽카드", "저장장치", "케이스", "파워"];
+
 function PcAssembly() {
   const [totalPrice, setTotalPrice] = useState(400000);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("CPU");
 
   return (
     <main className="pc-assembly">
@@ -109,7 +113,18 @@ function PcAssembly() {
 
       {isFilterOpen && (
         <Modal title="필터" onClose={() => setIsFilterOpen(false)}>
-          필터 내용
+          <div className="pc-assembly__filter">
+            {categories.map((category) => (
+              <button
+                key={category}
+                type="button"
+                className={`pc-assembly__filter-category ${selectedCategory === category ? "is-active" : ""}`}
+                onClick={() => setSelectedCategory(category)}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
         </Modal>
       )}
     </main>
