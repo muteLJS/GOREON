@@ -4,19 +4,19 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 
-import AddressModal from "components/AddressModal/AddressModal";
-import CreditCardIcon from "assets/icons/creditcard.svg";
-import KakaoPayIcon from "assets/icons/kakaopay.svg";
-import SamsungPayIcon from "assets/icons/samsungpay.svg";
-import UserIcon from "assets/icons/user.svg";
-import VisaIcon from "assets/icons/visa.svg";
+import AddressModal from "../../components/AddressModal/AddressModal";
+import CreditCardIcon from "../../assets/icons/creditcard.svg";
+import KakaoPayIcon from "../../assets/icons/kakaopay.svg";
+import SamsungPayIcon from "../../assets/icons/samsungpay.svg";
+import UserIcon from "../../assets/icons/user.svg";
+import VisaIcon from "../../assets/icons/visa.svg";
 import {
   EMPTY_SHIPPING_FORM,
   createCartItems,
   formatPrice,
   getCartItems,
   summarizeOrder,
-} from "utils/cart";
+} from "../../utils/cart";
 
 const PAYMENT_OPTIONS = [
   { id: "card", label: "신용 카드", icon: CreditCardIcon, iconAlt: "신용 카드", available: true },

@@ -1,15 +1,15 @@
 ﻿import "./Footer.scss";
 
-import FacebookIcon from "assets/footer/pc/facebook.svg";
-import YoutubeIcon from "assets/footer/pc/youtube.svg";
-import InstagramIcon from "assets/footer/pc/instagram.svg";
-import ArrowRightIcon from "assets/footer/pc/arrow-right.svg";
-import FooterLogoIcon from "assets/logo/logo/icon.svg";
+import FacebookIcon from "../../assets/footer/pc/facebook.svg";
+import YoutubeIcon from "../../assets/footer/pc/youtube.svg";
+import InstagramIcon from "../../assets/footer/pc/instagram.svg";
+import ArrowRightIcon from "../../assets/footer/pc/arrow-right.svg";
+import FooterLogoIcon from "../../assets/logo/logo/icon.svg";
 
-import HomeIcon from "assets/footer/mobile/home.svg";
-import SearchIcon from "assets/footer/mobile/search.svg";
-import CartIcon from "assets/footer/mobile/cart.svg";
-import HamburgerIcon from "assets/footer/mobile/hamburger.svg";
+import HomeIcon from "../../assets/footer/mobile/home.svg";
+import SearchIcon from "../../assets/footer/mobile/search.svg";
+import CartIcon from "../../assets/footer/mobile/cart.svg";
+import HamburgerIcon from "../../assets/footer/mobile/hamburger.svg";
 
 function Footer() {
   const desktopColumns = [

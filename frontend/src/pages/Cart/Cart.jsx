@@ -1,4 +1,4 @@
-﻿/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 /* [페이지] 장바구니 (Cart)                                                    */
 /* 설명: 장바구니 상품 목록, 배송지 입력, 결제 금액 UI를 보여주는 페이지입니다. */
 /* -------------------------------------------------------------------------- */
@@ -9,9 +9,14 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
-import AddressModal from "components/AddressModal/AddressModal";
-import ProductList from "components/ProductList/ProductList";
-import { EMPTY_SHIPPING_FORM, formatPrice, getCartItems, summarizeOrder } from "utils/cart";
+import AddressModal from "../../components/AddressModal/AddressModal";
+import ProductList from "../../components/ProductList/ProductList";
+import {
+  EMPTY_SHIPPING_FORM,
+  formatPrice,
+  getCartItems,
+  summarizeOrder,
+} from "../../utils/cart";
 
 export default function Cart() {
   const storedCartItems = useSelector((state) => state.cart.items);
@@ -96,17 +101,20 @@ export default function Cart() {
     setIsAddressModalOpen(false);
   }, []);
 
-  const handleAddressSelect = useCallback((data) => {
-    const address = data.userSelectedType === "R" ? data.roadAddress : data.jibunAddress;
+  const handleAddressSelect = useCallback(
+    (data) => {
+      const address = data.userSelectedType === "R" ? data.roadAddress : data.jibunAddress;
 
-    setShippingForm((prevShippingForm) => ({
-      ...prevShippingForm,
-      postalCode: data.zonecode ?? "",
-      address,
-      addressDetail: "",
-    }));
-    closeAddressModal();
-  }, [closeAddressModal]);
+      setShippingForm((prevShippingForm) => ({
+        ...prevShippingForm,
+        postalCode: data.zonecode ?? "",
+        address,
+        addressDetail: "",
+      }));
+      closeAddressModal();
+    },
+    [closeAddressModal],
+  );
 
   return (
     <section className="cart-page">
