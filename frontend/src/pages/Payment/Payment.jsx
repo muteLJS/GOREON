@@ -1,41 +1,30 @@
 ﻿import "./Payment.scss";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 
+import AddressModal from "components/AddressModal/AddressModal";
 import CreditCardIcon from "assets/icons/creditcard.svg";
 import KakaoPayIcon from "assets/icons/kakaopay.svg";
 import SamsungPayIcon from "assets/icons/samsungpay.svg";
 import UserIcon from "assets/icons/user.svg";
 import VisaIcon from "assets/icons/visa.svg";
+import {
+  EMPTY_SHIPPING_FORM,
+  createCartItems,
+  formatPrice,
+  getCartItems,
+  summarizeOrder,
+} from "utils/cart";
 
-const PAYMENT_METHODS = [
-  {
-    id: "card",
-    label: "실물 카드",
-    icon: CreditCardIcon,
-    iconAlt: "실물 카드",
-  },
-  {
-    id: "kakao-pay",
-    label: "카카오 페이",
-    icon: KakaoPayIcon,
-    iconAlt: "카카오 페이",
-  },
-  {
-    id: "samsung-pay",
-    label: "삼성 페이",
-    icon: SamsungPayIcon,
-    iconAlt: "삼성 페이",
-  },
+const PAYMENT_OPTIONS = [
+  { id: "card", label: "신용 카드", icon: CreditCardIcon, iconAlt: "신용 카드", available: true },
+  { id: "kakao-pay", label: "카카오 페이", icon: KakaoPayIcon, iconAlt: "카카오 페이", available: false },
+  { id: "samsung-pay", label: "삼성 페이", icon: SamsungPayIcon, iconAlt: "삼성 페이", available: false },
 ];
 
-const ORDER_ITEMS = [
-  { id: "payment-item-1", name: "상품명", quantity: 1, amount: 10000 },
-  { id: "payment-item-2", name: "상품명", quantity: 1, amount: 10000 },
-  { id: "payment-item-3", name: "상품명", quantity: 1, amount: 10000 },
-];
-
-const INITIAL_PAYMENT_FORM = {
+const EMPTY_CARD_FORM = {
   cardNumber: "",
   cardHolder: "",
   expiryDate: "",
@@ -43,103 +32,92 @@ const INITIAL_PAYMENT_FORM = {
   saveCard: true,
 };
 
-const INITIAL_SHIPPING_FORM = {
-  recipient: "",
-  phone: "",
-  address: "",
-  addressDetail: "",
-};
-
-function formatPrice(amount) {
-  return `₩${amount.toLocaleString("ko-KR")}`;
+function cx(...classNames) {
+  return classNames.filter(Boolean).join(" ");
 }
 
-function PaymentSection({ title, titleClassName = "", children, className = "" }) {
-  const sectionClassName = ["payment-page__section", className].filter(Boolean).join(" ");
-  const headingClassName = ["payment-page__section-title", titleClassName].filter(Boolean).join(" ");
-
+function Section({ title, titleClassName, children }) {
   return (
-    <section className={sectionClassName}>
-      {title ? <h3 className={headingClassName}>{title}</h3> : null}
+    <section>
+      {title ? <h3 className={cx("payment-page__section-title", titleClassName)}>{title}</h3> : null}
       {children}
     </section>
   );
 }
 
-function PaymentMethodCard({ method, isSelected, onSelect }) {
-  const buttonClassName = [
-    "payment-page__method-card",
-    isSelected ? "payment-page__method-card--active" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
-
+function MethodOption({ option, isSelected, onClick }) {
   return (
     <button
       type="button"
-      className={buttonClassName}
-      onClick={() => onSelect(method.id)}
+      className={cx("payment-page__method-option", isSelected && "payment-page__method-option--active")}
+      onClick={() => onClick(option)}
       aria-pressed={isSelected}
+      aria-disabled={!option.available}
     >
-      <div className="payment-page__method-icon-wrap">
-        <img src={method.icon} alt={method.iconAlt} className="payment-page__method-icon" />
-      </div>
-      <span className="payment-page__method-label">{method.label}</span>
+      <span className="payment-page__method-icon-box">
+        <img src={option.icon} alt={option.iconAlt} className="payment-page__method-icon" />
+      </span>
+      <span className="payment-page__method-label">{option.label}</span>
     </button>
   );
 }
 
-function PaymentField({ label, children, className = "" }) {
-  const fieldClassName = ["payment-page__field", className].filter(Boolean).join(" ");
-
+function Field({ label, className, children }) {
   return (
-    <label className={fieldClassName}>
+    <label className={cx("payment-page__field", className)}>
       <span className="payment-page__field-label">{label}</span>
       {children}
     </label>
   );
 }
 
-function PaymentInput({ icon, iconAlt = "", className = "", ...props }) {
-  const wrapperClassName = ["payment-page__input-wrap", className].filter(Boolean).join(" ");
-
+function TextField({ icon, iconAlt = "", className, ...inputProps }) {
   return (
-    <div className={wrapperClassName}>
+    <div className={cx("payment-page__input", className)}>
       {icon ? <img src={icon} alt={iconAlt} className="payment-page__input-icon" /> : null}
-      <input {...props} />
+      <input {...inputProps} />
     </div>
   );
 }
 
 export default function Payment() {
-  const [selectedMethod, setSelectedMethod] = useState(PAYMENT_METHODS[0].id);
-  const [paymentForm, setPaymentForm] = useState(INITIAL_PAYMENT_FORM);
-  const [shippingForm, setShippingForm] = useState(INITIAL_SHIPPING_FORM);
-
-  const productCount = useMemo(
-    () => ORDER_ITEMS.reduce((total, item) => total + item.quantity, 0),
-    []
-  );
-  const orderTotal = useMemo(
-    () => ORDER_ITEMS.reduce((total, item) => total + item.quantity * item.amount, 0),
-    []
+  const { state } = useLocation();
+  const storedCartItems = useSelector((store) => store.cart.items);
+  const initialShippingForm = useMemo(
+    () => ({
+      ...EMPTY_SHIPPING_FORM,
+      ...state?.shippingForm,
+    }),
+    [state?.shippingForm],
   );
 
-  const paymentRows = useMemo(
-    () =>
-      ORDER_ITEMS.map((item) => ({
-        id: item.id,
-        label: `${item.quantity} X ${item.name}`,
-        amount: formatPrice(item.quantity * item.amount),
-      })),
-    []
+  const [selectedMethodId, setSelectedMethodId] = useState(PAYMENT_OPTIONS[0].id);
+  const [cardForm, setCardForm] = useState(EMPTY_CARD_FORM);
+  const [shippingForm, setShippingForm] = useState(initialShippingForm);
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+
+  const orderItems = useMemo(() => {
+    if (Array.isArray(state?.orderItems)) {
+      return createCartItems(state.orderItems);
+    }
+
+    return getCartItems(storedCartItems);
+  }, [state?.orderItems, storedCartItems]);
+
+  const { productCount, orderTotal, summaryLines } = useMemo(
+    () => summarizeOrder(orderItems),
+    [orderItems],
   );
 
-  const handlePaymentFieldChange = ({ target }) => {
+  useEffect(() => {
+    setShippingForm(initialShippingForm);
+  }, [initialShippingForm]);
+
+  const handleCardFieldChange = ({ target }) => {
     const { name, value, type, checked } = target;
 
-    setPaymentForm((prev) => ({
-      ...prev,
+    setCardForm((prevCardForm) => ({
+      ...prevCardForm,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
@@ -147,15 +125,44 @@ export default function Payment() {
   const handleShippingFieldChange = ({ target }) => {
     const { name, value } = target;
 
-    setShippingForm((prev) => ({
-      ...prev,
+    setShippingForm((prevShippingForm) => ({
+      ...prevShippingForm,
       [name]: value,
     }));
   };
 
+  const handleMethodClick = (option) => {
+    if (!option.available) {
+      window.alert("서비스 준비중입니다.");
+      return;
+    }
+
+    setSelectedMethodId(option.id);
+  };
+
+  const openAddressModal = () => {
+    setIsAddressModalOpen(true);
+  };
+
+  const closeAddressModal = useCallback(() => {
+    setIsAddressModalOpen(false);
+  }, []);
+
+  const handleAddressSelect = useCallback((data) => {
+    const address = data.userSelectedType === "R" ? data.roadAddress : data.jibunAddress;
+
+    setShippingForm((prevShippingForm) => ({
+      ...prevShippingForm,
+      postalCode: data.zonecode ?? "",
+      address,
+      addressDetail: "",
+    }));
+    closeAddressModal();
+  }, [closeAddressModal]);
+
   return (
     <section className="payment-page">
-      <div className="payment-page__hero">
+      <div className="payment-page__header">
         <h2 className="payment-page__title">결제</h2>
 
         <div className="payment-page__progress" aria-label="주문 단계">
@@ -172,168 +179,161 @@ export default function Payment() {
       </div>
 
       <div className="payment-page__layout">
-        <div className="payment-page__main">
-          <PaymentSection title="결제수단" titleClassName="payment-page__section-title--desktop-only">
-            <div className="payment-page__method-grid">
-              {PAYMENT_METHODS.map((method) => (
-                <PaymentMethodCard
-                  key={method.id}
-                  method={method}
-                  isSelected={selectedMethod === method.id}
-                  onSelect={setSelectedMethod}
+        <div className="payment-page__content">
+          <Section title="결제수단" titleClassName="payment-page__section-title--desktop">
+            <div className="payment-page__method-list">
+              {PAYMENT_OPTIONS.map((option) => (
+                <MethodOption
+                  key={option.id}
+                  option={option}
+                  isSelected={selectedMethodId === option.id}
+                  onClick={handleMethodClick}
                 />
               ))}
             </div>
-          </PaymentSection>
+          </Section>
 
-          <PaymentSection title="결제정보">
-            <div className="payment-page__form-box">
-              <PaymentField label="카드번호">
-                <PaymentInput
+          <Section title="결제정보">
+            <div className="payment-page__card">
+              <Field label="카드번호">
+                <TextField
                   type="text"
                   name="cardNumber"
-                  value={paymentForm.cardNumber}
-                  onChange={handlePaymentFieldChange}
+                  value={cardForm.cardNumber}
+                  onChange={handleCardFieldChange}
                   placeholder="1234 5678 0123 4567"
                   icon={VisaIcon}
                   iconAlt="Visa"
                 />
-              </PaymentField>
+              </Field>
 
-              <PaymentField label="카드 명의자">
-                <PaymentInput
+              <Field label="카드 명의자">
+                <TextField
                   type="text"
                   name="cardHolder"
-                  value={paymentForm.cardHolder}
-                  onChange={handlePaymentFieldChange}
+                  value={cardForm.cardHolder}
+                  onChange={handleCardFieldChange}
                   placeholder="이름을 입력하세요."
                   icon={UserIcon}
-                  iconAlt=""
                 />
-              </PaymentField>
+              </Field>
 
-              <div className="payment-page__field-grid">
-                <PaymentField label="유효기간">
-                  <PaymentInput
+              <div className="payment-page__field-row">
+                <Field label="유효기간">
+                  <TextField
                     type="text"
                     name="expiryDate"
-                    value={paymentForm.expiryDate}
-                    onChange={handlePaymentFieldChange}
+                    value={cardForm.expiryDate}
+                    onChange={handleCardFieldChange}
                     placeholder="00 / 00"
                   />
-                </PaymentField>
+                </Field>
 
-                <PaymentField label="CVC">
-                  <PaymentInput
+                <Field label="CVC">
+                  <TextField
                     type="text"
                     name="cvc"
-                    value={paymentForm.cvc}
-                    onChange={handlePaymentFieldChange}
+                    value={cardForm.cvc}
+                    onChange={handleCardFieldChange}
                     placeholder="카드 뒷면 3자리"
                   />
-                </PaymentField>
+                </Field>
               </div>
 
-              <label className="payment-page__checkbox">
+              <label className="payment-page__save-card">
                 <input
                   type="checkbox"
                   name="saveCard"
-                  checked={paymentForm.saveCard}
-                  onChange={handlePaymentFieldChange}
+                  checked={cardForm.saveCard}
+                  onChange={handleCardFieldChange}
                 />
-                <span className="payment-page__checkbox-mark" />
-                <span className="payment-page__checkbox-label">카드정보 저장</span>
+                <span className="payment-page__save-card-mark" />
+                <span className="payment-page__save-card-label">카드정보 저장</span>
               </label>
             </div>
-          </PaymentSection>
+          </Section>
         </div>
 
-        <div className="payment-page__side">
-          <PaymentSection title="배송지 확인">
-            <div className="payment-page__form-box payment-page__form-box--shipping">
-              <label className="payment-page__field payment-page__field--shipping">
-                <span className="payment-page__field-label">수령인</span>
-                <div className="payment-page__input-wrap payment-page__input-wrap--shipping">
-                  <input
+        <div className="payment-page__sidebar">
+          <Section title="배송지 확인">
+            <div className="payment-page__card payment-page__card--shipping">
+              <Field label="수령인" className="payment-page__field--shipping">
+                <TextField
+                  type="text"
+                  name="recipient"
+                  value={shippingForm.recipient}
+                  onChange={handleShippingFieldChange}
+                  placeholder="받는 분 이름을 입력해 주세요."
+                  className="payment-page__input--shipping"
+                />
+              </Field>
+
+              <Field label="연락처" className="payment-page__field--shipping">
+                <TextField
+                  type="tel"
+                  name="phone"
+                  value={shippingForm.phone}
+                  onChange={handleShippingFieldChange}
+                  placeholder="010-0000-0000"
+                  className="payment-page__input--shipping"
+                />
+              </Field>
+
+              <Field label="배송지" className="payment-page__field--shipping">
+                <TextField
+                  type="text"
+                  name="postalCode"
+                  value={shippingForm.postalCode}
+                  placeholder="우편번호"
+                  className="payment-page__input--shipping"
+                  readOnly
+                />
+
+                <div className="payment-page__address-row">
+                  <TextField
                     type="text"
-                    name="recipient"
-                    value={shippingForm.recipient}
-                    onChange={handleShippingFieldChange}
-                    placeholder="받는 분 이름을 입력해 주세요."
+                    name="address"
+                    value={shippingForm.address}
+                    placeholder="주소를 검색하세요."
+                    className="payment-page__input--shipping"
+                    readOnly
                   />
-                </div>
-              </label>
-
-              <label className="payment-page__field payment-page__field--shipping">
-                <span className="payment-page__field-label">연락처</span>
-                <div className="payment-page__input-wrap payment-page__input-wrap--shipping">
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={shippingForm.phone}
-                    onChange={handleShippingFieldChange}
-                    placeholder="010-0000-0000"
-                  />
-                </div>
-              </label>
-
-              <div className="payment-page__field payment-page__field--shipping">
-                <span className="payment-page__field-label">배송지</span>
-
-                <div className="payment-page__address-row payment-page__address-row--shipping">
-                  <div className="payment-page__input-wrap payment-page__input-wrap--shipping">
-                    <input
-                      type="text"
-                      name="address"
-                      value={shippingForm.address}
-                      onChange={handleShippingFieldChange}
-                      placeholder="주소를 검색하세요"
-                    />
-                  </div>
                   <button
                     type="button"
-                    className="payment-page__address-button payment-page__address-button--shipping"
+                    className="payment-page__address-button"
+                    onClick={openAddressModal}
                   >
                     검색
                   </button>
                 </div>
 
-                <div className="payment-page__address-row payment-page__address-row--shipping">
-                  <div className="payment-page__input-wrap payment-page__input-wrap--shipping">
-                    <input
-                      type="text"
-                      name="addressDetail"
-                      value={shippingForm.addressDetail}
-                      onChange={handleShippingFieldChange}
-                      placeholder="상세 주소를 입력하세요."
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    className="payment-page__address-button payment-page__address-button--shipping"
-                  >
-                    저장
-                  </button>
-                </div>
-              </div>
+                <TextField
+                  type="text"
+                  name="addressDetail"
+                  value={shippingForm.addressDetail}
+                  onChange={handleShippingFieldChange}
+                  placeholder="상세 주소를 입력하세요."
+                  className="payment-page__input--shipping"
+                />
+              </Field>
             </div>
-          </PaymentSection>
+          </Section>
 
-          <PaymentSection title="결제 금액">
-            <div className="payment-page__summary-box">
-              <div className="payment-page__summary-title">
+          <Section title="결제 금액">
+            <div className="payment-page__summary-card">
+              <div className="payment-page__summary-count">
                 상품 총 {String(productCount).padStart(2, "0")}건
               </div>
 
               <div className="payment-page__summary-list">
-                {paymentRows.map((row) => (
-                  <div className="payment-page__summary-row" key={row.id}>
-                    <span>{row.label}</span>
-                    <strong>{row.amount}</strong>
+                {summaryLines.map((line) => (
+                  <div className="payment-page__summary-line" key={line.id}>
+                    <span>{line.label}</span>
+                    <strong>{line.amount}</strong>
                   </div>
                 ))}
 
-                <div className="payment-page__summary-row">
+                <div className="payment-page__summary-line">
                   <span>배송비</span>
                   <strong>무료배송</strong>
                 </div>
@@ -344,13 +344,19 @@ export default function Payment() {
                 <strong>{formatPrice(orderTotal)}</strong>
               </div>
             </div>
-          </PaymentSection>
+          </Section>
 
-          <button type="button" className="payment-page__submit-button">
+          <button type="button" className="payment-page__submit">
             결제하기
           </button>
         </div>
       </div>
+
+      <AddressModal
+        isOpen={isAddressModalOpen}
+        onClose={closeAddressModal}
+        onSelectAddress={handleAddressSelect}
+      />
     </section>
   );
 }
