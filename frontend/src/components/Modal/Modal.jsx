@@ -1,4 +1,4 @@
-/* [컴포넌트] 모달창 (Modal)                   */                                           */
+/* [컴포넌트] 모달창 (Modal)                   */
 /* 모바일에서 모달창을 그리는 컴포넌트 입니다. */
 import { useEffect } from "react";
 import "./Modal.scss";
