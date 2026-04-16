@@ -12,6 +12,7 @@ import Payment from "./pages/Payment/Payment";
 import MyPage from "./pages/MyPage/MyPage";
 import Category from "./pages/Category/Category";
 import PcAssembly from "./pages/PcAssembly/PcAssembly";
+import PcAssemblyQuote from "./pages/PcAssemblyQuote/PcAssemblyQuote";
 import Register from "./pages/Register/Register";
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
         <Route path="/search" element={<Search />} />
         <Route path="/category" element={<Category />} />
         <Route path="/pc-assembly" element={<PcAssembly />} />
+        <Route path="/pc-assembly-quote" element={<PcAssemblyQuote />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/cart" element={<Cart />} />
