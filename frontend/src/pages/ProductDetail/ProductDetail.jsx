@@ -3,6 +3,21 @@ import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
+﻿import "./ProductDetail.scss";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+
+import ReviewSection from "../../components/ReviewSection/ReviewSection";
+import { addToCart } from "../../store/slices/cartSlice";
+import { addToWishlist, removeFromWishlist } from "../../store/slices/wishlistSlice";
+import LikeBefore from "../../assets/icons/like-before.svg";
+import LikeAfter from "../../assets/icons/like-after.svg";
+import ChevronDown from "../../assets/icons/chevron-down.svg";
+import { getProductDetailById } from "../../data/products";
+
+const formatPrice = (price) => `₩${price.toLocaleString("ko-KR")}`;
+
 import ReviewSection from "../../components/ReviewSection/ReviewSection";
 import { addToCart } from "../../store/slices/cartSlice";
 import { addToWishlist, removeFromWishlist } from "../../store/slices/wishlistSlice";
@@ -144,6 +159,7 @@ const productCatalog = {
 
 const formatPrice = (price) => `W ${price.toLocaleString("ko-KR")}`;
 
+
 function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -153,11 +169,31 @@ function ProductDetail() {
   const overviewRef = useRef(null);
   const reviewsRef = useRef(null);
 
-  const product = productCatalog[id] || productCatalog.default;
+  const product = getProductDetailById(id);
   const [selectedOptionId, setSelectedOptionId] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("overview");
   const [isOverviewExpanded, setIsOverviewExpanded] = useState(false);
+
+  if (!product) {
+    return (
+      <main className="product-detail">
+        <section className="product-detail__story">
+          <h1 className="product-detail__title">상품을 찾을 수 없습니다.</h1>
+          <p className="product-detail__feature-body">
+            요청한 상품 id에 해당하는 목록 데이터가 없습니다.
+          </p>
+        </section>
+      </main>
+    );
+  }
+
+  useEffect(() => {
+    setSelectedOptionId(product.options[0]?.id ?? "");
+    setQuantity(1);
+    setActiveTab("overview");
+    setIsOverviewExpanded(false);
+  }, [product.id]);
 
   const selectedOption =
     product.options.find((option) => option.id === selectedOptionId) || null;
@@ -174,7 +210,7 @@ function ProductDetail() {
     dispatch(
       addToWishlist({
         id: product.id,
-        title: product.title,
+        name: product.title,
         price: product.price,
         image: product.heroImage,
       }),
@@ -184,10 +220,10 @@ function ProductDetail() {
   const handleAddToCart = () => {
     dispatch(
       addToCart({
-        id: `${product.id}-${selectedOption.id}`,
+        id: `${product.id}-${displayOption.id}`,
         productId: product.id,
-        title: product.title,
-        optionLabel: displayOption.label,
+        name: product.title,
+        option: displayOption.label,
         price: displayOption.price,
         image: product.heroImage,
         quantity,
@@ -209,6 +245,25 @@ function ProductDetail() {
     const targetRef = tab === "overview" ? overviewRef : reviewsRef;
     targetRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+
+  const renderTabs = () => (
+    <div className="product-detail__tabs">
+      <button
+        type="button"
+        className={activeTab === "overview" ? "is-active" : ""}
+        onClick={() => handleTabClick("overview")}
+      >
+        상품 설명
+      </button>
+      <button
+        type="button"
+        className={activeTab === "reviews" ? "is-active" : ""}
+        onClick={() => handleTabClick("reviews")}
+      >
+        리뷰
+      </button>
+    </div>
+  );
 
   return (
     <main className="product-detail">
@@ -237,6 +292,7 @@ function ProductDetail() {
         <div className="product-detail__content">
           <h1 className="product-detail__title">{product.title}</h1>
           <p className="product-detail__price">{formatPrice(product.price)}</p>
+          <p className="product-detail__feature-body">{product.shortDescription}</p>
 
           <div className="product-detail__purchase-box">
             <label className="product-detail__field" aria-label="옵션명">
@@ -300,22 +356,7 @@ function ProductDetail() {
         </div>
       </section>
 
-      <div className="product-detail__tabs">
-        <button
-          type="button"
-          className={activeTab === "overview" ? "is-active" : ""}
-          onClick={() => handleTabClick("overview")}
-        >
-          상품 설명
-        </button>
-        <button
-          type="button"
-          className={activeTab === "reviews" ? "is-active" : ""}
-          onClick={() => handleTabClick("reviews")}
-        >
-          리뷰
-        </button>
-      </div>
+      {renderTabs()}
 
       <section className="product-detail__story" ref={overviewRef}>
         <div
@@ -388,7 +429,15 @@ function ProductDetail() {
           className="product-detail__overview-toggle"
           onClick={() => setIsOverviewExpanded((prev) => !prev)}
         >
-          {isOverviewExpanded ? "상세보기 접기" : "상세보기 펼쳐보기"}
+          <span>{isOverviewExpanded ? "상세정보 접기" : "상세정보 더보기"}</span>
+          <img
+            src={ChevronDown}
+            alt=""
+            aria-hidden="true"
+            className={`product-detail__overview-toggle-icon ${
+              isOverviewExpanded ? "is-expanded" : ""
+            }`}
+          />
         </button>
       </section>
 

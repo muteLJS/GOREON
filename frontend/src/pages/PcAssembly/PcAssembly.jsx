@@ -64,6 +64,7 @@ const productList = [
 /* 필터 더미데이터 */
 const categories = ["CPU", "램", "메인보드", "그래픽카드", "저장장치", "케이스", "파워"];
 
+
 function PcAssembly() {
   const [totalPrice, setTotalPrice] = useState(400000);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
