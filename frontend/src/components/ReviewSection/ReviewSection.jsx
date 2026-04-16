@@ -1,14 +1,10 @@
 import "./ReviewSection.scss";
-<<<<<<< Updated upstream
-import { useState } from "react";
-=======
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Rating from "../Rating/Rating";
 import ChevronDown from "../../assets/icons/chevron-down.svg";
 import ThumbsUp from "../../assets/icons/Thumbs_up.svg";
->>>>>>> Stashed changes
 
 function ReviewSection({ rating, reviewCount, photoCount, gallery, reviews }) {
   const REVIEW_PREVIEW_COUNT = 5;

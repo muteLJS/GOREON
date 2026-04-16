@@ -1,20 +1,4 @@
-<<<<<<< Updated upstream
 import "./ProductDetail.scss";
-import { useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-
-import ReviewSection from "components/ReviewSection/ReviewSection";
-import { addToCart } from "store/slices/cartSlice";
-import { addToWishlist, removeFromWishlist } from "store/slices/wishlistSlice";
-
-import ProductHeroImage from "assets/img/intel-core-ultra5-250kf-plus-product-image-genuine.jpg";
-import DetailImage from "assets/img/intel-core-ultra5-250kf-plus-detail-description-genuine.jpg";
-import LifestyleImage from "assets/img/amd-ryzen5-7400f-raphael-detail-description.jpg";
-import LikeBefore from "assets/icons/like-before.svg";
-import LikeAfter from "assets/icons/like-after.svg";
-=======
-﻿import "./ProductDetail.scss";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -26,7 +10,6 @@ import LikeBefore from "../../assets/icons/like-before.svg";
 import LikeAfter from "../../assets/icons/like-after.svg";
 import ChevronDown from "../../assets/icons/chevron-down.svg";
 import { getProductDetailById } from "../../data/products";
->>>>>>> Stashed changes
 
 const formatPrice = (price) => `₩${price.toLocaleString("ko-KR")}`;
 
