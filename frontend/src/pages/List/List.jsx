@@ -78,9 +78,8 @@ const FilterMenuBox = ({ title, items }) => {
     <div className="side_menu_bottom">
       <div className="side_menu_bottom_filter_container">
         <h3>{title}</h3>
-        <img src={arrowIcon} alt="arrow" onClick={dropdown} className={isOpen ? "show" : ""} />
       </div>
-      <ul className={`side_menu_bottom_filter_list ${isOpen ? "show" : ""}`}>
+      <ul className={`side_menu_bottom_filter_list`}>
         {items.map((item) => (
           <FilterMenuList>{item}</FilterMenuList>
         ))}

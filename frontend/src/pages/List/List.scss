@@ -143,6 +143,7 @@
     .list-assembly__banner {
       img {
         width: 100%;
+        object-fit: cover;
       }
     }
     .list-wrap-content {
@@ -173,7 +174,7 @@
     .list-assembly__banner {
       img {
         width: 100%;
-        margin-bottom: 120px;
+        margin-bottom: 40px;
       }
     }
     .list-wrap-content {
@@ -181,7 +182,7 @@
       gap: 25px;
 
       .side_menu {
-        width: 20%;
+        width: 24%;
         display: block;
 
         &_top {
@@ -265,12 +266,10 @@
             display: flex;
             flex-direction: column;
             gap: 4px;
-            max-height: 0;
+
             overflow: hidden;
             transition: max-height 0.4s ease-out;
-            &.show {
-              max-height: 200px;
-            }
+
             li {
               display: flex;
               gap: 8px;
@@ -290,7 +289,7 @@
             font-size: $font-xl;
           }
           .filter-container {
-            display: none;
+            display: flex;
           }
         }
         &__content {
