@@ -277,20 +277,22 @@ function FloatingChatWidget() {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <ChatPanel
-        isOpen={isOpen}
-        isInitialView={mode === CHAT_MODE.INITIAL}
-        isBusy={status.isLoading || status.isTyping}
-        messages={visibleMessages}
-        suggestions={CHAT_SUGGESTIONS}
-        draft={draft}
-        error={status.error}
-        onDraftChange={setDraft}
-        onSendMessage={handleSendMessage}
-        onSuggestionClick={handleSendMessage}
-        onBack={handleBack}
-        onClose={handleClose}
-      />
+      {isOpen && (
+        <ChatPanel
+          isOpen={isOpen}
+          isInitialView={mode === CHAT_MODE.INITIAL}
+          isBusy={status.isLoading || status.isTyping}
+          messages={visibleMessages}
+          suggestions={CHAT_SUGGESTIONS}
+          draft={draft}
+          error={status.error}
+          onDraftChange={setDraft}
+          onSendMessage={handleSendMessage}
+          onSuggestionClick={handleSendMessage}
+          onBack={handleBack}
+          onClose={handleClose}
+        />
+      )}
 
       <ChatTriggerButton
         isOpen={isOpen}
