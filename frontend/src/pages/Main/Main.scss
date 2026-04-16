@@ -1,9 +1,23 @@
-@import "styles/variables";
+﻿@import "styles/variables";
 @import "styles/mixins";
 
 .main-page {
   width: 100%;
   min-height: 100vh;
+  @include flex(center, center, column);
+  gap: 12px;
+
+  h2 {
+    font-weight: $font-bold;
+    font-size: $font-xl-2;
+    color: $color-category-text;
+  }
+
+  h4 {
+    font-weight: $font-medium;
+    font-size: $font-sm;
+    color: $color-sub-category-text;
+  }
 }
 
 .main-page__section {
@@ -13,16 +27,14 @@
 }
 
 .sections {
-  padding: 120px 300px;
+  padding: 20px 20px;
 }
 
-.input {
-  @include input();
+.hidden {
+  display: none;
 }
+
 .section__AI {
-<<<<<<< Updated upstream
-  background: url(@/assets/pc/Main/AISection.svg);
-=======
   padding: 20px 16px;
   // background: url(@/assets/pc/Main/AISection.svg);
   background-color: $color-bg;
@@ -173,9 +185,11 @@
         }
         .stars {
           @include flex(center, flex-start);
-          .rating img {
+          gap: 2px;
+          svg {
             width: 14px;
             height: 14px;
+            fill: $color-text-sub;
           }
         }
       }
@@ -532,5 +546,5 @@
       flex-direction: row;
     }
   }
->>>>>>> Stashed changes
+
 }
