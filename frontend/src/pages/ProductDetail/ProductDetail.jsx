@@ -1,4 +1,5 @@
 ﻿import "./ProductDetail.scss";
+import productList from "@/data/products_list.json";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,142 +10,96 @@ import { addToWishlist, removeFromWishlist } from "../../store/slices/wishlistSl
 import LikeBefore from "../../assets/icons/like-before.svg";
 import LikeAfter from "../../assets/icons/like-after.svg";
 import ChevronDown from "../../assets/icons/chevron-down.svg";
-import { getProductDetailById } from "../../data/products";
 
 import ProductHeroImage from "../../assets/img/intel-core-ultra5-250kf-plus-product-image-genuine.jpg";
-import DetailImage from "../../assets/img/intel-core-ultra5-250kf-plus-detail-description-genuine.jpg";
-import LifestyleImage from "../../assets/img/amd-ryzen5-7400f-raphael-detail-description.jpg";
 
-const defaultProduct = {
-  id: "1",
-  brand: "Intel Core Ultra 5",
-  title: "인텔 코어 Ultra5 250KF Plus 정품",
-  subtitle: "게이밍과 작업을 한 번에 잡는 차세대 퍼포먼스",
-  shortDescription:
-    "최신 세대 아키텍처 기반의 퍼포먼스로 게임, 스트리밍, 멀티태스킹까지 폭넓게 대응하는 데스크톱 CPU입니다.",
-  price: 389000,
-  rating: 4.8,
-  reviewCount: 214,
-  photoCount: 29,
-  shipping: "평일 오후 2시 이전 주문 시 당일 출고",
-  heroImage: ProductHeroImage,
-  promoImage: DetailImage,
-  secondaryImage: LifestyleImage,
-  gallery: [
-    ProductHeroImage,
-    ProductHeroImage,
-    ProductHeroImage,
-    ProductHeroImage,
-    ProductHeroImage,
-  ],
-  options: [
-    { id: "box", label: "정품 박스", price: 389000 },
-    { id: "tray", label: "벌크 / 트레이", price: 359000 },
-  ],
-  keyPoints: [
-    {
-      title: "높은 멀티코어 효율",
-      body: "게임 실행 중에도 방송 송출과 백그라운드 작업을 안정적으로 처리하기 좋은 구성을 지향합니다.",
-    },
-    {
-      title: "체감되는 반응 속도",
-      body: "앱 실행, 프로젝트 빌드, 파일 압축 같은 반복 작업에서도 경쾌한 응답감을 기대할 수 있습니다.",
-    },
-    {
-      title: "업그레이드 친화성",
-      body: "메인스트림 조립 PC에 자연스럽게 어울려 게이밍부터 생산성 작업까지 폭넓게 구성할 수 있습니다.",
-    },
-  ],
-  specs: [
-    ["소켓", "LGA 1851"],
-    ["코어 구성", "고성능 + 고효율 하이브리드"],
-    ["용도", "게이밍 / 작업 / 스트리밍"],
-    ["패키지", "정품 박스 / 벌크 선택 가능"],
-    ["보증", "정품 기준 공식 유통 보증"],
-    ["권장 조합", "DDR5 메모리 / 최신 메인보드"],
-  ],
-  reviews: [
+const formatPrice = (price) => `W ${price.toLocaleString("ko-KR")}`;
+const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
+const buildRouteId = (category, product, productIndex) =>
+  `${category.categoryId ?? category.categoryName}-${product.id ?? productIndex + 1}-${productIndex}`;
+const normalizeImageUrl = (value) => {
+  const raw = String(value ?? "").trim();
+  if (!raw) {
+    return "";
+  }
+  if (raw.startsWith("http:///")) {
+    return "";
+  }
+  if (raw.startsWith("http://")) {
+    return `https://${raw.slice("http://".length)}`;
+  }
+  return raw;
+};
+
+function getProductDetailByIdFromJson(id) {
+  const flatProducts = productList.flatMap((category) => {
+    const categoryProducts = Array.isArray(category.products) ? category.products : [];
+    return categoryProducts.map((product, productIndex) => ({
+      ...product,
+      categoryName: category.categoryName,
+      categoryId: category.categoryId,
+      routeId: buildRouteId(category, product, productIndex),
+    }));
+  });
+
+  const product =
+    flatProducts.find((item) => String(item.routeId) === String(id)) ??
+    flatProducts.find((item) => String(item.id) === String(id));
+
+  if (!product) {
+    return null;
+  }
+
+  const price = parsePrice(product.price);
+  const heroImage = normalizeImageUrl(product.image) || ProductHeroImage;
+  const normalizedDetailImages = Array.isArray(product.detailImages)
+    ? product.detailImages.map((src) => normalizeImageUrl(src)).filter(Boolean)
+    : [];
+  const gallery =
+    normalizedDetailImages.length > 0
+      ? normalizedDetailImages
+      : [heroImage, heroImage, heroImage, heroImage, heroImage];
+  const options =
+    Array.isArray(product.priceOptions) && product.priceOptions.length > 0
+      ? product.priceOptions.map((option, index) => ({
+          id: `option-${index + 1}`,
+          label: option.optionName || `옵션 ${index + 1}`,
+          price: parsePrice(option.price) || price,
+        }))
+      : [{ id: "default", label: "기본 옵션", price }];
+  const reviews = [
     {
       id: 1,
-      author: "User**6",
-      date: "2026.04.07",
-      body: "게임 프레임 유지가 안정적이고 작업할 때도 버벅임이 적어서 만족합니다. 발열 관리만 잘해주면 체감 성능이 꽤 좋습니다.",
-      images: [ProductHeroImage, ProductHeroImage, ProductHeroImage, ProductHeroImage],
+      author: "User**1",
+      date: "2026.04.10",
+      body: `${product.name} 기준으로 실사용 만족도가 높고 기본 구성이 안정적입니다.`,
+      images: gallery.slice(0, 4),
     },
     {
       id: 2,
-      author: "User**6",
-      date: "2026.04.07",
-      body: "빌드 시간도 줄고 게임 실행도 빨라져서 업그레이드 효과를 확실히 느꼈습니다. 정품 포장 상태도 깔끔했습니다.",
-      images: [ProductHeroImage, ProductHeroImage, ProductHeroImage, ProductHeroImage],
+      author: "User**7",
+      date: "2026.04.12",
+      body: "옵션 선택폭이 넓고 가격대 비교가 쉬워 구매 결정에 도움이 됐습니다.",
+      images: gallery.slice(0, 4),
     },
-    {
-      id: 3,
-      author: "User**0",
-      date: "2026.04.07",
-      body: "멀티태스킹이 많아도 답답하지 않고, 고주사율 게임에서도 안정적인 편이었습니다. 작업용과 게임용을 같이 보는 분들께 괜찮습니다.",
-      images: [ProductHeroImage, ProductHeroImage, ProductHeroImage, ProductHeroImage],
-    },
-    {
-      id: 4,
-      author: "User**8",
-      date: "2026.04.07",
-      body: "초기 세팅 후 전력 제한만 조금 잡아주니 훨씬 안정적으로 사용 중입니다. 체감상 전 세대보다 여유가 생긴 느낌입니다.",
-      images: [ProductHeroImage, ProductHeroImage, ProductHeroImage, ProductHeroImage],
-    },
-    {
-      id: 5,
-      author: "User**1",
-      date: "2026.04.07",
-      body: "조립 PC 새로 맞추면서 선택했는데 병목 없이 잘 돌아갑니다. 게임이랑 영상 편집을 같이 하는 환경에서 만족도가 높습니다.",
-      images: [ProductHeroImage, ProductHeroImage, ProductHeroImage, ProductHeroImage],
-    },
-  ],
-};
+  ];
 
-const productCatalog = {
-  default: defaultProduct,
-  1: defaultProduct,
-  2: {
-    ...defaultProduct,
-    id: "2",
-    brand: "LG gram Pro 16",
-    title: "LG gram Pro 16 고성능 노트북",
-    subtitle: "이동성과 작업 효율을 함께 챙긴 크리에이터 노트북",
-    shortDescription:
-      "가벼운 무게와 긴 배터리, 넉넉한 화면 크기를 바탕으로 영상 편집과 문서 작업을 폭넓게 소화하기 좋은 노트북입니다.",
-    price: 1899000,
-    shipping: "평일 오후 3시 이전 주문 시 당일 출고",
-    options: [
-      { id: "standard", label: "기본 구성", price: 1899000 },
-      { id: "upgrade", label: "메모리 업그레이드", price: 2099000 },
-    ],
-    keyPoints: [
-      {
-        title: "가벼운 휴대성",
-        body: "강의실, 카페, 사무실을 자주 오가는 사용자에게 부담이 적은 무게와 두께를 제공합니다.",
-      },
-      {
-        title: "넓은 작업 화면",
-        body: "영상 편집 타임라인과 여러 창을 동시에 띄워도 답답하지 않도록 16형 화면 구성을 활용할 수 있습니다.",
-      },
-      {
-        title: "실사용 배터리",
-        body: "외부 전원이 없는 환경에서도 문서 작업과 가벼운 편집을 안정적으로 이어가기 좋은 사용 시간을 기대할 수 있습니다.",
-      },
-    ],
-    specs: [
-      ["디스플레이", "16형 고해상도 패널"],
-      ["프로세서", "Intel Core Ultra 7"],
-      ["그래픽", "RTX 3050"],
-      ["메모리", "32GB"],
-      ["저장장치", "1TB SSD"],
-      ["특징", "휴대성 / 영상 편집 / 문서 작업"],
-    ],
-  },
-};
-
-const formatPrice = (price) => `W ${price.toLocaleString("ko-KR")}`;
+  return {
+    id: String(product.routeId),
+    brand: String(product.name ?? "").split(" ")[0] || "브랜드 정보 준비중",
+    title: product.name,
+    subtitle: `${product.categoryName} 카테고리 추천 상품`,
+    shortDescription: `${product.name}의 핵심 정보와 옵션을 상세 페이지에서 확인할 수 있습니다.`,
+    price,
+    rating: Number(product.rating) || 0,
+    reviewCount: reviews.length,
+    photoCount: gallery.length,
+    heroImage,
+    gallery,
+    options,
+    reviews,
+  };
+}
 
 function ProductDetail() {
   const { id } = useParams();
@@ -155,7 +110,7 @@ function ProductDetail() {
   const overviewRef = useRef(null);
   const reviewsRef = useRef(null);
 
-  const product = getProductDetailById(id);
+  const product = getProductDetailByIdFromJson(id);
   const [selectedOptionId, setSelectedOptionId] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("overview");
@@ -259,6 +214,9 @@ function ProductDetail() {
               src={product.heroImage}
               alt={product.title}
               className="product-detail__hero-image"
+              onError={(event) => {
+                event.currentTarget.src = ProductHeroImage;
+              }}
             />
 
             <button
@@ -361,52 +319,15 @@ function ProductDetail() {
                 <p>{product.subtitle}</p>
               </div>
               <div className="product-detail__story-image">
-                <img src={product.promoImage} alt={`${product.brand} 프로모션 이미지`} />
-              </div>
-            </article>
-
-            <article className="product-detail__reason-block">
-              <p className="product-detail__section-label">{product.brand}</p>
-              <h3 className="product-detail__section-title">선택의 이유를 한눈에</h3>
-
-              <div className="product-detail__reason-grid">
-                {product.keyPoints.map((point) => (
-                  <div className="product-detail__reason-card" key={point.title}>
-                    <p className="product-detail__reason-title">{point.title}</p>
-                    <p className="product-detail__reason-body">{point.body}</p>
-                  </div>
-                ))}
-              </div>
-            </article>
-
-            <article className="product-detail__feature-card">
-              <div className="product-detail__feature-copy">
-                <p className="product-detail__section-label">실전 체감 성능</p>
-                <h3 className="product-detail__section-title">
-                  게임과 작업 모두를 고려한 메인스트림 선택
-                </h3>
-                <p className="product-detail__feature-body">
-                  최신 그래픽카드와의 조합, 멀티태스킹, 장시간 사용 환경까지 고려해 균형감 있게
-                  사용할 수 있는 퍼포먼스를 중심으로 정리했습니다.
-                </p>
-              </div>
-              <div className="product-detail__feature-image">
-                <img src={product.secondaryImage} alt={`${product.brand} 사용 이미지`} />
-              </div>
-            </article>
-
-            <article className="product-detail__specs">
-              <div className="product-detail__specs-header">
-                <p className="product-detail__section-label">핵심 사양</p>
-                <h3 className="product-detail__section-title">기본 정보</h3>
-              </div>
-
-              <div className="product-detail__spec-list">
-                {product.specs.map(([label, value]) => (
-                  <div className="product-detail__spec-row" key={label}>
-                    <span>{label}</span>
-                    <strong>{value}</strong>
-                  </div>
+                {product.gallery.map((image, index) => (
+                  <img
+                    key={`${product.id}-detail-${index}`}
+                    src={image}
+                    alt={`${product.brand} 상세 이미지 ${index + 1}`}
+                    onError={(event) => {
+                      event.currentTarget.src = ProductHeroImage;
+                    }}
+                  />
                 ))}
               </div>
             </article>
