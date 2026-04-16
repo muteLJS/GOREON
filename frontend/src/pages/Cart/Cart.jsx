@@ -124,11 +124,19 @@ export default function Cart() {
         <div className="cart-page__progress" aria-label="주문 단계">
           <div className="cart-page__progress-track" />
           <div className="cart-page__progress-step cart-page__progress-step--active">
-            <span>1</span>
+            <Link to="/cart" className="cart-page__progress-link" aria-current="page">
+              1
+            </Link>
             <strong>장바구니</strong>
           </div>
           <div className="cart-page__progress-step">
-            <span>2</span>
+            <Link
+              to="/payment"
+              state={{ orderItems: selectedItems, shippingForm }}
+              className="cart-page__progress-link"
+            >
+              2
+            </Link>
             <strong>결제</strong>
           </div>
         </div>

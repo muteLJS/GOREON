@@ -2,6 +2,9 @@
 @import "styles/mixins";
 
 .product-list-name-price {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   min-width: 0;
 }
 
@@ -23,6 +26,8 @@
   font-size: 15px;
   font-weight: $font-bold;
   line-height: 1.34;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 .product-list-name-price__option {
@@ -34,8 +39,10 @@
 }
 
 .product-list-name-price__footer {
-  @include flex(center, space-between);
-  gap: 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 16px;
   margin-top: 10px;
 }
 
@@ -44,6 +51,7 @@
   font-size: 18px;
   font-weight: $font-black;
   line-height: 1;
+  min-width: 0;
 }
 
 @include tablet-up {
@@ -74,4 +82,3 @@
     font-size: 22px;
   }
 }
-

@@ -297,7 +297,7 @@
     gap: 10px;
     z-index: 1;
 
-    span {
+    .cart-page__progress-link {
       @include flex-center;
       width: 50px;
       height: 50px;
@@ -308,6 +308,7 @@
       font-size: 18px;
       font-weight: $font-black;
       line-height: 1;
+      text-decoration: none;
     }
 
     strong {
@@ -318,7 +319,7 @@
     }
   }
 
-  .cart-page__progress-step--active span {
+  .cart-page__progress-step--active .cart-page__progress-link {
     background: $color-text-main;
     color: $color-white;
   }
@@ -403,4 +404,3 @@
     font-size: 24px;
   }
 }
-
