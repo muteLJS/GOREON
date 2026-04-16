@@ -69,11 +69,6 @@ const FilterMenuList = ({ children }) => {
 };
 
 const FilterMenuBox = ({ title, items }) => {
-  const [isOpen, setIsOpen] = useState(true);
-
-  const dropdown = () => {
-    setIsOpen(!isOpen);
-  };
   return (
     <div className="side_menu_bottom">
       <div className="side_menu_bottom_filter_container">
