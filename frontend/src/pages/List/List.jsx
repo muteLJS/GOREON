@@ -1,9 +1,9 @@
-﻿/* -------------------------------------------------------------------------- */
-/* [페이지] 찜하기 (Wishlist)                                                 */
-/* 찜하기: 하트를 누른 관심 상품 목록 모아보기                                */
+/* -------------------------------------------------------------------------- */
+/* [페이지] 검색 결과 (Search)                                                */
+/* 사용자가 입력한 검색어에 일치하는 상품 및 스펙 비교 결과를 나열합니다.     */
 /* -------------------------------------------------------------------------- */
 import { useState } from "react";
-import "./Wishlist.scss";
+import "./List.scss";
 import banner1 from "@/assets/banner/banner-1.jpg";
 import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
 import ProductCardVertical from "@/components/ProductCard/ProductCardVertical";
@@ -73,7 +73,13 @@ const FilterMenuBox = ({ title, items }) => {
     <div className="side_menu_bottom">
       <div className="side_menu_bottom_filter_container">
         <h3>{title}</h3>
+        <img src={arrowIcon} alt="" />
       </div>
+      <ul className="side_menu_bottom_filter_list">
+        {items.map((item) => (
+          <FilterMenuList>{item}</FilterMenuList>
+        ))}
+      </ul>
     </div>
   );
 };
@@ -108,23 +114,47 @@ export default function List() {
         <section className="list-wrap-content">
           <section className="side_menu">
             <div className="side_menu_top">
-              <h2>카테고리 분류</h2>
+              <h2>필터</h2>
+              <div className="side_menu_rightbox">
+                <p>초기화</p>
+                <button>
+                  <img src={resetIcon} alt="reset" />
+                </button>
+              </div>
             </div>
             <div className="side_menu_bottom_container">
-              <h3 className="title">전체상품</h3>
-              <FilterMenuBox title={"노트북"} />
-              <FilterMenuBox title={"모니터"} />
-              <FilterMenuBox title={"이어폰"} />
+              <FilterMenuBox items={manufacturerList} title={"제조사"} />
+              <FilterMenuBox items={weightList} title={"무게"} />
+              <FilterMenuBox items={screenSizeList} title={"화면크기"} />
+              <FilterMenuBox items={gpulist} title={"GPU 종류"} />
+              <div className="side_menu_bottom_range">
+                <h3>가격</h3>
+                <input
+                  type="range"
+                  min={MIN}
+                  max={MAX}
+                  step={10000}
+                  onChange={handleChange}
+                  className="range-input range-input--min"
+                />
+                <div className="value">
+                  <p>₩{minValue}</p>
+                  <p>₩{maxValue}</p>
+                </div>
+              </div>
             </div>
           </section>
           <section className="list-assembly">
             <section className="list-assembly__top">
               <h2 className="list-assembly__title">
-                찜한 상품 <span>({productLength})</span>
+                노트북 전체 <span>({productLength})</span>
               </h2>
               <div className="filter-container">
                 <button className="filter-button">
-                  전체 상품 <img src={ChevronDownIcon} alt="down" />
+                  필터 <img src={ChevronDownIcon} alt="down" />
+                </button>
+                <button className="filter-button">
+                  인기상품순 <img src={ChevronDownIcon} alt="down" />
                 </button>
               </div>
             </section>

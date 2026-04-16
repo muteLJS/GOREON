@@ -217,10 +217,24 @@
           background-color: #ffffff;
           border: 1px solid $color-border;
 
-          .title {
-            font-size: 20px;
-            font-weight: 700;
+          .side_menu_bottom_range {
             padding: 0 23px;
+            h3 {
+              font-size: 20px;
+              font-weight: 700;
+            }
+            input {
+              width: 100%;
+            }
+            .value {
+              display: flex;
+              justify-content: space-between;
+              p {
+                font-size: $font-xs;
+                color: $color-sub-category-text;
+                font-weight: $font-medium;
+              }
+            }
           }
         }
         &_bottom {
@@ -237,7 +251,6 @@
             h3 {
               font-size: $font-lg-2;
               font-weight: $font-bold;
-              color: $color-sub-category-text;
             }
             img {
               transform: rotate(-90deg);

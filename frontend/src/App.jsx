@@ -29,6 +29,7 @@ function App() {
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/payment" element={<Payment />} />
         <Route path="/mypage" element={<MyPage />} />
+        <Route path="/list" element={<List />} />
       </Route>
     </Routes>
   );
