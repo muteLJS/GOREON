@@ -1,19 +1,11 @@
-/* -------------------------------------------------------------------------- */
-/* [컴포넌트] 상품 리스트 행 (ProductListRow)                                   */
-/* 설명: 장바구니에서 사용하는 가로형 상품 카드 UI 컴포넌트입니다.              */
-/* -------------------------------------------------------------------------- */
-
 import "./ProductList-row.scss";
 
 import { Link } from "react-router-dom";
 
-import CartIcon from "assets/icons/cart-straight.svg";
-import LikeAfterIcon from "assets/icons/like-after.svg";
-import ProductListNamePrice from "components/ProductList-name,price/ProductList-name,price";
-
-function formatPrice(price) {
-  return `₩ ${price.toLocaleString("ko-KR")}`;
-}
+import CartIcon from "../../assets/icons/cart-straight.svg";
+import LikeAfterIcon from "../../assets/icons/like-after.svg";
+import ProductListNamePrice from "../ProductList-name,price/ProductList-name,price";
+import { formatPrice } from "../../utils/cart";
 
 function ProductThumbnail({ imageSrc, name }) {
   return (

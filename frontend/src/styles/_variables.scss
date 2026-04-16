@@ -27,11 +27,21 @@ $color-error: #ef4444; // 에러
 // 그레이 스케일
 $color-gray-100: #f5f5f5;
 $color-gray-200: #e5e7eb;
-$color-gray-300: #d1d5db;
+$color-gray-300: #d9d9d9;
 $color-gray-400: #9ca3af;
-$color-gray-500: #6b7280;
+$color-gray-500: #606060;
 $color-gray-600: #575757;
 $color-placeholder: #aeaeae;
+
+// 메인 버튼 배경색
+$color-button: #d9f4f3;
+
+// 메인 AI 버튼 외곽선 색
+$color-button-outline: #c5eded;
+
+// 메인 카테고리 텍스트 컬러
+$color-category-text: #003a43;
+$color-sub-category-text: #606060;
 
 // ==========================================
 // 1-1. 공통 사용 alias 컬러
@@ -70,11 +80,16 @@ $line-height-tight: 1.2;
 // ==========================================
 
 $font-xxs: 10px;
+$font-xxs-2: 11px;
 $font-xs: 12px;
+$font-xs-2: 13px;
 $font-sm: 14px;
 $font-md: 16px;
 $font-lg: 18px;
+$font-lg-2: 20px;
+$font-lg-3: 22px;
 $font-xl: 24px;
+$font-xl-2: 28px;
 $font-xxl: 32px;
 $font-display: 48px;
 
@@ -117,11 +132,12 @@ $layout-desktop-max-width: 1280px;
 // ==========================================
 
 $radius-sm: 6px;
-$radius-md: 12px;
+$radius-md: 10px;
 $radius-lg: 20px;
 $radius-xl: 24px;
 $radius-full: 9999px;
 
+$radius-ai: 40px;
 // Button
 $radius-btn: 10px;
 

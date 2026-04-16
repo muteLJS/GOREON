@@ -1,11 +1,6 @@
-/* -------------------------------------------------------------------------- */
-/* [컴포넌트] 상품 리스트 (ProductList)                                         */
-/* 설명: 상품 카드 배열을 받아 반복 렌더링하는 리스트 컴포넌트입니다.           */
-/* -------------------------------------------------------------------------- */
-
 import "./ProductList.scss";
 
-import ProductListRow from "components/ProductList-row/ProductList-row";
+import ProductListRow from "../ProductList-row/ProductList-row";
 
 function ProductList({
   items,

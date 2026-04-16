@@ -1,0 +1,523 @@
+﻿@import "styles/variables";
+@import "styles/mixins";
+
+.payment-page {
+  padding: 40px 0 56px;
+}
+
+.payment-page__header {
+  padding-top: 4px;
+}
+
+.payment-page__title {
+  color: $color-text-main;
+  font-size: 26px;
+  font-weight: $font-black;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.payment-page__progress {
+  display: none;
+}
+
+.payment-page__layout {
+  display: grid;
+  gap: 36px;
+  margin-top: 38px;
+}
+
+.payment-page__content,
+.payment-page__sidebar {
+  display: grid;
+  gap: 36px;
+}
+
+.payment-page__section-title {
+  margin-bottom: 12px;
+  color: $color-text-main;
+  font-size: 18px;
+  font-weight: $font-black;
+  line-height: 1.3;
+}
+
+.payment-page__section-title--desktop {
+  display: none;
+}
+
+.payment-page__method-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.payment-page__method-option {
+  @include flex(center, flex-start, column);
+  min-height: 128px;
+  padding: 20px 8px 18px;
+  border: 1px solid rgba($color-text-main, 0.18);
+  border-radius: 12px;
+  background: $color-white;
+  cursor: pointer;
+  transition: border-color $transition-fast;
+}
+
+.payment-page__method-option--active {
+  border-color: rgba($color-text-main, 0.92);
+}
+
+.payment-page__method-icon-box {
+  @include flex-center;
+  flex: 1;
+  width: 100%;
+  min-height: 54px;
+}
+
+.payment-page__method-icon {
+  width: auto;
+  max-width: 74px;
+  max-height: 50px;
+}
+
+.payment-page__method-label {
+  color: $color-text-main;
+  font-size: 13px;
+  font-weight: $font-bold;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.payment-page__card {
+  padding: 16px;
+  border: 1px solid rgba($color-text-main, 0.18);
+  border-radius: 22px;
+  background: #f8fffe;
+}
+
+.payment-page__card--shipping {
+  padding: 14px;
+  border-color: rgba($color-text-sub, 0.18);
+  border-radius: 18px;
+}
+
+.payment-page__field {
+  display: grid;
+  gap: 8px;
+}
+
+.payment-page__field + .payment-page__field {
+  margin-top: 16px;
+}
+
+.payment-page__field--shipping + .payment-page__field--shipping {
+  margin-top: 14px;
+}
+
+.payment-page__field-label {
+  color: $color-text-main;
+  font-size: 13px;
+  font-weight: $font-bold;
+  line-height: 1.2;
+}
+
+.payment-page__field-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.payment-page__field-row .payment-page__field + .payment-page__field {
+  margin-top: 0;
+}
+
+.payment-page__input {
+  @include flex(center, flex-start);
+  gap: 8px;
+  width: 100%;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba($color-text-main, 0.18);
+  border-radius: 10px;
+  background: $color-white;
+
+  input {
+    width: 100%;
+    height: 34px;
+    border: 0;
+    background: transparent;
+    color: $color-text-main;
+    font-size: 13px;
+    font-weight: $font-medium;
+
+    &::placeholder {
+      color: rgba($color-text-main, 0.34);
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+.payment-page__input--shipping {
+  @include input();
+  min-height: 0;
+  padding: 0 12px;
+  border-radius: 8px;
+  border-color: rgba($color-text-main, 0.18);
+  gap: 0;
+
+  input {
+    height: 32px;
+    font-size: 13px;
+
+    &::placeholder {
+      color: rgba($color-text-main, 0.4);
+    }
+  }
+}
+
+.payment-page__input--shipping + .payment-page__address-row,
+.payment-page__address-row + .payment-page__input--shipping {
+  margin-top: 8px;
+}
+
+.payment-page__input-icon {
+  display: block;
+  flex-shrink: 0;
+  width: auto;
+  max-width: 38px;
+  max-height: 16px;
+}
+
+.payment-page__address-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 50px;
+  gap: 8px;
+}
+
+.payment-page__address-button {
+  @include button-base($padding: 0, $radius: 8px);
+  min-width: 50px;
+  width: 50px;
+  height: 32px;
+  font-size: 13px;
+}
+
+.payment-page__save-card {
+  @include flex(center, flex-start);
+  gap: 8px;
+  margin-top: 18px;
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.payment-page__save-card-mark {
+  @include flex-center;
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  background: $color-text-main;
+
+  &::after {
+    content: "";
+    width: 7px;
+    height: 4px;
+    border-left: 2px solid $color-white;
+    border-bottom: 2px solid $color-white;
+    transform: translateY(-1px) rotate(-45deg);
+  }
+}
+
+.payment-page__save-card-label {
+  color: $color-text-main;
+  font-size: 13px;
+  font-weight: $font-bold;
+  line-height: 1.2;
+}
+
+.payment-page__summary-card {
+  padding: 18px 16px;
+  border-radius: 22px;
+  background: #f7f7f7;
+}
+
+.payment-page__summary-count {
+  color: $color-text-main;
+  font-size: 18px;
+  font-weight: $font-black;
+  line-height: 1.2;
+}
+
+.payment-page__summary-list {
+  margin-top: 18px;
+}
+
+.payment-page__summary-line {
+  @include flex(center, space-between);
+  gap: 12px;
+  color: rgba($color-text-main, 0.84);
+  font-size: 14px;
+  font-weight: $font-semibold;
+  line-height: 1.45;
+
+  span {
+    @include ellipsis;
+    max-width: 65%;
+  }
+
+  strong {
+    color: rgba($color-text-main, 0.84);
+    font-size: 14px;
+    font-weight: $font-black;
+  }
+}
+
+.payment-page__summary-line + .payment-page__summary-line {
+  margin-top: 14px;
+}
+
+.payment-page__summary-total {
+  @include flex(center, space-between);
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba($color-text-main, 0.22);
+  color: $color-text-main;
+  font-size: 18px;
+  font-weight: $font-black;
+  line-height: 1.2;
+}
+
+.payment-page__submit {
+  @include button-base($padding: 0, $radius: 10px);
+  width: 100%;
+  min-height: 46px;
+  font-size: 16px;
+  font-weight: $font-black;
+}
+
+@include tablet-up {
+  .payment-page {
+    padding-top: 52px;
+    padding-bottom: 72px;
+  }
+
+  .payment-page__layout {
+    margin-top: 48px;
+  }
+
+  .payment-page__card {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .payment-page__card--shipping {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .payment-page__method-option {
+    min-height: 138px;
+  }
+}
+
+@include desktop-up {
+  .payment-page {
+    padding: 76px 0 118px;
+  }
+
+  .payment-page__title {
+    font-size: 60px;
+  }
+
+  .payment-page__progress {
+    @include flex(center, center);
+    position: relative;
+    gap: 170px;
+    width: 358px;
+    margin: 40px auto 0;
+  }
+
+  .payment-page__progress-track {
+    position: absolute;
+    top: 25px;
+    left: 63px;
+    right: 63px;
+    height: 3px;
+    background: rgba($color-text-main, 0.95);
+  }
+
+  .payment-page__progress-step {
+    @include flex(center, center, column);
+    position: relative;
+    gap: 10px;
+    z-index: 1;
+
+    span {
+      @include flex-center;
+      width: 50px;
+      height: 50px;
+      border: 2px solid rgba($color-text-main, 0.96);
+      border-radius: 50%;
+      background: $color-white;
+      color: $color-text-main;
+      font-size: 18px;
+      font-weight: $font-black;
+      line-height: 1;
+    }
+
+    strong {
+      color: $color-text-main;
+      font-size: 18px;
+      font-weight: $font-black;
+      line-height: 1.2;
+    }
+  }
+
+  .payment-page__progress-step--active span {
+    background: $color-text-main;
+    color: $color-white;
+  }
+
+  .payment-page__layout {
+    grid-template-columns: minmax(0, 1.55fr) minmax(340px, 0.95fr);
+    gap: 70px;
+    align-items: start;
+    margin-top: 92px;
+  }
+
+  .payment-page__content,
+  .payment-page__sidebar {
+    gap: 34px;
+  }
+
+  .payment-page__section-title {
+    margin-bottom: 14px;
+    font-size: 18px;
+  }
+
+  .payment-page__section-title--desktop {
+    display: block;
+  }
+
+  .payment-page__method-list {
+    gap: 8px;
+  }
+
+  .payment-page__method-option {
+    min-height: 105px;
+    padding: 14px 10px 12px;
+    border-radius: 12px;
+  }
+
+  @media (hover: hover) {
+    .payment-page__method-option:hover {
+      border-color: rgba($color-text-main, 0.48);
+    }
+
+    .payment-page__method-option--active:hover {
+      border-color: rgba($color-text-main, 0.92);
+    }
+  }
+
+  .payment-page__method-icon-box {
+    min-height: 40px;
+  }
+
+  .payment-page__method-icon {
+    max-width: 74px;
+    max-height: 45px;
+  }
+
+  .payment-page__method-label {
+    font-size: 13px;
+  }
+
+  .payment-page__card {
+    padding: 22px 34px 18px;
+    border-radius: 18px;
+  }
+
+  .payment-page__card--shipping {
+    padding: 20px 20px 18px;
+  }
+
+  .payment-page__field {
+    gap: 10px;
+  }
+
+  .payment-page__field + .payment-page__field {
+    margin-top: 16px;
+  }
+
+  .payment-page__field-label,
+  .payment-page__save-card-label {
+    font-size: 14px;
+  }
+
+  .payment-page__field-row {
+    gap: 20px;
+  }
+
+  .payment-page__input {
+    min-height: 42px;
+    border-radius: 10px;
+
+    input {
+      height: 40px;
+      font-size: 14px;
+    }
+  }
+
+  .payment-page__input--shipping {
+    input {
+      height: 42px;
+      font-size: 14px;
+    }
+  }
+
+  .payment-page__address-row {
+    grid-template-columns: minmax(0, 1fr) 50px;
+  }
+
+  .payment-page__address-button {
+    height: 42px;
+    font-size: 14px;
+  }
+
+  .payment-page__save-card {
+    margin-top: 16px;
+  }
+
+  .payment-page__summary-card {
+    padding: 18px 18px 20px;
+    border-radius: 18px;
+  }
+
+  .payment-page__summary-count,
+  .payment-page__summary-total {
+    font-size: 18px;
+  }
+
+  .payment-page__summary-line {
+    font-size: 16px;
+
+    strong {
+      font-size: 16px;
+    }
+  }
+
+  .payment-page__submit {
+    min-height: 56px;
+    font-size: 24px;
+    border-radius: 12px;
+  }
+}
+

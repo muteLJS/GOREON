@@ -124,6 +124,7 @@ function ProductDetail() {
         <div className="product-detail__visual">
           <div className="product-detail__visual-frame">
             <img src={product.heroImage} alt={product.title} className="product-detail__hero-image" />
+            <img src={product.heroImage} alt={product.title} className="product-detail__hero-image" />
 
             <button
               type="button"

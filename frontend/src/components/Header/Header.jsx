@@ -1,39 +1,61 @@
-import "./Header.scss";
+﻿import "./Header.scss";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import LogoIcon from "assets/logo/logo/icon.svg";
-import LogoFull from "assets/logo/logo/icon&text.svg";
-import Cart from "assets/header/header-icons/cart.svg";
-import Like from "assets/header/header-icons/like.svg";
-import Search from "assets/header/header-icons/search.svg";
-import User from "assets/header/header-icons/user.svg";
-import ChevronDown from "assets/icons/chevron-down.svg";
+import LogoIcon from "../../assets/logo/logo/icon.svg";
+import LogoFull from "../../assets/logo/logo/icon&text.svg";
+import Cart from "../../assets/header/header-icons/cart.svg";
+import Like from "../../assets/header/header-icons/like.svg";
+import Search from "../../assets/header/header-icons/search.svg";
+import User from "../../assets/header/header-icons/user.svg";
+import ChevronDown from "../../assets/icons/chevron-down.svg";
 
 const categoryMenu = [
   {
     id: 1,
     key: "computer",
     title: "컴퓨터",
-    items: ["노트북", "데스크탑", "모니터", "키보드", "마우스", "PC 주변기기", "PC 부품"],
+    items: [
+      { label: "노트북", type: "notebook" },
+      { label: "데스크탑", type: "desktop" },
+      { label: "모니터", type: "monitor" },
+      { label: "키보드", type: "keyboard" },
+      { label: "마우스", type: "mouse" },
+      { label: "PC 주변기기", type: "pc-accessory" },
+      { label: "PC 부품", type: "pc-part" },
+    ],
   },
   {
     id: 2,
     key: "mobile",
     title: "모바일",
-    items: ["스마트폰", "스마트워치", "이어폰"],
+    items: [
+      { label: "스마트폰", type: "smartphone" },
+      { label: "스마트워치", type: "smartwatch" },
+      { label: "이어폰", type: "earphone" },
+    ],
   },
   {
     id: 3,
     key: "tablet",
     title: "태블릿",
-    items: ["태블릿", "태블릿 액세서리", "펜슬", "키보드 케이스"],
+    items: [
+      { label: "태블릿", type: "tablet" },
+      { label: "태블릿 액세서리", type: "tablet-accessory" },
+      { label: "펜슬", type: "pencil" },
+      { label: "키보드 케이스", type: "keyboard-case" },
+    ],
   },
   {
     id: 4,
     key: "accessory",
     title: "생활가전",
-    items: ["프린터", "공유기", "웹캠", "보조배터리"],
+    items: [
+      { label: "프린터", type: "printer" },
+      { label: "공유기", type: "router" },
+      { label: "웹캠", type: "webcam" },
+      { label: "보조배터리", type: "power-bank" },
+    ],
   },
 ];
 
@@ -42,19 +64,59 @@ const brandMenu = [
     id: 1,
     key: "premium",
     title: "프리미엄",
-    items: ["Apple", "Samsung", "LG"],
+    items: [
+      {
+        label: "Apple",
+        type: "apple",
+      },
+      {
+        label: "Samsung",
+        type: "samsung",
+      },
+      {
+        label: "LG",
+        type: "lg",
+      },
+    ],
   },
+
   {
     id: 2,
     key: "value",
     title: "가성비",
-    items: ["HP", "Lenovo", "Dell"],
+    items: [
+      {
+        label: "HP",
+        type: "hp",
+      },
+      {
+        label: "Lenovo",
+        type: "lenovo",
+      },
+      {
+        label: "Dell",
+        type: "dell",
+      },
+    ],
   },
   {
     id: 3,
     key: "gaming",
     title: "게이밍",
-    items: ["MSI", "ASUS", "Acer"],
+    items: [
+      {
+        label: "MSI",
+        type: "msi",
+      },
+      {
+        label: "ASUS",
+        type: "asus",
+      },
+      {
+        label: "Acer",
+        type: "acer",
+      },
+    ],
   },
 ];
 
@@ -73,7 +135,9 @@ const createExpandedState = (items) =>
 function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMobileTab, setActiveMobileTab] = useState("category");
-  const [expandedCategories, setExpandedCategories] = useState(() => createExpandedState(categoryMenu));
+  const [expandedCategories, setExpandedCategories] = useState(() =>
+    createExpandedState(categoryMenu),
+  );
   const [expandedBrands, setExpandedBrands] = useState(() => createExpandedState(brandMenu));
 
   const headerIcons = [
@@ -172,7 +236,6 @@ function Header() {
             <button type="button" className="gnb__button">
               품목별
             </button>
-
             <div className="dropdown dropdown--category">
               <div className="dropdown__panel">
                 <div className="dropdown__inner dropdown__inner--category">
@@ -181,8 +244,8 @@ function Header() {
                       <div className="dropdown__title">{category.title}</div>
                       <ul className="dropdown__list">
                         {category.items.map((item) => (
-                          <li className="dropdown__list-item" key={item}>
-                            <Link to="/category">{item}</Link>
+                          <li className="dropdown__list-item" key={item.type}>
+                            <Link to={`/list?type=${item.type}`}>{item.label}</Link>
                           </li>
                         ))}
                       </ul>
@@ -206,8 +269,8 @@ function Header() {
                       <div className="dropdown__title">{group.title}</div>
                       <ul className="dropdown__list dropdown__list--brand">
                         {group.items.map((brand) => (
-                          <li className="dropdown__list-item dropdown__brand-item" key={brand}>
-                            <Link to="/category">{brand}</Link>
+                          <li className="dropdown__list-item dropdown__brand-item" key={brand.type}>
+                            <Link to={`/list?type=${brand.type}`}>{brand.label}</Link>
                           </li>
                         ))}
                       </ul>
@@ -266,9 +329,12 @@ function Header() {
                   {expandedCategories[section.key] && (
                     <ul className="mobile-menu__list">
                       {section.items.map((item) => (
-                        <li key={item} className="mobile-menu__list-item">
-                          <Link to="/category" onClick={() => setIsMobileMenuOpen(false)}>
-                            {item}
+                        <li key={item.type} className="mobile-menu__list-item">
+                          <Link
+                            to={`/list?type=${item.type}`}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            {item.label}
                           </Link>
                         </li>
                       ))}
@@ -298,13 +364,15 @@ function Header() {
                       }`}
                     />
                   </button>
-
                   {expandedBrands[section.key] && (
                     <ul className="mobile-menu__list mobile-menu__list--brand-text">
                       {section.items.map((item) => (
-                        <li key={item} className="mobile-menu__list-item">
-                          <Link to="/category" onClick={() => setIsMobileMenuOpen(false)}>
-                            {item}
+                        <li key={item.type} className="mobile-menu__list-item">
+                          <Link
+                            to={`/list?type=${item.type}`}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            {item.label}
                           </Link>
                         </li>
                       ))}

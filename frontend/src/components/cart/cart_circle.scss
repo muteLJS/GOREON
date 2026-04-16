@@ -1,18 +1,38 @@
 @import "styles/variables";
+@import "styles/mixins";
 
-.cart-icon {
-  display: inline-block;
+.cart-circle {
+  @include flex-center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: $radius-full;
+  background-color: $color-white;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
   cursor: pointer;
-  color: $color-gray-400; // 기본 색
+  transition: box-shadow $transition-fast;
 
-  &:hover,
-  &:active {
-    color: $color-text-main; // 호버 및 액티브 시 색 변경
+  &__icon {
+    width: 20px;
+    height: 20px;
+    display: block;
   }
 
-  svg {
-    width: 24px;
-    height: 24px;
-    fill: currentColor; // 부모의 color를 따름
+  &__line {
+    fill: transparent;
+    stroke: $color-text-main;
+    stroke-width: 2;
+    stroke-linecap: butt;
+    stroke-linejoin: miter;
+  }
+
+  &__wheel {
+    fill: $color-text-main;
+  }
+
+  &:hover,
+  &:focus-visible {
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
   }
 }
