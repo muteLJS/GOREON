@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import AddressModal from "../../components/AddressModal/AddressModal";
 import CreditCardIcon from "../../assets/icons/creditcard.svg";
@@ -168,11 +168,15 @@ export default function Payment() {
         <div className="payment-page__progress" aria-label="주문 단계">
           <div className="payment-page__progress-track" />
           <div className="payment-page__progress-step">
-            <span>1</span>
+            <Link to="/cart" className="payment-page__progress-link">
+              1
+            </Link>
             <strong>장바구니</strong>
           </div>
           <div className="payment-page__progress-step payment-page__progress-step--active">
-            <span>2</span>
+            <Link to="/payment" className="payment-page__progress-link" aria-current="page">
+              2
+            </Link>
             <strong>결제</strong>
           </div>
         </div>
