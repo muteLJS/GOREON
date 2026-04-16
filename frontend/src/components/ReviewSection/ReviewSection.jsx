@@ -1,5 +1,4 @@
 import "./ReviewSection.scss";
-import { useState } from "react";
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -148,9 +147,7 @@ function ReviewSection({ rating, reviewCount, photoCount, gallery, reviews }) {
     return getHelpfulState(b).count - getHelpfulState(a).count;
   });
 
-  const visibleReviews = isExpanded
-    ? sortedReviews
-    : sortedReviews.slice(0, REVIEW_PREVIEW_COUNT);
+  const visibleReviews = isExpanded ? sortedReviews : sortedReviews.slice(0, REVIEW_PREVIEW_COUNT);
 
   return (
     <section className="review-section">
