@@ -20,5 +20,517 @@
   @include input();
 }
 .section__AI {
+<<<<<<< Updated upstream
   background: url(@/assets/pc/Main/AISection.svg);
+=======
+  padding: 20px 16px;
+  // background: url(@/assets/pc/Main/AISection.svg);
+  background-color: $color-bg;
+  @include flex(center, space-between, column);
+  gap: 12px;
+  .AI_container {
+    width: 100%;
+    @include flex(flex-start, space-between);
+    .AI_description {
+      @include flex(flex-start, space-between, column);
+      gap: $space-sm;
+      button {
+        padding: 5px;
+        @include flex(center, space-between);
+        color: $color-text-sub;
+        background-color: $color-button;
+        border: 1px solid $color-text-sub;
+        border-radius: 25.5px;
+        font-weight: $font-bold;
+        font-size: $font-xxs;
+        gap: 5px;
+        .circle {
+          width: 6px;
+          height: 6px;
+          border-radius: $radius-full;
+          background-color: $color-text-sub;
+        }
+      }
+      .AI_Main_text {
+        color: $color-text-main;
+        font-size: $font-xl;
+        font-weight: $font-black;
+
+        .input {
+          color: $color-text-sub;
+        }
+      }
+      .AI_sub_text {
+        display: none;
+      }
+      .AI_Chat_row_2 {
+        @include flex(flex-start, space-between, column);
+        gap: 12px;
+        button {
+          padding: 4.5px 6.5px;
+          background-color: inherit;
+          color: $color-text-main;
+          border: 1px solid $color-button-outline;
+          font-size: $font-xs;
+        }
+      }
+    }
+    .AI_logo {
+      width: 144px;
+    }
+  }
+}
+
+.AI_chat_container {
+  width: 100%;
+  background-color: $color-white;
+  margin-top: 18px;
+
+  .AI_Chat_row_1 {
+    @include flex(flex-start, space-between);
+    width: 100%;
+    border: 1px solid $color-text-sub;
+    border-radius: $radius-ai;
+    padding: 15px 25px;
+    color: $color-text-main;
+
+    textarea {
+      background-color: $color-white;
+      border: none;
+      color: $color-text-main;
+      flex: 1;
+      padding: 0;
+      overflow: hidden;
+      color: $color-text-main;
+      font-size: $font-md;
+      font-weight: $font-bold;
+
+      &:focus {
+        outline: none;
+        border-color: $color-text-sub;
+        box-shadow: none;
+      }
+    }
+    textarea::placeholder {
+      color: $color-text-main;
+      font-size: $font-md;
+      font-weight: $font-bold;
+    }
+
+    button {
+      width: 22px;
+      height: 22px;
+      padding: 0;
+      @include flex();
+      cursor: pointer;
+
+      svg {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+  .AI_Chat_row_2 {
+    display: none;
+  }
+}
+
+.section__AI_Review {
+  overflow: hidden;
+  background-color: $color-white;
+  @include flex(flex-start, center, column);
+  gap: 12px;
+  .text_box {
+    @include flex(flex-start, center, column);
+    gap: 8px;
+  }
+
+  .review_box {
+    @include flex();
+    gap: 12px;
+    .review_main {
+      width: 270px;
+      padding: 34px 20px;
+      @include flex(flex-start, center, column);
+      gap: 17px;
+      border: 1px solid rgba($color-sub-category-text, 0.24);
+      border-radius: $radius-lg;
+
+      .AI_box {
+        @include flex(flex-start, center, column);
+        gap: 6px;
+        .user_info {
+          @include flex();
+          gap: 8px;
+          img {
+            width: 34px;
+          }
+          .user_name {
+            font-weight: $font-bold;
+            font-size: $font-lg-3;
+            color: $color-category-text;
+          }
+        }
+        .stars {
+          @include flex(center, flex-start);
+          .rating img {
+            width: 14px;
+            height: 14px;
+          }
+        }
+      }
+    }
+
+    .item_name {
+      color: $color-sub-category-text;
+      font-weight: $font-bold;
+      font-size: $font-sm;
+    }
+    .description {
+      color: $color-sub-category-text;
+      font-weight: $font-medium;
+      font-size: $font-xs;
+    }
+  }
+}
+
+.section__Set_Category {
+  @include flex(flex-start, center, column);
+  gap: 12px;
+  background-color: $color-white;
+  overflow: hidden;
+  .category_top {
+    @include flex(flex-start, center, column);
+    gap: 8px;
+  }
+  .categories {
+    width: 100%;
+    form {
+      @include flex(center, space-between);
+      width: 100%;
+      gap: 13px;
+      border: 1px solid $color-gray-100;
+      border-radius: $radius-full;
+      padding: 5px 13.5px;
+      .category {
+        @include flex(center, space-between);
+        gap: 5px;
+        padding: 5px 9px;
+        background-color: $color-gray-100;
+        border-radius: $radius-full;
+        img {
+          width: 16px;
+        }
+        p {
+          font-weight: $font-medium;
+          font-size: $font-sm;
+          color: $color-sub-category-text;
+        }
+        &:hover p {
+          color: $color-category-text;
+        }
+      }
+    }
+  }
+  .item_box {
+    @include flex(flex-start, center);
+    gap: 12px;
+  }
+
+  .items {
+    @include flex(flex-start, center, column);
+    gap: 18px;
+    overflow: hidden;
+    color: $color-category-text;
+    font-weight: $font-bold;
+    gap: 18px;
+    .item_img_box {
+      @include flex(flex-end, flex-end, column);
+      position: relative;
+      gap: 20px;
+      width: 240px;
+      height: 220px;
+      padding: 8px 9px;
+      border: 1px solid $color-gray-300;
+      border-radius: $radius-md;
+      background-color: $color-gray-100;
+      .item_img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .icons {
+        @include flex(center, space-between);
+        gap: 8px;
+        button {
+          width: 30px;
+          height: 30px;
+          background-color: $color-gray-100;
+          border-radius: $radius-full;
+          box-shadow: 0 0 2px $color-black;
+          img {
+            width: 18px;
+            height: 18px;
+          }
+        }
+      }
+    }
+  }
+  .item_name {
+    font-size: $font-lg-3;
+  }
+  .options {
+    @include flex(flex-start, center);
+    gap: 6px;
+    p {
+      font-size: $font-xs;
+      font-weight: $font-semibold;
+      padding: 3px 9px;
+      background-color: $color-gray-100;
+      border-radius: $radius-full;
+    }
+  }
+  .item_price {
+    font-size: $font-xl;
+  }
+  .item_colors {
+    @include flex(flex-start, center);
+    gap: 12px;
+
+    .colors {
+      width: 20px;
+      height: 20px;
+      border-radius: $radius-full;
+    }
+    .color1 {
+      background-color: $color-black;
+    }
+    .color2 {
+      background-color: $color-gray-400;
+    }
+  }
+  .unfilled {
+    position: relative;
+    padding-top: 6px;
+    width: 100%;
+    height: 3px;
+    background-color: $color-gray-100;
+    border-radius: $radius-full;
+    .filled {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 25%;
+      height: 3px;
+      border-radius: $radius-full;
+      background-color: $color-category-text;
+    }
+  }
+}
+
+.section__Collarborates {
+  @include flex(flex-start, center, column);
+  gap: 34px;
+  font-weight: $font-bold;
+  overflow: hidden;
+  .texts {
+    @include flex(flex-start, center, column);
+    gap: 8px;
+  }
+  .gray_text {
+    color: $color-sub-category-text;
+  }
+  .pakage_boxs {
+    @include flex(center, flex-start);
+    gap: 16px;
+  }
+  .pakage_box {
+    @include flex(center, center, column);
+    box-sizing: border-box;
+    gap: 10px;
+    padding: 18px 20px;
+    border: 1px solid rgba($color-gray-500, 0.25);
+    border-radius: $radius-md;
+    color: $color-category-text;
+    .pakage_big {
+      @include flex(flex-start, center, column);
+      gap: 21px;
+      width: 100%;
+      .pakage_img {
+        margin: 0 auto;
+        width: 160px;
+      }
+
+      .pakage_texts {
+        width: 100%;
+        @include flex(flex-start, center, column);
+        gap: 2px;
+        .gray_text {
+          padding-top: 4px;
+          font-size: $font-xs;
+          font-weight: $font-medium;
+        }
+        .pakage_bottom {
+          width: 100%;
+          @include flex(center, space-between);
+          .icons {
+            @include flex(center, space-between);
+            gap: 8px;
+            button {
+              width: 24px;
+              height: 24px;
+              background-color: $color-gray-100;
+              border-radius: $radius-full;
+              box-shadow: 0 0 2px $color-black;
+              img {
+                width: 18px;
+                height: 18px;
+              }
+            }
+          }
+        }
+      }
+    }
+    .pakage_small {
+      @include flex(center, center, column);
+      gap: 4px;
+      .pakage_inner {
+        @include flex();
+        gap: 8px;
+      }
+      .pakage_img_box {
+        @include flex(center, center);
+        width: 60px;
+        height: 60px;
+        border: 1px solid rgba($color-gray-500, 0.25);
+        border-radius: $radius-md;
+        img {
+          width: 50px;
+        }
+      }
+      .pakage_item {
+        p {
+          font-size: $font-xs;
+        }
+        .gray_text {
+          font-size: $font-xxs;
+        }
+      }
+    }
+  }
+  .chevron {
+    @include flex-center;
+    width: 100%;
+    padding: 10px 0;
+
+    svg {
+      display: block;
+
+      width: 24px;
+      height: 12px;
+    }
+
+    path {
+      fill: none;
+      stroke: $color-sub-category-text;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  }
+}
+.section__New_Update {
+  @include flex(flex-start, center, column);
+  gap: 12px;
+  background-color: $color-white;
+
+  .item_boxs {
+    width: 100%;
+    @include flex(flex-start, flex-start, column);
+    gap: 20px;
+    .item_row {
+      width: 100%;
+      @include flex(flex-start, space-between);
+      gap: 16px;
+    }
+  }
+  .category_top {
+    @include flex(flex-start, center, column);
+    gap: 8px;
+  }
+
+  .item_box {
+    width: 100%;
+    @include flex(flex-start, space-between);
+    gap: 12px;
+  }
+
+  .items {
+    width: 100%;
+    @include flex(flex-start, center, column);
+    gap: 18px;
+    overflow: hidden;
+    color: $color-category-text;
+    font-weight: $font-bold;
+
+    .item_img_box {
+      width: 100%;
+      @include flex(flex-end, flex-end, column);
+      position: relative;
+      gap: 20px;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      padding: 8px 9px;
+      border: 1px solid $color-gray-300;
+      border-radius: $radius-md;
+      background-color: $color-gray-100;
+      .item_img {
+        position: absolute;
+        width: 70%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .icons {
+        @include flex(center, space-between);
+        gap: 8px;
+        button {
+          width: 30px;
+          height: 30px;
+          background-color: $color-gray-100;
+          border-radius: $radius-full;
+          box-shadow: 0 0 2px $color-black;
+          img {
+            width: 18px;
+            height: 18px;
+          }
+        }
+      }
+    }
+    .item_texts {
+      @include flex(flex-start, center, column);
+      gap: 7px;
+      .item_name {
+        font-size: $font-lg;
+      }
+      .item_price {
+        font-size: $font-lg;
+      }
+      .item_spec {
+        font-size: $font-xs-2;
+        border: 1px solid $color-category-text;
+        border-radius: $radius-full;
+        padding: 5px 10px;
+      }
+    }
+  }
+}
+@include tablet-up {
+  .section__New_Update {
+    .item_boxs {
+      flex-direction: row;
+    }
+  }
+>>>>>>> Stashed changes
 }
