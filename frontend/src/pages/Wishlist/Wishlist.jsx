@@ -10,8 +10,6 @@ import ProductCardVertical from "@/components/ProductCard/ProductCardVertical";
 import ProductImage from "@/assets/products/product-example.jpg";
 import cartIcon from "@/assets/icons/cart-straight.svg";
 import likeAffterIcon from "@/assets/icons/like-after.svg";
-import resetIcon from "@/assets/icons/reset.svg";
-import arrowIcon from "@/assets/icons/prev.svg";
 
 /* productList 더미데이터 */
 const productList = [
@@ -101,7 +99,7 @@ export default function List() {
 
   return (
     <>
-      <main className="list-wrap">
+      <main className="list-wrap-wishlist">
         <section className="list-assembly__banner">
           <img src={banner1} alt="광고 배너 1" />
         </section>

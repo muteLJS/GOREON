@@ -1,4 +1,5 @@
-import "./ProductDetail.scss";
+﻿import "./ProductDetail.scss";
+import productList from "@/data/products_list.json";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,9 +10,96 @@ import { addToWishlist, removeFromWishlist } from "../../store/slices/wishlistSl
 import LikeBefore from "../../assets/icons/like-before.svg";
 import LikeAfter from "../../assets/icons/like-after.svg";
 import ChevronDown from "../../assets/icons/chevron-down.svg";
-import { getProductDetailById } from "../../data/products";
 
-const formatPrice = (price) => `₩${price.toLocaleString("ko-KR")}`;
+import ProductHeroImage from "../../assets/img/intel-core-ultra5-250kf-plus-product-image-genuine.jpg";
+
+const formatPrice = (price) => `W ${price.toLocaleString("ko-KR")}`;
+const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
+const buildRouteId = (category, product, productIndex) =>
+  `${category.categoryId ?? category.categoryName}-${product.id ?? productIndex + 1}-${productIndex}`;
+const normalizeImageUrl = (value) => {
+  const raw = String(value ?? "").trim();
+  if (!raw) {
+    return "";
+  }
+  if (raw.startsWith("http:///")) {
+    return "";
+  }
+  if (raw.startsWith("http://")) {
+    return `https://${raw.slice("http://".length)}`;
+  }
+  return raw;
+};
+
+function getProductDetailByIdFromJson(id) {
+  const flatProducts = productList.flatMap((category) => {
+    const categoryProducts = Array.isArray(category.products) ? category.products : [];
+    return categoryProducts.map((product, productIndex) => ({
+      ...product,
+      categoryName: category.categoryName,
+      categoryId: category.categoryId,
+      routeId: buildRouteId(category, product, productIndex),
+    }));
+  });
+
+  const product =
+    flatProducts.find((item) => String(item.routeId) === String(id)) ??
+    flatProducts.find((item) => String(item.id) === String(id));
+
+  if (!product) {
+    return null;
+  }
+
+  const price = parsePrice(product.price);
+  const heroImage = normalizeImageUrl(product.image) || ProductHeroImage;
+  const normalizedDetailImages = Array.isArray(product.detailImages)
+    ? product.detailImages.map((src) => normalizeImageUrl(src)).filter(Boolean)
+    : [];
+  const gallery =
+    normalizedDetailImages.length > 0
+      ? normalizedDetailImages
+      : [heroImage, heroImage, heroImage, heroImage, heroImage];
+  const options =
+    Array.isArray(product.priceOptions) && product.priceOptions.length > 0
+      ? product.priceOptions.map((option, index) => ({
+          id: `option-${index + 1}`,
+          label: option.optionName || `옵션 ${index + 1}`,
+          price: parsePrice(option.price) || price,
+        }))
+      : [{ id: "default", label: "기본 옵션", price }];
+  const reviews = [
+    {
+      id: 1,
+      author: "User**1",
+      date: "2026.04.10",
+      body: `${product.name} 기준으로 실사용 만족도가 높고 기본 구성이 안정적입니다.`,
+      images: gallery.slice(0, 4),
+    },
+    {
+      id: 2,
+      author: "User**7",
+      date: "2026.04.12",
+      body: "옵션 선택폭이 넓고 가격대 비교가 쉬워 구매 결정에 도움이 됐습니다.",
+      images: gallery.slice(0, 4),
+    },
+  ];
+
+  return {
+    id: String(product.routeId),
+    brand: String(product.name ?? "").split(" ")[0] || "브랜드 정보 준비중",
+    title: product.name,
+    subtitle: `${product.categoryName} 카테고리 추천 상품`,
+    shortDescription: `${product.name}의 핵심 정보와 옵션을 상세 페이지에서 확인할 수 있습니다.`,
+    price,
+    rating: Number(product.rating) || 0,
+    reviewCount: reviews.length,
+    photoCount: gallery.length,
+    heroImage,
+    gallery,
+    options,
+    reviews,
+  };
+}
 
 function ProductDetail() {
   const { id } = useParams();
@@ -22,7 +110,7 @@ function ProductDetail() {
   const overviewRef = useRef(null);
   const reviewsRef = useRef(null);
 
-  const product = getProductDetailById(id);
+  const product = getProductDetailByIdFromJson(id);
   const [selectedOptionId, setSelectedOptionId] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("overview");
@@ -123,8 +211,14 @@ function ProductDetail() {
       <section className="product-detail__hero">
         <div className="product-detail__visual">
           <div className="product-detail__visual-frame">
-            <img src={product.heroImage} alt={product.title} className="product-detail__hero-image" />
-            <img src={product.heroImage} alt={product.title} className="product-detail__hero-image" />
+            <img
+              src={product.heroImage}
+              alt={product.title}
+              className="product-detail__hero-image"
+              onError={(event) => {
+                event.currentTarget.src = ProductHeroImage;
+              }}
+            />
 
             <button
               type="button"
@@ -226,52 +320,15 @@ function ProductDetail() {
                 <p>{product.subtitle}</p>
               </div>
               <div className="product-detail__story-image">
-                <img src={product.promoImage} alt={`${product.brand} 프로모션 이미지`} />
-              </div>
-            </article>
-
-            <article className="product-detail__reason-block">
-              <p className="product-detail__section-label">{product.brand}</p>
-              <h3 className="product-detail__section-title">선택의 이유를 한눈에</h3>
-
-              <div className="product-detail__reason-grid">
-                {product.keyPoints.map((point) => (
-                  <div className="product-detail__reason-card" key={point.title}>
-                    <p className="product-detail__reason-title">{point.title}</p>
-                    <p className="product-detail__reason-body">{point.body}</p>
-                  </div>
-                ))}
-              </div>
-            </article>
-
-            <article className="product-detail__feature-card">
-              <div className="product-detail__feature-copy">
-                <p className="product-detail__section-label">실전 체감 성능</p>
-                <h3 className="product-detail__section-title">
-                  게임과 작업 모두를 고려한 메인스트림 선택
-                </h3>
-                <p className="product-detail__feature-body">
-                  최신 그래픽카드와의 조합, 멀티태스킹, 장시간 사용 환경까지 고려해 균형감 있게
-                  사용할 수 있는 퍼포먼스를 중심으로 정리했습니다.
-                </p>
-              </div>
-              <div className="product-detail__feature-image">
-                <img src={product.secondaryImage} alt={`${product.brand} 사용 이미지`} />
-              </div>
-            </article>
-
-            <article className="product-detail__specs">
-              <div className="product-detail__specs-header">
-                <p className="product-detail__section-label">핵심 사양</p>
-                <h3 className="product-detail__section-title">기본 정보</h3>
-              </div>
-
-              <div className="product-detail__spec-list">
-                {product.specs.map(([label, value]) => (
-                  <div className="product-detail__spec-row" key={label}>
-                    <span>{label}</span>
-                    <strong>{value}</strong>
-                  </div>
+                {product.gallery.map((image, index) => (
+                  <img
+                    key={`${product.id}-detail-${index}`}
+                    src={image}
+                    alt={`${product.brand} 상세 이미지 ${index + 1}`}
+                    onError={(event) => {
+                      event.currentTarget.src = ProductHeroImage;
+                    }}
+                  />
                 ))}
               </div>
             </article>
