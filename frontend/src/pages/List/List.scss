@@ -254,12 +254,23 @@
             }
             img {
               transform: rotate(-90deg);
+              cursor: pointer;
+              transition: transform 0.3s ease-out;
+              &.show {
+                transform: rotate(-90deg);
+              }
             }
           }
           &_filter_list {
             display: flex;
             flex-direction: column;
             gap: 4px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+            &.show {
+              max-height: 200px;
+            }
             li {
               display: flex;
               gap: 8px;
@@ -284,7 +295,7 @@
         }
         &__content {
           .list-assembly__product-grid {
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
           }
         }
       }

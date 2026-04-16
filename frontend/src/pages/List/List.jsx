@@ -69,13 +69,18 @@ const FilterMenuList = ({ children }) => {
 };
 
 const FilterMenuBox = ({ title, items }) => {
+  const [isOpen, setIsOpen] = useState(true);
+
+  const dropdown = () => {
+    setIsOpen(!isOpen);
+  };
   return (
     <div className="side_menu_bottom">
       <div className="side_menu_bottom_filter_container">
         <h3>{title}</h3>
-        <img src={arrowIcon} alt="" />
+        <img src={arrowIcon} alt="arrow" onClick={dropdown} className={isOpen ? "show" : ""} />
       </div>
-      <ul className="side_menu_bottom_filter_list">
+      <ul className={`side_menu_bottom_filter_list ${isOpen ? "show" : ""}`}>
         {items.map((item) => (
           <FilterMenuList>{item}</FilterMenuList>
         ))}
