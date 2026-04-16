@@ -1,9 +1,4 @@
 ﻿import "./ProductDetail.scss";
-import { useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-
-﻿import "./ProductDetail.scss";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -16,17 +11,9 @@ import LikeAfter from "../../assets/icons/like-after.svg";
 import ChevronDown from "../../assets/icons/chevron-down.svg";
 import { getProductDetailById } from "../../data/products";
 
-const formatPrice = (price) => `₩${price.toLocaleString("ko-KR")}`;
-
-import ReviewSection from "../../components/ReviewSection/ReviewSection";
-import { addToCart } from "../../store/slices/cartSlice";
-import { addToWishlist, removeFromWishlist } from "../../store/slices/wishlistSlice";
-
 import ProductHeroImage from "../../assets/img/intel-core-ultra5-250kf-plus-product-image-genuine.jpg";
 import DetailImage from "../../assets/img/intel-core-ultra5-250kf-plus-detail-description-genuine.jpg";
 import LifestyleImage from "../../assets/img/amd-ryzen5-7400f-raphael-detail-description.jpg";
-import LikeBefore from "../../assets/icons/like-before.svg";
-import LikeAfter from "../../assets/icons/like-after.svg";
 
 const defaultProduct = {
   id: "1",
@@ -159,7 +146,6 @@ const productCatalog = {
 
 const formatPrice = (price) => `W ${price.toLocaleString("ko-KR")}`;
 
-
 function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -195,8 +181,7 @@ function ProductDetail() {
     setIsOverviewExpanded(false);
   }, [product.id]);
 
-  const selectedOption =
-    product.options.find((option) => option.id === selectedOptionId) || null;
+  const selectedOption = product.options.find((option) => option.id === selectedOptionId) || null;
   const displayOption = selectedOption || product.options[0];
   const totalPrice = displayOption.price * quantity;
   const isWishlisted = wishlistItems.some((item) => item.id === product.id);
@@ -270,7 +255,11 @@ function ProductDetail() {
       <section className="product-detail__hero">
         <div className="product-detail__visual">
           <div className="product-detail__visual-frame">
-            <img src={product.heroImage} alt={product.title} className="product-detail__hero-image" />
+            <img
+              src={product.heroImage}
+              alt={product.title}
+              className="product-detail__hero-image"
+            />
 
             <button
               type="button"
