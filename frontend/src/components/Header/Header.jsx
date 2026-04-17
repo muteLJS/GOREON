@@ -218,7 +218,6 @@ function Header() {
               </button>
             ))}
           </div>
-
           <div className="header__auth">
             <button type="button">로그인</button>
             <button type="button">회원가입</button>
