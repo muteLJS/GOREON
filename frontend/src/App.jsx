@@ -15,26 +15,30 @@ import PcAssembly from "./pages/PcAssembly/PcAssembly";
 import PcAssemblyQuote from "./pages/PcAssemblyQuote/PcAssemblyQuote";
 import Register from "./pages/Register/Register";
 import List from "./pages/List/List";
+import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 
 function App() {
   return (
-    <Routes>
-      <Route element={<MainLayout />}>
-        <Route path="/" element={<Main />} />
-        <Route path="/search" element={<Search />} />
-        <Route path="/category" element={<Category />} />
-        <Route path="/pc-assembly" element={<PcAssembly />} />
-        <Route path="/pc-assembly-quote" element={<PcAssemblyQuote />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/wishlist" element={<Wishlist />} />
-        <Route path="/product/:id" element={<ProductDetail />} />
-        <Route path="/payment" element={<Payment />} />
-        <Route path="/mypage" element={<MyPage />} />
-        <Route path="/list" element={<List />} />
-      </Route>
-    </Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Main />} />
+          <Route path="/search" element={<Search />} />
+          <Route path="/category" element={<Category />} />
+          <Route path="/pc-assembly" element={<PcAssembly />} />
+          <Route path="/pc-assembly-quote" element={<PcAssemblyQuote />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/mypage" element={<MyPage />} />
+          <Route path="/list" element={<List />} />
+        </Route>
+      </Routes>
+    </>
   );
 }
 
