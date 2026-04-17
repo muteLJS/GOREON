@@ -127,15 +127,11 @@ function PcAssemblyQuote() {
             </button>
           </div>
 
-          {items.length > 0 ? (
-            <PcAssemblyQuoteList
-              productList={items}
-              selectedIds={selectedIds}
-              onSelectItem={handleSelectItem}
-            />
-          ) : (
-            <p className="pc-assembly-quote__empty">아직 담긴 상품이 없습니다.</p>
-          )}
+          <PcAssemblyQuoteList
+            productList={items}
+            selectedIds={selectedIds}
+            onSelectItem={handleSelectItem}
+          />
         </section>
 
         <section className="pc-assembly-quote__compatibility">
