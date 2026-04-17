@@ -4,6 +4,7 @@
 /* -------------------------------------------------------------------------- */
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./PcAssembly.scss";
 
 import ProductCardVertical from "@/components/ProductCard/ProductCardVertical";
@@ -64,8 +65,8 @@ const productList = [
 /* 필터 더미데이터 */
 const categories = ["CPU", "램", "메인보드", "그래픽카드", "저장장치", "케이스", "파워"];
 
-
 function PcAssembly() {
+  const navigate = useNavigate();
   const [totalPrice, setTotalPrice] = useState(400000);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("CPU");
@@ -118,7 +119,12 @@ function PcAssembly() {
             <button className="pc-assembly__total">
               TOTAL : ₩{totalPrice.toLocaleString("ko-KR")}
             </button>
-            <button className="pc-assembly__list-button">견적 리스트</button>
+            <button
+              className="pc-assembly__list-button"
+              onClick={() => navigate("/pc-assembly-quote")}
+            >
+              견적 리스트
+            </button>
           </div>
           <div className="pc-assembly__compatibility">
             <div className="pc-assembly__compatibility-count">
@@ -152,7 +158,12 @@ function PcAssembly() {
               <div className="pc-assembly__compatibility-status">호환성 모두 이상 없음</div>
             </div>
 
-            <button className="pc-assembly__list-button">견적 리스트</button>
+            <button
+              className="pc-assembly__list-button"
+              onClick={() => navigate("/pc-assembly-quote")}
+            >
+              견적 리스트
+            </button>
           </section>
 
           <div className="pc-assembly__desktop-list">
