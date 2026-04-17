@@ -746,6 +746,7 @@
         padding: 0 25px 5px;
         @include flex(center, space-between);
         .buttons {
+          @include flex(flex-start, center);
           gap: 20px;
           button {
             font-size: $font-sm;
@@ -1216,5 +1217,4 @@
       }
     }
   }
-
 }
