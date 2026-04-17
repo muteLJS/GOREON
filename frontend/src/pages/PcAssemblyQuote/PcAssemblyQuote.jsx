@@ -2,94 +2,17 @@ import "./PcAssemblyQuote.scss";
 import PcAssemblyQuoteList from "@/components/PcAssemblyQuoteList/PcAssemblyQuoteList";
 import CheckIcon from "@/assets/icons/check.svg";
 import { useState } from "react";
-
-const productList = [
-  {
-    id: 1,
-    productId: 10111,
-    category: "CPU",
-    name: "인텔 코어 i5-14400F",
-    option: "벌크",
-    price: 200000,
-    quantity: 1,
-    image:
-      "https://img.danuri.io/catalog-image/286/424/108/577a3036f3bf4923a5358055d5c11dcb.jpg?shrink=500:*&_v=20260416113343",
-    compatibility: "ok",
-  },
-  {
-    id: 2,
-    productId: 20221,
-    category: "메인보드",
-    name: "MSI PRO B760M-A WIFI",
-    price: 189000,
-    quantity: 1,
-    image:
-      "https://img.danuri.io/catalog-image/286/424/108/577a3036f3bf4923a5358055d5c11dcb.jpg?shrink=500:*&_v=20260416113343",
-    compatibility: "ok",
-  },
-  {
-    id: 3,
-    productId: 30331,
-    category: "그래픽카드",
-    name: "ZOTAC GAMING 지포스 RTX 4060 SOLO",
-    option: "블랙",
-    price: 449000,
-    quantity: 1,
-    image:
-      "https://img.danuri.io/catalog-image/286/424/108/577a3036f3bf4923a5358055d5c11dcb.jpg?shrink=500:*&_v=20260416113343",
-    compatibility: "warning",
-  },
-  {
-    id: 4,
-    productId: 40441,
-    category: "램",
-    name: "삼성전자 DDR5-5600 16GB",
-    price: 59000,
-    quantity: 2,
-    image:
-      "https://img.danuri.io/catalog-image/286/424/108/577a3036f3bf4923a5358055d5c11dcb.jpg?shrink=500:*&_v=20260416113343",
-    compatibility: "ok",
-  },
-  {
-    id: 5,
-    productId: 50551,
-    category: "저장장치",
-    name: "삼성전자 990 EVO Plus 1TB",
-    price: 129000,
-    quantity: 1,
-    image:
-      "https://img.danuri.io/catalog-image/286/424/108/577a3036f3bf4923a5358055d5c11dcb.jpg?shrink=500:*&_v=20260416113343",
-    compatibility: "ok",
-  },
-  {
-    id: 6,
-    productId: 60661,
-    category: "케이스",
-    name: "darkFlash DS900 ARGB 강화유리",
-    option: "블랙",
-    price: 69000,
-    quantity: 1,
-    image:
-      "https://img.danuri.io/catalog-image/286/424/108/577a3036f3bf4923a5358055d5c11dcb.jpg?shrink=500:*&_v=20260416113343",
-    compatibility: "ok",
-  },
-  {
-    id: 7,
-    productId: 70771,
-    category: "파워",
-    name: "마이크로닉스 Classic II 750W GOLD",
-    price: 119000,
-    quantity: 1,
-    image:
-      "https://img.danuri.io/catalog-image/286/424/108/577a3036f3bf4923a5358055d5c11dcb.jpg?shrink=500:*&_v=20260416113343",
-    compatibility: "error",
-  },
-];
+import { useDispatch, useSelector } from "react-redux";
+import { removeQuoteItems, clearQuoteItems } from "@/store/slices/quoteSlice";
 
 function PcAssemblyQuote() {
-  const [items, setItems] = useState(productList);
-  const [selectedIds, setSelectedIds] = useState(productList.map((item) => item.id));
+  const dispatch = useDispatch();
+  const items = useSelector((state) => state.quote.items);
+  const [selectedIds, setSelectedIds] = useState([]);
   const isAllSelected = items.length > 0 && selectedIds.length === items.length;
+  const totalPrice = items.reduce((sum, item) => {
+    return sum + item.price * item.quantity;
+  }, 0);
 
   const handleSelectAll = () => {
     setSelectedIds(isAllSelected ? [] : items.map((item) => item.id));
@@ -102,7 +25,7 @@ function PcAssemblyQuote() {
   };
 
   const handleDeleteSelected = () => {
-    setItems((prev) => prev.filter((item) => !selectedIds.includes(item.id)));
+    dispatch(removeQuoteItems(selectedIds));
     setSelectedIds([]);
   };
 
@@ -137,12 +60,14 @@ function PcAssemblyQuote() {
         <section className="pc-assembly-quote__compatibility">
           <div className="pc-assembly-quote__compatibility-count">
             <img src={CheckIcon} alt="체크" />
-            부품 6개 선택
+            부품 {items.length} 선택
           </div>
           <div className="pc-assembly-quote__compatibility-status">호환성 모두 이상 없음</div>
         </section>
 
-        <strong className="pc-assembly-quote__total">TOTAL : 400,000원</strong>
+        <strong className="pc-assembly-quote__total">
+          TOTAL : ₩{totalPrice.toLocaleString("ko-KR")}
+        </strong>
 
         <div className="pc-assembly-quote__right">
           <section className="pc-assembly-quote__performance">
@@ -166,6 +91,10 @@ function PcAssemblyQuote() {
             <button
               className="pc-assembly-quote__action-button pc-assembly-quote__action-button--secondary"
               type="button"
+              onClick={() => {
+                dispatch(clearQuoteItems());
+                setSelectedIds([]);
+              }}
             >
               초기화
             </button>
