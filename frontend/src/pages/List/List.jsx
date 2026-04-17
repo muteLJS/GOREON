@@ -44,18 +44,44 @@ const TYPE_LABEL_MAP = {
   acer: "Acer",
 };
 
-const CATEGORY_TYPE_MAP = {
-  노트북: "notebook",
-  데스크탑: "desktop",
-  모니터: "monitor",
-  키보드: "keyboard",
-  마우스: "mouse",
-  PC주변기기: "pc-accessory",
-  PC부품: "pc-part",
-};
+const normalizeTagValue = (value) =>
+  String(value ?? "")
+    .replace(/\s/g, "")
+    .toLowerCase();
+const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
+const getTagTokens = (value) =>
+  String(value ?? "")
+    .split(",")
+    .map((token) => normalizeTagValue(token))
+    .filter(Boolean);
 
-const buildRouteId = (category, product, productIndex) =>
-  `${category.categoryId ?? category.categoryName}-${product.id ?? productIndex + 1}-${productIndex}`;
+const flattenProductList = (data) =>
+  data.flatMap((entry, entryIndex) => {
+    const hasNestedProducts = Array.isArray(entry?.products) || Array.isArray(entry?.subCategories);
+
+    if (!hasNestedProducts) {
+      return [{ ...entry, __routeId: String(entry?.id ?? entryIndex + 1) }];
+    }
+
+    const categoryName = entry.categoryName ?? "";
+    const directProducts = (entry.products ?? []).map((product, productIndex) => ({
+      ...product,
+      tag: product.tag ?? categoryName,
+      __routeId: `${entry.categoryId ?? categoryName}-${product.id ?? productIndex + 1}-${productIndex}`,
+    }));
+
+    const subCategoryProducts = (entry.subCategories ?? []).flatMap((subCategory, subIndex) =>
+      (subCategory.products ?? []).map((product, productIndex) => ({
+        ...product,
+        tag: product.tag ?? categoryName,
+        __routeId: `${entry.categoryId ?? categoryName}-${subCategory.categoryId ?? subIndex}-${
+          product.id ?? productIndex + 1
+        }-${productIndex}`,
+      })),
+    );
+
+    return [...directProducts, ...subCategoryProducts];
+  });
 
 const FilterMenuList = ({ children }) => {
   return (
@@ -97,27 +123,25 @@ export default function List() {
     }
   };
 
-  const normalizedProducts = productList.flatMap((category) => {
-    const mappedType = CATEGORY_TYPE_MAP[category.categoryName] ?? "";
-    const categoryProducts = Array.isArray(category.products) ? category.products : [];
+  const normalizedProducts = flattenProductList(productList).map((product, productIndex) => ({
+    ...product,
+    id: String(product.__routeId ?? product.id ?? productIndex + 1),
+    sourceId: product.id ?? null,
+    image: product.image || ProductImage,
+    price: parsePrice(product.price),
+    rating: Number(product.rating) || 0,
+  }));
 
-    return categoryProducts.map((product, productIndex) => ({
-      ...product,
-      id: buildRouteId(category, product, productIndex),
-      sourceId: product.id,
-      type: mappedType,
-      image: product.image || ProductImage,
-      price: Number(String(product.price).replace(/,/g, "")) || 0,
-      rating: Number(product.rating) || 0,
-    }));
-  });
-
-  const filteredProducts = type
-    ? normalizedProducts.filter((item) => item.type === type)
+  const normalizedType = normalizeTagValue(type);
+  const filteredProducts = normalizedType
+    ? normalizedProducts.filter((item) => {
+        const tagTokens = getTagTokens(item.tag);
+        return tagTokens.includes(normalizedType);
+      })
     : normalizedProducts;
 
   const filteredLength = filteredProducts.length;
-  const selectedTypeLabel = TYPE_LABEL_MAP[type] ?? "전체 상품";
+  const selectedTypeLabel = TYPE_LABEL_MAP[type] ?? type ?? "전체 상품";
   const manufacturerList = ["APPLE", "SAMSUNG", "ASUS", "LENOVO"];
   const weightList = ["1Kg 미만", "1Kg ~ 2Kg", "2Kg ~ 3Kg", "3Kg 이상"];
   const screenSizeList = ["13인치", "14인치", "15인치", "16인치", "17인치 이상"];
