@@ -15,6 +15,7 @@ import PcAssembly from "./pages/PcAssembly/PcAssembly";
 import PcAssemblyQuote from "./pages/PcAssemblyQuote/PcAssemblyQuote";
 import Register from "./pages/Register/Register";
 import List from "./pages/List/List";
+import OrderHistory from "./pages/OrderHistory/OrderHistory";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
           <Route path="/payment" element={<Payment />} />
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/list" element={<List />} />
+          <Route path="/order-history" element={<OrderHistory />} />
         </Route>
       </Routes>
     </>
