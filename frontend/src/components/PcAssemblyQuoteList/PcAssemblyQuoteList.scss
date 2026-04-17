@@ -1,0 +1,16 @@
+@import "styles/variables";
+@import "styles/mixins";
+
+.pc-assembly-quote-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(60, 60, 60, 0.24);
+  padding: $space-sm;
+
+  &__empty {
+    padding: $space-lg 0;
+    text-align: center;
+  }
+}

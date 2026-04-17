@@ -1,0 +1,148 @@
+@import "styles/variables";
+@import "styles/mixins";
+
+.pc-assembly-quote-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  align-items: center;
+  gap: $space-xs;
+  font-size: $font-sm;
+  padding-bottom: $space-sm;
+  border-bottom: 1px solid rgba(60, 60, 60, 0.24);
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .indicator {
+    display: inline-block;
+    border-radius: 999px;
+    width: $font-sm;
+    height: $font-sm;
+
+    &--ok {
+      background-color: green;
+    }
+
+    &--warning {
+      background-color: orange;
+    }
+
+    &--error {
+      background-color: red;
+    }
+  }
+
+  &__select {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 2;
+    cursor: pointer;
+
+    input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+
+  &__select-mark {
+    @include flex-center;
+    position: relative;
+    width: 16px;
+    height: 16px;
+    border: 1px solid $color-text-main;
+    border-radius: 5px;
+    background: $color-white;
+    transition:
+      background-color $transition-fast,
+      border-color $transition-fast;
+
+    &::after {
+      content: "";
+      width: 7px;
+      height: 4px;
+      border-left: 2px solid transparent;
+      border-bottom: 2px solid transparent;
+      transform: translateY(-1px) rotate(-45deg);
+      transition:
+        border-color $transition-fast,
+        opacity $transition-fast;
+      opacity: 0;
+    }
+  }
+
+  &__select input:checked + &__select-mark {
+    border-color: $color-text-main;
+    background: $color-text-main;
+
+    &::after {
+      border-color: $color-white;
+      opacity: 1;
+    }
+  }
+
+  &__image {
+    aspect-ratio: 1 / 1;
+    padding: $space-xs;
+    img {
+      object-fit: contain;
+    }
+  }
+
+  &__info {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  &__info-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__info-name {
+    @include ellipsis-multi(1);
+  }
+
+  &__info-category {
+    font-weight: $font-bold;
+  }
+
+  &__info-option {
+    color: $color-text-muted;
+    font-size: $font-xs;
+  }
+
+  &__info-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__info-price {
+    font-weight: $font-bold;
+  }
+
+  &__info-action {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+
+    button {
+      padding: 0;
+      width: $font-md;
+      height: $font-md;
+
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+}

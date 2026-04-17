@@ -1,0 +1,54 @@
+@import "styles/variables";
+@import "styles/mixins";
+
+.product-card-horizontal {
+  display: flex;
+  align-items: center;
+  gap: $space-md;
+  border-radius: 16px;
+  border: 1px solid #60606024;
+  padding: $space-md;
+  cursor: pointer;
+
+  &__thumbnail {
+    flex-shrink: 0;
+    width: 120px;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+
+  &__content {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+    align-self: stretch;
+    gap: $space-xs;
+  }
+
+  &__title {
+    @include ellipsis-multi(2);
+    color: $color-text-main;
+    font-size: $font-md;
+    font-weight: $font-bold;
+  }
+
+  &__bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: $space-md;
+    margin-top: auto;
+  }
+
+  &__price {
+    color: $color-text-main;
+    font-size: $font-lg;
+    font-weight: $font-bold;
+  }
+
+  &__action {
+    flex-shrink: 0;
+  }
+}

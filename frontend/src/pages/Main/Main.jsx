@@ -131,7 +131,7 @@ function Main() {
   const handleInput = (e) => {
     const el = e.target;
     el.style.height = "auto";
-    el.style.height = el.scrollHeight + "px";
+    el.style.height = `${el.scrollHeight}px`;
   };
 
   const handleCategorySwiperChange = (swiper) => {
