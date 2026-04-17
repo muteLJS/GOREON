@@ -16,13 +16,13 @@ const categoryMenu = [
     key: "computer",
     title: "컴퓨터",
     items: [
-      { label: "노트북", type: "notebook" },
-      { label: "데스크탑", type: "desktop" },
-      { label: "모니터", type: "monitor" },
-      { label: "키보드", type: "keyboard" },
-      { label: "마우스", type: "mouse" },
-      { label: "PC 주변기기", type: "pc-accessory" },
-      { label: "PC 부품", type: "pc-part" },
+      { label: "노트북", type: "노트북" },
+      { label: "데스크탑", type: "데스크탑" },
+      { label: "모니터", type: "모니터" },
+      { label: "키보드", type: "키보드" },
+      { label: "마우스", type: "마우스" },
+      { label: "PC 주변기기", type: "PC주변기기" },
+      { label: "PC 부품", type: "PC부품" },
     ],
   },
   {
@@ -30,9 +30,9 @@ const categoryMenu = [
     key: "mobile",
     title: "모바일",
     items: [
-      { label: "스마트폰", type: "smartphone" },
-      { label: "스마트워치", type: "smartwatch" },
-      { label: "이어폰", type: "earphone" },
+      { label: "스마트폰", type: "스마트폰" },
+      { label: "스마트워치", type: "스마트워치" },
+      { label: "이어폰", type: "이어폰" },
     ],
   },
   {
@@ -40,10 +40,10 @@ const categoryMenu = [
     key: "tablet",
     title: "태블릿",
     items: [
-      { label: "태블릿", type: "tablet" },
-      { label: "태블릿 액세서리", type: "tablet-accessory" },
-      { label: "펜슬", type: "pencil" },
-      { label: "키보드 케이스", type: "keyboard-case" },
+      { label: "태블릿", type: "태블릿" },
+      { label: "태블릿 액세서리", type: "태블릿액세서리" },
+      { label: "펜슬", type: "펜슬" },
+      { label: "키보드 케이스", type: "키보드케이스" },
     ],
   },
   {
@@ -51,10 +51,10 @@ const categoryMenu = [
     key: "accessory",
     title: "생활가전",
     items: [
-      { label: "프린터", type: "printer" },
-      { label: "공유기", type: "router" },
-      { label: "웹캠", type: "webcam" },
-      { label: "보조배터리", type: "power-bank" },
+      { label: "프린터", type: "프린터" },
+      { label: "공유기", type: "공유기" },
+      { label: "웹캠", type: "웹캠" },
+      { label: "보조배터리", type: "보조배터리" },
     ],
   },
 ];
@@ -67,15 +67,15 @@ const brandMenu = [
     items: [
       {
         label: "Apple",
-        type: "apple",
+        type: "애플",
       },
       {
         label: "Samsung",
-        type: "samsung",
+        type: "삼성",
       },
       {
         label: "LG",
-        type: "lg",
+        type: "LG",
       },
     ],
   },
@@ -91,11 +91,11 @@ const brandMenu = [
       },
       {
         label: "Lenovo",
-        type: "lenovo",
+        type: "레노버",
       },
       {
         label: "Dell",
-        type: "dell",
+        type: "델",
       },
     ],
   },
@@ -114,7 +114,7 @@ const brandMenu = [
       },
       {
         label: "Acer",
-        type: "acer",
+        type: "에이서",
       },
     ],
   },

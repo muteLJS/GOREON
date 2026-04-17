@@ -15,8 +15,6 @@ import ProductHeroImage from "../../assets/img/intel-core-ultra5-250kf-plus-prod
 
 const formatPrice = (price) => `W ${price.toLocaleString("ko-KR")}`;
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
-const buildRouteId = (category, product, productIndex) =>
-  `${category.categoryId ?? category.categoryName}-${product.id ?? productIndex + 1}-${productIndex}`;
 const normalizeImageUrl = (value) => {
   const raw = String(value ?? "").trim();
   if (!raw) {
@@ -31,16 +29,45 @@ const normalizeImageUrl = (value) => {
   return raw;
 };
 
-function getProductDetailByIdFromJson(id) {
-  const flatProducts = productList.flatMap((category) => {
-    const categoryProducts = Array.isArray(category.products) ? category.products : [];
-    return categoryProducts.map((product, productIndex) => ({
+const flattenProductList = (data) =>
+  data.flatMap((entry, entryIndex) => {
+    const hasNestedProducts = Array.isArray(entry?.products) || Array.isArray(entry?.subCategories);
+
+    if (!hasNestedProducts) {
+      return [
+        {
+          ...entry,
+          categoryName: entry?.tag ?? "",
+          categoryId: entry?.categoryId ?? null,
+          routeId: String(entry?.id ?? entryIndex + 1),
+        },
+      ];
+    }
+
+    const categoryName = entry.categoryName ?? "";
+    const directProducts = (entry.products ?? []).map((product, productIndex) => ({
       ...product,
-      categoryName: category.categoryName,
-      categoryId: category.categoryId,
-      routeId: buildRouteId(category, product, productIndex),
+      categoryName,
+      categoryId: entry.categoryId,
+      routeId: `${entry.categoryId ?? categoryName}-${product.id ?? productIndex + 1}-${productIndex}`,
     }));
+
+    const subCategoryProducts = (entry.subCategories ?? []).flatMap((subCategory, subIndex) =>
+      (subCategory.products ?? []).map((product, productIndex) => ({
+        ...product,
+        categoryName,
+        categoryId: entry.categoryId,
+        routeId: `${entry.categoryId ?? categoryName}-${subCategory.categoryId ?? subIndex}-${
+          product.id ?? productIndex + 1
+        }-${productIndex}`,
+      })),
+    );
+
+    return [...directProducts, ...subCategoryProducts];
   });
+
+function getProductDetailByIdFromJson(id) {
+  const flatProducts = flattenProductList(productList);
 
   const product =
     flatProducts.find((item) => String(item.routeId) === String(id)) ??
