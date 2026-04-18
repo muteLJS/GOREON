@@ -163,8 +163,7 @@ function ProductDetail() {
     setIsOverviewExpanded(false);
   }, [product.id]);
 
-  const selectedOption =
-    product.options.find((option) => option.id === selectedOptionId) || null;
+  const selectedOption = product.options.find((option) => option.id === selectedOptionId) || null;
   const displayOption = selectedOption || product.options[0];
   const totalPrice = displayOption.price * quantity;
   const isWishlisted = wishlistItems.some((item) => item.id === product.id);
