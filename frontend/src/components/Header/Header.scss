@@ -364,7 +364,7 @@ body.mobile-menu-open {
 
   .dropdown {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 1px);
     left: 0;
     width: 100%;
     background: $color-white;
@@ -441,4 +441,3 @@ body.mobile-menu-open {
     display: inline-flex;
   }
 }
-
