@@ -1,5 +1,5 @@
 ﻿import "./Main.scss";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import AI_Logo from "assets/logo/ai/character.svg";
@@ -20,10 +20,12 @@ import Cart_straight from "assets/Icons/cart-straight.svg";
 
 function Main() {
   const [showAiResult, setShowAiResult] = useState(false);
+  const [isAiSwitching, setIsAiSwitching] = useState(false);
   const [categorySwiperState, setCategorySwiperState] = useState({
     progress: 0,
     thumbWidth: 25,
   });
+  const aiSwitchTimeoutRef = useRef(null);
   const promptItems = [
     "🎬 유튜브용 편집용 노트북",
     "🎮 FPS 게임에 맞는 모니터",
@@ -128,6 +130,26 @@ function Main() {
       tags: ["#업무용", "#가벼움", "#배터리"],
     },
   ];
+  const aiResultItems = [
+    {
+      name: "갤럭시 탭 S10",
+      spec: "128/256GB, WiFi,그레이",
+      price: "632,000원",
+      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/product_detail_main_img.png",
+    },
+    {
+      name: "갤럭시 탭 S10",
+      spec: "128/256GB, WiFi,그레이",
+      price: "632,000원",
+      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/product_detail_main_img.png",
+    },
+    {
+      name: "갤럭시 탭 S10",
+      spec: "128/256GB, WiFi,그레이",
+      price: "632,000원",
+      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/product_detail_main_img.png",
+    },
+  ];
   const handleInput = (e) => {
     const el = e.target;
     el.style.height = "auto";
@@ -150,191 +172,219 @@ function Main() {
 
   const handleAiSubmit = (e) => {
     e.preventDefault();
+    if (showAiResult) {
+      return;
+    }
+    setIsAiSwitching(true);
     setShowAiResult(true);
+    aiSwitchTimeoutRef.current = window.setTimeout(() => {
+      setIsAiSwitching(false);
+      aiSwitchTimeoutRef.current = null;
+    }, 650);
   };
+
+  useEffect(
+    () => () => {
+      if (aiSwitchTimeoutRef.current) {
+        window.clearTimeout(aiSwitchTimeoutRef.current);
+      }
+    },
+    [],
+  );
+
+  const renderAiReviewSection = () => (
+    <section className="main-page__section main-page__section--ai-review">
+      <div className="back back--ai-review" />
+      <div className="section__AI_Review sections section__AI_Review--revealed">
+        <div className="text_box">
+          <h2>AI 추천 제품 실제 구매 리뷰</h2>
+          <h4>고르미의 추천을 받고 구매한 고객들의 생생한 리뷰입니다.</h4>
+        </div>
+        <div className="review_box">
+          <ReviewCard
+            userImage={Review_user}
+            userName="User**6*"
+            productName="갤럭시 탭 S10"
+            description={reviewDescription}
+          />
+          <ReviewCard
+            userImage={Review_user}
+            userName="User**6*"
+            productName="갤럭시 탭 S10"
+            description={reviewDescription}
+          />
+          <ReviewCard
+            userImage={Review_user}
+            userName="User**6*"
+            productName="갤럭시 탭 S10"
+            description={reviewDescription}
+          />
+        </div>
+      </div>
+    </section>
+  );
+
+  const renderInitialAiSection = (isLeaving = false) => (
+    <div className={`ai-stage__layer ai-stage__layer--initial ${isLeaving ? "is-leaving" : ""}`}>
+      <div className="section__AI sections">
+        <div className="AI_container">
+          <div className="AI_description">
+            <button>
+              <div className="circle"></div>AI 전자기기 추천 서비스
+            </button>
+            <h2 className="AI_Main_text">
+              복잡한 스펙 비교,
+              <br /> 이제 <span className="input">AI 고르미</span>에게
+              <br /> 맡기세요
+            </h2>
+            <p className="AI_sub_text">
+              용도 · 예산 · 사용환경을 말하면
+              <br /> 수천 개의 제품 중 딱 맞는 전자기기를 골라드려요
+              <br />
+              어려운 스펙 설명 없이, 쉽고 빠르게.
+            </p>
+            <div className="AI_Chat_row_2">
+              <PromptButtonList items={promptItems} />
+            </div>
+          </div>
+          <img src={AI_Logo} alt="AI_logo" className="AI_logo" />
+        </div>
+        <div className="AI_chat_container">
+          <form action="#" method="POST" onSubmit={handleAiSubmit}>
+            <div className="AI_Chat_row_1">
+              <textarea
+                name="ai_chat"
+                id="ai_chat"
+                rows={1}
+                placeholder="무엇이든 물어보세요!"
+                onInput={handleInput}
+              />
+              <button className="submit" type="submit">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="12" fill="#0AA6A6" />
+                  <path
+                    d="M8 13L12 9L16 13"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="AI_Chat_row_2">
+              <PromptButtonList items={promptItems} variant="swiper" />
+              <button className="submit" type="submit">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                  <circle cx="20" cy="20" r="20" fill="#0AA6A6" />
+                  <path
+                    d="M13 22L20 15L27 22"
+                    stroke="white"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderResultAiSection = (isEntering = false) => (
+    <div className={`ai-stage__layer ai-stage__layer--result ${isEntering ? "is-entering" : ""}`}>
+      <div className="section__AI_result sections">
+        <Swiper
+          className="recommends"
+          slidesPerView={1.4}
+          spaceBetween={12}
+          breakpoints={{
+            768: {
+              slidesPerView: 3,
+              spaceBetween: 20,
+            },
+            1024: {
+              slidesPerView: 3,
+              spaceBetween: 24,
+            },
+          }}
+        >
+          {aiResultItems.map((item, index) => (
+            <SwiperSlide key={`ai-result-${index}`}>
+              <div className="recommend">
+                <img src={item.image} alt="" />
+                <div className="texts">
+                  <p>{item.name}</p>
+                  <p>{item.spec}</p>
+                </div>
+                <div className="go">
+                  <p className="price">{item.price}</p>
+                  <div className="chevron" aria-hidden="true">
+                    <svg viewBox="0 0 24 12">
+                      <path d="M2 10L12 2L22 10" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+        <div className="AI_chat_response">
+          <img src={Lighting} alt="Lighting" />
+          <p>대학생에게 인기 있는 가벼운 노트북 3가지를 추천해드릴게요</p>
+        </div>
+        <div className="AI_chat_container">
+          <form action="#" method="POST" onSubmit={handleAiSubmit}>
+            <div className="AI_Chat_row_1">
+              <textarea
+                name="ai_chat"
+                id="ai_chat"
+                rows={1}
+                placeholder="대학생용 가벼운 노트북 추천해줘."
+                onInput={handleInput}
+              />
+            </div>
+            <div className="AI_Chat_row_2">
+              <PromptButtonList items={promptItems} />
+              <button className="submit" type="submit">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                  <circle cx="20" cy="20" r="20" fill="#0AA6A6" />
+                  <path
+                    d="M13 22L20 15L27 22"
+                    stroke="white"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          </form>
+          <div className="AI_container">
+            <img src={AI_Logo} alt="AI_logo" className="AI_logo" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <main className="main-page">
       <h1 className="hidden">메인 페이지</h1>
-      <section className="main-page__section">
-        {showAiResult ? (
-          <>
-            <div className="back back--ai-result" />
-            <div className="section__AI_result sections">
-              <div className="recommends">
-                <div className="recommend">
-                  <img
-                    src="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/product_detail_main_img.png"
-                    alt=""
-                  />
-                  <div className="texts">
-                    <p>갤럭시 탭 S10</p>
-                    <p>128/256GB, WiFi,그레이</p>
-                  </div>
-                  <div className="go">
-                    <p className="price">632,000원</p>
-                    <div className="chevron" aria-hidden="true">
-                      <svg viewBox="0 0 24 12">
-                        <path d="M2 10L12 2L22 10" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>{" "}
-                <div className="recommend">
-                  <img
-                    src="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/product_detail_main_img.png"
-                    alt=""
-                  />
-                  <div className="texts">
-                    <p>갤럭시 탭 S10</p>
-                    <p>128/256GB, WiFi,그레이</p>
-                  </div>
-                  <div className="go">
-                    <p className="price">632,000원</p>
-                    <div className="chevron" aria-hidden="true">
-                      <svg viewBox="0 0 24 12">
-                        <path d="M2 10L12 2L22 10" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="AI_chat_response">
-                <img src={Lighting} alt="Lighting" />
-                <p>대학생에게 인기 있는 가벼운 노트북 3가지를 추천해드릴게요</p>
-              </div>
-              <div className="AI_chat_container">
-                <form action="#" method="POST">
-                  <div className="AI_Chat_row_1">
-                    <textarea
-                      name="ai_chat"
-                      id="ai_chat"
-                      rows={1}
-                      placeholder="대학생용 가벼운 노트북 추천해줘."
-                      onInput={handleInput}
-                    />
-                  </div>
-                  <div className="AI_Chat_row_2">
-                    <PromptButtonList items={promptItems} />
-                    <button className="submit">
-                      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-                        <circle cx="20" cy="20" r="20" fill="#0AA6A6" />
-                        <path
-                          d="M13 22L20 15L27 22"
-                          stroke="white"
-                          strokeWidth="3"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                </form>
-                <div className="AI_container">
-                  <img src={AI_Logo} alt="AI_logo" className="AI_logo" />
-                </div>
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="back back--ai" />
-            <div className="section__AI sections">
-              <div className="AI_container">
-                <div className="AI_description">
-                  <button>
-                    <div className="circle"></div>AI 전자기기 추천 서비스
-                  </button>
-                  <h2 className="AI_Main_text">
-                    복잡한 스펙 비교,
-                    <br /> 이제 <span className="input">AI 고르미</span>에게
-                    <br /> 맡기세요
-                  </h2>
-                  <p className="AI_sub_text">
-                    용도 · 예산 · 사용환경을 말하면
-                    <br /> 수천 개의 제품 중 딱 맞는 전자기기를 골라드려요
-                    <br />
-                    어려운 스펙 설명 없이, 쉽고 빠르게.
-                  </p>
-                  <div className="AI_Chat_row_2">
-                    <PromptButtonList items={promptItems} />
-                  </div>
-                </div>
-                <img src={AI_Logo} alt="AI_logo" className="AI_logo" />
-              </div>
-              <div className="AI_chat_container">
-                <form action="#" method="POST" onSubmit={handleAiSubmit}>
-                  <div className="AI_Chat_row_1">
-                    <textarea
-                      name="ai_chat"
-                      id="ai_chat"
-                      rows={1}
-                      placeholder="무엇이든 물어보세요!"
-                      onInput={handleInput}
-                    />
-                    <button className="submit" type="submit">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="12" fill="#0AA6A6" />
-                        <path
-                          d="M8 13L12 9L16 13"
-                          stroke="white"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                  <div className="AI_Chat_row_2">
-                    <PromptButtonList items={promptItems} />
-                    <button className="submit" type="submit">
-                      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-                        <circle cx="20" cy="20" r="20" fill="#0AA6A6" />
-                        <path
-                          d="M13 22L20 15L27 22"
-                          stroke="white"
-                          strokeWidth="3"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </>
-        )}
-      </section>
-      <section className="main-page__section">
-        <div className="back back--ai-review" />
-        <div className="section__AI_Review sections">
-          <div className="text_box">
-            <h2>AI 추천 제품 실제 구매 리뷰</h2>
-            <h4>고르미의 추천을 받고 구매한 고객들의 생생한 리뷰입니다.</h4>
-          </div>
-          <div className="review_box">
-            <ReviewCard
-              userImage={Review_user}
-              userName="User**6*"
-              productName="갤럭시 탭 S10"
-              description={reviewDescription}
-            />
-            <ReviewCard
-              userImage={Review_user}
-              userName="User**6*"
-              productName="갤럭시 탭 S10"
-              description={reviewDescription}
-            />
-            <ReviewCard
-              userImage={Review_user}
-              userName="User**6*"
-              productName="갤럭시 탭 S10"
-              description={reviewDescription}
-            />
-          </div>
+      <section
+        className={`main-page__section main-page__section--ai ${
+          showAiResult ? "is-ai-result" : "is-ai-initial"
+        } ${isAiSwitching ? "is-ai-switching" : ""}`}
+      >
+        <div className={`back ${showAiResult ? "back--ai-result" : "back--ai"}`} />
+        <div className="ai-stage">
+          {!showAiResult || isAiSwitching ? renderInitialAiSection(isAiSwitching) : null}
+          {showAiResult ? renderResultAiSection(isAiSwitching) : null}
         </div>
       </section>
+      {showAiResult ? renderAiReviewSection() : null}
       <section className="main-page__section">
         <div className="back back--set-category" />
         <div className="section__Set_Category sections">
@@ -376,10 +426,6 @@ function Main() {
             onSwiper={handleCategorySwiperChange}
             onSlideChange={handleCategorySwiperChange}
             breakpoints={{
-              768: {
-                slidesPerView: 2.2,
-                spaceBetween: 16,
-              },
               1024: {
                 slidesPerView: 3.1,
                 spaceBetween: 20,
