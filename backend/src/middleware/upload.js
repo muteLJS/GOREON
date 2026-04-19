@@ -1,10 +1,14 @@
-/* -------------------------------------------------------------------------- */
-/* [미들웨어] 업로드 미들웨어 (upload)                                         */
-/* 설명: 이미지나 파일 업로드 전처리를 담당하는 미들웨어입니다.               */
-/* -------------------------------------------------------------------------- */
+const path = require("path");
+const multer = require("multer");
 
-function upload(req, res, next) {
-  next();
-}
+const storage = multer.diskStorage({
+  destination: path.join(process.cwd(), "uploads"),
+  filename: (req, file, cb) => {
+    const safeName = `${Date.now()}-${file.originalname.replace(/\s+/g, "-")}`;
+    cb(null, safeName);
+  },
+});
+
+const upload = multer({ storage });
 
 module.exports = upload;

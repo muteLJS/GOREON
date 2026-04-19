@@ -1,7 +1,8 @@
-﻿import "./Register.scss";
+import "./Register.scss";
+import Login from "../Login/Login";
 
 function Register() {
-  return <main>Register Page</main>;
+  return <Login initialMode="register" />;
 }
 
 export default Register;

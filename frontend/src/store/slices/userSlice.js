@@ -5,9 +5,13 @@
 
 import { createSlice } from "@reduxjs/toolkit";
 
+const persistedToken = localStorage.getItem("authToken");
+const persistedUser = localStorage.getItem("userInfo");
+
 const initialState = {
-  isLoggedIn: false,
-  userInfo: null,
+  isLoggedIn: Boolean(persistedToken),
+  token: persistedToken || null,
+  userInfo: persistedUser ? JSON.parse(persistedUser) : null,
 };
 
 const userSlice = createSlice({
@@ -16,11 +20,15 @@ const userSlice = createSlice({
   reducers: {
     login: (state, action) => {
       state.isLoggedIn = true;
-      state.userInfo = action.payload;
+      state.userInfo = action.payload.user;
+      state.token = action.payload.token;
     },
     logout: (state) => {
       state.isLoggedIn = false;
       state.userInfo = null;
+      state.token = null;
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("userInfo");
     },
   },
 });

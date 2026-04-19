@@ -2,7 +2,7 @@ import { useState } from "react";
 import LikeCircle from "components/like/like_circle";
 import Cart_straight from "assets/Icons/cart-straight.svg";
 
-function PackageCard({ title, description, price, mainImage, detailItems, defaultOpen = true }) {
+function PackageCard({ title, description, price, mainImage, detailItems, defaultOpen = false }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
@@ -41,7 +41,7 @@ function PackageCard({ title, description, price, mainImage, detailItems, defaul
       </div>
       <button
         type="button"
-        className={`chevron ${isOpen ? "is-open" : ""}`}
+        className={`chevron ${!isOpen ? "is-open" : ""}`}
         aria-expanded={isOpen}
         aria-label="패키지 상세 항목 보기"
         onClick={() => setIsOpen((prev) => !prev)}

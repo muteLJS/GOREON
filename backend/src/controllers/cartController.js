@@ -1,8 +1,16 @@
-/* -------------------------------------------------------------------------- */
-/* [컨트롤러] 장바구니 컨트롤러 (cartController)                               */
-/* 설명: 장바구니 조회, 추가, 삭제 등 장바구니 관련 요청을 처리합니다.        */
-/* -------------------------------------------------------------------------- */
+const cartService = require("../services/cartService");
 
-function getCart(req, res) {}
+async function getCart(req, res) {
+  const cart = await cartService.getCartByUserId(req.params.userId);
+  res.status(200).json({ data: cart });
+}
 
-module.exports = { getCart };
+async function upsertCart(req, res) {
+  const cart = await cartService.upsertCart(req.params.userId, req.body.items || []);
+  res.status(200).json({ data: cart });
+}
+
+module.exports = {
+  getCart,
+  upsertCart,
+};

@@ -273,7 +273,7 @@ function Main() {
               </button>
             </div>
             <div className="AI_Chat_row_2">
-              <PromptButtonList items={promptItems} variant="swiper" />
+              <PromptButtonList items={promptItems} variant="result" />
               <button className="submit" type="submit">
                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
                   <circle cx="20" cy="20" r="20" fill="#0AA6A6" />
@@ -482,7 +482,7 @@ function Main() {
               <h2>추천 조합</h2>
               <h4>함께 사면 시너지 효과가 큰 제품 세트를 고르미가 골라드려요</h4>
             </div>
-            <More />
+            <More className="more--desktop-only" />
           </div>
           <div className="pakage_boxs">
             <PackageCard

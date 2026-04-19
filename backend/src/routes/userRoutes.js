@@ -1,8 +1,12 @@
-/* -------------------------------------------------------------------------- */
-/* [라우트] 사용자 라우트 (userRoutes)                                         */
-/* 설명: 사용자 관련 API 엔드포인트를 연결하는 라우트 파일입니다.             */
-/* -------------------------------------------------------------------------- */
+const express = require("express");
 
-const userRoutes = [];
+const asyncHandler = require("../utils/asyncHandler");
+const userController = require("../controllers/userController");
 
-module.exports = userRoutes;
+const router = express.Router();
+
+router.get("/", asyncHandler(userController.listUsers));
+router.post("/", asyncHandler(userController.createUser));
+router.get("/:userId", asyncHandler(userController.getUser));
+
+module.exports = router;

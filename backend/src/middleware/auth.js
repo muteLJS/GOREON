@@ -1,10 +1,28 @@
-/* -------------------------------------------------------------------------- */
-/* [미들웨어] 인증 미들웨어 (auth)                                             */
-/* 설명: 로그인 여부와 권한을 확인하는 인증 처리 미들웨어입니다.              */
-/* -------------------------------------------------------------------------- */
+const jwt = require("jsonwebtoken");
+
+const env = require("../config/env");
+const ApiError = require("../utils/ApiError");
 
 function auth(req, res, next) {
-  next();
+  const authorization = req.header("authorization") || "";
+  const [scheme, token] = authorization.split(" ");
+
+  if (scheme !== "Bearer" || !token) {
+    return next(new ApiError(401, "Authentication required"));
+  }
+
+  try {
+    const decoded = jwt.verify(token, env.jwtSecret);
+    req.user = {
+      id: decoded.sub,
+      email: decoded.email,
+      role: decoded.role,
+    };
+
+    return next();
+  } catch (error) {
+    return next(new ApiError(401, "Invalid or expired token"));
+  }
 }
 
 module.exports = auth;

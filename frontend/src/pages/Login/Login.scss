@@ -16,6 +16,15 @@
     font-weight: $font-bold;
   }
 
+  .auth-error-message {
+    margin: -16px 0 0;
+    color: #cf2f2f;
+    font-size: 14px;
+    font-weight: $font-semibold;
+    line-height: 1.5;
+    text-align: center;
+  }
+
   form {
     // 폼 전체 세로 배치
     display: flex;
@@ -34,6 +43,15 @@
         font-size: $font-xs;
       }
     }
+  }
+
+  .auth-error-message {
+    margin: -36px 0 -28px;
+    color: #cf2f2f;
+    font-size: 15px;
+    font-weight: $font-semibold;
+    line-height: 1.5;
+    text-align: center;
   }
 
   // 로그인/회원가입 버튼 영역

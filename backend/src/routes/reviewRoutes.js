@@ -1,8 +1,11 @@
-/* -------------------------------------------------------------------------- */
-/* [라우트] 리뷰 라우트 (reviewRoutes)                                         */
-/* 설명: 리뷰 관련 API 엔드포인트를 연결하는 라우트 파일입니다.               */
-/* -------------------------------------------------------------------------- */
+const express = require("express");
 
-const reviewRoutes = [];
+const asyncHandler = require("../utils/asyncHandler");
+const reviewController = require("../controllers/reviewController");
 
-module.exports = reviewRoutes;
+const router = express.Router();
+
+router.get("/", asyncHandler(reviewController.getReviews));
+router.post("/", asyncHandler(reviewController.createReview));
+
+module.exports = router;

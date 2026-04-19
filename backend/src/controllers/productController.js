@@ -1,8 +1,22 @@
-/* -------------------------------------------------------------------------- */
-/* [컨트롤러] 상품 컨트롤러 (productController)                                 */
-/* 설명: 상품 목록 조회, 상품 상세 조회 등 상품 관련 요청을 처리합니다.        */
-/* -------------------------------------------------------------------------- */
+const productService = require("../services/productService");
 
-function getProducts(req, res) {}
+async function getProducts(req, res) {
+  const products = await productService.listProducts(req.query);
+  res.status(200).json({ data: products });
+}
 
-module.exports = { getProducts };
+async function getProduct(req, res) {
+  const product = await productService.getProductById(req.params.productId);
+  res.status(200).json({ data: product });
+}
+
+async function createProduct(req, res) {
+  const product = await productService.createProduct(req.body);
+  res.status(201).json({ data: product });
+}
+
+module.exports = {
+  getProducts,
+  getProduct,
+  createProduct,
+};

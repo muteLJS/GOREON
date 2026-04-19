@@ -1,9 +1,9 @@
 ﻿import "./More.scss";
 
-function More() {
+function More({ className = "" }) {
   return (
     <>
-      <div className="more">
+      <div className={`more ${className}`.trim()}>
         <p>더보기</p>
         <div className="icon_box" aria-hidden="true">
           <svg viewBox="0 0 49 31">

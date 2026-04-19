@@ -1,10 +1,18 @@
-/* -------------------------------------------------------------------------- */
-/* [미들웨어] 에러 핸들러 (errorHandler)                                       */
-/* 설명: 애플리케이션 전역 에러를 일관된 응답 형식으로 처리합니다.            */
-/* -------------------------------------------------------------------------- */
-
 function errorHandler(err, req, res, next) {
-  next(err);
+  const statusCode = err.statusCode || 500;
+  const message =
+    statusCode === 500 ? "Internal server error" : err.message || "Request failed";
+
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  return res.status(statusCode).json({
+    error: {
+      message,
+      ...(process.env.NODE_ENV !== "production" && { details: err.message }),
+    },
+  });
 }
 
 module.exports = errorHandler;

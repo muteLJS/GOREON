@@ -1,8 +1,11 @@
-/* -------------------------------------------------------------------------- */
-/* [라우트] 장바구니 라우트 (cartRoutes)                                       */
-/* 설명: 장바구니 관련 API 엔드포인트를 연결하는 라우트 파일입니다.           */
-/* -------------------------------------------------------------------------- */
+const express = require("express");
 
-const cartRoutes = [];
+const asyncHandler = require("../utils/asyncHandler");
+const cartController = require("../controllers/cartController");
 
-module.exports = cartRoutes;
+const router = express.Router();
+
+router.get("/:userId", asyncHandler(cartController.getCart));
+router.put("/:userId", asyncHandler(cartController.upsertCart));
+
+module.exports = router;

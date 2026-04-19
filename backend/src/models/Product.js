@@ -1,8 +1,47 @@
-/* -------------------------------------------------------------------------- */
-/* [모델] 상품 모델 (Product)                                                   */
-/* 설명: 상품 데이터 구조와 스키마를 정의하는 모델 파일입니다.                */
-/* -------------------------------------------------------------------------- */
+const { Schema, model } = require("mongoose");
 
-class Product {}
+const productSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    brand: {
+      type: String,
+      trim: true,
+    },
+    category: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    stock: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    description: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    thumbnailUrl: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-module.exports = Product;
+productSchema.index({ category: 1, brand: 1 });
+
+module.exports = model("Product", productSchema);

@@ -239,6 +239,19 @@
       font-size: $font-xs;
       font-weight: $font-bold;
     }
+
+    .buttons__slide {
+      width: auto !important;
+    }
+  }
+
+  .buttons--measure {
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: -1;
   }
 }
 
@@ -518,6 +531,30 @@
         button {
           flex: 0 0 auto;
           white-space: nowrap;
+        }
+      }
+
+      .buttons--desktop {
+        display: block;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+
+        .buttons__pages-swiper {
+          width: 100%;
+          overflow: hidden;
+        }
+
+        .buttons__page {
+          @include flex(center, flex-start);
+          flex-wrap: nowrap;
+          gap: 12px;
+          width: 100%;
+          overflow: hidden;
+        }
+
+        .swiper-slide {
+          width: 100% !important;
         }
       }
 
@@ -804,6 +841,30 @@
           }
         }
 
+        .buttons--desktop {
+          display: block;
+          flex: 1;
+          min-width: 0;
+          overflow: hidden;
+
+          .buttons__pages-swiper {
+            width: 100%;
+            overflow: hidden;
+          }
+
+          .buttons__page {
+            @include flex(center, flex-start);
+            flex-wrap: nowrap;
+            gap: 12px;
+            width: 100%;
+            overflow: hidden;
+          }
+
+          .swiper-slide {
+            width: 100% !important;
+          }
+        }
+
         .buttons--swiper {
           display: block;
           overflow: hidden;
@@ -922,6 +983,10 @@
 
   .section__Collarborates {
     gap: 24px;
+
+    .more--desktop-only {
+      display: none;
+    }
 
     .pakage_boxs {
       gap: 20px;
@@ -1500,10 +1565,34 @@
         padding: 0 25px 5px;
         @include flex(center, space-between);
         .buttons {
-          @include flex(flex-start, center);
+          @include flex(flex-start, flex-start);
+          flex-wrap: nowrap;
+          align-items: flex-start;
           gap: 20px;
+          width: 100%;
+          min-width: 0;
+
           button {
             font-size: $font-sm;
+            flex: 0 0 auto;
+            white-space: nowrap;
+          }
+
+          .buttons__pages-swiper {
+            width: 100%;
+            overflow: hidden;
+          }
+
+          .buttons__page {
+            @include flex(flex-start, flex-start);
+            flex-wrap: nowrap;
+            gap: 20px;
+            width: 100%;
+            overflow: hidden;
+          }
+
+          .swiper-slide {
+            width: 100% !important;
           }
         }
         .submit {
@@ -1604,15 +1693,33 @@
         padding: 0 25px 12px;
         @include flex(center, space-between);
         .buttons {
-          @include flex(center, flex-start);
+          @include flex(flex-start, flex-start);
           flex: 1;
           min-width: 0;
-          flex-wrap: wrap;
+          flex-wrap: nowrap;
+          align-items: flex-start;
           gap: 12px;
           button {
             font-size: $font-sm;
             flex: 0 0 auto;
             white-space: nowrap;
+          }
+
+          .buttons__pages-swiper {
+            width: 100%;
+            overflow: hidden;
+          }
+
+          .buttons__page {
+            @include flex(flex-start, flex-start);
+            flex-wrap: nowrap;
+            gap: 12px;
+            width: 100%;
+            overflow: hidden;
+          }
+
+          .swiper-slide {
+            width: 100% !important;
           }
         }
         .submit {
@@ -1828,6 +1935,10 @@
     }
   }
   .section__Collarborates {
+    .more--desktop-only {
+      display: none;
+    }
+
     .category_top {
       width: 100%;
       @include flex(flex-start, space-between);
@@ -1915,6 +2026,10 @@
     }
     .chevron {
       padding: 15px 0;
+    }
+
+    .more--desktop-only {
+      display: flex;
     }
   }
 

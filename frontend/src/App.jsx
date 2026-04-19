@@ -17,6 +17,7 @@ import Register from "./pages/Register/Register";
 import List from "./pages/List/List";
 import OrderHistory from "./pages/OrderHistory/OrderHistory";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
 function App() {
   return (
@@ -35,9 +36,23 @@ function App() {
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/payment" element={<Payment />} />
-          <Route path="/mypage" element={<MyPage />} />
+          <Route
+            path="/mypage"
+            element={
+              <ProtectedRoute>
+                <MyPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/list" element={<List />} />
-          <Route path="/order-history" element={<OrderHistory />} />
+          <Route
+            path="/order-history"
+            element={
+              <ProtectedRoute>
+                <OrderHistory />
+              </ProtectedRoute>
+            }
+          />
         </Route>
       </Routes>
     </>

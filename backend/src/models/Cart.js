@@ -1,8 +1,38 @@
-/* -------------------------------------------------------------------------- */
-/* [모델] 장바구니 모델 (Cart)                                                 */
-/* 설명: 장바구니 데이터 구조와 스키마를 정의하는 모델 파일입니다.            */
-/* -------------------------------------------------------------------------- */
+const { Schema, model } = require("mongoose");
 
-class Cart {}
+const cartItemSchema = new Schema(
+  {
+    productId: {
+      type: Schema.Types.ObjectId,
+      ref: "Product",
+      required: true,
+    },
+    quantity: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
+  },
+  { _id: false }
+);
 
-module.exports = Cart;
+const cartSchema = new Schema(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      unique: true,
+      index: true,
+    },
+    items: {
+      type: [cartItemSchema],
+      default: [],
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+module.exports = model("Cart", cartSchema);
