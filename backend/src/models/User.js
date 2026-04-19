@@ -1,8 +1,45 @@
-/* -------------------------------------------------------------------------- */
-/* [모델] 사용자 모델 (User)                                                   */
-/* 설명: 사용자 데이터 구조와 스키마를 정의하는 모델 파일입니다.              */
-/* -------------------------------------------------------------------------- */
+const { Schema, model } = require("mongoose");
 
-class User {}
+const userSchema = new Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+    },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 8,
+    },
+    phone: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    role: {
+      type: String,
+      enum: ["customer", "admin"],
+      default: "customer",
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-module.exports = User;
+userSchema.set("toJSON", {
+  transform: (doc, ret) => {
+    delete ret.password;
+    return ret;
+  },
+});
+
+module.exports = model("User", userSchema);

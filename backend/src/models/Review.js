@@ -1,8 +1,35 @@
-/* -------------------------------------------------------------------------- */
-/* [모델] 리뷰 모델 (Review)                                                   */
-/* 설명: 리뷰 데이터 구조와 스키마를 정의하는 모델 파일입니다.                */
-/* -------------------------------------------------------------------------- */
+const { Schema, model } = require("mongoose");
 
-class Review {}
+const reviewSchema = new Schema(
+  {
+    productId: {
+      type: Schema.Types.ObjectId,
+      ref: "Product",
+      required: true,
+      index: true,
+    },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    rating: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 5,
+    },
+    content: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-module.exports = Review;
+reviewSchema.index({ productId: 1, createdAt: -1 });
+
+module.exports = model("Review", reviewSchema);

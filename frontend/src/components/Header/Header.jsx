@@ -1,6 +1,7 @@
-﻿import "./Header.scss";
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import "./Header.scss";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import LogoIcon from "../../assets/logo/logo/icon.svg";
 import LogoFull from "../../assets/logo/logo/icon&text.svg";
@@ -9,6 +10,7 @@ import Like from "../../assets/header/header-icons/like.svg";
 import Search from "../../assets/header/header-icons/search.svg";
 import User from "../../assets/header/header-icons/user.svg";
 import ChevronDown from "../../assets/icons/chevron-down.svg";
+import { logout } from "../../store/slices/userSlice";
 
 const categoryMenu = [
   {
@@ -16,13 +18,13 @@ const categoryMenu = [
     key: "computer",
     title: "컴퓨터",
     items: [
-      { label: "노트북", type: "노트북" },
-      { label: "데스크탑", type: "데스크탑" },
-      { label: "모니터", type: "모니터" },
-      { label: "키보드", type: "키보드" },
-      { label: "마우스", type: "마우스" },
-      { label: "PC 주변기기", type: "PC주변기기" },
-      { label: "PC 부품", type: "PC부품" },
+      { label: "노트북", type: "laptop" },
+      { label: "데스크탑", type: "desktop" },
+      { label: "모니터", type: "monitor" },
+      { label: "키보드", type: "keyboard" },
+      { label: "마우스", type: "mouse" },
+      { label: "PC 주변기기", type: "pc-accessory" },
+      { label: "PC 부품", type: "pc-parts" },
     ],
   },
   {
@@ -30,9 +32,9 @@ const categoryMenu = [
     key: "mobile",
     title: "모바일",
     items: [
-      { label: "스마트폰", type: "스마트폰" },
-      { label: "스마트워치", type: "스마트워치" },
-      { label: "이어폰", type: "이어폰" },
+      { label: "스마트폰", type: "smartphone" },
+      { label: "스마트워치", type: "smartwatch" },
+      { label: "이어폰", type: "earphone" },
     ],
   },
   {
@@ -40,21 +42,21 @@ const categoryMenu = [
     key: "tablet",
     title: "태블릿",
     items: [
-      { label: "태블릿", type: "태블릿" },
-      { label: "태블릿 액세서리", type: "태블릿액세서리" },
-      { label: "펜슬", type: "펜슬" },
-      { label: "키보드 케이스", type: "키보드케이스" },
+      { label: "태블릿", type: "tablet" },
+      { label: "태블릿 액세서리", type: "tablet-accessory" },
+      { label: "펜슬", type: "pencil" },
+      { label: "키보드 케이스", type: "keyboard-case" },
     ],
   },
   {
     id: 4,
-    key: "accessory",
+    key: "home",
     title: "생활가전",
     items: [
-      { label: "프린터", type: "프린터" },
-      { label: "공유기", type: "공유기" },
-      { label: "웹캠", type: "웹캠" },
-      { label: "보조배터리", type: "보조배터리" },
+      { label: "프린터", type: "printer" },
+      { label: "공유기", type: "router" },
+      { label: "스피커", type: "speaker" },
+      { label: "보조배터리", type: "power-bank" },
     ],
   },
 ];
@@ -65,38 +67,19 @@ const brandMenu = [
     key: "premium",
     title: "프리미엄",
     items: [
-      {
-        label: "Apple",
-        type: "애플",
-      },
-      {
-        label: "Samsung",
-        type: "삼성",
-      },
-      {
-        label: "LG",
-        type: "LG",
-      },
+      { label: "Apple", type: "apple" },
+      { label: "Samsung", type: "samsung" },
+      { label: "LG", type: "lg" },
     ],
   },
-
   {
     id: 2,
     key: "value",
     title: "가성비",
     items: [
-      {
-        label: "HP",
-        type: "hp",
-      },
-      {
-        label: "Lenovo",
-        type: "레노버",
-      },
-      {
-        label: "Dell",
-        type: "델",
-      },
+      { label: "HP", type: "hp" },
+      { label: "Lenovo", type: "lenovo" },
+      { label: "Dell", type: "dell" },
     ],
   },
   {
@@ -104,26 +87,24 @@ const brandMenu = [
     key: "gaming",
     title: "게이밍",
     items: [
-      {
-        label: "MSI",
-        type: "msi",
-      },
-      {
-        label: "ASUS",
-        type: "asus",
-      },
-      {
-        label: "Acer",
-        type: "에이서",
-      },
+      { label: "MSI", type: "msi" },
+      { label: "ASUS", type: "asus" },
+      { label: "Acer", type: "acer" },
     ],
   },
 ];
 
 const mobileTabs = [
-  { key: "category", label: "품목별" },
-  { key: "brand", label: "브랜드별" },
+  { key: "category", label: "카테고리" },
+  { key: "brand", label: "브랜드" },
   { key: "pc-build", label: "PC 조립" },
+];
+
+const searchSuggestions = [
+  "유튜브용 편집용 노트북",
+  "FPS 게임에 맞는 모니터",
+  "대학생 첫 노트북 50만원 이하",
+  "부모님 쉽게 쓸 태블릿",
 ];
 
 const createExpandedState = (items) =>
@@ -133,18 +114,29 @@ const createExpandedState = (items) =>
   }, {});
 
 function Header() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const userInfo = useSelector((state) => state.user.userInfo);
+  const desktopSearchRef = useRef(null);
+  const mobileSearchRef = useRef(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMobileTab, setActiveMobileTab] = useState("category");
   const [expandedCategories, setExpandedCategories] = useState(() =>
-    createExpandedState(categoryMenu),
+    createExpandedState(categoryMenu)
   );
   const [expandedBrands, setExpandedBrands] = useState(() => createExpandedState(brandMenu));
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isSearchPinned, setIsSearchPinned] = useState(false);
+  const [activeDesktopMenu, setActiveDesktopMenu] = useState(null);
+  const [hoveredDesktopMenu, setHoveredDesktopMenu] = useState(null);
 
   const headerIcons = [
-    { id: 1, name: "search", src: Search, alt: "검색" },
-    { id: 2, name: "cart", src: Cart, alt: "장바구니" },
-    { id: 3, name: "like", src: Like, alt: "찜 목록" },
-    { id: 4, name: "user", src: User, alt: "마이페이지" },
+    { id: 2, name: "cart", src: Cart, alt: "장바구니", to: "/cart" },
+    { id: 3, name: "like", src: Like, alt: "찜 목록", to: "/wishlist" },
+    { id: 4, name: "user", src: User, alt: "마이페이지", to: isLoggedIn ? "/mypage" : "/login" },
   ];
 
   useEffect(() => {
@@ -156,19 +148,30 @@ function Header() {
       setIsMobileMenuOpen(false);
     };
 
+    const handleToggleSearch = () => {
+      if (window.innerWidth < 1024) {
+        setIsSearchOpen((prev) => !prev);
+        setIsSearchPinned((prev) => !prev);
+      }
+    };
+
     const handleResize = () => {
       if (window.innerWidth >= 1024) {
         setIsMobileMenuOpen(false);
+        setIsSearchOpen(false);
+        setIsSearchPinned(false);
       }
     };
 
     window.addEventListener("toggle-mobile-menu", handleToggleMenu);
     window.addEventListener("close-mobile-menu", handleCloseMenu);
+    window.addEventListener("toggle-mobile-search", handleToggleSearch);
     window.addEventListener("resize", handleResize);
 
     return () => {
       window.removeEventListener("toggle-mobile-menu", handleToggleMenu);
       window.removeEventListener("close-mobile-menu", handleCloseMenu);
+      window.removeEventListener("toggle-mobile-search", handleToggleSearch);
       window.removeEventListener("resize", handleResize);
     };
   }, []);
@@ -180,6 +183,40 @@ function Header() {
       document.body.classList.remove("mobile-menu-open");
     };
   }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    setIsSearchOpen(false);
+    setIsSearchPinned(false);
+    setActiveDesktopMenu(null);
+    setHoveredDesktopMenu(null);
+  }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    const handlePointerDown = (event) => {
+      const isInsideDesktop = desktopSearchRef.current?.contains(event.target);
+      const isInsideMobile = mobileSearchRef.current?.contains(event.target);
+
+      if (!isInsideDesktop && !isInsideMobile) {
+        setIsSearchOpen(false);
+        setIsSearchPinned(false);
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setIsSearchOpen(false);
+        setIsSearchPinned(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   const toggleCategorySection = (sectionKey) => {
     setExpandedCategories((prev) => ({
@@ -195,6 +232,74 @@ function Header() {
     }));
   };
 
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/");
+  };
+
+  const goToPath = (path) => {
+    navigate(path);
+  };
+
+  const openSearchLayer = () => {
+    if (window.innerWidth >= 1024) {
+      setIsSearchOpen(true);
+    }
+  };
+
+  const closeSearchLayer = () => {
+    if (window.innerWidth >= 1024 && !isSearchPinned) {
+      setIsSearchOpen(false);
+    }
+  };
+
+  const toggleSearchLayer = () => {
+    const nextPinned = !isSearchPinned;
+    setIsSearchPinned(nextPinned);
+    setIsSearchOpen(nextPinned || window.innerWidth >= 1024);
+  };
+
+  const closeSearch = () => {
+    setIsSearchOpen(false);
+    setIsSearchPinned(false);
+  };
+
+  const openDesktopMenu = (menuKey) => {
+    if (window.innerWidth >= 1024) {
+      setHoveredDesktopMenu(menuKey);
+      closeSearch();
+    }
+  };
+
+  const pinDesktopMenu = (menuKey) => {
+    if (window.innerWidth >= 1024) {
+      setActiveDesktopMenu((prev) => (prev === menuKey ? null : menuKey));
+      setHoveredDesktopMenu(null);
+      closeSearch();
+    }
+  };
+
+  const clearDesktopHover = () => {
+    if (window.innerWidth >= 1024) {
+      setHoveredDesktopMenu(null);
+    }
+  };
+
+  const visibleDesktopMenu = hoveredDesktopMenu ?? activeDesktopMenu;
+
+  const submitSearch = (keyword = searchQuery) => {
+    const nextQuery = keyword.trim();
+
+    navigate(nextQuery ? `/search?q=${encodeURIComponent(nextQuery)}` : "/search");
+    setSearchQuery(nextQuery);
+    closeSearch();
+  };
+
+  const handleSearchSubmit = (event) => {
+    event.preventDefault();
+    submitSearch();
+  };
+
   return (
     <header className="header">
       <div className="header__top">
@@ -207,33 +312,167 @@ function Header() {
 
         <div className="header__right">
           <div className="header__icons">
+            <div
+              ref={desktopSearchRef}
+              className={`header__search ${isSearchOpen ? "is-open" : ""}`}
+              onMouseEnter={openSearchLayer}
+              onMouseLeave={closeSearchLayer}
+            >
+              <button
+                type="button"
+                className="header__icon-btn header__icon-btn--search"
+                aria-label="검색"
+                aria-expanded={isSearchOpen}
+                onClick={toggleSearchLayer}
+              >
+                <img src={Search} alt="" />
+              </button>
+
+              <div className="header__search-panel">
+                <div className="header__search-sheet">
+                  <form className="header__search-form" onSubmit={handleSearchSubmit}>
+                    <div className="header__search-input-wrap">
+                      <button
+                        type="submit"
+                        className="header__search-icon-button"
+                        aria-label="검색 실행"
+                      >
+                        <img src={Search} alt="" className="header__search-icon" />
+                      </button>
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        placeholder="검색어를 입력하세요"
+                        onChange={(event) => setSearchQuery(event.target.value)}
+                        onFocus={() => setIsSearchOpen(true)}
+                      />
+                    </div>
+
+                    <div className="header__search-suggestions">
+                      {searchSuggestions.map((suggestion) => (
+                        <button
+                          key={suggestion}
+                          type="button"
+                          className="header__search-suggestion"
+                          onClick={() => submitSearch(suggestion)}
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button type="submit" className="header__search-submit">
+                      검색
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
             {headerIcons.map((icon) => (
               <button
                 type="button"
                 className={`header__icon-btn header__icon-btn--${icon.name}`}
                 key={icon.id}
                 aria-label={icon.alt}
+                onClick={() => goToPath(icon.to)}
               >
                 <img src={icon.src} alt="" />
               </button>
             ))}
           </div>
+
           <div className="header__auth">
-            <button type="button">로그인</button>
-            <button type="button">회원가입</button>
+            {isLoggedIn ? (
+              <>
+                <button type="button" onClick={() => goToPath("/mypage")}>
+                  {userInfo?.name || "마이페이지"}
+                </button>
+                <button type="button" onClick={handleLogout}>
+                  로그아웃
+                </button>
+              </>
+            ) : (
+              <>
+                <button type="button" onClick={() => goToPath("/login")}>
+                  로그인
+                </button>
+                <button type="button" onClick={() => goToPath("/register")}>
+                  회원가입
+                </button>
+              </>
+            )}
           </div>
         </div>
 
-        <button type="button" className="header__mobile-user" aria-label="마이페이지">
+        <div
+          ref={mobileSearchRef}
+          className={`header__search header__search--mobile ${isSearchOpen ? "is-open" : ""}`}
+        >
+          <div className="header__search-panel">
+            <div className="header__search-sheet">
+              <form className="header__search-form" onSubmit={handleSearchSubmit}>
+                <div className="header__search-input-wrap">
+                  <button
+                    type="submit"
+                    className="header__search-icon-button"
+                    aria-label="검색 실행"
+                  >
+                    <img src={Search} alt="" className="header__search-icon" />
+                  </button>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    placeholder="검색어를 입력하세요"
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                  />
+                </div>
+
+                <div className="header__search-suggestions">
+                  {searchSuggestions.map((suggestion) => (
+                    <button
+                      key={`mobile-${suggestion}`}
+                      type="button"
+                      className="header__search-suggestion"
+                      onClick={() => submitSearch(suggestion)}
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+
+                <button type="submit" className="header__search-submit">
+                  검색
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          className="header__mobile-user"
+          aria-label="마이페이지"
+          onClick={() => goToPath(isLoggedIn ? "/mypage" : "/login")}
+        >
           <img src={User} alt="" />
         </button>
       </div>
 
       <nav className="header__nav" aria-label="메인 메뉴">
-        <ul className="gnb">
-          <li className="gnb__item gnb__item--with-dropdown">
-            <button type="button" className="gnb__button">
-              품목별
+        <ul className="gnb" onMouseLeave={clearDesktopHover}>
+          <li
+            className={`gnb__item gnb__item--with-dropdown ${
+              visibleDesktopMenu === "category" ? "is-open" : ""
+            }`}
+            onMouseEnter={() => openDesktopMenu("category")}
+          >
+            <button
+              type="button"
+              className="gnb__button"
+              onClick={() => pinDesktopMenu("category")}
+            >
+              카테고리
             </button>
             <div className="dropdown dropdown--category">
               <div className="dropdown__panel">
@@ -255,9 +494,18 @@ function Header() {
             </div>
           </li>
 
-          <li className="gnb__item gnb__item--with-dropdown">
-            <button type="button" className="gnb__button">
-              브랜드별
+          <li
+            className={`gnb__item gnb__item--with-dropdown ${
+              visibleDesktopMenu === "brand" ? "is-open" : ""
+            }`}
+            onMouseEnter={() => openDesktopMenu("brand")}
+          >
+            <button
+              type="button"
+              className="gnb__button"
+              onClick={() => pinDesktopMenu("brand")}
+            >
+              브랜드관
             </button>
 
             <div className="dropdown dropdown--brand">
@@ -280,8 +528,15 @@ function Header() {
             </div>
           </li>
 
-          <li className="gnb__item">
-            <Link to="/pc-assembly" className="gnb__link">
+          <li
+            className={`gnb__item ${visibleDesktopMenu === "pc-build" ? "is-open" : ""}`}
+            onMouseEnter={() => openDesktopMenu("pc-build")}
+          >
+            <Link
+              to="/pc-assembly"
+              className="gnb__link"
+              onClick={() => pinDesktopMenu("pc-build")}
+            >
               PC 조립
             </Link>
           </li>

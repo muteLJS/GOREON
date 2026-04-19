@@ -1,8 +1,16 @@
-/* -------------------------------------------------------------------------- */
-/* [컨트롤러] 리뷰 컨트롤러 (reviewController)                                 */
-/* 설명: 리뷰 조회, 등록, 수정, 삭제 등 리뷰 관련 요청을 처리합니다.          */
-/* -------------------------------------------------------------------------- */
+const reviewService = require("../services/reviewService");
 
-function getReviews(req, res) {}
+async function getReviews(req, res) {
+  const reviews = await reviewService.listReviews(req.query);
+  res.status(200).json({ data: reviews });
+}
 
-module.exports = { getReviews };
+async function createReview(req, res) {
+  const review = await reviewService.createReview(req.body);
+  res.status(201).json({ data: review });
+}
+
+module.exports = {
+  getReviews,
+  createReview,
+};

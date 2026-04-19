@@ -1,8 +1,22 @@
-/* -------------------------------------------------------------------------- */
-/* [컨트롤러] 사용자 컨트롤러 (userController)                                 */
-/* 설명: 회원 조회, 회원 정보 수정, 인증 관련 사용자 요청을 처리합니다.       */
-/* -------------------------------------------------------------------------- */
+const userService = require("../services/userService");
 
-function getUser(req, res) {}
+async function listUsers(req, res) {
+  const users = await userService.listUsers();
+  res.status(200).json({ data: users });
+}
 
-module.exports = { getUser };
+async function getUser(req, res) {
+  const user = await userService.getUserById(req.params.userId);
+  res.status(200).json({ data: user });
+}
+
+async function createUser(req, res) {
+  const user = await userService.createUser(req.body);
+  res.status(201).json({ data: user });
+}
+
+module.exports = {
+  listUsers,
+  getUser,
+  createUser,
+};

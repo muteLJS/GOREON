@@ -1,8 +1,12 @@
-/* -------------------------------------------------------------------------- */
-/* [라우트] 상품 라우트 (productRoutes)                                         */
-/* 설명: 상품 관련 API 엔드포인트를 연결하는 라우트 파일입니다.               */
-/* -------------------------------------------------------------------------- */
+const express = require("express");
 
-const productRoutes = [];
+const asyncHandler = require("../utils/asyncHandler");
+const productController = require("../controllers/productController");
 
-module.exports = productRoutes;
+const router = express.Router();
+
+router.get("/", asyncHandler(productController.getProducts));
+router.post("/", asyncHandler(productController.createProduct));
+router.get("/:productId", asyncHandler(productController.getProduct));
+
+module.exports = router;

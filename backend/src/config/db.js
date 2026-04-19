@@ -1,10 +1,15 @@
-/* -------------------------------------------------------------------------- */
-/* [설정] 데이터베이스 연결 설정 (db)                                           */
-/* 설명: 백엔드에서 사용할 데이터베이스 연결 문자열을 관리하는 설정 파일입니다. */
-/* -------------------------------------------------------------------------- */
+const mongoose = require("mongoose");
 
-function connectDb() {
-  return process.env.MONGODB_URI || "";
+const env = require("./env");
+
+async function connectDb() {
+  mongoose.set("strictQuery", true);
+
+  await mongoose.connect(env.mongodbUri, {
+    dbName: env.mongodbDbName,
+  });
+
+  console.log(`MongoDB connected: ${env.mongodbDbName}`);
 }
 
 module.exports = { connectDb };
