@@ -6,7 +6,6 @@ import api from "@/utils/api";
 const Search = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q")?.trim() ?? "";
-
   const [products, setProducts] = useState([]);
   const [status, setStatus] = useState("loading");
   const [errorMessage, setErrorMessage] = useState("");
@@ -45,7 +44,7 @@ const Search = () => {
         filteredProducts={products}
         status={status}
         errorMessage={errorMessage}
-        selectedTypeLabel={query}
+        searchLabel={`‘${query}’ 대한 검색 결과입니다.`}
       />
     </div>
   );

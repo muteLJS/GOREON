@@ -68,7 +68,13 @@ const FilterMenuBox = ({ title, items }) => {
   );
 };
 
-export default function ListLayout({ filteredProducts, status, errorMessage, selectedTypeLabel }) {
+export default function ListLayout({
+  filteredProducts,
+  status,
+  errorMessage,
+  selectedTypeLabel,
+  searchLabel,
+}) {
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type");
   const MIN = 10000;
@@ -132,8 +138,10 @@ export default function ListLayout({ filteredProducts, status, errorMessage, sel
             </section>
             <section className="list-assembly__top">
               <h2 className="list-assembly__title">
-                {selectedTypeLabel}
-                <span>({filteredLength})</span>
+                {selectedTypeLabel ?? "전체상품"}
+                {searchLabel ?? ""}
+
+                <span>({filteredLength}) </span>
               </h2>
               <div className="filter-container">
                 <button className="filter-button">

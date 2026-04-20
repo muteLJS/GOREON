@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import AddressModal from "../../components/AddressModal/AddressModal";
 import CreditCardIcon from "../../assets/icons/creditcard.svg";
@@ -20,8 +20,20 @@ import {
 
 const PAYMENT_OPTIONS = [
   { id: "card", label: "신용 카드", icon: CreditCardIcon, iconAlt: "신용 카드", available: true },
-  { id: "kakao-pay", label: "카카오 페이", icon: KakaoPayIcon, iconAlt: "카카오 페이", available: false },
-  { id: "samsung-pay", label: "삼성 페이", icon: SamsungPayIcon, iconAlt: "삼성 페이", available: false },
+  {
+    id: "kakao-pay",
+    label: "카카오 페이",
+    icon: KakaoPayIcon,
+    iconAlt: "카카오 페이",
+    available: false,
+  },
+  {
+    id: "samsung-pay",
+    label: "삼성 페이",
+    icon: SamsungPayIcon,
+    iconAlt: "삼성 페이",
+    available: false,
+  },
 ];
 
 const EMPTY_CARD_FORM = {
@@ -39,7 +51,9 @@ function cx(...classNames) {
 function Section({ title, titleClassName, children }) {
   return (
     <section>
-      {title ? <h3 className={cx("payment-page__section-title", titleClassName)}>{title}</h3> : null}
+      {title ? (
+        <h3 className={cx("payment-page__section-title", titleClassName)}>{title}</h3>
+      ) : null}
       {children}
     </section>
   );
@@ -49,7 +63,10 @@ function MethodOption({ option, isSelected, onClick }) {
   return (
     <button
       type="button"
-      className={cx("payment-page__method-option", isSelected && "payment-page__method-option--active")}
+      className={cx(
+        "payment-page__method-option",
+        isSelected && "payment-page__method-option--active",
+      )}
       onClick={() => onClick(option)}
       aria-pressed={isSelected}
       aria-disabled={!option.available}
@@ -82,6 +99,7 @@ function TextField({ icon, iconAlt = "", className, ...inputProps }) {
 
 export default function Payment() {
   const { state } = useLocation();
+  const navigate = useNavigate();
   const storedCartItems = useSelector((store) => store.cart.items);
   const initialShippingForm = useMemo(
     () => ({
@@ -148,17 +166,24 @@ export default function Payment() {
     setIsAddressModalOpen(false);
   }, []);
 
-  const handleAddressSelect = useCallback((data) => {
-    const address = data.userSelectedType === "R" ? data.roadAddress : data.jibunAddress;
+  const handleAddressSelect = useCallback(
+    (data) => {
+      const address = data.userSelectedType === "R" ? data.roadAddress : data.jibunAddress;
 
-    setShippingForm((prevShippingForm) => ({
-      ...prevShippingForm,
-      postalCode: data.zonecode ?? "",
-      address,
-      addressDetail: "",
-    }));
-    closeAddressModal();
-  }, [closeAddressModal]);
+      setShippingForm((prevShippingForm) => ({
+        ...prevShippingForm,
+        postalCode: data.zonecode ?? "",
+        address,
+        addressDetail: "",
+      }));
+      closeAddressModal();
+    },
+    [closeAddressModal],
+  );
+
+  const handlePayment = () => {
+    navigate("/order-history");
+  };
 
   return (
     <section className="payment-page">
@@ -178,6 +203,12 @@ export default function Payment() {
               2
             </Link>
             <strong>결제</strong>
+          </div>
+          <div className="payment-page__progress-step">
+            <Link to="/order-history" className="payment-page__progress-link">
+              3
+            </Link>
+            <strong>주문내역</strong>
           </div>
         </div>
       </div>
@@ -350,7 +381,7 @@ export default function Payment() {
             </div>
           </Section>
 
-          <button type="button" className="payment-page__submit">
+          <button type="button" className="payment-page__submit" onClick={handlePayment}>
             결제하기
           </button>
         </div>

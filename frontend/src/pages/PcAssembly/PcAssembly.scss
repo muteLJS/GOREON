@@ -134,6 +134,8 @@
 
 @include desktop-up {
   .pc-assembly {
+    padding-top: $page-content-start-desktop;
+
     &__title {
       margin: 0 auto;
       font-size: $font-xxl;

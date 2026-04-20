@@ -11,6 +11,7 @@ import Search from "../../assets/header/header-icons/search.svg";
 import User from "../../assets/header/header-icons/user.svg";
 import ChevronDown from "../../assets/icons/chevron-down.svg";
 import { logout } from "../../store/slices/userSlice";
+import Modal from "../Modal/Modal";
 
 const categoryMenu = [
   {
@@ -118,13 +119,12 @@ function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
-  const userInfo = useSelector((state) => state.user.userInfo);
   const desktopSearchRef = useRef(null);
-  const mobileSearchRef = useRef(null);
+  const searchCloseTimerRef = useRef(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMobileTab, setActiveMobileTab] = useState("category");
   const [expandedCategories, setExpandedCategories] = useState(() =>
-    createExpandedState(categoryMenu)
+    createExpandedState(categoryMenu),
   );
   const [expandedBrands, setExpandedBrands] = useState(() => createExpandedState(brandMenu));
   const [searchQuery, setSearchQuery] = useState("");
@@ -152,6 +152,7 @@ function Header() {
       if (window.innerWidth < 1024) {
         setIsSearchOpen((prev) => !prev);
         setIsSearchPinned((prev) => !prev);
+        setIsMobileMenuOpen(false);
       }
     };
 
@@ -192,11 +193,17 @@ function Header() {
   }, [location.pathname, location.search]);
 
   useEffect(() => {
+    const clearSearchCloseTimer = () => {
+      if (searchCloseTimerRef.current) {
+        window.clearTimeout(searchCloseTimerRef.current);
+        searchCloseTimerRef.current = null;
+      }
+    };
+
     const handlePointerDown = (event) => {
       const isInsideDesktop = desktopSearchRef.current?.contains(event.target);
-      const isInsideMobile = mobileSearchRef.current?.contains(event.target);
 
-      if (!isInsideDesktop && !isInsideMobile) {
+      if (!isInsideDesktop && window.innerWidth >= 1024) {
         setIsSearchOpen(false);
         setIsSearchPinned(false);
       }
@@ -209,12 +216,20 @@ function Header() {
       }
     };
 
+    const handleScroll = () => {
+      setIsSearchOpen(false);
+      setIsSearchPinned(false);
+    };
+
     document.addEventListener("mousedown", handlePointerDown);
     document.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
+      clearSearchCloseTimer();
       document.removeEventListener("mousedown", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -241,15 +256,27 @@ function Header() {
     navigate(path);
   };
 
+  const clearSearchCloseTimer = () => {
+    if (searchCloseTimerRef.current) {
+      window.clearTimeout(searchCloseTimerRef.current);
+      searchCloseTimerRef.current = null;
+    }
+  };
+
   const openSearchLayer = () => {
     if (window.innerWidth >= 1024) {
+      clearSearchCloseTimer();
       setIsSearchOpen(true);
     }
   };
 
   const closeSearchLayer = () => {
     if (window.innerWidth >= 1024 && !isSearchPinned) {
-      setIsSearchOpen(false);
+      clearSearchCloseTimer();
+      searchCloseTimerRef.current = window.setTimeout(() => {
+        setIsSearchOpen(false);
+        searchCloseTimerRef.current = null;
+      }, 120);
     }
   };
 
@@ -300,6 +327,40 @@ function Header() {
     submitSearch();
   };
 
+  const mobileSearchModalContent = (
+    <form className="header__search-form header__search-form--modal" onSubmit={handleSearchSubmit}>
+      <div className="header__search-input-wrap header__search-input-wrap--modal">
+        <button type="submit" className="header__search-icon-button" aria-label="검색 실행">
+          <img src={Search} alt="" className="header__search-icon" />
+        </button>
+        <input
+          type="text"
+          value={searchQuery}
+          placeholder="검색어를 입력하세요"
+          onChange={(event) => setSearchQuery(event.target.value)}
+          autoFocus
+        />
+      </div>
+
+      <div className="header__search-suggestions header__search-suggestions--modal">
+        {searchSuggestions.map((suggestion) => (
+          <button
+            key={`modal-${suggestion}`}
+            type="button"
+            className="header__search-suggestion"
+            onClick={() => submitSearch(suggestion)}
+          >
+            {suggestion}
+          </button>
+        ))}
+      </div>
+
+      <button type="submit" className="header__search-submit header__search-submit--modal">
+        검색
+      </button>
+    </form>
+  );
+
   return (
     <header className="header">
       <div className="header__top">
@@ -328,7 +389,11 @@ function Header() {
                 <img src={Search} alt="" />
               </button>
 
-              <div className="header__search-panel">
+              <div
+                className="header__search-panel"
+                onMouseEnter={openSearchLayer}
+                onMouseLeave={closeSearchLayer}
+              >
                 <div className="header__search-sheet">
                   <form className="header__search-form" onSubmit={handleSearchSubmit}>
                     <div className="header__search-input-wrap">
@@ -384,14 +449,9 @@ function Header() {
 
           <div className="header__auth">
             {isLoggedIn ? (
-              <>
-                <button type="button" onClick={() => goToPath("/mypage")}>
-                  {userInfo?.name || "마이페이지"}
-                </button>
-                <button type="button" onClick={handleLogout}>
-                  로그아웃
-                </button>
-              </>
+              <button type="button" onClick={handleLogout}>
+                로그아웃
+              </button>
             ) : (
               <>
                 <button type="button" onClick={() => goToPath("/login")}>
@@ -404,51 +464,6 @@ function Header() {
             )}
           </div>
         </div>
-
-        <div
-          ref={mobileSearchRef}
-          className={`header__search header__search--mobile ${isSearchOpen ? "is-open" : ""}`}
-        >
-          <div className="header__search-panel">
-            <div className="header__search-sheet">
-              <form className="header__search-form" onSubmit={handleSearchSubmit}>
-                <div className="header__search-input-wrap">
-                  <button
-                    type="submit"
-                    className="header__search-icon-button"
-                    aria-label="검색 실행"
-                  >
-                    <img src={Search} alt="" className="header__search-icon" />
-                  </button>
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    placeholder="검색어를 입력하세요"
-                    onChange={(event) => setSearchQuery(event.target.value)}
-                  />
-                </div>
-
-                <div className="header__search-suggestions">
-                  {searchSuggestions.map((suggestion) => (
-                    <button
-                      key={`mobile-${suggestion}`}
-                      type="button"
-                      className="header__search-suggestion"
-                      onClick={() => submitSearch(suggestion)}
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
-                </div>
-
-                <button type="submit" className="header__search-submit">
-                  검색
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-
         <button
           type="button"
           className="header__mobile-user"
@@ -500,11 +515,7 @@ function Header() {
             }`}
             onMouseEnter={() => openDesktopMenu("brand")}
           >
-            <button
-              type="button"
-              className="gnb__button"
-              onClick={() => pinDesktopMenu("brand")}
-            >
+            <button type="button" className="gnb__button" onClick={() => pinDesktopMenu("brand")}>
               브랜드관
             </button>
 
@@ -542,6 +553,12 @@ function Header() {
           </li>
         </ul>
       </nav>
+
+      {isSearchOpen && window.innerWidth < 1024 && (
+        <Modal title="검색" onClose={closeSearch}>
+          {mobileSearchModalContent}
+        </Modal>
+      )}
 
       <div className={`mobile-menu ${isMobileMenuOpen ? "is-open" : ""}`}>
         <div className="mobile-menu__tabs" role="tablist" aria-label="모바일 메뉴">

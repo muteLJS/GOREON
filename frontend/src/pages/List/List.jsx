@@ -1,5 +1,6 @@
-﻿import { useState, useEffect } from "react";
-import ListLayout from "@/layouts/ListLayout/ListLayout";
+﻿import ListLayout from "@/layouts/ListLayout/ListLayout";
+import api from "@/utils/api";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 const TYPE_LABEL_MAP = {
   laptop: "노트북",
@@ -10,6 +11,7 @@ const TYPE_LABEL_MAP = {
   mouse: "마우스",
   "pc-accessory": "PC 주변기기",
   "pc-part": "PC 부품",
+  "pc-parts": "PC 부품",
   smartphone: "스마트폰",
   smartwatch: "스마트워치",
   earphone: "이어폰",
@@ -33,14 +35,45 @@ const TYPE_LABEL_MAP = {
 };
 const List = () => {
   const [searchParams] = useSearchParams();
-
+  const [products, setProducts] = useState([]);
+  const [status, setStatus] = useState("loading");
+  const [errorMessage, setErrorMessage] = useState("");
   const type = searchParams.get("type");
   const selectedTypeLabel = TYPE_LABEL_MAP[type] ?? type ?? "전체 상품";
-  console.log(type);
+  useEffect(() => {
+    const controller = new AbortController();
+    const fetchData = async () => {
+      try {
+        setStatus("loading");
+        const result = await api.get("/products", {
+          params: type ? { type } : {},
+          signal: controller.signal,
+        });
+        setProducts(result.data.data);
+        setStatus("success");
+      } catch (error) {
+        if (error.name === "CanceledError") return;
+        setStatus("error");
+        setErrorMessage("검색 결과를 불러오지 못했습니다.");
+      }
+    };
+    if (type) {
+      fetchData();
+    } else {
+      setProducts([]);
+      setStatus("error");
+    }
+    fetchData();
+  }, [type]);
 
   return (
     <div>
-      <ListLayout />
+      <ListLayout
+        errorMessage={errorMessage}
+        status={status}
+        filteredProducts={products}
+        selectedTypeLabel={selectedTypeLabel}
+      />
     </div>
   );
 };
