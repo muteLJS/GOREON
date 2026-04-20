@@ -19,6 +19,8 @@ import OrderHistory from "./pages/OrderHistory/OrderHistory";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
+const TEMP_OPEN_MYPAGE = true;
+
 function App() {
   return (
     <>
@@ -39,9 +41,13 @@ function App() {
           <Route
             path="/mypage"
             element={
-              <ProtectedRoute>
+              TEMP_OPEN_MYPAGE ? (
                 <MyPage />
-              </ProtectedRoute>
+              ) : (
+                <ProtectedRoute>
+                  <MyPage />
+                </ProtectedRoute>
+              )
             }
           />
           <Route path="/list" element={<List />} />
