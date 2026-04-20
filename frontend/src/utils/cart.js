@@ -19,6 +19,7 @@ export function toCartItem(item, index) {
     category: item.category ?? "상품",
     name: item.name ?? item.title ?? "상품명",
     option: item.option ?? item.spec ?? "옵션 정보가 없습니다.",
+    image: item.image ?? item.imageSrc ?? item.thumbnailImage ?? item.thumbnail ?? "",
     price: Number(item.price) || 0,
     quantity: quantity > 0 ? quantity : 1,
   };
