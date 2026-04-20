@@ -116,6 +116,12 @@ export default function Cart() {
             </Link>
             <strong>결제</strong>
           </div>
+          <div className="cart-page__progress-step">
+            <Link to="/order-history" className="cart-page__progress-link">
+              3
+            </Link>
+            <strong>주문내역</strong>
+          </div>
         </div>
       </div>
 

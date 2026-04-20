@@ -23,6 +23,7 @@ const TYPE_LABEL_MAP = {
   mouse: "마우스",
   "pc-accessory": "PC 주변기기",
   "pc-part": "PC 부품",
+  "pc-parts": "PC 부품",
   smartphone: "스마트폰",
   smartwatch: "스마트워치",
   earphone: "이어폰",
@@ -45,11 +46,16 @@ const TYPE_LABEL_MAP = {
   acer: "Acer",
 };
 
+const parseProductPrice = (price) => {
+  const parsed = Number(String(price ?? "").replace(/[^\d]/g, ""));
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
 const normalizeProduct = (product) => ({
   ...product,
   id: product._id ?? product.id,
   image: product.image || ProductImage,
-  price: Number(product.price) || 0,
+  price: parseProductPrice(product.price),
   rating: Number(product.averageRating ?? product.rating) || 0,
 });
 

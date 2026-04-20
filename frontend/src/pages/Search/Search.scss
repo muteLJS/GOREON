@@ -1,1 +1,47 @@
 ﻿
+@import "styles/variables";
+@import "styles/mixins";
+
+.search-page {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: $page-content-start-mobile 20px 80px;
+  color: #1f2937;
+}
+
+.search-page__title {
+  margin: 0 0 14px;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.search-page__summary {
+  margin: 0 0 28px;
+  font-size: 18px;
+}
+
+.search-page__empty {
+  padding: 24px 20px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  background: $color-white;
+}
+
+.search-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+@include tablet-up {
+  .search-page {
+    padding-top: $page-content-start-tablet;
+  }
+}
+
+@include desktop-up {
+  .search-page {
+    padding-top: $page-content-start-desktop;
+  }
+}

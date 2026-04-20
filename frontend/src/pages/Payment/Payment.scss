@@ -2,16 +2,34 @@
 @import "styles/mixins";
 
 .payment-page {
-  padding: 40px 0 56px;
+  width: 100%;
+  min-width: 0;
+  padding: $page-content-start-mobile 16px 56px;
+  box-sizing: border-box;
+}
+
+.payment-page__header,
+.payment-page__layout,
+.payment-page__content,
+.payment-page__sidebar,
+.payment-page__card,
+.payment-page__summary-card,
+.payment-page__method-list,
+.payment-page__field-row,
+.payment-page__address-row {
+  min-width: 0;
 }
 
 .payment-page__header {
-  padding-top: 4px;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-top: 0;
 }
 
 .payment-page__title {
   color: $color-text-main;
-  font-size: 26px;
+  font-size: 28px;
   font-weight: $font-black;
   line-height: 1.2;
   text-align: center;
@@ -24,7 +42,9 @@
 .payment-page__layout {
   display: grid;
   gap: 36px;
-  margin-top: 38px;
+  width: 100%;
+  max-width: 1280px;
+  margin: 34px auto 0;
 }
 
 .payment-page__content,
@@ -34,7 +54,7 @@
 }
 
 .payment-page__section-title {
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   color: $color-text-main;
   font-size: 18px;
   font-weight: $font-black;
@@ -47,14 +67,14 @@
 
 .payment-page__method-list {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 10px;
 }
 
 .payment-page__method-option {
   @include flex(center, flex-start, column);
-  min-height: 128px;
-  padding: 20px 8px 18px;
+  min-height: 112px;
+  padding: 16px 12px;
   border: 1px solid rgba($color-text-main, 0.18);
   border-radius: 12px;
   background: $color-white;
@@ -70,13 +90,13 @@
   @include flex-center;
   flex: 1;
   width: 100%;
-  min-height: 54px;
+  min-height: 44px;
 }
 
 .payment-page__method-icon {
   width: auto;
   max-width: 74px;
-  max-height: 50px;
+  max-height: 44px;
 }
 
 .payment-page__method-label {
@@ -85,6 +105,7 @@
   font-weight: $font-bold;
   line-height: 1.3;
   text-align: center;
+  word-break: keep-all;
 }
 
 .payment-page__card {
@@ -106,7 +127,7 @@
 }
 
 .payment-page__field + .payment-page__field {
-  margin-top: 16px;
+  margin-top: 14px;
 }
 
 .payment-page__field--shipping + .payment-page__field--shipping {
@@ -122,7 +143,7 @@
 
 .payment-page__field-row {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 10px;
   margin-top: 16px;
 }
@@ -140,9 +161,11 @@
   border: 1px solid rgba($color-text-main, 0.18);
   border-radius: 10px;
   background: $color-white;
+  box-sizing: border-box;
 
   input {
     width: 100%;
+    min-width: 0;
     height: 34px;
     border: 0;
     background: transparent;
@@ -169,6 +192,7 @@
   gap: 0;
 
   input {
+    min-width: 0;
     height: 32px;
     font-size: 13px;
 
@@ -268,14 +292,17 @@
   line-height: 1.45;
 
   span {
-    @include ellipsis;
+    min-width: 0;
     max-width: 65%;
+    word-break: keep-all;
   }
 
   strong {
+    flex-shrink: 0;
     color: rgba($color-text-main, 0.84);
     font-size: 14px;
     font-weight: $font-black;
+    text-align: right;
   }
 }
 
@@ -293,6 +320,16 @@
   font-size: 18px;
   font-weight: $font-black;
   line-height: 1.2;
+
+  span,
+  strong {
+    min-width: 0;
+    word-break: keep-all;
+  }
+
+  strong {
+    text-align: right;
+  }
 }
 
 .payment-page__submit {
@@ -303,10 +340,19 @@
   font-weight: $font-black;
 }
 
+@media (min-width: 480px) {
+  .payment-page__method-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .payment-page__field-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @include tablet-up {
   .payment-page {
-    padding-top: 52px;
-    padding-bottom: 72px;
+    padding: $page-content-start-tablet 24px 72px;
   }
 
   .payment-page__layout {
@@ -330,18 +376,22 @@
 
 @include desktop-up {
   .payment-page {
-    padding: 76px 0 118px;
+    padding: $page-content-start-desktop 0 118px;
+  }
+
+  .payment-page__header {
+    padding-top: 0;
   }
 
   .payment-page__title {
-    font-size: 60px;
+    font-size: 64px;
   }
 
   .payment-page__progress {
     @include flex(center, center);
     position: relative;
-    gap: 170px;
-    width: 358px;
+    gap: 130px;
+    width: 500px;
     margin: 40px auto 0;
   }
 
@@ -442,7 +492,7 @@
   }
 
   .payment-page__card {
-    padding: 22px 34px 18px;
+    padding: 20px 34px 18px;
     border-radius: 18px;
   }
 
@@ -451,11 +501,11 @@
   }
 
   .payment-page__field {
-    gap: 10px;
+    gap: 8px;
   }
 
   .payment-page__field + .payment-page__field {
-    margin-top: 16px;
+    margin-top: 14px;
   }
 
   .payment-page__field-label,
@@ -498,7 +548,7 @@
   }
 
   .payment-page__summary-card {
-    padding: 18px 18px 20px;
+    padding: 18px 18px 22px;
     border-radius: 18px;
   }
 
@@ -513,6 +563,11 @@
     strong {
       font-size: 16px;
     }
+  }
+
+  .payment-page__summary-total {
+    margin-top: 16px;
+    padding-top: 18px;
   }
 
   .payment-page__submit {

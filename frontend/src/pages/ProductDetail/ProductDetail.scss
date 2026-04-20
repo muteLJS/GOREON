@@ -3,7 +3,7 @@
 
 .product-detail {
   width: 100%;
-  padding: 16px 0 132px;
+  padding: $page-content-start-mobile 0 132px;
   color: $color-text-main;
 }
 
@@ -431,7 +431,7 @@
 
 @include tablet-up {
   .product-detail {
-    padding-top: 28px;
+    padding-top: $page-content-start-tablet;
   }
 
   .product-detail__overview-preview.is-collapsed {
@@ -453,6 +453,7 @@
 
 @include desktop-up {
   .product-detail {
+    padding-top: $page-content-start-desktop;
     padding-bottom: 88px;
   }
 
