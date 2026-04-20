@@ -2,6 +2,8 @@
 @import "styles/mixins";
 
 .pc-assembly {
+  padding-top: 40px;
+
   &__banner {
     img {
       width: 100%;
@@ -122,8 +124,18 @@
   }
 }
 
+@include tablet-up {
+  .pc-assembly {
+    &__product-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+}
+
 @include desktop-up {
   .pc-assembly {
+    padding-top: $page-content-start-desktop;
+
     &__title {
       margin: 0 auto;
       font-size: $font-xxl;

@@ -1,8 +1,9 @@
 ﻿import "./Main.scss";
 import { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay } from "swiper/modules";
 import "swiper/css";
-import AI_Logo from "assets/logo/ai/character.svg";
+import AICharacter from "components/AICharacter/AICharacter";
 import Review_user from "assets/Icons/review_user.svg";
 import Book from "assets/Icons/main/book.svg";
 import Direct from "assets/Icons/main/direct.svg";
@@ -17,7 +18,7 @@ import UpdateSubCard from "components/UpdateSubCard/UpdateSubCard";
 import EventModal from "components/EventModal/EventModal";
 
 import LikeCircle from "components/like/like_circle";
-import Cart_straight from "assets/Icons/cart-straight.svg";
+import Cart_straight from "assets/icons/cart-straight.svg";
 
 function Main() {
   const [showAiResult, setShowAiResult] = useState(false);
@@ -28,6 +29,8 @@ function Main() {
     thumbWidth: 25,
   });
   const aiSwitchTimeoutRef = useRef(null);
+  const categorySwiperRef = useRef(null);
+  const desktopCategoryTrackRef = useRef(null);
   const promptItems = [
     "🎬 유튜브용 편집용 노트북",
     "🎮 FPS 게임에 맞는 모니터",
@@ -100,56 +103,128 @@ function Main() {
       image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png",
     },
   ];
-  const categoryItems = [
+  const updateMobileItems = [
     {
       name: "MacBook Pro 14 M3",
       price: "￦2,419,000",
-      tags: ["#안정성", "#파이널컷", "#프리미어"],
+      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png",
+      specs: [
+        { label: "CPU", value: "M3 8코어 (8-Core, 10 GPU)" },
+        { label: "RAM", value: "8GB 통합 메모리" },
+        { label: "저장장치", value: "512GB SSD" },
+        { label: "디스플레이", value: '14.2" Liquid Retina XDR' },
+      ],
     },
     {
       name: "LG gram Pro 16",
       price: "￦1,989,000",
-      tags: ["#휴대성", "#대학생", "#문서작업"],
+      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png",
+      specs: [
+        { label: "CPU", value: "Intel Core Ultra 7" },
+        { label: "RAM", value: "16GB LPDDR5x" },
+        { label: "저장장치", value: "512GB NVMe SSD" },
+        { label: "디스플레이", value: '16" WQXGA OLED' },
+      ],
     },
     {
-      name: "ROG Zephyrus G14",
-      price: "￦2,299,000",
-      tags: ["#게이밍", "#고성능", "#RTX"],
+      name: "ASUS ProArt P16",
+      price: "￦2,699,000",
+      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png",
+      specs: [
+        { label: "CPU", value: "AMD Ryzen AI 9 HX" },
+        { label: "RAM", value: "32GB LPDDR5x" },
+        { label: "저장장치", value: "1TB SSD" },
+        { label: "디스플레이", value: '16" 4K OLED' },
+      ],
     },
     {
       name: "Galaxy Book5 Pro 360",
       price: "￦1,799,000",
-      tags: ["#터치", "#필기", "#OLED"],
-    },
-    {
-      name: "iPad Air 13",
-      price: "￦1,249,000",
-      tags: ["#크리에이티브", "#휴대성", "#M시리즈"],
-    },
-    {
-      name: "Surface Laptop 7",
-      price: "￦1,699,000",
-      tags: ["#업무용", "#가벼움", "#배터리"],
+      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png",
+      specs: [
+        { label: "CPU", value: "Intel Core Ultra 7" },
+        { label: "RAM", value: "16GB 메모리" },
+        { label: "저장장치", value: "512GB SSD" },
+        { label: "디스플레이", value: '16" AMOLED 터치' },
+      ],
     },
   ];
+  const categoryItemsMap = {
+    direct: [
+      {
+        name: "MacBook Pro 14 M3",
+        price: "￦2,419,000",
+        tags: ["#안정성", "#파이널컷", "#프리미어"],
+      },
+      {
+        name: "LG gram Pro 16",
+        price: "￦1,989,000",
+        tags: ["#대화면", "#휴대성", "#영상편집입문"],
+      },
+      { name: "ASUS ProArt P16", price: "￦2,699,000", tags: ["#OLED", "#크리에이터", "#색감"] },
+      {
+        name: "Galaxy Book5 Pro 360",
+        price: "￦1,799,000",
+        tags: ["#터치", "#펜입력", "#멀티작업"],
+      },
+      { name: "iPad Air 13", price: "￦1,249,000", tags: ["#썸네일", "#가벼움", "#M시리즈"] },
+      { name: "Surface Laptop 7", price: "￦1,699,000", tags: ["#업무겸용", "#배터리", "#슬림"] },
+    ],
+    game: [
+      { name: "ROG Zephyrus G14", price: "￦2,299,000", tags: ["#게이밍", "#RTX", "#고주사율"] },
+      { name: "Lenovo Legion 5i", price: "￦1,949,000", tags: ["#FPS", "#발열관리", "#가성비"] },
+      { name: "OMEN 16", price: "￦1,899,000", tags: ["#144Hz", "#고성능", "#몰입감"] },
+      { name: "Alienware m16", price: "￦2,899,000", tags: ["#프리미엄", "#QHD", "#RGB"] },
+      { name: "MSI Katana 17", price: "￦1,659,000", tags: ["#17인치", "#RTX4060", "#입문게이밍"] },
+      { name: "AORUS 15", price: "￦2,099,000", tags: ["#e스포츠", "#반응속도", "#성능"] },
+    ],
+    student: [
+      { name: "LG gram 15", price: "￦1,589,000", tags: ["#가벼움", "#문서작업", "#배터리"] },
+      { name: "Galaxy Book4", price: "￦1,129,000", tags: ["#대학생", "#휴대성", "#필기연동"] },
+      {
+        name: "MacBook Air 13 M3",
+        price: "￦1,590,000",
+        tags: ["#조용함", "#과제", "#오래가는배터리"],
+      },
+      {
+        name: "ASUS Vivobook 15",
+        price: "￦899,000",
+        tags: ["#가성비", "#온라인강의", "#첫노트북"],
+      },
+      { name: "Surface Go 4", price: "￦879,000", tags: ["#태블릿겸용", "#필기", "#이동수업"] },
+      { name: "Acer Swift Go 14", price: "￦1,099,000", tags: ["#휴대성", "#리포트", "#실속형"] },
+    ],
+    together: [
+      { name: "Galaxy Tab S10", price: "￦632,000", tags: ["#큰글씨", "#영상통화", "#쉬운사용"] },
+      { name: "iPad 11세대", price: "￦529,000", tags: ["#직관적", "#가족공유", "#안정성"] },
+      { name: "LG 스탠바이미 Go", price: "￦1,179,000", tags: ["#큰화면", "#OTT", "#간편이동"] },
+      { name: "갤럭시 A35", price: "￦449,000", tags: ["#쉬운UI", "#카메라", "#가성비"] },
+      { name: "아이뮤즈 뮤패드", price: "￦289,000", tags: ["#입문형", "#유튜브", "#실속형"] },
+      { name: "레노버 Tab Plus", price: "￦399,000", tags: ["#스피커", "#OTT", "#간편사용"] },
+    ],
+  };
+  const categoryItems = categoryItemsMap[selectedCategory];
   const aiResultItems = [
     {
       name: "갤럭시 탭 S10",
       spec: "128/256GB, WiFi,그레이",
       price: "632,000원",
-      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/product_detail_main_img.png",
+      image:
+        "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/product_detail_main_img.png",
     },
     {
       name: "갤럭시 탭 S10",
       spec: "128/256GB, WiFi,그레이",
       price: "632,000원",
-      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/product_detail_main_img.png",
+      image:
+        "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/product_detail_main_img.png",
     },
     {
       name: "갤럭시 탭 S10",
       spec: "128/256GB, WiFi,그레이",
       price: "632,000원",
-      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/product_detail_main_img.png",
+      image:
+        "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/product_detail_main_img.png",
     },
   ];
   const handleInput = (e) => {
@@ -159,11 +234,16 @@ function Main() {
   };
 
   const handleCategorySwiperChange = (swiper) => {
+    if (!swiper || swiper.destroyed || !swiper.params) {
+      return;
+    }
+
     const visibleSlides =
       typeof swiper.params.slidesPerView === "number" ? swiper.params.slidesPerView : 1;
     const clampedVisibleSlides = Math.min(visibleSlides, categoryItems.length);
     const maxIndex = Math.max(categoryItems.length - clampedVisibleSlides, 0);
-    const nextProgress = maxIndex === 0 ? 0 : swiper.activeIndex / maxIndex;
+    const activeIndex = swiper.params.loop ? swiper.realIndex : swiper.activeIndex;
+    const nextProgress = maxIndex === 0 ? 0 : Math.min(activeIndex, maxIndex) / maxIndex;
     const nextThumbWidth = (clampedVisibleSlides / categoryItems.length) * 100 * 0.78;
 
     setCategorySwiperState({
@@ -193,6 +273,73 @@ function Main() {
     },
     [],
   );
+
+  useEffect(() => {
+    const desktopQuery = window.matchMedia("(min-width: 1024px)");
+    const tabletQuery = window.matchMedia("(min-width: 768px) and (max-width: 1023px)");
+
+    const syncScreenState = () => {
+      setIsDesktopCategory(desktopQuery.matches);
+      setIsTabletCategory(tabletQuery.matches);
+    };
+
+    syncScreenState();
+
+    const addListener = (query, handler) => {
+      if (query.addEventListener) {
+        query.addEventListener("change", handler);
+      } else {
+        query.addListener(handler);
+      }
+    };
+
+    const removeListener = (query, handler) => {
+      if (query.removeEventListener) {
+        query.removeEventListener("change", handler);
+      } else {
+        query.removeListener(handler);
+      }
+    };
+
+    addListener(desktopQuery, syncScreenState);
+    addListener(tabletQuery, syncScreenState);
+
+    return () => {
+      removeListener(desktopQuery, syncScreenState);
+      removeListener(tabletQuery, syncScreenState);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isDesktopCategory) {
+      setCategorySwiperState({
+        progress: 0,
+        thumbWidth: (3.1 / categoryItems.length) * 100 * 0.78,
+      });
+      return;
+    }
+
+    if (isTabletCategory) {
+      categorySwiperRef.current = null;
+      setCategorySwiperState({
+        progress: 0,
+        thumbWidth: 100,
+      });
+      return;
+    }
+
+    const swiper = categorySwiperRef.current;
+    if (!swiper || swiper.destroyed || !swiper.params) {
+      return;
+    }
+
+    if (swiper.autoplay) {
+      swiper.autoplay.stop();
+    }
+    swiper.slideTo(0, 0, false);
+    swiper.update();
+    handleCategorySwiperChange(swiper);
+  }, [isDesktopCategory, isTabletCategory, selectedCategory, categoryItems.length]);
 
   const renderAiReviewSection = () => (
     <section className="main-page__section main-page__section--ai-review">
@@ -249,7 +396,7 @@ function Main() {
               <PromptButtonList items={promptItems} />
             </div>
           </div>
-          <img src={AI_Logo} alt="AI_logo" className="AI_logo" />
+          <AICharacter className="AI_logo" />
         </div>
         <div className="AI_chat_container">
           <form action="#" method="POST" onSubmit={handleAiSubmit}>
@@ -294,6 +441,105 @@ function Main() {
       </div>
     </div>
   );
+
+  const renderCategoryCard = (item) => (
+    <div className="items pointer" key={item.name}>
+      <div className="item_img_box">
+        <img
+          src="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png"
+          alt="items"
+          className="item_img"
+        />
+        <div className="icons">
+          <button type="button" aria-label={`${item.name} 장바구니 담기`}>
+            <img src={Cart_straight} alt="" />
+          </button>
+          <LikeCircle />
+        </div>
+      </div>
+      <p className="item_name">{item.name}</p>
+      <div className="options">
+        {item.tags.map((tag) => (
+          <p key={tag}>{tag}</p>
+        ))}
+      </div>
+      <p className="item_price">{item.price}</p>
+      <div className="item_colors">
+        <div className="color1 colors"></div>
+        <div className="color2 colors"></div>
+      </div>
+    </div>
+  );
+
+  const renderCategoryItems = () => {
+    if (isDesktopCategory) {
+      return (
+        <>
+          <div className="item_box category_marquee" ref={desktopCategoryTrackRef}>
+            <div className="category_marquee__track">
+              {[...categoryItems, ...categoryItems].map((item, index) => (
+                <div className="category_marquee__slide" key={`${item.name}-${index}`}>
+                  {renderCategoryCard(item)}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="unfilled unfilled--desktop">
+            <div
+              className="filled filled--desktop"
+              style={{
+                "--thumb-width": `${(3.1 / categoryItems.length) * 100 * 0.78}%`,
+                width: `${(3.1 / categoryItems.length) * 100 * 0.78}%`,
+              }}
+            ></div>
+          </div>
+        </>
+      );
+    }
+
+    if (isTabletCategory) {
+      return (
+        <div className="item_box category_grid">
+          {categoryItems.map((item) => (
+            <div className="category_grid__cell" key={item.name}>
+              {renderCategoryCard(item)}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    return (
+      <>
+        <Swiper
+          key={`category-swiper-${selectedCategory}-mobile`}
+          className="item_box category_swiper"
+          spaceBetween={12}
+          slidesPerView={2.1}
+          allowTouchMove={true}
+          onSwiper={(swiper) => {
+            categorySwiperRef.current = swiper;
+            handleCategorySwiperChange(swiper);
+          }}
+          onSlideChange={handleCategorySwiperChange}
+          onProgress={handleCategorySwiperChange}
+        >
+          {categoryItems.map((item) => (
+            <SwiperSlide key={item.name}>{renderCategoryCard(item)}</SwiperSlide>
+          ))}
+        </Swiper>
+        <div className="unfilled">
+          <div
+            className="filled"
+            style={{
+              width: `${categorySwiperState.thumbWidth}%`,
+              left: `calc((100% - ${categorySwiperState.thumbWidth}%) * ${categorySwiperState.progress})`,
+            }}
+          ></div>
+        </div>
+      </>
+    );
+  };
 
   const renderResultAiSection = (isEntering = false) => (
     <div className={`ai-stage__layer ai-stage__layer--result ${isEntering ? "is-entering" : ""}`}>
@@ -365,7 +611,7 @@ function Main() {
             </div>
           </form>
           <div className="AI_container">
-            <img src={AI_Logo} alt="AI_logo" className="AI_logo" />
+            <AICharacter className="AI_logo" />
           </div>
         </div>
       </div>
@@ -399,81 +645,57 @@ function Main() {
           </div>
           <div className="categories">
             <form action="#">
-              <input type="radio" id="direct" name="category" className="hidden" defaultChecked />
+              <input
+                type="radio"
+                id="direct"
+                name="category"
+                className="hidden"
+                checked={selectedCategory === "direct"}
+                onChange={() => setSelectedCategory("direct")}
+              />
               <label htmlFor="direct" className="category category_1 pointer">
                 <img src={Direct} alt="direct" />
                 <p>영상 편집</p>
               </label>
-              <input type="radio" id="game" name="category" className="hidden" />
+              <input
+                type="radio"
+                id="game"
+                name="category"
+                className="hidden"
+                checked={selectedCategory === "game"}
+                onChange={() => setSelectedCategory("game")}
+              />
               <label htmlFor="game" className="category category_2 pointer">
                 <img src={Game} alt="game" />
                 <p>게이밍</p>
               </label>
-              <input type="radio" id="student" name="category" className="hidden" />
+              <input
+                type="radio"
+                id="student"
+                name="category"
+                className="hidden"
+                checked={selectedCategory === "student"}
+                onChange={() => setSelectedCategory("student")}
+              />
               <label htmlFor="student" className="category category_3 pointer">
                 <img src={Book} alt="student" />
                 <p>학생</p>
               </label>
-              <input type="radio" id="together" name="category" className="hidden" />
+              <input
+                type="radio"
+                id="together"
+                name="category"
+                className="hidden"
+                checked={selectedCategory === "together"}
+                onChange={() => setSelectedCategory("together")}
+              />
               <label htmlFor="together" className="category category_4 pointer">
                 <img src={Together} alt="together" />
                 <p>부모님</p>
               </label>
             </form>
           </div>
-          <Swiper
-            className="item_box category_swiper"
-            spaceBetween={6}
-            slidesPerView={2.1}
-            onSwiper={handleCategorySwiperChange}
-            onSlideChange={handleCategorySwiperChange}
-            breakpoints={{
-              1024: {
-                slidesPerView: 3.1,
-                spaceBetween: 20,
-              },
-            }}
-          >
-            {categoryItems.map((item) => (
-              <SwiperSlide key={item.name}>
-                <div className="items pointer">
-                  <div className="item_img_box">
-                    <img
-                      src="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png"
-                      alt="items"
-                      className="item_img"
-                    />
-                    <div className="icons">
-                      <button type="button">
-                        <img src={Cart_straight} alt="cart" />
-                      </button>
-                      <LikeCircle />
-                    </div>
-                  </div>
-                  <p className="item_name">{item.name}</p>
-                  <div className="options">
-                    {item.tags.map((tag) => (
-                      <p key={tag}>{tag}</p>
-                    ))}
-                  </div>
-                  <p className="item_price">{item.price}</p>
-                  <div className="item_colors">
-                    <div className="color1 colors"></div>
-                    <div className="color2 colors"></div>
-                  </div>
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-          <div className="unfilled">
-            <div
-              className="filled"
-              style={{
-                width: `${categorySwiperState.thumbWidth}%`,
-                left: `calc((100% - ${categorySwiperState.thumbWidth}%) * ${categorySwiperState.progress})`,
-              }}
-            ></div>
-          </div>
+          {renderCategoryItems()}
         </div>
       </section>
       <section className="main-page__section">
@@ -591,98 +813,36 @@ function Main() {
           </div>
           <div className="mobile">
             <div className="item_boxs">
-              <div className="item_row">
-                <div className="item_box">
-                  <div className="items">
-                    <div className="item_img_box">
-                      <img
-                        src="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png"
-                        alt="items"
-                        className="item_img"
-                      />
-                      <div className="icons">
-                        <button>
-                          <img src={Cart_straight} alt="cart" />
-                        </button>
-                        <LikeCircle />
+              {[0, 2].map((startIndex) => (
+                <div className="item_row" key={`update-mobile-row-${startIndex}`}>
+                  {updateMobileItems.slice(startIndex, startIndex + 2).map((item) => (
+                    <div className="item_box" key={item.name}>
+                      <div className="items">
+                        <div className="item_img_box">
+                          <img src={item.image} alt={item.name} className="item_img" />
+                          <div className="icons">
+                            <button type="button" aria-label={`${item.name} 장바구니 담기`}>
+                              <img src={Cart_straight} alt="" />
+                            </button>
+                            <LikeCircle className={startIndex > 0 ? "like-circle--sm" : ""} />
+                          </div>
+                        </div>
+                        <div className="item_texts">
+                          <p className="item_name">{item.name}</p>
+                          <p className="item_price">{item.price}</p>
+                          <button
+                            type="button"
+                            className="item_spec"
+                            onClick={() => setSelectedSpecProduct(item)}
+                          >
+                            주요스펙
+                          </button>
+                        </div>
                       </div>
                     </div>
-                    <div className="item_texts">
-                      <p className="item_name">MacBook Pro 14 M3</p>
-                      <p className="item_price">￦2,419,000</p>
-                      <p className="item_spec">주요스펙</p>
-                    </div>
-                  </div>
+                  ))}
                 </div>
-                <div className="item_box">
-                  <div className="items">
-                    <div className="item_img_box">
-                      <img
-                        src="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png"
-                        alt="items"
-                        className="item_img"
-                      />
-                      <div className="icons">
-                        <button>
-                          <img src={Cart_straight} alt="cart" />
-                        </button>
-                        <LikeCircle />
-                      </div>
-                    </div>
-                    <div className="item_texts">
-                      <p className="item_name">MacBook Pro 14 M3</p>
-                      <p className="item_price">￦2,419,000</p>
-                      <p className="item_spec">주요스펙</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="item_row">
-                <div className="item_box">
-                  <div className="items">
-                    <div className="item_img_box">
-                      <img
-                        src="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png"
-                        alt="items"
-                        className="item_img"
-                      />
-                      <div className="icons">
-                        <button>
-                          <img src={Cart_straight} alt="cart" />
-                        </button>
-                        <LikeCircle className="like-circle--sm" />
-                      </div>
-                    </div>
-                    <div className="item_texts">
-                      <p className="item_name">MacBook Pro 14 M3</p>
-                      <p className="item_price">￦2,419,000</p>
-                      <p className="item_spec">주요스펙</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="item_box">
-                  <div className="items">
-                    <div className="item_img_box">
-                      <img
-                        src="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png"
-                        alt="items"
-                        className="item_img"
-                      />
-                      <div className="icons">
-                        <button>
-                          <img src={Cart_straight} alt="cart" />
-                        </button>
-                        <LikeCircle className="like-circle--sm" />
-                      </div>
-                    </div>
-                    <div className="item_texts">
-                      <p className="item_name">MacBook Pro 14 M3</p>
-                      <p className="item_price">￦2,419,000</p>
-                      <p className="item_spec">주요스펙</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>

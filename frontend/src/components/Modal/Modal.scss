@@ -5,16 +5,17 @@
   inset: 0;
   background-color: rgba(0, 0, 0, 0.3);
   z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
 }
 
 .modal {
-  position: absolute;
-  bottom: 0;
-  left: 0;
   width: 100vw;
   background: $color-white;
   border-radius: 16px 16px 0 0;
   padding: $layout-mobile-padding;
+  max-width: $breakpoint-desktop;
 
   &__title {
     font-size: $font-md;
