@@ -1,0 +1,169 @@
+/* -------------------------------------------------------------------------- */
+/* [스타일] 디자인 토큰 (_variables.scss)                                     */
+/* 프로젝트 전체에서 공통으로 사용할 컬러, 폰트, 간격 등을 정의합니다.        */
+/* -------------------------------------------------------------------------- */
+
+// 필요한 건 추가하셔도 됩니다.
+
+// ==========================================
+// 1. 컬러 팔레트 (Color Palette)
+// ==========================================
+
+$color-bg: #f4fffe; // 배경
+$color-text-main: #004e5a; // 메인 텍스트
+$color-layout: #d1d4dc; // 카드/레이아웃
+$color-text-sub: #0aa5a5; // 서브 텍스트
+$color-btn: #7ae0d4; // 버튼/보조
+
+// 기본 컬러
+$color-white: #ffffff;
+$color-black: #000000;
+
+// 상태 컬러
+$color-success: #22c55e; // 성공
+$color-warning: #facc15; // 경고
+$color-error: #ef4444; // 에러
+
+// 그레이 스케일
+$color-gray-100: #f5f5f5;
+$color-gray-200: #e5e7eb;
+$color-gray-300: #d9d9d9;
+$color-gray-400: #9ca3af;
+$color-gray-500: #606060;
+$color-gray-600: #575757;
+$color-placeholder: #aeaeae;
+
+// 메인 버튼 배경색
+$color-button: #d9f4f3;
+
+// 메인 AI 버튼 외곽선 색
+$color-button-outline: #c5eded;
+
+// 메인 카테고리 텍스트 컬러
+$color-category-text: #003a43;
+$color-sub-category-text: #606060;
+
+// ==========================================
+// 1-1. 공통 사용 alias 컬러
+// 기존 컴포넌트(Header/Footer 등)에서 자주 쓰는 이름들
+// ==========================================
+
+$color-primary: $color-text-sub; // 메인 포인트 컬러
+$color-primary-light: $color-btn; // 밝은 포인트 컬러
+$color-primary-dark: $color-text-main; // 진한 포인트 컬러
+
+$color-text: $color-text-main; // 기본 텍스트
+$color-text-muted: $color-gray-500; // 보조 텍스트
+$color-border: $color-gray-200; // 기본 보더
+$color-surface: $color-white; // 카드/박스 배경
+
+// ==========================================
+// 2. 타이포그래피 (Typography)
+// ==========================================
+
+$font-main: "Google Sans Flex", sans-serif;
+$font-logo: "Tmoney RoundWind", sans-serif;
+
+// Font Weight
+$font-regular: 400;
+$font-medium: 500;
+$font-semibold: 600;
+$font-bold: 700;
+$font-black: 900;
+
+// Line Height
+$line-height-base: 1.5;
+$line-height-tight: 1.2;
+
+// ==========================================
+// 3. Font Size System
+// ==========================================
+
+$font-xxs: 10px;
+$font-xxs-2: 11px;
+$font-xs: 12px;
+$font-xs-2: 13px;
+$font-sm: 14px;
+$font-md: 16px;
+$font-lg: 18px;
+$font-lg-2: 20px;
+$font-lg-3: 22px;
+$font-xl: 24px;
+$font-xl-2: 28px;
+$font-xl-3: 30px;
+$font-xxl: 32px;
+$font-display: 48px;
+
+// ==========================================
+// 4. Spacing System
+// ==========================================
+
+$space-xxs: 4px;
+$space-xs: 8px;
+$space-sm: 12px;
+$space-md: 16px;
+$space-lg: 24px;
+$space-xl: 32px;
+$space-xxl: 40px;
+
+$space-2xs: 2px;
+$space-3xs: 3px;
+$space-10: 10px;
+$space-14: 14px;
+$space-20: 20px;
+$space-26: 26px;
+$space-28: 28px;
+$space-48: 48px;
+
+// ==========================================
+// 4-1. Breakpoints / Layout
+// ==========================================
+
+$breakpoint-tablet: 768px;
+$breakpoint-desktop: 1024px;
+$breakpoint-desktop-lg: 1280px;
+
+$layout-mobile-padding: 16px;
+$layout-tablet-padding: 24px;
+$layout-desktop-padding: 32px;
+$layout-desktop-max-width: 1280px;
+
+// ==========================================
+// 5. Border Radius
+// ==========================================
+
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 20px;
+$radius-xl: 24px;
+$radius-full: 9999px;
+
+$radius-ai: 40px;
+// Button
+$radius-btn: 10px;
+
+// ==========================================
+// 6. Shadow System
+// ==========================================
+
+$shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08);
+$shadow-medium: 0 8px 20px rgba(0, 0, 0, 0.12);
+$shadow-strong: 0 12px 30px rgba(0, 0, 0, 0.2);
+
+// ==========================================
+// 7. Z-index System
+// ==========================================
+
+$z-base: 1;
+$z-header: 100;
+$z-dropdown: 200;
+$z-modal: 1000;
+$z-toast: 1100;
+
+// ==========================================
+// 8. Transition System
+// ==========================================
+
+$transition-fast: 0.15s ease;
+$transition-base: 0.3s ease;
+$transition-slow: 0.5s ease;

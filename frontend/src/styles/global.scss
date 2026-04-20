@@ -1,0 +1,40 @@
+/* -------------------------------------------------------------------------- */
+/* [스타일] 전역 스타일 (global.scss)                                         */
+/* 프로젝트 전체에 공통으로 적용할 기본 스타일을 정의합니다.                  */
+/* -------------------------------------------------------------------------- */
+
+html {
+  font-size: 16px;
+}
+
+body {
+  min-height: 100vh;
+  font-family: $font-main;
+  font-size: $font-md;
+  font-weight: $font-regular;
+  line-height: $line-height-base;
+  color: $color-text-main;
+  background-color: $color-white;
+  overflow-x: hidden;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+::selection {
+  background: $color-text-sub;
+  color: $color-white;
+}

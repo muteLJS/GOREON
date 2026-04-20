@@ -1,0 +1,2175 @@
+﻿@import "styles/variables";
+@import "styles/mixins";
+
+.main-page {
+  width: 100%;
+  min-height: 100vh;
+  // @include flex(center, center, column);
+  margin: 0 auto;
+  gap: 12px;
+
+  h2 {
+    margin: 0;
+    font-weight: $font-bold;
+    font-size: $font-xl-2;
+    color: $color-category-text;
+  }
+
+  h4 {
+    margin: 0;
+    font-weight: $font-medium;
+    font-size: $font-sm;
+    color: $color-sub-category-text;
+  }
+}
+
+.main-page__section {
+  position: relative;
+  width: 100%;
+}
+
+.main-page__section--ai-review {
+  overflow: hidden;
+}
+
+.ai-stage {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.ai-stage__layer {
+  width: 100%;
+}
+
+.back {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  z-index: 0;
+}
+
+.sections {
+  position: relative;
+  z-index: 1;
+  padding: 20px 20px;
+}
+
+.back--ai {
+  background-color: $color-bg;
+}
+
+.back--ai-result {
+  background-color: $color-bg;
+}
+
+.back--ai-review {
+  background-color: $color-white;
+}
+
+.back--set-category {
+  background-color: $color-white;
+}
+
+.back--new-update {
+  background-color: $color-white;
+}
+
+.hidden {
+  display: none;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.section__AI {
+  padding: 20px 16px;
+  @include flex(center, space-between, column);
+  gap: 12px;
+  .AI_container {
+    width: 100%;
+    @include flex(flex-start, space-between);
+    .AI_logo {
+      width: 30%;
+    }
+  }
+  .AI_description {
+    @include flex(flex-start, space-between, column);
+    gap: $space-sm;
+  }
+  button {
+    padding: 5px;
+    @include flex(center, space-between);
+    color: $color-text-sub;
+    background-color: $color-button;
+    border: 1px solid $color-text-sub;
+    border-radius: 25.5px;
+    font-weight: $font-bold;
+    font-size: $font-xxs;
+    gap: 5px;
+    .circle {
+      width: 6px;
+      height: 6px;
+      border-radius: $radius-full;
+      background-color: $color-text-sub;
+    }
+  }
+  .AI_Main_text {
+    color: $color-text-main;
+    font-size: $font-xl;
+    font-weight: $font-black;
+
+    .input {
+      color: $color-text-sub;
+    }
+  }
+  .AI_sub_text {
+    display: none;
+  }
+}
+
+.main-page__section--ai.is-ai-switching {
+  .ai-stage {
+    position: relative;
+  }
+
+  .ai-stage__layer--initial.is-leaving {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    animation: aiStageFadeOut 0.55s ease forwards;
+
+    .AI_logo {
+      animation: aiLogoDriftOut 0.55s ease forwards;
+    }
+  }
+
+  .ai-stage__layer--result.is-entering {
+    animation: aiStageFadeIn 0.65s ease-out both;
+
+    .recommends,
+    .AI_chat_response,
+    .AI_chat_container {
+      animation: aiStageFadeIn 0.6s ease-out both;
+    }
+
+    .recommends {
+      animation-delay: 0.04s;
+    }
+
+    .AI_chat_response {
+      animation-delay: 0.1s;
+    }
+
+    .AI_chat_container {
+      animation-delay: 0.16s;
+    }
+
+    .AI_logo {
+      animation: aiLogoDriftIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+  }
+}
+
+@keyframes aiStageFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-18px);
+  }
+}
+
+@keyframes aiStageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes aiLogoDriftOut {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(26px, 18px, 0) scale(0.9);
+  }
+}
+
+@keyframes aiLogoDriftIn {
+  from {
+    opacity: 0;
+    transform: translate3d(-42px, -24px, 0) scale(0.88);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.AI_Chat_row_2 {
+  @include flex(flex-start, space-between, column);
+  gap: 12px;
+  .buttons {
+    @include flex(flex-start, space-between, column);
+    gap: 12px;
+    button {
+      padding: 4.5px 6.5px;
+      background-color: $color-bg;
+      color: $color-text-main;
+      border: 1px solid $color-button-outline;
+      border-radius: $radius-full;
+      font-size: $font-xs;
+      font-weight: $font-bold;
+    }
+
+    .buttons__slide {
+      width: auto !important;
+    }
+  }
+
+  .buttons--measure {
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: -1;
+  }
+}
+
+.AI_chat_container {
+  width: 100%;
+  background-color: $color-white;
+  margin-top: 18px;
+  form {
+    width: 100%;
+    border: 1px solid $color-text-sub;
+    border-radius: $radius-ai;
+
+    .AI_Chat_row_1 {
+      @include flex(flex-start, space-between);
+      width: 100%;
+      padding: 15px 25px;
+      color: $color-text-main;
+      gap: 10px;
+
+      button {
+        width: 24px;
+        height: 24px;
+        padding: 0;
+        @include flex();
+        cursor: pointer;
+        flex-shrink: 0;
+
+        svg {
+          width: 100%;
+          height: 100%;
+        }
+      }
+
+      .submit {
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    .AI_Chat_row_2 {
+      display: none;
+    }
+  }
+  textarea::placeholder {
+    color: $color-text-main;
+    font-size: $font-md;
+    font-weight: $font-bold;
+  }
+  textarea {
+    background-color: $color-white;
+    border: none;
+    color: $color-text-main;
+    width: 80%;
+    flex: 1;
+    padding: 0;
+    overflow: hidden;
+    resize: none;
+    color: $color-text-main;
+    font-size: $font-md;
+    font-weight: $font-bold;
+
+    &:focus {
+      outline: none;
+      border-color: $color-text-sub;
+      box-shadow: none;
+    }
+  }
+}
+
+.section__AI_Review {
+  overflow: hidden;
+  @include flex(flex-start, center, column);
+  gap: 12px;
+  .text_box {
+    @include flex(flex-start, center, column);
+    gap: 8px;
+  }
+
+  .review_box {
+    @include flex();
+    gap: 12px;
+
+    .item_name {
+      color: $color-sub-category-text;
+      font-weight: $font-bold;
+      font-size: $font-sm;
+    }
+    .description {
+      color: $color-sub-category-text;
+      font-weight: $font-medium;
+      font-size: $font-xs;
+    }
+  }
+  .review_main {
+    width: 270px;
+    padding: 34px 20px;
+    @include flex(flex-start, center, column);
+    gap: 17px;
+    border: 1px solid rgba($color-sub-category-text, 0.24);
+    border-radius: $radius-lg;
+  }
+  .AI_box {
+    @include flex(flex-start, center, column);
+    gap: 6px;
+    .user_info {
+      @include flex();
+      gap: 8px;
+      img {
+        width: 34px;
+      }
+      .user_name {
+        font-weight: $font-bold;
+        font-size: $font-lg-3;
+        color: $color-category-text;
+      }
+    }
+    .stars {
+      @include flex(center, flex-start);
+      gap: 2px;
+      svg {
+        width: 14px;
+        height: 14px;
+        fill: $color-text-sub;
+      }
+    }
+  }
+}
+
+.section__AI_Review--revealed {
+  animation: aiReviewFadeUp 0.45s ease-out;
+}
+
+.section__AI_result {
+  @include flex(flex-start, center, column);
+  gap: 18px;
+
+  .recommends {
+    width: 100%;
+    overflow: visible;
+
+    .swiper-slide {
+      height: auto;
+    }
+
+    .recommend {
+      width: 100%;
+      min-width: 0;
+      @include flex(flex-start, center, column);
+      gap: 10px;
+      padding: 18px 18px 16px;
+      background: rgba($color-white, 0.94);
+      border: 1px solid rgba($color-text-sub, 0.18);
+      border-radius: $radius-lg;
+      box-shadow: 0 10px 24px rgba(10, 166, 166, 0.08);
+
+      img {
+        width: min(62%, 180px);
+        margin: 0 auto;
+      }
+
+      .texts {
+        width: 100%;
+        @include flex(flex-start, center, column);
+        gap: 4px;
+
+        p:first-child {
+          font-size: $font-md;
+          font-weight: $font-bold;
+          color: $color-category-text;
+        }
+
+        p:last-child {
+          font-size: $font-xs-2;
+          line-height: 1.45;
+          color: $color-sub-category-text;
+        }
+      }
+
+      .go {
+        width: 100%;
+        @include flex(center, space-between);
+
+        .price {
+          font-size: $font-lg-2;
+          font-weight: $font-bold;
+          color: $color-category-text;
+        }
+
+        .chevron {
+          width: 14px;
+          padding: 0;
+          transform: rotate(90deg);
+
+          svg {
+            display: block;
+            width: 100%;
+            height: 10px;
+          }
+
+          path {
+            fill: none;
+            stroke: $color-text-main;
+            stroke-width: 2.5px;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+          }
+        }
+      }
+    }
+  }
+
+  .AI_chat_response {
+    width: 100%;
+    @include flex(center, flex-start);
+    gap: 14px;
+    padding: 22px 20px;
+    background: rgba($color-white, 0.94);
+    border-radius: $radius-lg;
+    box-shadow: 0 10px 24px rgba(10, 166, 166, 0.08);
+
+    img {
+      width: 20px;
+      flex-shrink: 0;
+    }
+
+    p {
+      font-size: $font-md;
+      font-weight: $font-medium;
+      line-height: 1.55;
+    }
+  }
+
+  .AI_chat_container {
+    width: 100%;
+    @include flex(flex-end, space-between);
+    gap: 8px;
+    background: none;
+    margin-top: 0;
+    flex-direction: row;
+    align-items: center;
+    padding-right: 8px;
+    box-sizing: border-box;
+
+    form {
+      flex: 1;
+      min-width: 0;
+      background: rgba($color-white, 0.96);
+      border-radius: $radius-lg;
+    }
+
+    .AI_Chat_row_1 {
+      display: block;
+      padding: 18px 20px 8px;
+
+      textarea {
+        width: 100%;
+      }
+    }
+
+    .AI_Chat_row_2 {
+      display: none;
+      padding: 0 20px 10px;
+      @include flex(center, space-between);
+
+      .buttons {
+        @include flex(center, flex-start);
+        flex-wrap: nowrap;
+        gap: 12px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+
+        button {
+          flex: 0 0 auto;
+          white-space: nowrap;
+        }
+      }
+
+      .buttons--desktop {
+        display: block;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+
+        .buttons__pages-swiper {
+          width: 100%;
+          overflow: hidden;
+        }
+
+        .buttons__page {
+          @include flex(center, flex-start);
+          flex-wrap: nowrap;
+          gap: 12px;
+          width: 100%;
+          overflow: hidden;
+        }
+
+        .swiper-slide {
+          width: 100% !important;
+        }
+      }
+
+      .buttons--swiper {
+        display: block;
+        overflow: hidden;
+        flex: 1;
+        min-width: 0;
+        gap: 0;
+
+        .buttons__swiper {
+          width: 100%;
+        }
+
+        .swiper-wrapper {
+          align-items: center;
+        }
+
+        .buttons__slide {
+          width: auto !important;
+        }
+
+        button {
+          flex: 0 0 auto;
+          white-space: nowrap;
+        }
+      }
+
+      .submit {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        @include flex-center;
+        flex: 0 0 auto;
+        background: none;
+        border: none;
+        margin-left: 12px;
+      }
+    }
+
+    .AI_container {
+      width: 60px;
+      flex: 0 0 auto;
+      align-self: center;
+      padding-right: 10px;
+      overflow: visible;
+
+      .AI_logo {
+        width: 100%;
+        display: block;
+        height: auto;
+      }
+      padding-right: 6px;
+      overflow: visible;
+
+      .AI_logo {
+        width: 100%;
+        display: block;
+        height: auto;
+      }
+    }
+  }
+}
+
+@keyframes aiReviewFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .main-page__section--ai.is-ai-switching {
+    .ai-stage__layer--initial.is-leaving,
+    .ai-stage__layer--result.is-entering,
+    .ai-stage__layer--initial.is-leaving .AI_logo,
+    .ai-stage__layer--result.is-entering .AI_logo,
+    .ai-stage__layer--result.is-entering .recommends,
+    .ai-stage__layer--result.is-entering .AI_chat_response,
+    .ai-stage__layer--result.is-entering .AI_chat_container {
+      animation: none;
+    }
+  }
+
+  .section__AI_Review--revealed {
+    animation: none;
+  }
+}
+
+@media (min-width: $breakpoint-tablet) and (max-width: 1023px) {
+  .sections {
+    width: 100%;
+    padding: 40px 0;
+  }
+
+  .section__AI {
+    gap: 24px;
+
+    .AI_container {
+      align-items: flex-start;
+      gap: 28px;
+
+      .AI_logo {
+        width: 26%;
+        max-width: 220px;
+        flex-shrink: 0;
+        margin-top: 8px;
+      }
+    }
+
+    .AI_description {
+      flex: 1;
+      gap: 18px;
+    }
+
+    .AI_Main_text {
+      font-size: clamp(34px, 4.8vw, 42px);
+      line-height: 1.16;
+      letter-spacing: -0.02em;
+    }
+
+    .AI_sub_text {
+      display: block;
+      font-size: $font-lg;
+      line-height: 1.5;
+    }
+
+    .AI_chat_container {
+      margin-top: 0;
+
+      form {
+        border-radius: $radius-lg;
+      }
+
+      form .AI_Chat_row_1 {
+        padding: 20px 24px 16px;
+      }
+
+      form .AI_Chat_row_2 {
+        display: none;
+      }
+
+      textarea,
+      textarea::placeholder {
+        font-size: $font-lg;
+      }
+    }
+  }
+
+  .section__AI_result {
+    gap: 26px;
+
+    .recommends {
+      width: 100%;
+      gap: 20px;
+
+      .recommend {
+        width: 100%;
+        min-width: 0;
+        gap: 12px;
+        padding: 22px 20px 18px;
+        border: 2px solid rgba($color-text-sub, 0.18);
+        border-radius: $radius-lg;
+        background: rgba($color-white, 0.92);
+        box-shadow: 0 12px 24px rgba(10, 166, 166, 0.08);
+
+        img {
+          width: min(72%, 180px);
+        }
+
+        .texts {
+          width: 100%;
+          padding: 0;
+          gap: 4px;
+
+          p:first-child {
+            font-size: $font-lg;
+            font-weight: $font-bold;
+            color: $color-category-text;
+          }
+
+          p:last-child {
+            font-size: $font-xs-2;
+            line-height: 1.45;
+            color: $color-sub-category-text;
+          }
+        }
+
+        .go {
+          @include flex(center, space-between);
+          width: 100%;
+          padding: 0;
+
+          .price {
+            font-size: $font-lg-3;
+          }
+
+          .chevron {
+            width: 16px;
+            padding: 0;
+            transform: rotate(90deg);
+
+            svg {
+              display: block;
+              width: 100%;
+              height: 12px;
+            }
+
+            path {
+              fill: none;
+              stroke: $color-text-main;
+              stroke-width: 2.5px;
+              stroke-linecap: round;
+              stroke-linejoin: round;
+            }
+          }
+        }
+      }
+    }
+
+    .AI_chat_response {
+      width: 100%;
+      padding: 24px 26px;
+      border-radius: $radius-lg;
+      background: rgba($color-white, 0.94);
+      box-shadow: 0 10px 24px rgba(10, 166, 166, 0.08);
+
+      p {
+        font-size: $font-lg;
+        line-height: 1.45;
+      }
+    }
+
+    .AI_chat_container {
+      width: 100%;
+      @include flex(flex-end, space-between);
+      gap: 20px;
+      flex-direction: row;
+      align-items: center;
+      padding-right: 12px;
+      box-sizing: border-box;
+
+      form {
+        flex: 1;
+        min-width: 0;
+        background: rgba($color-white, 0.96);
+        border-radius: $radius-lg;
+      }
+
+      .AI_Chat_row_1 {
+        display: block;
+        padding: 20px 24px 10px;
+
+        textarea {
+          width: 100%;
+        }
+      }
+
+      .AI_Chat_row_2 {
+        display: block;
+        padding: 0 24px 12px;
+        @include flex(center, space-between);
+
+        .buttons {
+          @include flex(center, flex-start);
+          flex-wrap: nowrap;
+          gap: 12px;
+          overflow-x: auto;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+
+          &::-webkit-scrollbar {
+            display: none;
+          }
+
+          button {
+            flex: 0 0 auto;
+            white-space: nowrap;
+          }
+        }
+
+        .buttons--desktop {
+          display: block;
+          flex: 1;
+          min-width: 0;
+          overflow: hidden;
+
+          .buttons__pages-swiper {
+            width: 100%;
+            overflow: hidden;
+          }
+
+          .buttons__page {
+            @include flex(center, flex-start);
+            flex-wrap: nowrap;
+            gap: 12px;
+            width: 100%;
+            overflow: hidden;
+          }
+
+          .swiper-slide {
+            width: 100% !important;
+          }
+        }
+
+        .buttons--swiper {
+          display: block;
+          overflow: hidden;
+          flex: 1;
+          min-width: 0;
+          gap: 0;
+
+          .buttons__swiper {
+            width: 100%;
+          }
+
+          .swiper-wrapper {
+            align-items: center;
+          }
+
+          .buttons__slide {
+            width: auto !important;
+          }
+
+          button {
+            flex: 0 0 auto;
+            white-space: nowrap;
+          }
+        }
+
+        .submit {
+          width: 40px;
+          height: 40px;
+          padding: 0;
+          @include flex-center;
+          flex: 0 0 auto;
+          background: none;
+          border: none;
+          margin-left: 14px;
+        }
+      }
+
+      .AI_container {
+        width: 76px;
+        min-width: 76px;
+        max-width: 76px;
+        flex: 0 0 auto;
+        align-self: center;
+        padding-right: 12px;
+        overflow: visible;
+
+        .AI_logo {
+          width: 100%;
+          display: block;
+          height: auto;
+        }
+      }
+    }
+
+    textarea,
+    textarea::placeholder {
+      font-size: $font-lg;
+    }
+  }
+
+  .section__AI_Review {
+    gap: 24px;
+
+    .text_box {
+      width: 100%;
+      align-items: flex-start;
+    }
+
+    .review_box {
+      width: 100%;
+      @include flex(flex-start, flex-start);
+      gap: 16px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      .review_main {
+        width: 340px;
+        min-width: 340px;
+        padding: 28px 24px;
+        gap: 14px;
+      }
+    }
+
+    .AI_box {
+      width: 100%;
+      @include flex(flex-start, space-between);
+
+      .user_info {
+        gap: 10px;
+      }
+
+      .stars {
+        gap: 4px;
+      }
+    }
+  }
+
+  .section__Set_Category {
+    gap: 18px;
+
+    .category_top {
+      width: 100%;
+    }
+
+    .categories form {
+      gap: 10px;
+      padding: 8px;
+    }
+  }
+
+  .section__Collarborates {
+    gap: 24px;
+
+    .more--desktop-only {
+      display: none;
+    }
+
+    .pakage_boxs {
+      gap: 20px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    .pakage_box {
+      min-width: 320px;
+    }
+  }
+
+  .section__New_Update {
+    gap: 18px;
+
+    .item_boxs {
+      gap: 18px;
+    }
+
+    .item_row {
+      gap: 18px;
+    }
+  }
+}
+
+.section__Set_Category {
+  @include flex(flex-start, center, column);
+  gap: 12px;
+  overflow: hidden;
+  .category_top {
+    @include flex(flex-start, center, column);
+    gap: 8px;
+
+    .main-texts {
+      @include flex(flex-start, center, column);
+      gap: 8px;
+    }
+  }
+  .categories {
+    width: 100%;
+    background-color: $color-white;
+    border-radius: $radius-full;
+    form {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      width: 100%;
+      gap: 12px;
+      background-color: $color-white;
+      border: 1px solid $color-gray-100;
+      border-radius: $radius-full;
+      padding: 8px;
+
+      .hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .category {
+        width: 100%;
+        min-width: 0;
+        @include flex(center, center);
+        gap: 5px;
+        min-height: 38px;
+        padding: 8px 12px;
+        background-color: $color-white;
+        border-radius: $radius-full;
+        cursor: pointer;
+        transition: $transition-base;
+        img {
+          width: 16px;
+          flex-shrink: 0;
+        }
+        p {
+          font-weight: $font-medium;
+          font-size: $font-sm;
+          color: $color-sub-category-text;
+          white-space: nowrap;
+        }
+        &:hover p {
+          color: $color-category-text;
+        }
+      }
+
+      .hidden:checked + .category {
+        background-color: $color-gray-100;
+
+        p {
+          color: $color-category-text;
+        }
+      }
+
+      .hidden:focus-visible + .category {
+        outline: 2px solid rgba($color-text-sub, 0.35);
+        outline-offset: 2px;
+      }
+    }
+  }
+  .item_box {
+    @include flex(flex-start, center);
+    gap: 12px;
+  }
+
+  .category_swiper {
+    width: 100%;
+
+    .swiper-slide {
+      width: 100%;
+      min-width: 0;
+      flex-shrink: 0;
+      height: auto;
+    }
+
+    .items {
+      height: 100%;
+      width: 100%;
+      min-width: 0;
+    }
+  }
+
+  .items {
+    width: 100%;
+    min-width: 0;
+    @include flex(flex-start, center, column);
+    gap: 18px;
+    overflow: hidden;
+    color: $color-category-text;
+    font-weight: $font-bold;
+    gap: 18px;
+    .item_img_box {
+      @include flex(flex-end, flex-end, column);
+      position: relative;
+      gap: 20px;
+      width: 100%;
+      height: 220px;
+      padding: 8px 9px;
+      box-sizing: border-box;
+      border: 1px solid $color-gray-300;
+      border-radius: $radius-md;
+      background-color: $color-gray-100;
+      .item_img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .icons {
+        @include flex(center, space-between);
+        gap: 8px;
+        button {
+          width: 30px;
+          height: 30px;
+          background-color: $color-gray-100;
+          border-radius: $radius-full;
+          box-shadow: 0 0 2px $color-black;
+          img {
+            width: 18px;
+            height: 18px;
+          }
+        }
+      }
+    }
+  }
+  .item_name {
+    font-size: $font-lg-3;
+    width: 100%;
+    min-width: 0;
+  }
+  .options {
+    width: 100%;
+    @include flex(center, flex-start);
+    gap: 6px;
+    flex-wrap: wrap;
+    p {
+      font-size: $font-xs;
+      font-weight: $font-semibold;
+      padding: 3px 9px;
+      background-color: $color-gray-100;
+      border-radius: $radius-full;
+    }
+  }
+  .item_price {
+    font-size: $font-xl;
+  }
+  .item_colors {
+    width: 100%;
+    @include flex(center, flex-start);
+    gap: 12px;
+
+    .colors {
+      width: 20px;
+      height: 20px;
+      border-radius: $radius-full;
+    }
+    .color1 {
+      background-color: $color-black;
+    }
+    .color2 {
+      background-color: $color-gray-400;
+    }
+  }
+  .unfilled {
+    position: relative;
+    margin-top: 6px;
+    width: 100%;
+    height: 3px;
+    background-color: $color-gray-100;
+    border-radius: $radius-full;
+    overflow: hidden;
+    .filled {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 3px;
+      border-radius: $radius-full;
+      background-color: $color-category-text;
+      transition: left $transition-base;
+    }
+  }
+}
+
+.section__Collarborates {
+  @include flex(flex-start, center, column);
+  gap: 34px;
+  font-weight: $font-bold;
+  overflow: hidden;
+  .texts {
+    @include flex(flex-start, center, column);
+    gap: 8px;
+  }
+  .gray_text {
+    color: $color-sub-category-text;
+  }
+  .pakage_boxs {
+    @include flex(flex-start, flex-start);
+    gap: 16px;
+  }
+  .pakage_box {
+    @include flex(center, center, column);
+    flex: 1 1 0;
+    width: 100%;
+    box-sizing: border-box;
+    gap: 10px;
+    padding: 18px 20px;
+    border: 1px solid rgba($color-gray-500, 0.25);
+    border-radius: $radius-md;
+    color: $color-category-text;
+    .pakage_big {
+      @include flex(flex-start, center, column);
+      gap: 21px;
+      width: 100%;
+      .pakage_img {
+        margin: 0 auto;
+        width: 160px;
+      }
+
+      .pakage_texts {
+        width: 100%;
+        @include flex(flex-start, center, column);
+        gap: 2px;
+        .gray_text {
+          padding-top: 4px;
+          font-size: $font-xs;
+          font-weight: $font-medium;
+        }
+        .pakage_bottom {
+          width: 100%;
+          @include flex(center, space-between);
+          .icons {
+            @include flex(center, space-between);
+            gap: 8px;
+            button {
+              width: 24px;
+              height: 24px;
+              background-color: $color-gray-100;
+              border-radius: $radius-full;
+              box-shadow: 0 0 2px $color-black;
+              img {
+                width: 18px;
+                height: 18px;
+              }
+            }
+          }
+        }
+      }
+    }
+    .pakage_small {
+      display: grid;
+      grid-template-rows: 1fr;
+      width: 100%;
+      overflow: hidden;
+      opacity: 1;
+      transition:
+        grid-template-rows 0.55s ease,
+        opacity 0.4s ease,
+        padding-top 0.55s ease;
+
+      .pakage_small_inner {
+        min-height: 0;
+        @include flex(center, center, column);
+        gap: 4px;
+      }
+
+      .pakage_img_box {
+        @include flex(center, center);
+        width: 60px;
+        height: 60px;
+        border: 1px solid rgba($color-gray-500, 0.25);
+        border-radius: $radius-md;
+        img {
+          width: 50px;
+        }
+      }
+      .pakage_item {
+        p {
+          font-size: $font-xs;
+        }
+        .gray_text {
+          font-size: $font-xxs;
+        }
+      }
+    }
+    .pakage_inner {
+      @include flex();
+      gap: 8px;
+    }
+
+    &:not(.is-open) {
+      .pakage_small {
+        grid-template-rows: 0fr;
+        opacity: 0;
+        padding-top: 0;
+        pointer-events: none;
+      }
+    }
+  }
+  .chevron {
+    @include flex-center;
+    width: 100%;
+    padding: 10px 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+
+    svg {
+      display: block;
+      width: 24px;
+      height: 12px;
+      transition: transform $transition-fast;
+    }
+
+    path {
+      fill: none;
+      stroke: $color-sub-category-text;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    &.is-open svg {
+      transform: rotate(180deg);
+    }
+  }
+}
+.section__New_Update {
+  width: 100%;
+  .desktop {
+    display: none;
+  }
+  @include flex(flex-start, center, column);
+  gap: 12px;
+
+  .mobile {
+    width: 100%;
+  }
+
+  .item_boxs {
+    width: 100%;
+    @include flex(flex-start, flex-start, column);
+    gap: 20px;
+    .item_row {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+  }
+  .category_top {
+    width: 100%;
+    @include flex(flex-start, center, column);
+    gap: 8px;
+  }
+
+  .item_box {
+    width: 100%;
+    min-width: 0;
+    @include flex(flex-start, space-between);
+    gap: 12px;
+  }
+
+  .items {
+    width: 100%;
+    @include flex(flex-start, center, column);
+    gap: 18px;
+    overflow: hidden;
+    color: $color-category-text;
+    font-weight: $font-bold;
+
+    .item_img_box {
+      width: 100%;
+      @include flex(flex-end, flex-end, column);
+      position: relative;
+      gap: 20px;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      padding: 8px 9px;
+      box-sizing: border-box;
+      border: 1px solid $color-gray-300;
+      border-radius: $radius-md;
+      background-color: $color-gray-100;
+      .item_img {
+        position: absolute;
+        width: 70%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .icons {
+        @include flex(center, space-between);
+        gap: 8px;
+        button {
+          width: 30px;
+          height: 30px;
+          background-color: $color-gray-100;
+          border-radius: $radius-full;
+          box-shadow: 0 0 2px $color-black;
+          img {
+            width: 18px;
+            height: 18px;
+          }
+        }
+      }
+    }
+    .item_texts {
+      width: 100%;
+      @include flex(flex-start, center, column);
+      gap: 7px;
+      .item_name {
+        font-size: $font-lg;
+      }
+      .item_price {
+        font-size: $font-lg;
+      }
+      .item_spec {
+        font-size: $font-xs-2;
+        border: 1px solid $color-category-text;
+        border-radius: $radius-full;
+        padding: 5px 10px;
+      }
+    }
+  }
+}
+
+@include desktop-up {
+  .main-page {
+    h2 {
+      font-size: $font-xxl;
+    }
+
+    h4 {
+      font-size: $font-lg;
+    }
+  }
+
+  .sections {
+    padding: 120px 0;
+    width: 100%;
+
+    .more {
+      gap: 80px;
+      p {
+        font-size: $font-md;
+      }
+      .icon_box {
+        width: 56px;
+        height: 31px;
+        flex: 0 0 56px;
+
+        circle {
+          transform: scale(1.35);
+          transform-origin: center;
+          transform-box: fill-box;
+        }
+      }
+    }
+  }
+
+  .back--ai,
+  .back--ai-result {
+    background: url(@/assets/pc/Main/AISection.svg) center / cover no-repeat;
+  }
+
+  .back--set-category,
+  .back--new-update {
+    background-color: $color-bg;
+  }
+
+  .section__AI {
+    .AI_container {
+      .AI_logo {
+        width: 25%;
+      }
+    }
+    .AI_description {
+      gap: 36px;
+    }
+    .AI_Main_text {
+      font-size: $font-display;
+      line-height: 1.2;
+    }
+    .AI_sub_text {
+      display: block;
+      font-weight: $font-bold;
+      font-size: $font-xl;
+      line-height: 1.4;
+    }
+    button {
+      font-size: $font-xs;
+      padding: 8px 20px;
+      gap: 10px;
+      .circle {
+        gap: 10px;
+        width: 10px;
+        height: 10px;
+      }
+    }
+    textarea::placeholder {
+      font-size: $font-xl;
+    }
+    form {
+      .AI_Chat_row_1 {
+        padding: 15px 25px 0px;
+        textarea {
+          height: 40px;
+          font-size: $font-xl;
+        }
+        .submit {
+          display: none;
+        }
+      }
+    }
+
+    .AI_Chat_row_2 {
+      display: none;
+    }
+    .AI_chat_container {
+      border-radius: $radius-lg;
+      form {
+        border-radius: $radius-lg;
+      }
+      .AI_Chat_row_2 {
+        display: block;
+        padding: 0 25px 5px;
+        @include flex(center, space-between);
+        .buttons {
+          @include flex(flex-start, flex-start);
+          flex-wrap: nowrap;
+          align-items: flex-start;
+          gap: 20px;
+          width: 100%;
+          min-width: 0;
+
+          button {
+            font-size: $font-sm;
+            flex: 0 0 auto;
+            white-space: nowrap;
+          }
+
+          .buttons__pages-swiper {
+            width: 100%;
+            overflow: hidden;
+          }
+
+          .buttons__page {
+            @include flex(flex-start, flex-start);
+            flex-wrap: nowrap;
+            gap: 20px;
+            width: 100%;
+            overflow: hidden;
+          }
+
+          .swiper-slide {
+            width: 100% !important;
+          }
+        }
+        .submit {
+          background-color: $color-white;
+          border: none;
+        }
+      }
+    }
+  }
+
+  .section__AI_result {
+    @include flex(flex-start, center, column);
+    width: 100%;
+    gap: 43px;
+    .recommends {
+      @include flex(flex-start, center);
+      gap: 120px;
+
+      .recommend {
+        @include flex(flex-start, center, column);
+        gap: 15px;
+        cursor: pointer;
+        background: $color-white;
+        border: 3px solid $color-gray-300;
+        border-radius: $radius-lg;
+        padding: 30px 0px 20px;
+        font-weight: $font-medium;
+        color: $color-text-main;
+        &:hover {
+          border: 3px solid $color-text-sub;
+          transition: $transition-base;
+        }
+        img {
+          width: 70%;
+          margin: 0 auto;
+        }
+        .texts {
+          @include flex(flex-start, center, column);
+          padding: 0 40px;
+          line-height: 1.2;
+        }
+        .go {
+          @include flex(center, space-between);
+          width: 100%;
+          padding: 0 20px 0 40px;
+          .price {
+            line-height: 1.2;
+            font-weight: $font-bold;
+            font-size: $font-lg-3;
+          }
+          .chevron {
+            width: 16px;
+            stroke: $color-text-main;
+            fill: none;
+            stroke-width: 3px;
+            padding: 15px 0;
+            transform: rotate(90deg);
+          }
+        }
+      }
+    }
+    .AI_chat_response {
+      width: 100%;
+      @include flex(center, flex-start);
+      background: $color-white;
+      border: 2px solid $color-text-sub;
+      gap: 17px;
+      border-radius: $radius-lg;
+      padding: 35px;
+      img {
+        width: 20px;
+      }
+      p {
+        font-size: $font-lg;
+        font-weight: $font-medium;
+      }
+    }
+    .AI_chat_container {
+      width: 100%;
+      background: none;
+      border-radius: $radius-lg;
+      @include flex(center, space-between);
+      gap: 54px;
+      padding-right: 20px;
+      overflow: visible;
+      form {
+        background-color: $color-white;
+        border-radius: $radius-lg;
+        textarea::placeholder {
+          font-weight: $font-medium;
+        }
+      }
+      .AI_Chat_row_1 {
+        padding: 15px 25px 0px;
+      }
+      .AI_Chat_row_2 {
+        display: block;
+        padding: 0 25px 12px;
+        @include flex(center, space-between);
+        .buttons {
+          @include flex(flex-start, flex-start);
+          flex: 1;
+          min-width: 0;
+          flex-wrap: nowrap;
+          align-items: flex-start;
+          gap: 12px;
+          button {
+            font-size: $font-sm;
+            flex: 0 0 auto;
+            white-space: nowrap;
+          }
+
+          .buttons__pages-swiper {
+            width: 100%;
+            overflow: hidden;
+          }
+
+          .buttons__page {
+            @include flex(flex-start, flex-start);
+            flex-wrap: nowrap;
+            gap: 12px;
+            width: 100%;
+            overflow: hidden;
+          }
+
+          .swiper-slide {
+            width: 100% !important;
+          }
+        }
+        .submit {
+          background-color: $color-white;
+          border: none;
+          flex: 0 0 auto;
+          margin-left: 12px;
+        }
+      }
+      .AI_container {
+        width: 112px;
+        min-width: 112px;
+        max-width: 112px;
+        flex: 0 0 auto;
+        margin-right: 8px;
+        overflow: visible;
+        img {
+          width: 100%;
+          display: block;
+          height: auto;
+        }
+      }
+    }
+    textarea::placeholder {
+      font-size: $font-xl;
+    }
+    textarea {
+      height: 40px;
+      font-size: $font-xl;
+      font-weight: $font-medium;
+      resize: none;
+    }
+    .buttons {
+      button {
+        font-size: $font-sm;
+      }
+    }
+  }
+  .section__AI_Review {
+    gap: 48px;
+    .AI_box {
+      width: 100%;
+      @include flex(center, space-between);
+
+      .user_info {
+        gap: 10px;
+
+        img {
+          width: 40px;
+        }
+
+        .user_name {
+          font-size: $font-xl;
+        }
+      }
+
+      .stars {
+        gap: 4px;
+
+        svg {
+          width: 16px;
+          height: 16px;
+        }
+      }
+    }
+    .review_main {
+      width: calc(33%);
+      padding: 38px 24px;
+
+      .item_name {
+        font-size: $font-lg-2;
+      }
+
+      .description {
+        font-size: $font-sm;
+        line-height: 1.7;
+      }
+    }
+  }
+
+  .section__Set_Category {
+    overflow: visible;
+    gap: 45px;
+    .category_top {
+      width: 100%;
+      @include flex(flex-start, space-between);
+      gap: 8px;
+    }
+
+    .categories {
+      width: 60%;
+      margin: 0 auto;
+      background-color: $color-white;
+      border-radius: $radius-full;
+      form {
+        width: 100%;
+        gap: 12px;
+        padding: 6px 8px;
+
+        .category {
+          gap: 9px;
+          padding: 10px 12px;
+          background-color: $color-white;
+          transition: $transition-base;
+          img {
+            width: 18px;
+          }
+
+          p {
+            font-size: $font-md;
+          }
+
+          &:hover,
+          &:active {
+            background-color: $color-gray-100;
+
+            p {
+              color: $color-category-text;
+            }
+          }
+        }
+
+        .hidden:checked + .category {
+          background-color: $color-gray-100;
+
+          p {
+            color: $color-category-text;
+          }
+        }
+
+        .item_box {
+          @include flex(flex-start, center);
+          gap: 12px;
+        }
+      }
+    }
+
+    .item_box {
+      gap: 20px;
+    }
+    .category_swiper {
+      .swiper-slide {
+        display: flex;
+        width: auto;
+      }
+
+      .items {
+        width: 100%;
+        cursor: pointer;
+      }
+    }
+    .items {
+      width: 100%;
+      gap: 13px;
+
+      .item_name {
+        font-size: $font-xl;
+      }
+
+      .options {
+        gap: 8px;
+
+        p {
+          font-size: $font-sm;
+          padding: 4px 10px;
+        }
+      }
+
+      .item_price {
+        font-size: $font-xxl;
+      }
+
+      .item_img_box {
+        gap: 40px;
+        width: 90%;
+        height: 35vh;
+        aspect-ratio: 1/1;
+        padding: 15px;
+        box-sizing: border-box;
+        margin-bottom: 5px;
+        transition: $transition-base;
+        .item_img {
+          width: 60%;
+        }
+        .icons {
+          gap: 10px;
+          button {
+            width: 24px;
+            height: 24px;
+          }
+          .like-circle {
+            .like-circle__button {
+              width: 24px;
+              height: 24px;
+            }
+
+            .like-circle__icon {
+              width: 14px;
+              height: 14px;
+            }
+          }
+        }
+        &:hover {
+          box-shadow: inset 0 0 0 5px $color-text-main;
+        }
+      }
+    }
+    .unfilled {
+      height: 5px;
+      .filled {
+        height: 5px;
+      }
+    }
+  }
+  .section__Collarborates {
+    .more--desktop-only {
+      display: none;
+    }
+
+    .category_top {
+      width: 100%;
+      @include flex(flex-start, space-between);
+      gap: 8px;
+    }
+    .pakage_boxs {
+      @include flex(flex-start, space-between);
+      gap: 24px;
+      width: 100%;
+    }
+    .pakage_box {
+      gap: 10px;
+      padding: 20px 35px 0;
+      flex: 1 1 0;
+      min-width: 0;
+      .pakage_big {
+        gap: 30px;
+        width: 100%;
+        .pakage_img {
+          margin: 0 auto;
+          width: 100%;
+        }
+        .pakage_texts {
+          gap: 8px;
+          font-size: $font-xxl;
+          .gray_text {
+            padding: 0;
+            font-size: $font-lg;
+            font-weight: $font-medium;
+            line-height: 1.45;
+          }
+          .pakage_bottom {
+            @include flex(center, space-between);
+            font-size: $font-xxl;
+            width: 100%;
+            padding: 6px 0;
+            .icons {
+              gap: 10px;
+              button {
+                width: 24px;
+                height: 24px;
+              }
+              .like-circle {
+                .like-circle__button {
+                  width: 24px;
+                  height: 24px;
+                }
+                .like-circle__icon {
+                  width: 14px;
+                  height: 14px;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    .pakage_small {
+      width: 100%;
+      padding: 24px 2px 0;
+
+      .pakage_inner {
+        @include flex(center, space-between);
+        gap: 20px;
+        width: 100%;
+      }
+      .pakage_img_box {
+        width: 20%;
+        height: 20%;
+        aspect-ratio: 1/1;
+        img {
+          width: 80%;
+        }
+      }
+      .pakage_item {
+        width: 80%;
+        p {
+          font-size: $font-md;
+          font-weight: $font-bold;
+        }
+        .gray_text {
+          font-size: $font-sm;
+        }
+      }
+    }
+    .chevron {
+      padding: 15px 0;
+    }
+
+    .more--desktop-only {
+      display: flex;
+    }
+  }
+
+  .section__New_Update {
+    @include flex(flex-start, center, column);
+    gap: 48px;
+    .mobile {
+      display: none;
+    }
+    .more {
+      display: none;
+    }
+    .desktop {
+      display: block;
+      width: 100%;
+      @include flex(center, space-between);
+      gap: 30px;
+      .main_item {
+        width: 60%;
+        height: 100%;
+        position: relative;
+        cursor: pointer;
+        .back_img {
+          padding: 80px 0;
+          img {
+            margin: 0 auto;
+            width: 80%;
+            border-radius: $radius-md;
+          }
+        }
+        .modal_info {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          padding: 80px 80px 40px;
+          @include flex(flex-start, space-between, column);
+          border-radius: $radius-md;
+          background: rgba($color: #000000, $alpha: 0.6);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          pointer-events: none;
+          .options {
+            @include flex(flex-start, center, column);
+            width: 100%;
+            gap: 20px;
+            .option {
+              width: 100%;
+              @include flex(center, space-between);
+              font-size: $font-lg-2;
+              color: $color-white;
+              font-weight: $font-bold;
+              .item_info {
+                font-weight: $font-medium;
+              }
+            }
+          }
+          .icons {
+            @include flex(center, space-between);
+            gap: 10px;
+            margin-left: auto;
+            button {
+              width: 34px;
+              height: 34px;
+              background-color: $color-gray-100;
+              border-radius: $radius-full;
+              box-shadow: 0 0 2px $color-black;
+              img {
+                margin: 0 auto;
+                width: 18px;
+                height: 18px;
+              }
+            }
+            .like-circle {
+              .like-circle__button {
+                width: 34px;
+                height: 34px;
+              }
+              .like-circle__icon {
+                width: 22px;
+                height: 22px;
+              }
+            }
+          }
+        }
+        &:hover .modal_info {
+          opacity: 1;
+          pointer-events: auto;
+        }
+      }
+      .sub_item {
+        @include flex(center, flex-start, column);
+        width: 35%;
+        height: 100%;
+        gap: 40px;
+        .sub_info {
+          flex: 1;
+          width: 100%;
+          height: 100%;
+          @include flex(center, space-between);
+          cursor: pointer;
+          background-color: $color-white;
+          border: 2px solid $color-gray-100;
+          border-radius: $radius-md;
+          padding: 12px;
+          &:hover {
+            border: 2px solid $color-text-main;
+          }
+          .sub_title {
+            width: 100%;
+            @include flex(center, flex-start);
+            gap: 24px;
+            img {
+              width: 20%;
+            }
+            .pakage_texts {
+              @include flex(flex-start, center, column);
+              gap: 5px;
+              color: $color-text-main;
+              font-weight: $font-bold;
+              font-size: $font-xl;
+              .gray_text {
+                color: $color-gray-600;
+                font-weight: $font-medium;
+                font-size: $font-md;
+                line-height: 1.45;
+              }
+            }
+          }
+          .chevron {
+            width: 20px;
+            stroke: $color-text-main;
+            fill: none;
+            stroke-width: 2px;
+            padding: 15px 0;
+            transform: rotate(90deg);
+          }
+        }
+      }
+    }
+  }
+}

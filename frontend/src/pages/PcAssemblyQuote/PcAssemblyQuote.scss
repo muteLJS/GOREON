@@ -1,0 +1,235 @@
+@import "styles/variables";
+@import "styles/mixins";
+
+.pc-assembly-quote {
+  margin-bottom: $space-lg;
+
+  &__layout {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: $space-lg 16px;
+  }
+
+  &__list,
+  &__compatibility,
+  &__total,
+  &__right {
+    grid-column: 1 / -1;
+  }
+
+  &__right {
+    display: flex;
+    flex-direction: column;
+    gap: $space-lg;
+  }
+
+  .indicator {
+    display: inline-block;
+    border-radius: 999px;
+    width: $font-sm;
+    height: $font-sm;
+
+    &--ok {
+      background-color: green;
+    }
+
+    &--warning {
+      background-color: orange;
+    }
+
+    &--error {
+      background-color: red;
+    }
+  }
+
+  &__title {
+    text-align: center;
+    font-size: $font-xl;
+    font-weight: $font-bold;
+    margin: $space-lg 0;
+  }
+
+  &__control {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  &__select-all {
+    @include flex(center, flex-start);
+    gap: 8px;
+    color: $color-text-main;
+    font-size: $font-lg;
+    font-weight: $font-bold;
+    cursor: pointer;
+
+    input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+
+  &__checkbox-mark {
+    @include flex-center;
+    position: relative;
+    width: 22px;
+    height: 22px;
+    border: 1px solid $color-text-main;
+    border-radius: 8px;
+    background: $color-white;
+    transition:
+      background-color $transition-fast,
+      border-color $transition-fast;
+
+    &::after {
+      content: "";
+      width: 10px;
+      height: 5px;
+      border-left: 2px solid transparent;
+      border-bottom: 2px solid transparent;
+      transform: translateY(-1px) rotate(-45deg);
+      transition:
+        border-color $transition-fast,
+        opacity $transition-fast;
+      opacity: 0;
+    }
+  }
+
+  &__select-all input:checked + &__checkbox-mark {
+    border-color: $color-text-main;
+    background: $color-text-main;
+
+    &::after {
+      border-color: $color-white;
+      opacity: 1;
+    }
+  }
+
+  &__delete-button {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: $color-text-main;
+    font-size: $font-lg;
+    font-weight: $font-bold;
+    cursor: pointer;
+  }
+
+  &__summary {
+    display: flex;
+    flex-direction: column;
+    gap: $space-md;
+  }
+
+  &__compatibility {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-md;
+    background-color: #0aa5a515;
+    border-radius: $radius-md;
+  }
+
+  &__compatibility-count,
+  &__compatibility-status {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: $space-xs;
+  }
+
+  &__compatibility-count {
+    display: flex;
+    gap: $space-xs;
+    font-weight: $font-bold;
+    font-size: $font-sm;
+  }
+
+  &__compatibility-status {
+    font-size: $font-xs;
+    color: $color-text-sub;
+  }
+
+  &__total {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: $color-gray-100;
+    border-radius: $radius-md;
+    padding: $space-xs;
+    margin-top: -$space-md;
+  }
+
+  &__section-title {
+    font-size: $font-lg;
+    font-weight: $font-bold;
+    margin-bottom: $space-xs;
+  }
+
+  &__panel {
+    display: flex;
+    flex-direction: column;
+    gap: $space-xs;
+    border-radius: 16px;
+    border: 1px solid rgba(60, 60, 60, 0.24);
+    padding: $space-md;
+  }
+
+  &__panel-item {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+  }
+
+  &__action {
+    display: flex;
+    flex-direction: column;
+    gap: $space-md;
+  }
+
+  &__action-button {
+    @include button-base();
+  }
+
+  &__action-button--secondary {
+    @include button-gray();
+  }
+
+  @include desktop-up {
+    &__layout {
+      grid-template-columns: repeat(12, 1fr);
+      gap: 24px;
+    }
+
+    &__total {
+      grid-column: 1 / span 3;
+      grid-row: 1;
+      margin-top: 0;
+    }
+
+    &__compatibility {
+      grid-column: 4 / -1;
+      grid-row: 1;
+    }
+
+    &__list {
+      grid-column: 1 / 9;
+      grid-row: 2;
+    }
+
+    &__right {
+      grid-column: 9 / -1;
+      grid-row: 2;
+      gap: $space-xxl;
+    }
+
+    &__action {
+      flex-direction: row;
+
+      button {
+        flex: 1;
+      }
+    }
+  }
+}

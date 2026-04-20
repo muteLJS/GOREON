@@ -1,0 +1,26 @@
+@import "styles/variables";
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.modal {
+  width: 100vw;
+  background: $color-white;
+  border-radius: 16px 16px 0 0;
+  padding: $layout-mobile-padding;
+  max-width: $breakpoint-desktop;
+
+  &__title {
+    font-size: $font-md;
+    font-weight: $font-bold;
+    margin-bottom: $space-md;
+    text-align: center;
+  }
+}

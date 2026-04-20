@@ -1,0 +1,81 @@
+@import "styles/variables";
+@import "styles/mixins";
+
+.review-write {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &__title {
+    font-size: $font-sm;
+    color: $color-text-muted;
+    margin-bottom: $space-xs;
+  }
+
+  &__content-area {
+    display: flex;
+    flex-direction: column;
+
+    textarea {
+      background-color: $color-gray-200;
+      border: none;
+      outline: none;
+      border-radius: 16px;
+      padding: $space-sm;
+      font-size: $font-sm;
+    }
+
+    span {
+      font-size: $font-sm;
+      color: $color-text-muted;
+      margin-left: auto;
+      padding-right: $space-xs;
+    }
+  }
+
+  &__images {
+    button {
+      width: 80px;
+      height: 80px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: $space-xs;
+      border-radius: 16px;
+      border: 1px solid rgba(60, 60, 60, 0.24);
+      flex-shrink: 0;
+    }
+  }
+
+  &__image-list {
+    display: flex;
+    gap: $space-xs;
+    overflow-x: scroll;
+  }
+
+  &__image-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: 16px;
+    border: 1px solid rgba(60, 60, 60, 0.24);
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 8px;
+
+    button {
+      flex: 1;
+    }
+
+    button:first-child {
+      @include button-gray();
+    }
+
+    button:last-child {
+      @include button-base();
+    }
+  }
+}

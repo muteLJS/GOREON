@@ -1,0 +1,211 @@
+﻿@import "styles/variables";
+@import "styles/mixins";
+
+.pc-assembly {
+  padding-top: 40px;
+
+  &__banner {
+    img {
+      width: 100%;
+    }
+  }
+
+  &__top {
+    display: flex;
+    margin-top: $space-md;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: $font-bold;
+  }
+
+  .filter-button {
+    display: flex;
+    border: 1px solid #60606024;
+    border-radius: 999px;
+    font-size: $font-xs;
+    gap: $space-xs;
+    padding: $space-xxs $space-xs;
+
+    img {
+      width: $font-xs;
+    }
+  }
+
+  &__content {
+    margin-top: $space-md;
+  }
+
+  &__product-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-md;
+  }
+
+  &__add-button {
+    background-color: $color-text-sub;
+    color: $color-white;
+    border-radius: $radius-md;
+    padding: 0 $space-xs;
+  }
+
+  &__bottom {
+    margin-top: $space-md;
+    margin-bottom: $space-md;
+  }
+
+  &__summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $space-md;
+  }
+
+  &__total {
+    @include button-gray();
+    background-color: $color-gray-100;
+    color: $color-text-main;
+  }
+
+  &__list-button {
+    @include button-base();
+  }
+
+  &__compatibility {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-md;
+    margin-top: $space-md;
+    background-color: #0aa5a515;
+    border-radius: $radius-md;
+  }
+
+  &__compatibility-count,
+  &__compatibility-status {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: $space-xs;
+  }
+
+  &__compatibility-count {
+    display: flex;
+    gap: $space-xs;
+    font-weight: $font-bold;
+    font-size: $font-sm;
+  }
+
+  &__compatibility-status {
+    font-size: $font-xs;
+    color: $color-text-sub;
+  }
+
+  &__filter {
+    display: flex;
+    flex-direction: column;
+    gap: $space-xs;
+    align-items: start;
+    font-size: $font-sm;
+  }
+
+  &__filter-category {
+    color: $color-text-muted;
+
+    &.is-active {
+      color: $color-text-main;
+      font-weight: $font-bold;
+    }
+  }
+
+  &__desktop {
+    display: none;
+  }
+}
+
+@include tablet-up {
+  .pc-assembly {
+    &__product-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+}
+
+@include desktop-up {
+  .pc-assembly {
+    &__title {
+      margin: 0 auto;
+      font-size: $font-xxl;
+      font-weight: $font-bold;
+    }
+
+    &__content {
+      display: none;
+    }
+
+    &__desktop {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 24px;
+      margin-top: $space-lg;
+      margin-bottom: $space-lg;
+    }
+
+    &__sidebar {
+      grid-column: span 3;
+      display: flex;
+      flex-direction: column;
+      gap: $space-md;
+    }
+
+    &__desktop-filter {
+      border-radius: 16px;
+      border: 1px solid #60606024;
+      overflow: hidden;
+    }
+
+    &__desktop-filter-title {
+      font-weight: $font-bold;
+      background-color: $color-gray-100;
+      padding: $space-md;
+      font-size: $font-lg;
+    }
+
+    &__desktop-filter-list {
+      padding: $space-md;
+      .pc-assembly__filter-category {
+        font-size: $font-md;
+        padding-left: 0;
+      }
+    }
+
+    &__main {
+      grid-column: span 9;
+      display: flex;
+      flex-direction: column;
+      gap: $space-md;
+    }
+
+    &__desktop-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: $space-md;
+    }
+
+    &__compatibility {
+      margin-top: 0;
+      flex: 1;
+    }
+
+    &__desktop-list {
+      display: flex;
+      flex-direction: column;
+      gap: $space-md;
+    }
+    .filter-button {
+      display: none;
+    }
+  }
+}

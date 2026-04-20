@@ -1,0 +1,25 @@
+@import "styles/variables";
+
+.rating-input {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-lg;
+}
+
+.rating-input__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: $radius-sm;
+  background: transparent;
+  cursor: pointer;
+
+  img {
+    width: $font-xl;
+    height: $font-xl;
+    display: block;
+  }
+}
