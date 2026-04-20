@@ -1,7 +1,7 @@
 ﻿import "./Main.scss";
 import { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay } from "swiper/modules";
+import { Autoplay, FreeMode } from "swiper/modules";
 import "swiper/css";
 import AICharacter from "components/AICharacter/AICharacter";
 import Review_user from "assets/Icons/review_user.svg";
@@ -34,7 +34,8 @@ function Main() {
   });
   const aiSwitchTimeoutRef = useRef(null);
   const categorySwiperRef = useRef(null);
-  const desktopCategoryTrackRef = useRef(null);
+  const categoryProgressRef = useRef(null);
+  const categoryProgressFrameRef = useRef(null);
   const promptItems = [
     "🎬 유튜브용 편집용 노트북",
     "🎮 FPS 게임에 맞는 모니터",
@@ -289,6 +290,86 @@ function Main() {
     });
   };
 
+  const getCategorySwiperProgress = (swiper) => {
+    if (!swiper || swiper.destroyed || !Array.isArray(swiper.slidesGrid)) {
+      return typeof swiper?.progress === "number" ? swiper.progress : 0;
+    }
+
+    const translate = -swiper.getTranslate();
+    const slidesGrid = swiper.slidesGrid;
+    let slideIndex = swiper.activeIndex ?? 0;
+
+    for (let index = 0; index < slidesGrid.length - 1; index += 1) {
+      if (translate >= slidesGrid[index] && translate < slidesGrid[index + 1]) {
+        slideIndex = index;
+        break;
+      }
+    }
+
+    const currentStart = slidesGrid[slideIndex] ?? 0;
+    const nextStart = slidesGrid[slideIndex + 1] ?? currentStart + 1;
+    const distance = Math.max(nextStart - currentStart, 1);
+    const intraSlideProgress = Math.max(0, Math.min((translate - currentStart) / distance, 1));
+    const slideEl = swiper.slides?.[slideIndex];
+    const realIndexFromSlide = Number(slideEl?.getAttribute("data-swiper-slide-index"));
+    const realIndex = Number.isFinite(realIndexFromSlide)
+      ? realIndexFromSlide
+      : swiper.params.loop
+        ? swiper.realIndex
+        : slideIndex;
+
+    return ((realIndex + intraSlideProgress) % categoryItems.length) / categoryItems.length;
+  };
+
+  const moveCategorySwiperByProgress = (progress) => {
+    const swiper = categorySwiperRef.current;
+
+    if (!swiper || swiper.destroyed) {
+      return;
+    }
+
+    const clampedProgress = Math.max(0, Math.min(progress, 1));
+    const targetIndex = Math.round(clampedProgress * Math.max(categoryItems.length - 1, 0));
+
+    if (swiper.params.loop && typeof swiper.slideToLoop === "function") {
+      swiper.slideToLoop(targetIndex, 300);
+    } else {
+      swiper.slideTo(targetIndex, 300);
+    }
+
+    if (swiper.autoplay) {
+      swiper.autoplay.start();
+    }
+  };
+
+  const handleCategoryProgressPointerDown = (event) => {
+    const progressBar = categoryProgressRef.current;
+
+    if (!progressBar) {
+      return;
+    }
+
+    const updateFromPointer = (pointerEvent) => {
+      const rect = progressBar.getBoundingClientRect();
+      const progress = rect.width === 0 ? 0 : (pointerEvent.clientX - rect.left) / rect.width;
+      moveCategorySwiperByProgress(progress);
+    };
+
+    const handlePointerMove = (pointerEvent) => {
+      updateFromPointer(pointerEvent);
+    };
+
+    const handlePointerUp = () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+
+    event.preventDefault();
+    updateFromPointer(event);
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+  };
+
   const handleAiSubmit = (e) => {
     e.preventDefault();
     if (showAiResult) {
@@ -306,6 +387,10 @@ function Main() {
     () => () => {
       if (aiSwitchTimeoutRef.current) {
         window.clearTimeout(aiSwitchTimeoutRef.current);
+      }
+
+      if (categoryProgressFrameRef.current) {
+        window.cancelAnimationFrame(categoryProgressFrameRef.current);
       }
     },
     [],
@@ -348,25 +433,53 @@ function Main() {
   }, []);
 
   useEffect(() => {
-    if (isDesktopCategory) {
-      setCategorySwiperState({
-        progress: 0,
-        thumbWidth: (3.1 / categoryItems.length) * 100 * 0.78,
-      });
-      return;
-    }
-
     const swiper = categorySwiperRef.current;
     if (!swiper || swiper.destroyed || !swiper.params) {
       return;
     }
 
-    if (swiper.autoplay) {
+    if (!isDesktopCategory && swiper.autoplay) {
       swiper.autoplay.stop();
     }
-    swiper.slideTo(0, 0, false);
+
+    if (swiper.params.loop && typeof swiper.slideToLoop === "function") {
+      swiper.slideToLoop(0, 0, false);
+    } else {
+      swiper.slideTo(0, 0, false);
+    }
+
     swiper.update();
     handleCategorySwiperChange(swiper);
+  }, [isDesktopCategory, selectedCategory, categoryItems.length]);
+
+  useEffect(() => {
+    if (categoryProgressFrameRef.current) {
+      window.cancelAnimationFrame(categoryProgressFrameRef.current);
+      categoryProgressFrameRef.current = null;
+    }
+
+    if (!isDesktopCategory) {
+      return undefined;
+    }
+
+    const tick = () => {
+      const swiper = categorySwiperRef.current;
+
+      if (swiper && !swiper.destroyed) {
+        handleCategorySwiperChange(swiper, getCategorySwiperProgress(swiper));
+      }
+
+      categoryProgressFrameRef.current = window.requestAnimationFrame(tick);
+    };
+
+    categoryProgressFrameRef.current = window.requestAnimationFrame(tick);
+
+    return () => {
+      if (categoryProgressFrameRef.current) {
+        window.cancelAnimationFrame(categoryProgressFrameRef.current);
+        categoryProgressFrameRef.current = null;
+      }
+    };
   }, [isDesktopCategory, selectedCategory, categoryItems.length]);
 
   const renderAiReviewSection = () => (
@@ -500,39 +613,32 @@ function Main() {
   );
 
   const renderCategoryItems = () => {
-    if (isDesktopCategory) {
-      return (
-        <>
-          <div className="item_box category_marquee" ref={desktopCategoryTrackRef}>
-            <div className="category_marquee__track">
-              {[...categoryItems, ...categoryItems].map((item, index) => (
-                <div className="category_marquee__slide" key={`${item.name}-${index}`}>
-                  {renderCategoryCard(item)}
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="unfilled unfilled--desktop">
-            <div
-              className="filled filled--desktop"
-              style={{
-                "--thumb-width": `${(3.1 / categoryItems.length) * 100 * 0.78}%`,
-                width: `${(3.1 / categoryItems.length) * 100 * 0.78}%`,
-              }}
-            ></div>
-          </div>
-        </>
-      );
-    }
+    const isDesktop = isDesktopCategory;
 
     return (
       <>
         <Swiper
-          key={`category-swiper-${selectedCategory}-${isTabletCategory ? "tablet" : "mobile"}`}
+          key={`category-swiper-${selectedCategory}-${
+            isDesktop ? "desktop" : isTabletCategory ? "tablet" : "mobile"
+          }`}
           className="item_box category_swiper"
-          spaceBetween={isTabletCategory ? 24 : 16}
-          slidesPerView={isTabletCategory ? 3.1 : 2.1}
+          modules={isDesktop ? [Autoplay, FreeMode] : undefined}
+          spaceBetween={isDesktop ? 20 : isTabletCategory ? 24 : 16}
+          slidesPerView={isDesktop ? 3.1 : isTabletCategory ? 3.1 : 2.1}
           allowTouchMove={true}
+          grabCursor={isDesktop}
+          loop={isDesktop}
+          speed={isDesktop ? 6500 : 300}
+          freeMode={isDesktop ? { enabled: true, momentum: false } : false}
+          autoplay={
+            isDesktop
+              ? {
+                  delay: 0,
+                  disableOnInteraction: false,
+                  pauseOnMouseEnter: false,
+                }
+              : false
+          }
           onSwiper={(swiper) => {
             categorySwiperRef.current = swiper;
             handleCategorySwiperChange(swiper);
@@ -544,9 +650,19 @@ function Main() {
             <SwiperSlide key={item.name}>{renderCategoryCard(item)}</SwiperSlide>
           ))}
         </Swiper>
-        <div className="unfilled">
+        <div
+          className={`unfilled ${isDesktop ? "unfilled--desktop" : ""}`}
+          ref={categoryProgressRef}
+          onPointerDown={handleCategoryProgressPointerDown}
+          role="slider"
+          aria-label="목적별 추천 카테고리 위치"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(categorySwiperState.progress * 100)}
+          tabIndex={0}
+        >
           <div
-            className="filled"
+            className={`filled ${isDesktop ? "filled--desktop" : ""}`}
             style={{
               width: `${categorySwiperState.thumbWidth}%`,
               left: `calc((100% - ${categorySwiperState.thumbWidth}%) * ${categorySwiperState.progress})`,
