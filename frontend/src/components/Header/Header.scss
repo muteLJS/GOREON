@@ -25,9 +25,29 @@
   padding: 0 20px;
 }
 
+.header__mobile-back {
+  @include flex-center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+
+  img {
+    width: 9px;
+    height: 17px;
+  }
+}
+
 .header__logo {
+  display: none;
   flex: 0 0 auto;
   margin: 0;
+}
+
+.header__logo--mobile {
+  display: block;
 }
 
 .header__logo a {
@@ -391,6 +411,15 @@ body.mobile-menu-open {
   .header {
     position: relative;
     border-bottom: 1px solid rgba($color-black, 0.08);
+  }
+
+  .header__mobile-back,
+  .header__logo--mobile {
+    display: none;
+  }
+
+  .header__logo--desktop {
+    display: block;
   }
 
   .header__logo-icon {

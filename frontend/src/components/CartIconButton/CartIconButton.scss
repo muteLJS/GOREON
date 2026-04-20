@@ -1,0 +1,17 @@
+@import "styles/variables";
+@import "styles/mixins";
+
+.cart-icon-button {
+  @include flex-center;
+  border: 0;
+  cursor: pointer;
+
+  img {
+    display: block;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}

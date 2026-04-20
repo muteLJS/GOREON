@@ -2,8 +2,8 @@ import "./ProductList-row.scss";
 
 import { Link } from "react-router-dom";
 
-import CartIcon from "../../assets/icons/cart-straight.svg";
-import LikeAfterIcon from "../../assets/icons/like-after.svg";
+import CartIconButton from "../CartIconButton/CartIconButton";
+import WishlistIconButton from "../WishlistIconButton/WishlistIconButton";
 import ProductListNamePrice from "../ProductList-name,price/ProductList-name,price";
 import { formatPrice } from "../../utils/cart";
 
@@ -19,15 +19,7 @@ function ProductThumbnail({ imageSrc, name }) {
   );
 }
 
-function ProductListRow({
-  item,
-  isSelected,
-  onSelect,
-  onDecrease,
-  onIncrease,
-  onCartClick,
-  onWishClick,
-}) {
+function ProductListRow({ item, isSelected, onSelect, onDecrease, onIncrease }) {
   const imageSrc = item.imageSrc ?? item.image ?? item.thumbnailImage ?? item.thumbnail ?? "";
 
   return (
@@ -46,23 +38,15 @@ function ProductListRow({
           <ProductThumbnail imageSrc={imageSrc} name={item.name} />
         </Link>
 
-        <button
-          type="button"
+        <CartIconButton
+          product={item}
           className="product-list-row__overlay-button product-list-row__overlay-button--cart"
-          aria-label="장바구니 담기"
-          onClick={onCartClick}
-        >
-          <img src={CartIcon} alt="" />
-        </button>
+        />
 
-        <button
-          type="button"
+        <WishlistIconButton
+          product={item}
           className="product-list-row__overlay-button product-list-row__overlay-button--wish"
-          aria-label="찜하기"
-          onClick={onWishClick}
-        >
-          <img src={LikeAfterIcon} alt="" />
-        </button>
+        />
       </div>
 
       <ProductListNamePrice

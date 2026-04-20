@@ -10,6 +10,7 @@ import Like from "../../assets/header/header-icons/like.svg";
 import Search from "../../assets/header/header-icons/search.svg";
 import User from "../../assets/header/header-icons/user.svg";
 import ChevronDown from "../../assets/icons/chevron-down.svg";
+import Prev from "../../assets/icons/prev.svg";
 import { logout } from "../../store/slices/userSlice";
 import Modal from "../Modal/Modal";
 
@@ -247,6 +248,14 @@ function Header() {
     }));
   };
 
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  };
+
   const handleLogout = () => {
     dispatch(logout());
     navigate("/");
@@ -327,44 +336,29 @@ function Header() {
     submitSearch();
   };
 
-  const mobileSearchModalContent = (
-    <form className="header__search-form header__search-form--modal" onSubmit={handleSearchSubmit}>
-      <div className="header__search-input-wrap header__search-input-wrap--modal">
-        <button type="submit" className="header__search-icon-button" aria-label="검색 실행">
-          <img src={Search} alt="" className="header__search-icon" />
-        </button>
-        <input
-          type="text"
-          value={searchQuery}
-          placeholder="검색어를 입력하세요"
-          onChange={(event) => setSearchQuery(event.target.value)}
-          autoFocus
-        />
-      </div>
-
-      <div className="header__search-suggestions header__search-suggestions--modal">
-        {searchSuggestions.map((suggestion) => (
-          <button
-            key={`modal-${suggestion}`}
-            type="button"
-            className="header__search-suggestion"
-            onClick={() => submitSearch(suggestion)}
-          >
-            {suggestion}
-          </button>
-        ))}
-      </div>
-
-      <button type="submit" className="header__search-submit header__search-submit--modal">
-        검색
-      </button>
-    </form>
-  );
+  const isHomePage = location.pathname === "/";
 
   return (
     <header className="header">
       <div className="header__top">
-        <h1 className="header__logo">
+        {isHomePage ? (
+          <h1 className="header__logo header__logo--mobile">
+            <Link to="/" aria-label="GOREON 홈">
+              <img src={LogoIcon} alt="GOREON 아이콘" className="header__logo-icon" />
+              <img src={LogoFull} alt="GOREON 로고" className="header__logo-full" />
+            </Link>
+          </h1>
+        ) : (
+          <button
+            type="button"
+            className="header__mobile-back"
+            aria-label="뒤로가기"
+            onClick={handleBack}
+          >
+            <img src={Prev} alt="" />
+          </button>
+        )}
+        <h1 className="header__logo header__logo--desktop">
           <Link to="/" aria-label="GOREON 홈">
             <img src={LogoIcon} alt="GOREON 아이콘" className="header__logo-icon" />
             <img src={LogoFull} alt="GOREON 로고" className="header__logo-full" />
@@ -553,12 +547,6 @@ function Header() {
           </li>
         </ul>
       </nav>
-
-      {isSearchOpen && window.innerWidth < 1024 && (
-        <Modal title="검색" onClose={closeSearch}>
-          {mobileSearchModalContent}
-        </Modal>
-      )}
 
       <div className={`mobile-menu ${isMobileMenuOpen ? "is-open" : ""}`}>
         <div className="mobile-menu__tabs" role="tablist" aria-label="모바일 메뉴">

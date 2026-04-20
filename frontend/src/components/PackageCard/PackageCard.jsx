@@ -1,9 +1,16 @@
 import { useState } from "react";
-import LikeCircle from "components/like/like_circle";
-import Cart_straight from "assets/Icons/cart-straight.svg";
+import CartIconButton from "components/CartIconButton/CartIconButton";
+import WishlistIconButton from "components/WishlistIconButton/WishlistIconButton";
 
 function PackageCard({ title, description, price, mainImage, detailItems, defaultOpen = false }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
+  const product = {
+    id: 1,
+    name: title,
+    price,
+    image: mainImage,
+    option: "추천 조합",
+  };
 
   return (
     <div className={`pakage_box ${isOpen ? "is-open" : ""}`}>
@@ -15,10 +22,8 @@ function PackageCard({ title, description, price, mainImage, detailItems, defaul
           <div className="pakage_bottom">
             <p>{price}</p>
             <div className="icons">
-              <button type="button">
-                <img src={Cart_straight} alt="cart" />
-              </button>
-              <LikeCircle />
+              <CartIconButton product={product} />
+              <WishlistIconButton product={product} />
             </div>
           </div>
         </div>

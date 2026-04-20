@@ -6,10 +6,10 @@ import { useEffect, useMemo, useState } from "react";
 import "./List.scss";
 import banner1 from "@/assets/banner/banner-1.jpg";
 import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
+import CartIconButton from "@/components/CartIconButton/CartIconButton";
 import ProductCardVertical from "@/components/ProductCard/ProductCardVertical";
+import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 import ProductImage from "@/assets/products/product-example.jpg";
-import cartIcon from "@/assets/icons/cart-straight.svg";
-import likeAffterIcon from "@/assets/icons/like-after.svg";
 import resetIcon from "@/assets/icons/reset.svg";
 import { useSearchParams } from "react-router-dom";
 import api from "@/utils/api";
@@ -207,13 +207,9 @@ export default function List() {
                       key={product.id}
                       product={product}
                       action={
-                        <div className="list-assembly__button_container">
-                          <button className="cart-add-button" type="button">
-                            <img src={cartIcon} alt="" />
-                          </button>
-                          <button className="cart-add-button" type="button">
-                            <img src={likeAffterIcon} alt="" />
-                          </button>
+                      <div className="list-assembly__button-container">
+                          <CartIconButton product={product} className="cart-add-button" />
+                          <WishlistIconButton product={product} className="cart-add-button" />
                         </div>
                       }
                     />
