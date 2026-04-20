@@ -15,7 +15,7 @@ import PackageCard from "components/PackageCard/PackageCard";
 import PromptButtonList from "components/PromptButtonList/PromptButtonList";
 import ReviewCard from "components/ReviewCard/ReviewCard";
 import UpdateSubCard from "components/UpdateSubCard/UpdateSubCard";
-import Modal from "components/Modal/Modal";
+import EventModal from "components/EventModal/EventModal";
 
 import LikeCircle from "components/like/like_circle";
 import Cart_straight from "assets/icons/cart-straight.svg";
@@ -23,10 +23,7 @@ import Cart_straight from "assets/icons/cart-straight.svg";
 function Main() {
   const [showAiResult, setShowAiResult] = useState(false);
   const [isAiSwitching, setIsAiSwitching] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("direct");
-  const [selectedSpecProduct, setSelectedSpecProduct] = useState(null);
-  const [isDesktopCategory, setIsDesktopCategory] = useState(false);
-  const [isTabletCategory, setIsTabletCategory] = useState(false);
+  const [isEventModalOpen, setIsEventModalOpen] = useState(true);
   const [categorySwiperState, setCategorySwiperState] = useState({
     progress: 0,
     thumbWidth: 25,
@@ -850,44 +847,8 @@ function Main() {
           </div>
         </div>
       </section>
-      {selectedSpecProduct ? (
-        <Modal title="주요 스펙" onClose={() => setSelectedSpecProduct(null)}>
-          <div className="main-spec-modal">
-            <div className="main-spec-modal__summary">
-              <div className="main-spec-modal__image">
-                <img src={selectedSpecProduct.image} alt={selectedSpecProduct.name} />
-              </div>
-              <div className="main-spec-modal__product">
-                <p className="main-spec-modal__name">{selectedSpecProduct.name}</p>
-                <p className="main-spec-modal__price">{selectedSpecProduct.price}</p>
-              </div>
-            </div>
-            <dl className="main-spec-modal__list">
-              {selectedSpecProduct.specs.map((spec) => (
-                <div className="main-spec-modal__row" key={spec.label}>
-                  <dt>{spec.label}</dt>
-                  <dd>{spec.value}</dd>
-                </div>
-              ))}
-            </dl>
-            <div className="main-spec-modal__actions">
-              <button
-                type="button"
-                className="main-spec-modal__button main-spec-modal__button--ghost"
-                onClick={() => setSelectedSpecProduct(null)}
-              >
-                닫기
-              </button>
-              <button
-                type="button"
-                className="main-spec-modal__button main-spec-modal__button--primary"
-              >
-                상세페이지로 이동
-              </button>
-            </div>
-          </div>
-        </Modal>
-      ) : null}
+
+      <EventModal isOpen={isEventModalOpen} onClose={() => setIsEventModalOpen(false)} />
     </main>
   );
 }
