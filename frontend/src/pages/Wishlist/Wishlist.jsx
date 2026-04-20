@@ -27,9 +27,6 @@ export default function Wishlist() {
   return (
     <>
       <main className="list-wrap-wishlist">
-        <section className="list-assembly__banner">
-          <img src={banner1} alt="광고 배너 1" />
-        </section>
         <section className="list-wrap-content">
           <section className="side_menu">
             <div className="side_menu_top">
@@ -43,6 +40,9 @@ export default function Wishlist() {
             </div>
           </section>
           <section className="list-assembly">
+            <section className="list-assembly__banner">
+              <img src={banner1} alt="광고 배너 1" />
+            </section>
             <section className="list-assembly__top">
               <h2 className="list-assembly__title">
                 찜한 상품 <span>({productLength})</span>
