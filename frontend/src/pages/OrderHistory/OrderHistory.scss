@@ -1,0 +1,361 @@
+@import "styles/variables";
+@import "styles/mixins";
+
+.order-history-page {
+  width: 100%;
+  min-width: 0;
+  padding: $page-content-start-mobile 16px 56px;
+  box-sizing: border-box;
+}
+
+.order-history-page__header,
+.order-history-page__layout,
+.order-history-page__groups,
+.order-history-page__group,
+.order-history-page__card,
+.order-history-item,
+.order-history-item__top,
+.order-history-item__info {
+  min-width: 0;
+}
+
+.order-history-page__header {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-top: 0;
+}
+
+.order-history-page__title {
+  color: $color-text-main;
+  font-size: 28px;
+  font-weight: $font-black;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.order-history-page__progress {
+  display: none;
+}
+
+.order-history-page__layout {
+  display: grid;
+  gap: 36px;
+  width: 100%;
+  max-width: 1280px;
+  margin: 34px auto 0;
+}
+
+.order-history-page__groups {
+  display: grid;
+  gap: 36px;
+}
+
+.order-history-page__group {
+  display: grid;
+  gap: 10px;
+}
+
+.order-history-page__date-row {
+  @include flex(center, flex-start);
+  gap: 12px;
+}
+
+.order-history-page__date {
+  flex-shrink: 0;
+  margin: 0;
+  color: rgba($color-text-main, 0.55);
+  font-size: 16px;
+  font-weight: $font-bold;
+  line-height: 1.3;
+}
+
+.order-history-page__date-line {
+  width: 100%;
+  height: 1px;
+  background: $color-border;
+}
+
+.order-history-page__card {
+  padding: 16px;
+  border: 1px solid rgba($color-text-main, 0.18);
+  border-radius: 22px;
+  background: $color-white;
+}
+
+.order-history-item {
+  padding: 14px 0;
+}
+
+.order-history-item__top {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.order-history-item__thumb {
+  width: 80px;
+  height: 80px;
+  overflow: hidden;
+  border: 1px solid $color-border;
+  border-radius: 14px;
+  background: $color-gray-100;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.order-history-item__info {
+  min-width: 0;
+}
+
+.order-history-item__category {
+  margin: 0 0 4px;
+  color: $color-text-main;
+  font-size: 16px;
+  font-weight: $font-black;
+  line-height: 1.3;
+}
+
+.order-history-item__name {
+  margin: 0;
+  color: $color-text-main;
+  font-size: 15px;
+  font-weight: $font-bold;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.order-history-item__desc {
+  margin: 0;
+  color: $color-text-main;
+  font-size: 14px;
+  font-weight: $font-bold;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.order-history-item__option {
+  margin: 6px 0 0;
+  color: rgba($color-text-main, 0.6);
+  font-size: 13px;
+  font-weight: $font-semibold;
+  line-height: 1.35;
+}
+
+.order-history-item__price {
+  display: block;
+  margin-top: 8px;
+  color: $color-text-main;
+  font-size: 18px;
+  font-weight: $font-black;
+  line-height: 1.1;
+}
+
+.order-history-item__action {
+  display: none;
+}
+
+.order-history-item__action--mobile {
+  display: block;
+  margin-top: 12px;
+}
+
+.order-history-item__review-btn {
+  width: 100%;
+  height: 44px;
+  border: 2px solid $color-text-main;
+  border-radius: 12px;
+  background: $color-white;
+  color: $color-text-main;
+  font-size: 14px;
+  font-weight: $font-bold;
+  cursor: pointer;
+  transition:
+    background-color $transition-fast,
+    color $transition-fast,
+    border-color $transition-fast;
+
+  &:hover {
+    background: $color-text-main;
+    color: $color-white;
+  }
+}
+
+.order-history-item__divider {
+  height: 1px;
+  background: rgba($color-text-main, 0.18);
+}
+
+@include tablet-up {
+  .order-history-page {
+    padding: $page-content-start-tablet 24px 72px;
+  }
+
+  .order-history-page__layout {
+    margin-top: 48px;
+  }
+
+  .order-history-page__card {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .order-history-item__top {
+    grid-template-columns: 92px minmax(0, 1fr);
+  }
+
+  .order-history-item__thumb {
+    width: 92px;
+    height: 92px;
+  }
+}
+
+@include desktop-up {
+  .order-history-page {
+    padding: $page-content-start-desktop 0 118px;
+  }
+
+  .order-history-page__header {
+    padding-top: 0;
+  }
+
+  .order-history-page__title {
+    font-size: 64px;
+  }
+
+  .order-history-page__progress {
+    @include flex(center, center);
+    position: relative;
+    gap: 130px;
+    width: 500px;
+    margin: 40px auto 0;
+  }
+
+  .order-history-page__progress-track {
+    position: absolute;
+    top: 25px;
+    left: 63px;
+    right: 63px;
+    height: 3px;
+    background: rgba($color-text-main, 0.95);
+  }
+
+  .order-history-page__progress-step {
+    @include flex(center, center, column);
+    position: relative;
+    gap: 10px;
+    z-index: 1;
+
+    strong {
+      color: $color-text-main;
+      font-size: 18px;
+      font-weight: $font-black;
+      line-height: 1.2;
+    }
+  }
+
+  .order-history-page__progress-link {
+    @include flex-center;
+    width: 50px;
+    height: 50px;
+    border: 2px solid rgba($color-text-main, 0.96);
+    border-radius: 50%;
+    background: $color-white;
+    color: $color-text-main;
+    font-size: 18px;
+    font-weight: $font-black;
+    line-height: 1;
+    text-decoration: none;
+    transition:
+      background-color $transition-fast,
+      color $transition-fast;
+  }
+
+  .order-history-page__progress-step--active {
+    .order-history-page__progress-link {
+      background: $color-text-main;
+      color: $color-white;
+    }
+  }
+
+  .order-history-page__layout {
+    max-width: 760px;
+    margin: 92px auto 0;
+    gap: 28px;
+  }
+
+  .order-history-page__groups {
+    gap: 28px;
+  }
+
+  .order-history-page__date {
+    font-size: 18px;
+    font-weight: $font-black;
+    color: rgba($color-text-main, 0.55);
+  }
+
+  .order-history-page__card {
+    padding: 20px 34px 18px;
+    border-radius: 22px;
+  }
+
+  .order-history-item {
+    padding: 14px 0;
+  }
+
+  .order-history-item__top {
+    grid-template-columns: 96px minmax(0, 1fr) 96px;
+    gap: 18px;
+    align-items: center;
+  }
+
+  .order-history-item__thumb {
+    width: 96px;
+    height: 96px;
+  }
+
+  .order-history-item__category {
+    margin-bottom: 5px;
+    font-size: 18px;
+  }
+
+  .order-history-item__name {
+    font-size: 16px;
+  }
+
+  .order-history-item__desc {
+    font-size: 15px;
+  }
+
+  .order-history-item__option {
+    margin-top: 8px;
+    font-size: 14px;
+  }
+
+  .order-history-item__price {
+    margin-top: 12px;
+    font-size: 28px;
+  }
+
+  .order-history-item__action {
+    @include flex(center, flex-end);
+  }
+
+  .order-history-item__action--mobile {
+    display: none;
+  }
+
+  .order-history-item__review-btn {
+    width: auto;
+    min-width: 84px;
+    height: 42px;
+    border-radius: 10px;
+    font-size: 14px;
+  }
+}

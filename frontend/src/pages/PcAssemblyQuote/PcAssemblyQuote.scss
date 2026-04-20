@@ -2,6 +2,7 @@
 @import "styles/mixins";
 
 .pc-assembly-quote {
+  padding-top: $page-content-start-mobile;
   margin-bottom: $space-lg;
 
   &__layout {
@@ -46,7 +47,7 @@
     text-align: center;
     font-size: $font-xl;
     font-weight: $font-bold;
-    margin: $space-lg 0;
+    margin: 0 0 $space-lg;
   }
 
   &__control {
@@ -196,7 +197,13 @@
     @include button-gray();
   }
 
+  @include tablet-up {
+    padding-top: $page-content-start-tablet;
+  }
+
   @include desktop-up {
+    padding-top: $page-content-start-desktop;
+
     &__layout {
       grid-template-columns: repeat(12, 1fr);
       gap: 24px;

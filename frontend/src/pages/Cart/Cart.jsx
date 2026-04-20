@@ -11,12 +11,7 @@ import { Link } from "react-router-dom";
 
 import AddressModal from "../../components/AddressModal/AddressModal";
 import ProductList from "../../components/ProductList/ProductList";
-import {
-  EMPTY_SHIPPING_FORM,
-  formatPrice,
-  getCartItems,
-  summarizeOrder,
-} from "../../utils/cart";
+import { EMPTY_SHIPPING_FORM, formatPrice, getCartItems, summarizeOrder } from "../../utils/cart";
 
 export default function Cart() {
   const storedCartItems = useSelector((state) => state.cart.items);
@@ -139,6 +134,12 @@ export default function Cart() {
             </Link>
             <strong>결제</strong>
           </div>
+          <div className="cart-page__progress-step">
+            <Link to="/order-history" className="cart-page__progress-link">
+              3
+            </Link>
+            <strong>주문내역</strong>
+          </div>
         </div>
       </div>
 
@@ -151,7 +152,11 @@ export default function Cart() {
               <span>전체선택</span>
             </label>
 
-            <button type="button" className="cart-page__delete-button" onClick={handleDeleteSelected}>
+            <button
+              type="button"
+              className="cart-page__delete-button"
+              onClick={handleDeleteSelected}
+            >
               삭제
             </button>
           </div>

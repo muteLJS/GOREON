@@ -14,44 +14,6 @@ dotenv.config({
 const DATA_SOURCE = "products_list.json";
 const dataPath = path.resolve(__dirname, "../../frontend/src/data/products_list.json");
 
-const parsePrice = (value) => {
-  if (typeof value === "number") {
-    return value;
-  }
-
-  const parsed = Number(String(value || "").replace(/[^\d]/g, ""));
-  return Number.isFinite(parsed) ? parsed : 0;
-};
-
-const normalizeProduct = (product) => {
-  const tags = Array.isArray(product.tag) ? product.tag : [];
-  const [brand = "", category = ""] = tags;
-
-  return {
-    name: product.name,
-    brand,
-    category,
-    description: product.url || "",
-    price: parsePrice(product.price),
-    stock: 100,
-    image: product.image || "",
-    averageRating: Number(product.rating) || 0,
-    specs: {
-      source: DATA_SOURCE,
-      sourceId: product.id,
-      url: product.url || "",
-      tags,
-      priceOptions: Array.isArray(product.priceOptions)
-        ? product.priceOptions.map((option) => ({
-            optionName: option.optionName || "",
-            price: parsePrice(option.price),
-          }))
-        : [],
-      detailImages: Array.isArray(product.detailImages) ? product.detailImages : [],
-    },
-  };
-};
-
 const seedProducts = async () => {
   if (!process.env.MONGODB_URI) {
     throw new Error("MONGODB_URI is required");
@@ -65,18 +27,21 @@ const seedProducts = async () => {
   );
 
   const rawData = fs.readFileSync(dataPath, "utf8").replace(/^\uFEFF/, "");
-  const products = JSON.parse(rawData).map(normalizeProduct);
+  const products = JSON.parse(rawData);
+
+  if (!Array.isArray(products)) {
+    throw new Error(`${DATA_SOURCE} must contain a JSON array`);
+  }
 
   await mongoose.connect(process.env.MONGODB_URI, {
     dbName: process.env.MONGODB_DB_NAME,
   });
 
-  const deleteResult = await Product.deleteMany({ "specs.source": DATA_SOURCE });
-  const insertedProducts = await Product.insertMany(products, { ordered: false });
+  const deleteResult = await Product.deleteMany({});
+  const insertedProducts = await Product.collection.insertMany(products, { ordered: false });
 
-  console.log(
-    `Seeded products: deleted ${deleteResult.deletedCount}, inserted ${insertedProducts.length}`,
-  );
+  console.log(`Seeded products from ${DATA_SOURCE}`);
+  console.log(`Deleted ${deleteResult.deletedCount}, inserted ${insertedProducts.insertedCount}`);
 };
 
 seedProducts()

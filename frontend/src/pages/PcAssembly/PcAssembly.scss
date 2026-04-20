@@ -2,6 +2,8 @@
 @import "styles/mixins";
 
 .pc-assembly {
+  padding-top: $page-content-start-mobile;
+
   &__banner {
     img {
       width: 100%;
@@ -122,8 +124,16 @@
   }
 }
 
+@include tablet-up {
+  .pc-assembly {
+    padding-top: $page-content-start-tablet;
+  }
+}
+
 @include desktop-up {
   .pc-assembly {
+    padding-top: $page-content-start-desktop;
+
     &__title {
       margin: 0 auto;
       font-size: $font-xxl;
