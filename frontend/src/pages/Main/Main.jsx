@@ -14,6 +14,7 @@ import PackageCard from "components/PackageCard/PackageCard";
 import PromptButtonList from "components/PromptButtonList/PromptButtonList";
 import ReviewCard from "components/ReviewCard/ReviewCard";
 import UpdateSubCard from "components/UpdateSubCard/UpdateSubCard";
+import EventModal from "components/EventModal/EventModal";
 
 import LikeCircle from "components/like/like_circle";
 import Cart_straight from "assets/Icons/cart-straight.svg";
@@ -21,6 +22,7 @@ import Cart_straight from "assets/Icons/cart-straight.svg";
 function Main() {
   const [showAiResult, setShowAiResult] = useState(false);
   const [isAiSwitching, setIsAiSwitching] = useState(false);
+  const [isEventModalOpen, setIsEventModalOpen] = useState(true);
   const [categorySwiperState, setCategorySwiperState] = useState({
     progress: 0,
     thumbWidth: 25,
@@ -685,6 +687,8 @@ function Main() {
           </div>
         </div>
       </section>
+
+      <EventModal isOpen={isEventModalOpen} onClose={() => setIsEventModalOpen(false)} />
     </main>
   );
 }
