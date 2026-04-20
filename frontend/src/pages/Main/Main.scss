@@ -1252,15 +1252,6 @@
           }
         }
 
-        .like-circle__button {
-          width: 30px;
-          height: 30px;
-        }
-
-        .like-circle__icon {
-          width: 20px;
-          height: 20px;
-        }
       }
     }
   }
@@ -2525,15 +2516,6 @@
       }
     }
 
-    .like-circle__button {
-      width: 30px;
-      height: 30px;
-    }
-
-    .like-circle__icon {
-      width: 20px;
-      height: 20px;
-    }
   }
 }
 
@@ -2542,15 +2524,13 @@
     .icons {
       gap: 6px;
 
-      > button,
-      .like-circle__button {
+      > button {
         width: 26px;
         height: 26px;
         flex: 0 0 26px;
       }
 
-      > button img,
-      .like-circle__icon {
+      > button img {
         width: 17px;
         height: 17px;
       }
