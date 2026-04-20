@@ -2428,12 +2428,13 @@
           color: inherit;
           font: inherit;
           text-align: left;
+          transition: $transition-fast;
           &:hover {
             border: 2px solid $color-text-main;
           }
 
           &.is-active {
-            border-color: $color-text-sub;
+            border-color: $color-text-main;
           }
 
           .sub_title {
