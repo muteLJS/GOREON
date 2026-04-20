@@ -10,7 +10,9 @@ import Like from "../../assets/header/header-icons/like.svg";
 import Search from "../../assets/header/header-icons/search.svg";
 import User from "../../assets/header/header-icons/user.svg";
 import ChevronDown from "../../assets/icons/chevron-down.svg";
+import Prev from "../../assets/icons/prev.svg";
 import { logout } from "../../store/slices/userSlice";
+import Modal from "../Modal/Modal";
 
 const categoryMenu = [
   {
@@ -18,7 +20,7 @@ const categoryMenu = [
     key: "computer",
     title: "컴퓨터",
     items: [
-      { label: "노트북", type: "laptop" },
+      { label: "노트북", type: "notebook" },
       { label: "데스크탑", type: "desktop" },
       { label: "모니터", type: "monitor" },
       { label: "키보드", type: "keyboard" },
@@ -118,13 +120,12 @@ function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
-  const userInfo = useSelector((state) => state.user.userInfo);
   const desktopSearchRef = useRef(null);
-  const mobileSearchRef = useRef(null);
+  const searchCloseTimerRef = useRef(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMobileTab, setActiveMobileTab] = useState("category");
   const [expandedCategories, setExpandedCategories] = useState(() =>
-    createExpandedState(categoryMenu)
+    createExpandedState(categoryMenu),
   );
   const [expandedBrands, setExpandedBrands] = useState(() => createExpandedState(brandMenu));
   const [searchQuery, setSearchQuery] = useState("");
@@ -152,6 +153,7 @@ function Header() {
       if (window.innerWidth < 1024) {
         setIsSearchOpen((prev) => !prev);
         setIsSearchPinned((prev) => !prev);
+        setIsMobileMenuOpen(false);
       }
     };
 
@@ -192,11 +194,17 @@ function Header() {
   }, [location.pathname, location.search]);
 
   useEffect(() => {
+    const clearSearchCloseTimer = () => {
+      if (searchCloseTimerRef.current) {
+        window.clearTimeout(searchCloseTimerRef.current);
+        searchCloseTimerRef.current = null;
+      }
+    };
+
     const handlePointerDown = (event) => {
       const isInsideDesktop = desktopSearchRef.current?.contains(event.target);
-      const isInsideMobile = mobileSearchRef.current?.contains(event.target);
 
-      if (!isInsideDesktop && !isInsideMobile) {
+      if (!isInsideDesktop && window.innerWidth >= 1024) {
         setIsSearchOpen(false);
         setIsSearchPinned(false);
       }
@@ -209,12 +217,20 @@ function Header() {
       }
     };
 
+    const handleScroll = () => {
+      setIsSearchOpen(false);
+      setIsSearchPinned(false);
+    };
+
     document.addEventListener("mousedown", handlePointerDown);
     document.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
+      clearSearchCloseTimer();
       document.removeEventListener("mousedown", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -232,6 +248,14 @@ function Header() {
     }));
   };
 
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  };
+
   const handleLogout = () => {
     dispatch(logout());
     navigate("/");
@@ -241,15 +265,27 @@ function Header() {
     navigate(path);
   };
 
+  const clearSearchCloseTimer = () => {
+    if (searchCloseTimerRef.current) {
+      window.clearTimeout(searchCloseTimerRef.current);
+      searchCloseTimerRef.current = null;
+    }
+  };
+
   const openSearchLayer = () => {
     if (window.innerWidth >= 1024) {
+      clearSearchCloseTimer();
       setIsSearchOpen(true);
     }
   };
 
   const closeSearchLayer = () => {
     if (window.innerWidth >= 1024 && !isSearchPinned) {
-      setIsSearchOpen(false);
+      clearSearchCloseTimer();
+      searchCloseTimerRef.current = window.setTimeout(() => {
+        setIsSearchOpen(false);
+        searchCloseTimerRef.current = null;
+      }, 120);
     }
   };
 
@@ -300,10 +336,29 @@ function Header() {
     submitSearch();
   };
 
+  const isHomePage = location.pathname === "/";
+
   return (
     <header className="header">
       <div className="header__top">
-        <h1 className="header__logo">
+        {isHomePage ? (
+          <h1 className="header__logo header__logo--mobile">
+            <Link to="/" aria-label="GOREON 홈">
+              <img src={LogoIcon} alt="GOREON 아이콘" className="header__logo-icon" />
+              <img src={LogoFull} alt="GOREON 로고" className="header__logo-full" />
+            </Link>
+          </h1>
+        ) : (
+          <button
+            type="button"
+            className="header__mobile-back"
+            aria-label="뒤로가기"
+            onClick={handleBack}
+          >
+            <img src={Prev} alt="" />
+          </button>
+        )}
+        <h1 className="header__logo header__logo--desktop">
           <Link to="/" aria-label="GOREON 홈">
             <img src={LogoIcon} alt="GOREON 아이콘" className="header__logo-icon" />
             <img src={LogoFull} alt="GOREON 로고" className="header__logo-full" />
@@ -328,7 +383,11 @@ function Header() {
                 <img src={Search} alt="" />
               </button>
 
-              <div className="header__search-panel">
+              <div
+                className="header__search-panel"
+                onMouseEnter={openSearchLayer}
+                onMouseLeave={closeSearchLayer}
+              >
                 <div className="header__search-sheet">
                   <form className="header__search-form" onSubmit={handleSearchSubmit}>
                     <div className="header__search-input-wrap">
@@ -384,14 +443,9 @@ function Header() {
 
           <div className="header__auth">
             {isLoggedIn ? (
-              <>
-                <button type="button" onClick={() => goToPath("/mypage")}>
-                  {userInfo?.name || "마이페이지"}
-                </button>
-                <button type="button" onClick={handleLogout}>
-                  로그아웃
-                </button>
-              </>
+              <button type="button" onClick={handleLogout}>
+                로그아웃
+              </button>
             ) : (
               <>
                 <button type="button" onClick={() => goToPath("/login")}>
@@ -404,51 +458,6 @@ function Header() {
             )}
           </div>
         </div>
-
-        <div
-          ref={mobileSearchRef}
-          className={`header__search header__search--mobile ${isSearchOpen ? "is-open" : ""}`}
-        >
-          <div className="header__search-panel">
-            <div className="header__search-sheet">
-              <form className="header__search-form" onSubmit={handleSearchSubmit}>
-                <div className="header__search-input-wrap">
-                  <button
-                    type="submit"
-                    className="header__search-icon-button"
-                    aria-label="검색 실행"
-                  >
-                    <img src={Search} alt="" className="header__search-icon" />
-                  </button>
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    placeholder="검색어를 입력하세요"
-                    onChange={(event) => setSearchQuery(event.target.value)}
-                  />
-                </div>
-
-                <div className="header__search-suggestions">
-                  {searchSuggestions.map((suggestion) => (
-                    <button
-                      key={`mobile-${suggestion}`}
-                      type="button"
-                      className="header__search-suggestion"
-                      onClick={() => submitSearch(suggestion)}
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
-                </div>
-
-                <button type="submit" className="header__search-submit">
-                  검색
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-
         <button
           type="button"
           className="header__mobile-user"
@@ -500,11 +509,7 @@ function Header() {
             }`}
             onMouseEnter={() => openDesktopMenu("brand")}
           >
-            <button
-              type="button"
-              className="gnb__button"
-              onClick={() => pinDesktopMenu("brand")}
-            >
+            <button type="button" className="gnb__button" onClick={() => pinDesktopMenu("brand")}>
               브랜드관
             </button>
 

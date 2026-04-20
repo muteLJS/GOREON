@@ -1,13 +1,3 @@
-export const FALLBACK_CART_ITEMS = Array.from({ length: 6 }, (_, index) => ({
-  id: `fallback-cart-item-${index + 1}`,
-  productId: index + 1,
-  category: "CPU",
-  name: "인텔 코어 i5-14세대 14400F (랩터레이크 리프레시) (벌크팩 정품)",
-  option: "옵션명:용량,뷰 등등",
-  price: 20000,
-  quantity: 1,
-}));
-
 export const EMPTY_SHIPPING_FORM = {
   postalCode: "",
   recipient: "",
@@ -29,6 +19,7 @@ export function toCartItem(item, index) {
     category: item.category ?? "상품",
     name: item.name ?? item.title ?? "상품명",
     option: item.option ?? item.spec ?? "옵션 정보가 없습니다.",
+    image: item.image ?? item.imageSrc ?? item.thumbnailImage ?? item.thumbnail ?? "",
     price: Number(item.price) || 0,
     quantity: quantity > 0 ? quantity : 1,
   };
@@ -52,7 +43,6 @@ export function mergeCartItems(items) {
 
     itemsByKey.set(key, {
       ...item,
-      id: key,
     });
   });
 
@@ -64,9 +54,7 @@ export function createCartItems(items) {
 }
 
 export function getCartItems(storeCartItems) {
-  const sourceItems = storeCartItems.length > 0 ? storeCartItems : FALLBACK_CART_ITEMS;
-
-  return createCartItems(sourceItems);
+  return createCartItems(storeCartItems);
 }
 
 export function summarizeOrder(items) {

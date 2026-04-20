@@ -2,11 +2,27 @@
 @import "styles/mixins";
 
 .cart-page {
-  padding: 30px 0 56px;
+  width: 100%;
+  min-width: 0;
+  padding: $page-content-start-mobile 16px 56px;
+  box-sizing: border-box;
+}
+
+.cart-page__header,
+.cart-page__layout,
+.cart-page__sidebar,
+.cart-page__list-card,
+.cart-page__address-card,
+.cart-page__summary-card,
+.cart-page__address-row {
+  min-width: 0;
 }
 
 .cart-page__header {
-  padding-top: 4px;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-top: 0;
 }
 
 .cart-page__title {
@@ -24,11 +40,15 @@
 .cart-page__layout {
   display: grid;
   gap: 36px;
-  margin-top: 34px;
+  width: 100%;
+  max-width: 1280px;
+  margin: 34px auto 0;
 }
 
 .cart-page__list-toolbar {
   @include flex(center, space-between);
+  flex-wrap: wrap;
+  gap: 10px 12px;
   margin-bottom: 12px;
 }
 
@@ -50,6 +70,7 @@
 .cart-page__checkbox-mark {
   @include flex-center;
   position: relative;
+  flex-shrink: 0;
   width: 22px;
   height: 22px;
   border: 1px solid $color-text-main;
@@ -94,10 +115,13 @@
 }
 
 .cart-page__list-card {
+  width: 100%;
+  overflow: hidden;
   padding: 8px 12px;
   border: 1px solid rgba($color-text-main, 0.22);
   border-radius: 12px;
   background: $color-white;
+  box-sizing: border-box;
 }
 
 .cart-page__empty {
@@ -149,13 +173,16 @@
 
 .cart-page__input {
   @include input();
+  width: 100%;
   padding: 0 12px;
   border-radius: 8px;
   border-color: rgba($color-text-main, 0.18);
   gap: 0;
+  box-sizing: border-box;
 
   input {
     width: 100%;
+    min-width: 0;
     height: 32px;
     color: $color-text-main;
     font-size: 13px;
@@ -213,14 +240,17 @@
   line-height: 1.4;
 
   span {
-    @include ellipsis;
+    min-width: 0;
     max-width: 72%;
+    word-break: keep-all;
   }
 
   strong {
+    flex-shrink: 0;
     color: rgba($color-text-main, 0.88);
     font-size: 14px;
     font-weight: $font-black;
+    text-align: right;
   }
 }
 
@@ -238,6 +268,16 @@
   font-size: 18px;
   font-weight: $font-black;
   line-height: 1.2;
+
+  span,
+  strong {
+    min-width: 0;
+    word-break: keep-all;
+  }
+
+  strong {
+    text-align: right;
+  }
 }
 
 .cart-page__checkout-button {
@@ -252,7 +292,11 @@
 
 @include tablet-up {
   .cart-page {
-    padding-bottom: 72px;
+    padding: $page-content-start-tablet 24px 72px;
+  }
+
+  .cart-page__layout {
+    margin-top: 48px;
   }
 
   .cart-page__list-card {
@@ -263,11 +307,11 @@
 
 @include desktop-up {
   .cart-page {
-    padding: 76px 0 118px;
+    padding: $page-content-start-desktop 0 118px;
   }
 
   .cart-page__header {
-    padding-top: 8px;
+    padding-top: 0;
   }
 
   .cart-page__title {
@@ -277,8 +321,8 @@
   .cart-page__progress {
     @include flex(center, center);
     position: relative;
-    gap: 170px;
-    width: 358px;
+    gap: 130px;
+    width: 500px;
     margin: 40px auto 0;
   }
 

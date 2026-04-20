@@ -3,7 +3,7 @@
 
 .product-detail {
   width: 100%;
-  padding: 16px 0 132px;
+  padding: $page-content-start-mobile 0 132px;
   color: $color-text-main;
 }
 
@@ -38,19 +38,20 @@
   position: absolute;
   right: 18px;
   bottom: 20px;
-  width: 50px;
-  height: 50px;
-  padding: 0;
+  width: 44px;
+  height: 44px;
+  padding: 10px;
   border: 0;
-  background: transparent;
-  box-shadow: none;
+  border-radius: $radius-full;
+  background: $color-white;
+  box-shadow: 0 0 4px 0 rgba($color-black, 0.25);
   cursor: pointer;
 }
 
 .product-detail__favorite-icon {
   display: block;
-  width: 50px;
-  height: 50px;
+  width: 24px;
+  height: 22px;
 }
 
 .product-detail__title {
@@ -430,7 +431,7 @@
 
 @include tablet-up {
   .product-detail {
-    padding-top: 28px;
+    padding-top: $page-content-start-tablet;
   }
 
   .product-detail__overview-preview.is-collapsed {
@@ -452,6 +453,7 @@
 
 @include desktop-up {
   .product-detail {
+    padding-top: $page-content-start-desktop;
     padding-bottom: 88px;
   }
 

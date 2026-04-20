@@ -1,14 +1,12 @@
 ﻿import "./ProductDetail.scss";
 import productList from "@/data/products_list.json";
 import { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
+import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 import ReviewSection from "../../components/ReviewSection/ReviewSection";
 import { addToCart } from "../../store/slices/cartSlice";
-import { addToWishlist, removeFromWishlist } from "../../store/slices/wishlistSlice";
-import LikeBefore from "../../assets/icons/like-before.svg";
-import LikeAfter from "../../assets/icons/like-after.svg";
 import ChevronDown from "../../assets/icons/chevron-down.svg";
 import api from "../../utils/api";
 
@@ -30,55 +28,15 @@ const normalizeImageUrl = (value) => {
   return raw;
 };
 
-const flattenProductList = (data) =>
-  data.flatMap((entry, entryIndex) => {
-    const hasNestedProducts = Array.isArray(entry?.products) || Array.isArray(entry?.subCategories);
-
-    if (!hasNestedProducts) {
-      return [
-        {
-          ...entry,
-          categoryName: entry?.tag ?? "",
-          categoryId: entry?.categoryId ?? null,
-          routeId: String(entry?.id ?? entryIndex + 1),
-        },
-      ];
-    }
-
-    const categoryName = entry.categoryName ?? "";
-    const directProducts = (entry.products ?? []).map((product, productIndex) => ({
-      ...product,
-      categoryName,
-      categoryId: entry.categoryId,
-      routeId: `${entry.categoryId ?? categoryName}-${product.id ?? productIndex + 1}-${productIndex}`,
-    }));
-
-    const subCategoryProducts = (entry.subCategories ?? []).flatMap((subCategory, subIndex) =>
-      (subCategory.products ?? []).map((product, productIndex) => ({
-        ...product,
-        categoryName,
-        categoryId: entry.categoryId,
-        routeId: `${entry.categoryId ?? categoryName}-${subCategory.categoryId ?? subIndex}-${
-          product.id ?? productIndex + 1
-        }-${productIndex}`,
-      })),
-    );
-
-    return [...directProducts, ...subCategoryProducts];
-  });
-
 function getProductDetailByIdFromJson(id) {
-  const flatProducts = flattenProductList(productList);
-
-  const product =
-    flatProducts.find((item) => String(item.routeId) === String(id)) ??
-    flatProducts.find((item) => String(item.id) === String(id));
+  const product = productList.find((item) => String(item.id) === String(id));
 
   if (!product) {
     return null;
   }
 
   const price = parsePrice(product.price);
+  const tags = Array.isArray(product.tag) ? product.tag : [];
   const heroImage = normalizeImageUrl(product.image) || ProductHeroImage;
   const normalizedDetailImages = Array.isArray(product.detailImages)
     ? product.detailImages.map((src) => normalizeImageUrl(src)).filter(Boolean)
@@ -113,10 +71,10 @@ function getProductDetailByIdFromJson(id) {
   ];
 
   return {
-    id: String(product.routeId),
-    brand: String(product.name ?? "").split(" ")[0] || "브랜드 정보 준비중",
+    id: String(product.id),
+    brand: tags[0] || String(product.name ?? "").split(" ")[0] || "브랜드 정보 준비중",
     title: product.name,
-    subtitle: `${product.categoryName} 카테고리 추천 상품`,
+    subtitle: `${tags[1] || tags[0] || "상품"} 카테고리 추천 상품`,
     shortDescription: `${product.name}의 핵심 정보와 옵션을 상세 페이지에서 확인할 수 있습니다.`,
     price,
     rating: Number(product.rating) || 0,
@@ -130,21 +88,24 @@ function getProductDetailByIdFromJson(id) {
 }
 
 function getProductDetailFromApi(product) {
-  const price = Number(product.price) || 0;
+  const price = parsePrice(product.price);
   const heroImage = normalizeImageUrl(product.image) || ProductHeroImage;
-  const detailImages = Array.isArray(product.specs?.detailImages)
-    ? product.specs.detailImages.map((src) => normalizeImageUrl(src)).filter(Boolean)
+  const detailImages = Array.isArray(product.detailImages)
+    ? product.detailImages.map((src) => normalizeImageUrl(src)).filter(Boolean)
     : [];
   const gallery =
-    detailImages.length > 0 ? detailImages : [heroImage, heroImage, heroImage, heroImage, heroImage];
+    detailImages.length > 0
+      ? detailImages
+      : [heroImage, heroImage, heroImage, heroImage, heroImage];
   const options =
-    Array.isArray(product.specs?.priceOptions) && product.specs.priceOptions.length > 0
-      ? product.specs.priceOptions.map((option, index) => ({
+    Array.isArray(product.priceOptions) && product.priceOptions.length > 0
+      ? product.priceOptions.map((option, index) => ({
           id: `option-${index + 1}`,
           label: option.optionName || `옵션 ${index + 1}`,
-          price: Number(option.price) || price,
+          price: parsePrice(option.price) || price,
         }))
       : [{ id: "default", label: "기본 옵션", price }];
+  const tags = Array.isArray(product.tag) ? product.tag : [];
   const reviews = [
     {
       id: 1,
@@ -164,12 +125,12 @@ function getProductDetailFromApi(product) {
 
   return {
     id: String(product._id ?? product.id),
-    brand: product.brand || String(product.name ?? "").split(" ")[0] || "브랜드 정보 준비중",
+    brand: tags[0] || String(product.name ?? "").split(" ")[0] || "브랜드 정보 준비중",
     title: product.name,
-    subtitle: `${product.category || "상품"} 카테고리 추천 상품`,
+    subtitle: `${tags[1] || tags[0] || "상품"} 카테고리 추천 상품`,
     shortDescription: `${product.name}의 핵심 정보와 옵션을 상세 페이지에서 확인할 수 있습니다.`,
     price,
-    rating: Number(product.averageRating ?? product.rating) || 0,
+    rating: Number(product.rating) || 0,
     reviewCount: reviews.length,
     photoCount: gallery.length,
     heroImage,
@@ -183,7 +144,6 @@ function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const wishlistItems = useSelector((state) => state.wishlist.items);
 
   const overviewRef = useRef(null);
   const reviewsRef = useRef(null);
@@ -257,23 +217,6 @@ function ProductDetail() {
   const selectedOption = product.options.find((option) => option.id === selectedOptionId) || null;
   const displayOption = selectedOption || product.options[0];
   const totalPrice = displayOption.price * quantity;
-  const isWishlisted = wishlistItems.some((item) => item.id === product.id);
-
-  const handleWishlistToggle = () => {
-    if (isWishlisted) {
-      dispatch(removeFromWishlist(product.id));
-      return;
-    }
-
-    dispatch(
-      addToWishlist({
-        id: product.id,
-        name: product.title,
-        price: product.price,
-        image: product.heroImage,
-      }),
-    );
-  };
 
   const handleAddToCart = () => {
     dispatch(
@@ -337,20 +280,16 @@ function ProductDetail() {
               }}
             />
 
-            <button
-              type="button"
+            <WishlistIconButton
+              product={{
+                id: product.id,
+                name: product.title,
+                price: product.price,
+                image: product.heroImage,
+              }}
               className="product-detail__favorite"
-              aria-label={isWishlisted ? "찜 해제" : "찜하기"}
-              onClick={handleWishlistToggle}
-            >
-              <img
-                src={isWishlisted ? LikeAfter : LikeBefore}
-                alt=""
-                className={`product-detail__favorite-icon ${
-                  isWishlisted ? "is-active" : "is-idle"
-                }`}
-              />
-            </button>
+              iconClassName="product-detail__favorite-icon"
+            />
           </div>
         </div>
 

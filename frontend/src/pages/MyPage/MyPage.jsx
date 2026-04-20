@@ -1,3 +1,4 @@
+import "./MyPage.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -14,7 +15,7 @@ export default function MyPage() {
   };
 
   return (
-    <div>
+    <main className="my-page">
       <h1>마이페이지</h1>
       <p>{userInfo?.name || "사용자"}님</p>
       <p>{userInfo?.email || ""}</p>
@@ -26,6 +27,6 @@ export default function MyPage() {
       <button type="button" onClick={handleLogout}>
         로그아웃
       </button>
-    </div>
+    </main>
   );
 }

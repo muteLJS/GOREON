@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import AICharacter from "../../assets/logo/ai/character.svg";
+import AICharacter from "../AICharacter/AICharacter";
 import ChatProductCard from "./ChatProductCard";
 
 function ChatMessageList({ messages, isInitialView }) {
@@ -55,7 +55,7 @@ function ChatMessageList({ messages, isInitialView }) {
         <article key={message.id} className={`chat-widget__message-row is-${message.sender}`}>
           {message.sender === "bot" && (
             <div className="chat-widget__avatar" aria-hidden="true">
-              <img src={AICharacter} alt="" />
+              <AICharacter title="AI 고르미" animated={false} />
             </div>
           )}
 

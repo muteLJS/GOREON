@@ -1,0 +1,288 @@
+@import "styles/variables";
+@import "styles/mixins";
+
+.list-wrap {
+  width: 100%;
+  padding: 40px 0;
+
+  .list-assembly__baner {
+    width: 100%;
+    img {
+      width: 100%;
+    }
+  }
+  .list-wrap-content {
+    .side_menu {
+      display: none;
+    }
+    .list-assembly {
+      &__top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: $space-md;
+
+        span {
+          font-size: $font-xs;
+          margin-left: 4px;
+          font-weight: $font-bold;
+        }
+      }
+
+      &__title {
+        font-size: 1.25rem;
+        font-weight: $font-bold;
+      }
+
+      .filter-container {
+        display: flex;
+        gap: 6px;
+      }
+
+      .filter-button {
+        display: flex;
+        align-items: center;
+        border: 1px solid #60606024;
+        border-radius: 999px;
+        font-size: $font-xs;
+        gap: $space-xs;
+        padding: $space-xxs $space-xs;
+
+        img {
+          width: $font-xs;
+        }
+      }
+
+      &__content {
+        margin-top: $space-md;
+      }
+
+      &__state {
+        padding: $space-md 0;
+        color: $color-sub-category-text;
+        font-size: $font-md;
+      }
+
+      &__product-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: $space-md;
+      }
+
+      &__add-button {
+        background-color: $color-text-sub;
+        color: $color-white;
+        border-radius: $radius-md;
+        padding: 0 $space-xs;
+      }
+
+      &__bottom {
+        margin-top: $space-md;
+        margin-bottom: $space-md;
+      }
+
+      &__summary-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: $space-md;
+      }
+
+      &__total {
+        @include button-gray();
+        background-color: $color-gray-100;
+        color: $color-text-main;
+      }
+
+      &__list-button {
+        @include button-base();
+      }
+
+      &__compatibility {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: $space-md;
+        margin-top: $space-md;
+        background-color: #0aa5a515;
+        border-radius: $radius-md;
+      }
+
+      &__compatibility-count,
+      &__compatibility-status {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: $space-xs;
+      }
+
+      &__compatibility-count {
+        gap: $space-xs;
+        font-weight: $font-bold;
+        font-size: $font-sm;
+      }
+
+      &__compatibility-status {
+        font-size: $font-xs;
+        color: $color-text-sub;
+      }
+
+      &__button-container {
+        display: flex;
+        gap: 5px;
+      }
+    }
+  }
+}
+@include tablet-up {
+  .list-wrap {
+    .list-assembly__banner {
+      img {
+        width: 100%;
+        object-fit: cover;
+      }
+    }
+    .list-wrap-content {
+      .side_menu {
+        display: none;
+      }
+      .list-assembly {
+        &__top {
+          .list-assembly__title {
+            font-size: $font-xxl;
+            span {
+              font-size: $font-lg-2;
+            }
+          }
+        }
+        &__content {
+          .list-assembly__product-grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
+      }
+    }
+  }
+}
+
+@include desktop-up {
+  .list-wrap {
+    .list-assembly__banner {
+      img {
+        width: 100%;
+      }
+    }
+    .list-wrap-content {
+      display: flex;
+      gap: 25px;
+
+      .side_menu {
+        width: 24%;
+        display: block;
+
+        &_top {
+          display: flex;
+          justify-content: space-between;
+          background-color: $color-gray-100;
+          border-radius: 20px 20px 0 0;
+          padding: 23px;
+          border: 1px solid $color-border;
+          gap: 40px;
+          h2 {
+            font-size: $font-xl;
+            color: $color-text-main;
+            font-weight: $font-bold;
+          }
+          .side_menu_rightbox {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            p {
+              font-size: $font-md;
+              font-weight: $font-medium;
+              color: $color-sub-category-text;
+            }
+          }
+        }
+        &_bottom_container {
+          display: flex;
+          flex-direction: column;
+          padding: 29px 0;
+          gap: 40px;
+          background-color: #ffffff;
+          border: 1px solid $color-border;
+
+          .side_menu_bottom_range {
+            padding: 0 23px;
+            h3 {
+              font-size: 20px;
+              font-weight: 700;
+            }
+            input {
+              width: 100%;
+            }
+            .value {
+              display: flex;
+              justify-content: space-between;
+              p {
+                font-size: $font-xs;
+                color: $color-sub-category-text;
+                font-weight: $font-medium;
+              }
+            }
+          }
+        }
+        &_bottom {
+          background-color: #ffffff;
+          padding: 0 23px;
+
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+
+          &_filter_container {
+            display: flex;
+            justify-content: space-between;
+            h3 {
+              font-size: $font-lg-2;
+              font-weight: $font-bold;
+            }
+          }
+          &_filter_list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+
+            li {
+              display: flex;
+              gap: 8px;
+              p {
+                font-size: $font-md;
+                font-weight: $font-medium;
+                color: $color-sub-category-text;
+              }
+            }
+          }
+        }
+      }
+      .list-assembly {
+        width: 80%;
+        &__top {
+          .list-assembly__title {
+            font-size: $font-xl;
+          }
+          .filter-container {
+            display: flex;
+          }
+        }
+        &__content {
+          .list-assembly__product-grid {
+            grid-template-columns: repeat(4, 1fr);
+          }
+        }
+      }
+    }
+  }
+}

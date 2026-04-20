@@ -1,4 +1,5 @@
 import ChatInput from "./ChatInput";
+import AICharacter from "../AICharacter/AICharacter";
 import ChatMessageList from "./ChatMessageList";
 
 function ChatPanel({
@@ -37,7 +38,12 @@ function ChatPanel({
           </svg>
         </button>
 
-        <div className="chat-widget__title">고르미와 채팅</div>
+        <div className="chat-widget__title">
+          <span className="chat-widget__title-icon" aria-hidden="true">
+            <AICharacter title="AI 고르미" animated={false} />
+          </span>
+          고르미와 채팅
+        </div>
       </header>
 
       <div className="chat-widget__body">

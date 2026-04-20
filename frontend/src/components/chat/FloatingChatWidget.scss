@@ -79,15 +79,18 @@
   color: $color-text-main;
 }
 
-.chat-widget__title::before {
-  content: "";
+.chat-widget__title-icon {
+  @include flex-center;
   width: 24px;
   height: 24px;
   border-radius: $radius-full;
-  background:
-    url("../../assets/logo/ai/character.svg") center / contain no-repeat,
-    linear-gradient(180deg, #c2f3f1 0%, #77d9d3 100%);
+  background: linear-gradient(180deg, #c2f3f1 0%, #77d9d3 100%);
   box-shadow: 0 0 0 2px rgba($color-white, 0.95);
+
+  .ai-character {
+    width: 24px;
+    height: 24px;
+  }
 }
 
 .chat-widget__body {
@@ -160,7 +163,7 @@
   background: $color-white;
   box-shadow: 0 4px 10px rgba($color-black, 0.14);
 
-  img {
+  .ai-character {
     width: 24px;
     height: 24px;
   }
@@ -189,8 +192,8 @@
   height: 6px;
   margin-left: 8px;
   border-radius: 999px;
-  background:
-    radial-gradient(circle, rgba($color-text-sub, 0.95) 0 1px, transparent 1.4px) left center / 6px 6px repeat-x;
+  background: radial-gradient(circle, rgba($color-text-sub, 0.95) 0 1px, transparent 1.4px) left
+    center / 6px 6px repeat-x;
   animation: chat-widget-loading 1s linear infinite;
 }
 
@@ -306,11 +309,11 @@
   }
 }
 
-.chat-widget__favorite-button.like-circle {
+.chat-widget__favorite-button.wishlist-icon-button {
   box-shadow: none;
 }
 
-.chat-widget__favorite-button .like-circle__button {
+.chat-widget__favorite-button {
   width: 30px;
   height: 30px;
 }
@@ -510,6 +513,7 @@
   background: $color-white;
   box-shadow: 0 8px 24px rgba($color-black, 0.15);
   cursor: pointer;
+  animation: chat-widget-trigger-hop 3.2s ease-in-out infinite;
   transition:
     transform $transition-fast,
     box-shadow $transition-fast;
@@ -517,8 +521,13 @@
 
 .chat-widget__trigger:hover,
 .chat-widget__trigger.is-open {
+  animation: none;
   transform: translateY(-2px);
   box-shadow: 0 10px 26px rgba($color-black, 0.18);
+}
+
+.chat-widget__trigger.is-open {
+  animation: none;
 }
 
 .chat-widget__trigger-icon {
@@ -526,7 +535,7 @@
   width: 25px;
   height: 25px;
 
-  img {
+  .ai-character {
     width: 100%;
     height: 100%;
   }
@@ -539,13 +548,19 @@
   }
 
   .chat-widget__window {
-    height: min(644px, calc(100vh - 100px));
+    height: min(560px, calc(100vh - 176px));
+    max-height: calc(100vh - 176px);
   }
 }
 
 @include desktop-up {
   .chat-widget {
     bottom: 32px;
+  }
+
+  .chat-widget__window {
+    height: min(644px, calc(100vh - 96px));
+    max-height: calc(100vh - 96px);
   }
 }
 
@@ -577,6 +592,17 @@
 
   .chat-widget__error {
     margin-left: 36px;
+  }
+}
+
+@keyframes chat-widget-trigger-hop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-4px);
   }
 }
 

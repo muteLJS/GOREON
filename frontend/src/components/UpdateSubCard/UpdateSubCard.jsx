@@ -1,6 +1,11 @@
-function UpdateSubCard({ image, title, description }) {
+function UpdateSubCard({ image, title, description, isActive = false, onClick }) {
   return (
-    <div className="sub_info">
+    <button
+      type="button"
+      className={`sub_info ${isActive ? "is-active" : ""}`}
+      onClick={onClick}
+      aria-pressed={isActive}
+    >
       <div className="sub_title">
         <img src={image} alt="pakage_img" className="pakage_img" />
         <div className="pakage_texts">
@@ -13,7 +18,7 @@ function UpdateSubCard({ image, title, description }) {
           <path d="M2 10L12 2L22 10" />
         </svg>
       </div>
-    </div>
+    </button>
   );
 }
 
