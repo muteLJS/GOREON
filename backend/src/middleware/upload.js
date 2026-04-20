@@ -1,11 +1,21 @@
-const path = require("path");
 const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+
+const uploadPath = "uploads";
+
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath);
+}
 
 const storage = multer.diskStorage({
-  destination: path.join(process.cwd(), "uploads"),
+  destination: (req, file, cb) => {
+    cb(null, uploadPath);
+  },
   filename: (req, file, cb) => {
-    const safeName = `${Date.now()}-${file.originalname.replace(/\s+/g, "-")}`;
-    cb(null, safeName);
+    const ext = path.extname(file.originalname);
+    const name = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+    cb(null, name);
   },
 });
 

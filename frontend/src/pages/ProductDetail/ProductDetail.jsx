@@ -10,6 +10,7 @@ import { addToWishlist, removeFromWishlist } from "../../store/slices/wishlistSl
 import LikeBefore from "../../assets/icons/like-before.svg";
 import LikeAfter from "../../assets/icons/like-after.svg";
 import ChevronDown from "../../assets/icons/chevron-down.svg";
+import api from "../../utils/api";
 
 import ProductHeroImage from "../../assets/img/intel-core-ultra5-250kf-plus-product-image-genuine.jpg";
 
@@ -128,6 +129,56 @@ function getProductDetailByIdFromJson(id) {
   };
 }
 
+function getProductDetailFromApi(product) {
+  const price = Number(product.price) || 0;
+  const heroImage = normalizeImageUrl(product.image) || ProductHeroImage;
+  const detailImages = Array.isArray(product.specs?.detailImages)
+    ? product.specs.detailImages.map((src) => normalizeImageUrl(src)).filter(Boolean)
+    : [];
+  const gallery =
+    detailImages.length > 0 ? detailImages : [heroImage, heroImage, heroImage, heroImage, heroImage];
+  const options =
+    Array.isArray(product.specs?.priceOptions) && product.specs.priceOptions.length > 0
+      ? product.specs.priceOptions.map((option, index) => ({
+          id: `option-${index + 1}`,
+          label: option.optionName || `옵션 ${index + 1}`,
+          price: Number(option.price) || price,
+        }))
+      : [{ id: "default", label: "기본 옵션", price }];
+  const reviews = [
+    {
+      id: 1,
+      author: "User**1",
+      date: "2026.04.10",
+      body: `${product.name} 기준으로 실사용 만족도가 높고 기본 구성이 안정적입니다.`,
+      images: gallery.slice(0, 4),
+    },
+    {
+      id: 2,
+      author: "User**7",
+      date: "2026.04.12",
+      body: "옵션 선택폭이 넓고 가격대 비교가 쉬워 구매 결정에 도움이 됐습니다.",
+      images: gallery.slice(0, 4),
+    },
+  ];
+
+  return {
+    id: String(product._id ?? product.id),
+    brand: product.brand || String(product.name ?? "").split(" ")[0] || "브랜드 정보 준비중",
+    title: product.name,
+    subtitle: `${product.category || "상품"} 카테고리 추천 상품`,
+    shortDescription: `${product.name}의 핵심 정보와 옵션을 상세 페이지에서 확인할 수 있습니다.`,
+    price,
+    rating: Number(product.averageRating ?? product.rating) || 0,
+    reviewCount: reviews.length,
+    photoCount: gallery.length,
+    heroImage,
+    gallery,
+    options,
+    reviews,
+  };
+}
+
 function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -137,11 +188,58 @@ function ProductDetail() {
   const overviewRef = useRef(null);
   const reviewsRef = useRef(null);
 
-  const product = getProductDetailByIdFromJson(id);
+  const [product, setProduct] = useState(null);
+  const [status, setStatus] = useState("loading");
   const [selectedOptionId, setSelectedOptionId] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("overview");
   const [isOverviewExpanded, setIsOverviewExpanded] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchProduct = async () => {
+      try {
+        setStatus("loading");
+        const response = await api.get(`/products/${id}`, { signal: controller.signal });
+        setProduct(getProductDetailFromApi(response.data.data ?? response.data));
+        setStatus("success");
+      } catch (error) {
+        if (error.name === "CanceledError") {
+          return;
+        }
+
+        const fallbackProduct = getProductDetailByIdFromJson(id);
+        setProduct(fallbackProduct);
+        setStatus(fallbackProduct ? "success" : "error");
+      }
+    };
+
+    fetchProduct();
+
+    return () => controller.abort();
+  }, [id]);
+
+  useEffect(() => {
+    if (!product) {
+      return;
+    }
+
+    setSelectedOptionId(product.options[0]?.id ?? "");
+    setQuantity(1);
+    setActiveTab("overview");
+    setIsOverviewExpanded(false);
+  }, [product]);
+
+  if (status === "loading") {
+    return (
+      <main className="product-detail">
+        <section className="product-detail__story">
+          <h1 className="product-detail__title">상품을 불러오는 중입니다.</h1>
+        </section>
+      </main>
+    );
+  }
 
   if (!product) {
     return (
@@ -155,13 +253,6 @@ function ProductDetail() {
       </main>
     );
   }
-
-  useEffect(() => {
-    setSelectedOptionId(product.options[0]?.id ?? "");
-    setQuantity(1);
-    setActiveTab("overview");
-    setIsOverviewExpanded(false);
-  }, [product.id]);
 
   const selectedOption = product.options.find((option) => option.id === selectedOptionId) || null;
   const displayOption = selectedOption || product.options[0];

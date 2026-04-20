@@ -2,7 +2,7 @@
 /* [페이지] 검색 결과 (Search)                                                */
 /* 사용자가 입력한 검색어에 일치하는 상품 및 스펙 비교 결과를 나열합니다.     */
 /* -------------------------------------------------------------------------- */
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./List.scss";
 import banner1 from "@/assets/banner/banner-1.jpg";
 import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
@@ -12,9 +12,10 @@ import cartIcon from "@/assets/icons/cart-straight.svg";
 import likeAffterIcon from "@/assets/icons/like-after.svg";
 import resetIcon from "@/assets/icons/reset.svg";
 import { useSearchParams } from "react-router-dom";
-import productList from "@/data/products_list.json";
+import api from "@/utils/api";
 
 const TYPE_LABEL_MAP = {
+  laptop: "노트북",
   notebook: "노트북",
   desktop: "데스크탑",
   monitor: "모니터",
@@ -44,44 +45,13 @@ const TYPE_LABEL_MAP = {
   acer: "Acer",
 };
 
-const normalizeTagValue = (value) =>
-  String(value ?? "")
-    .replace(/\s/g, "")
-    .toLowerCase();
-const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
-const getTagTokens = (value) =>
-  String(value ?? "")
-    .split(",")
-    .map((token) => normalizeTagValue(token))
-    .filter(Boolean);
-
-const flattenProductList = (data) =>
-  data.flatMap((entry, entryIndex) => {
-    const hasNestedProducts = Array.isArray(entry?.products) || Array.isArray(entry?.subCategories);
-
-    if (!hasNestedProducts) {
-      return [{ ...entry, __routeId: String(entry?.id ?? entryIndex + 1) }];
-    }
-
-    const categoryName = entry.categoryName ?? "";
-    const directProducts = (entry.products ?? []).map((product, productIndex) => ({
-      ...product,
-      tag: product.tag ?? categoryName,
-      __routeId: `${entry.categoryId ?? categoryName}-${product.id ?? productIndex + 1}-${productIndex}`,
-    }));
-
-    const subCategoryProducts = (entry.subCategories ?? []).flatMap((subCategory, subIndex) =>
-      (subCategory.products ?? []).map((product, productIndex) => ({
-        ...product,
-        tag: product.tag ?? categoryName,
-        __routeId: `${entry.categoryId ?? categoryName}-${subCategory.categoryId ?? subIndex}-${
-          product.id ?? productIndex + 1
-        }-${productIndex}`,
-      })),
-    );
-
-    return [...directProducts, ...subCategoryProducts];
-  });
+const normalizeProduct = (product) => ({
+  ...product,
+  id: product._id ?? product.id,
+  image: product.image || ProductImage,
+  price: Number(product.price) || 0,
+  rating: Number(product.averageRating ?? product.rating) || 0,
+});
 
 const FilterMenuList = ({ children }) => {
   return (
@@ -114,6 +84,9 @@ export default function List() {
   const MAX = 1600000 * 2;
   const [minValue, setMinValue] = useState(0);
   const [maxValue, setMaxValue] = useState(160000);
+  const [products, setProducts] = useState([]);
+  const [status, setStatus] = useState("loading");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
     if (e.target.name === "min") {
@@ -123,22 +96,34 @@ export default function List() {
     }
   };
 
-  const normalizedProducts = flattenProductList(productList).map((product, productIndex) => ({
-    ...product,
-    id: String(product.__routeId ?? product.id ?? productIndex + 1),
-    sourceId: product.id ?? null,
-    image: product.image || ProductImage,
-    price: parsePrice(product.price),
-    rating: Number(product.rating) || 0,
-  }));
+  useEffect(() => {
+    const controller = new AbortController();
 
-  const normalizedType = normalizeTagValue(type);
-  const filteredProducts = normalizedType
-    ? normalizedProducts.filter((item) => {
-        const tagTokens = getTagTokens(item.tag);
-        return tagTokens.includes(normalizedType);
-      })
-    : normalizedProducts;
+    const fetchProducts = async () => {
+      try {
+        setStatus("loading");
+        setErrorMessage("");
+        const response = await api.get("/products", {
+          params: type ? { type } : {},
+          signal: controller.signal,
+        });
+        setProducts((response.data.data ?? response.data ?? []).map(normalizeProduct));
+        setStatus("success");
+      } catch (error) {
+        if (error.name === "CanceledError") {
+          return;
+        }
+        setStatus("error");
+        setErrorMessage("상품 목록을 불러오지 못했습니다.");
+      }
+    };
+
+    fetchProducts();
+
+    return () => controller.abort();
+  }, [type]);
+
+  const filteredProducts = useMemo(() => products, [products]);
 
   const filteredLength = filteredProducts.length;
   const selectedTypeLabel = TYPE_LABEL_MAP[type] ?? type ?? "전체 상품";
@@ -202,8 +187,14 @@ export default function List() {
               </div>
             </section>
             <section className="list-assembly__content">
-              <div className="list-assembly__product-grid">
-                {filteredProducts.map((product) => (
+              {status === "loading" ? <p className="list-assembly__state">상품을 불러오는 중입니다.</p> : null}
+              {status === "error" ? <p className="list-assembly__state">{errorMessage}</p> : null}
+              {status === "success" && filteredProducts.length === 0 ? (
+                <p className="list-assembly__state">조건에 맞는 상품이 없습니다.</p>
+              ) : null}
+              {status === "success" && filteredProducts.length > 0 ? (
+                <div className="list-assembly__product-grid">
+                  {filteredProducts.map((product) => (
                   <ProductCardVertical
                     key={product.id}
                     product={product}
@@ -218,8 +209,9 @@ export default function List() {
                       </div>
                     }
                   />
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : null}
             </section>
           </section>
         </section>

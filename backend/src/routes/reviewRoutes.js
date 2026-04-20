@@ -1,11 +1,13 @@
 const express = require("express");
-
-const asyncHandler = require("../utils/asyncHandler");
-const reviewController = require("../controllers/reviewController");
+const auth = require("../middleware/auth");
+const {
+  getReviewsByProduct,
+  createReview,
+} = require("../controllers/reviewController");
 
 const router = express.Router();
 
-router.get("/", asyncHandler(reviewController.getReviews));
-router.post("/", asyncHandler(reviewController.createReview));
+router.get("/:productId", getReviewsByProduct);
+router.post("/", auth, createReview);
 
 module.exports = router;

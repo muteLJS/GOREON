@@ -57,6 +57,12 @@
         margin-top: $space-md;
       }
 
+      &__state {
+        padding: $space-md 0;
+        color: $color-sub-category-text;
+        font-size: $font-md;
+      }
+
       &__product-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
