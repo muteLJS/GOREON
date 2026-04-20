@@ -18,7 +18,7 @@ import UpdateSubCard from "components/UpdateSubCard/UpdateSubCard";
 import Modal from "components/Modal/Modal";
 
 import LikeCircle from "components/like/like_circle";
-import Cart_straight from "assets/Icons/cart-straight.svg";
+import Cart_straight from "assets/icons/cart-straight.svg";
 
 function Main() {
   const [showAiResult, setShowAiResult] = useState(false);

@@ -2,7 +2,7 @@
 @import "styles/mixins";
 
 .pc-assembly {
-  padding-top: $page-content-start-mobile;
+  padding-top: 40px;
 
   &__banner {
     img {
@@ -126,7 +126,9 @@
 
 @include tablet-up {
   .pc-assembly {
-    padding-top: $page-content-start-tablet;
+    &__product-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
 }
 

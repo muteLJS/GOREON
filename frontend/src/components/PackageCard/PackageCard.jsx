@@ -1,6 +1,6 @@
 import { useState } from "react";
 import LikeCircle from "components/like/like_circle";
-import Cart_straight from "assets/Icons/cart-straight.svg";
+import Cart_straight from "assets/icons/cart-straight.svg";
 
 function PackageCard({ title, description, price, mainImage, detailItems, defaultOpen = false }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
