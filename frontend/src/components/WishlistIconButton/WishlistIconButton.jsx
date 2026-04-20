@@ -7,7 +7,7 @@ import "./WishlistIconButton.scss";
 
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
 
-function WishlistIconButton({ product, className = "", iconClassName = "" }) {
+function WishlistIconButton({ product, className = "", iconClassName = "", size = "md" }) {
   const dispatch = useDispatch();
   const wishlistItems = useSelector((state) => state.wishlist.items);
   const productId = product?._id ?? product?.productId ?? product?.id ?? 1;
@@ -35,7 +35,7 @@ function WishlistIconButton({ product, className = "", iconClassName = "" }) {
   return (
     <button
       type="button"
-      className={`wishlist-icon-button ${className}`.trim()}
+      className={`wishlist-icon-button wishlist-icon-button--${size} ${className}`.trim()}
       aria-label={isWishlisted ? "찜 해제" : "찜하기"}
       onClick={handleClick}
     >

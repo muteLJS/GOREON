@@ -62,8 +62,8 @@ export default function Wishlist() {
                       product={product}
                       action={
                         <div className="list-assembly__button-container">
-                          <CartIconButton product={product} className="cart-add-button" />
-                          <WishlistIconButton product={product} className="cart-add-button" />
+                          <CartIconButton product={product} size="sm" />
+                          <WishlistIconButton product={product} size="sm" />
                         </div>
                       }
                     />
