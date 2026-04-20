@@ -25,6 +25,7 @@ function Main() {
   const [isAiSwitching, setIsAiSwitching] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("direct");
   const [selectedSpecProduct, setSelectedSpecProduct] = useState(null);
+  const [selectedUpdateIndex, setSelectedUpdateIndex] = useState(0);
   const [isDesktopCategory, setIsDesktopCategory] = useState(false);
   const [isTabletCategory, setIsTabletCategory] = useState(false);
   const [categorySwiperState, setCategorySwiperState] = useState({
@@ -84,6 +85,14 @@ function Main() {
         </>
       ),
       image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png",
+      price: "￦ 2,419,000",
+      specs: [
+        { label: "CPU", value: "인텔 코어 i5 14400F" },
+        { label: "RAM", value: "16 GB" },
+        { label: "VGA", value: "RTX 5060" },
+        { label: "OS", value: "Window 11 (home)" },
+        { label: "모니터", value: "FHD / 144 Hz" },
+      ],
     },
     {
       title: "영상편집 패키지",
@@ -94,6 +103,14 @@ function Main() {
         </>
       ),
       image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png",
+      price: "￦ 1,989,000",
+      specs: [
+        { label: "CPU", value: "Intel Core Ultra 7" },
+        { label: "RAM", value: "16 GB LPDDR5x" },
+        { label: "VGA", value: "Intel Arc Graphics" },
+        { label: "OS", value: "Window 11 (home)" },
+        { label: "모니터", value: "WQXGA / OLED" },
+      ],
     },
     {
       title: "영상편집 패키지",
@@ -104,8 +121,17 @@ function Main() {
         </>
       ),
       image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png",
+      price: "￦ 2,699,000",
+      specs: [
+        { label: "CPU", value: "AMD Ryzen AI 9 HX" },
+        { label: "RAM", value: "32 GB" },
+        { label: "VGA", value: "RTX 4060" },
+        { label: "OS", value: "Window 11 (home)" },
+        { label: "모니터", value: "4K / OLED" },
+      ],
     },
   ];
+  const selectedUpdateItem = updateSubItems[selectedUpdateIndex] ?? updateSubItems[0];
   const updateMobileItems = [
     {
       name: "MacBook Pro 14 M3",
@@ -236,7 +262,7 @@ function Main() {
     el.style.height = `${el.scrollHeight}px`;
   };
 
-  const handleCategorySwiperChange = (swiper) => {
+  const handleCategorySwiperChange = (swiper, progressValue) => {
     if (!swiper || swiper.destroyed || !swiper.params) {
       return;
     }
@@ -246,7 +272,15 @@ function Main() {
     const clampedVisibleSlides = Math.min(visibleSlides, categoryItems.length);
     const maxIndex = Math.max(categoryItems.length - clampedVisibleSlides, 0);
     const activeIndex = swiper.params.loop ? swiper.realIndex : swiper.activeIndex;
-    const nextProgress = maxIndex === 0 ? 0 : Math.min(activeIndex, maxIndex) / maxIndex;
+    const rawProgress =
+      typeof progressValue === "number"
+        ? progressValue
+        : typeof swiper.progress === "number"
+          ? swiper.progress
+          : maxIndex === 0
+            ? 0
+            : Math.min(activeIndex, maxIndex) / maxIndex;
+    const nextProgress = Math.max(0, Math.min(rawProgress, 1));
     const nextThumbWidth = (clampedVisibleSlides / categoryItems.length) * 100 * 0.78;
 
     setCategorySwiperState({
@@ -322,15 +356,6 @@ function Main() {
       return;
     }
 
-    if (isTabletCategory) {
-      categorySwiperRef.current = null;
-      setCategorySwiperState({
-        progress: 0,
-        thumbWidth: 100,
-      });
-      return;
-    }
-
     const swiper = categorySwiperRef.current;
     if (!swiper || swiper.destroyed || !swiper.params) {
       return;
@@ -342,7 +367,7 @@ function Main() {
     swiper.slideTo(0, 0, false);
     swiper.update();
     handleCategorySwiperChange(swiper);
-  }, [isDesktopCategory, isTabletCategory, selectedCategory, categoryItems.length]);
+  }, [isDesktopCategory, selectedCategory, categoryItems.length]);
 
   const renderAiReviewSection = () => (
     <section className="main-page__section main-page__section--ai-review">
@@ -500,25 +525,13 @@ function Main() {
       );
     }
 
-    if (isTabletCategory) {
-      return (
-        <div className="item_box category_grid">
-          {categoryItems.map((item) => (
-            <div className="category_grid__cell" key={item.name}>
-              {renderCategoryCard(item)}
-            </div>
-          ))}
-        </div>
-      );
-    }
-
     return (
       <>
         <Swiper
-          key={`category-swiper-${selectedCategory}-mobile`}
+          key={`category-swiper-${selectedCategory}-${isTabletCategory ? "tablet" : "mobile"}`}
           className="item_box category_swiper"
-          spaceBetween={12}
-          slidesPerView={2.1}
+          spaceBetween={isTabletCategory ? 24 : 16}
+          slidesPerView={isTabletCategory ? 3.1 : 2.1}
           allowTouchMove={true}
           onSwiper={(swiper) => {
             categorySwiperRef.current = swiper;
@@ -541,6 +554,82 @@ function Main() {
           ></div>
         </div>
       </>
+    );
+  };
+
+  const renderPackageCards = () => (
+    <>
+      <PackageCard
+        title="영상편집 패키지"
+        description={
+          <>
+            큰 화면, 직관적 UI <br />
+            영상통화 · 유튜브에 딱 맞게
+          </>
+        }
+        price="￦ 2,419,000"
+        mainImage="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
+        detailItems={packageItems}
+      />
+      <PackageCard
+        title="영상편집 패키지"
+        description={
+          <>
+            큰 화면, 직관적 UI <br />
+            영상통화 · 유튜브에 딱 맞게
+          </>
+        }
+        price="￦ 2,419,000"
+        mainImage="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
+        detailItems={packageItems.slice(0, 1)}
+      />
+      <PackageCard
+        title="영상편집 패키지"
+        description={
+          <>
+            큰 화면, 직관적 UI <br />
+            영상통화 · 유튜브에 딱 맞게
+          </>
+        }
+        price="￦ 2,419,000"
+        mainImage="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
+        detailItems={packageItems.slice(0, 2)}
+      />
+    </>
+  );
+
+  const renderPackageSectionItems = () => {
+    if (isDesktopCategory) {
+      return <div className="pakage_boxs">{renderPackageCards()}</div>;
+    }
+
+    return (
+      <Swiper
+        className="pakage_boxs pakage_swiper"
+        slidesPerView="auto"
+        spaceBetween={isTabletCategory ? 28 : 24}
+      >
+        {[
+          packageItems,
+          packageItems.slice(0, 1),
+          packageItems.slice(0, 2),
+        ].map((detailItems, index) => (
+          <SwiperSlide key={`package-${index}`}>
+            <PackageCard
+              title="영상편집 패키지"
+              description={
+                <>
+                  큰 화면, 직관적 UI <br />
+                  영상통화 · 유튜브에 딱 맞게
+                </>
+              }
+              price="￦ 2,419,000"
+              mainImage="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
+              detailItems={detailItems}
+            />
+          </SwiperSlide>
+        ))}
+      </Swiper>
     );
   };
 
@@ -628,6 +717,7 @@ function Main() {
         className={`main-page__section main-page__section--ai ${
           showAiResult ? "is-ai-result" : "is-ai-initial"
         } ${isAiSwitching ? "is-ai-switching" : ""}`}
+        data-hide-floating-chat
       >
         <div className={`back ${showAiResult ? "back--ai-result" : "back--ai"}`} />
         <div className="ai-stage">
@@ -711,44 +801,7 @@ function Main() {
             </div>
             <More className="more--desktop-only" />
           </div>
-          <div className="pakage_boxs">
-            <PackageCard
-              title="영상편집 패키지"
-              description={
-                <>
-                  큰 화면, 직관적 UI <br />
-                  영상통화 · 유튜브에 딱 맞게
-                </>
-              }
-              price="￦ 2,419,000"
-              mainImage="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
-              detailItems={packageItems}
-            />
-            <PackageCard
-              title="영상편집 패키지"
-              description={
-                <>
-                  큰 화면, 직관적 UI <br />
-                  영상통화 · 유튜브에 딱 맞게
-                </>
-              }
-              price="￦ 2,419,000"
-              mainImage="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
-              detailItems={packageItems.slice(0, 1)}
-            />
-            <PackageCard
-              title="영상편집 패키지"
-              description={
-                <>
-                  큰 화면, 직관적 UI <br />
-                  영상통화 · 유튜브에 딱 맞게
-                </>
-              }
-              price="￦ 2,419,000"
-              mainImage="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
-              detailItems={packageItems.slice(0, 2)}
-            />
-          </div>
+          {renderPackageSectionItems()}
         </div>
       </section>
       <section className="main-page__section">
@@ -763,36 +816,22 @@ function Main() {
             <div className="main_item">
               <div className="back_img">
                 <img
-                  src="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
-                  alt="pakage_img"
+                  src={selectedUpdateItem.image}
+                  alt={selectedUpdateItem.title}
                   className="pakage_img"
                 />
               </div>
               <div className="modal_info">
                 <div className="options">
-                  <div className="option">
-                    <p>CPU</p>
-                    <p className="item_info">인텔 코어 i5 14400F</p>
-                  </div>
-                  <div className="option">
-                    <p>RAM</p>
-                    <p className="item_info">16 GB</p>
-                  </div>
-                  <div className="option">
-                    <p>VGA</p>
-                    <p className="item_info">RTX 5060</p>
-                  </div>
-                  <div className="option">
-                    <p>OS</p>
-                    <p className="item_info">Window 11 (home)</p>
-                  </div>
-                  <div className="option">
-                    <p>모니터</p>
-                    <p className="item_info">FHD / 144 Hz</p>
-                  </div>
+                  {selectedUpdateItem.specs.map((spec) => (
+                    <div className="option" key={spec.label}>
+                      <p>{spec.label}</p>
+                      <p className="item_info">{spec.value}</p>
+                    </div>
+                  ))}
                   <div className="option">
                     <p>가격</p>
-                    <p className="item_info">￦ 2,419,000</p>
+                    <p className="item_info">{selectedUpdateItem.price}</p>
                   </div>
                 </div>
                 <div className="icons">
@@ -810,6 +849,8 @@ function Main() {
                   image={item.image}
                   title={item.title}
                   description={item.description}
+                  isActive={selectedUpdateIndex === index}
+                  onClick={() => setSelectedUpdateIndex(index)}
                 />
               ))}
             </div>
@@ -827,7 +868,7 @@ function Main() {
                             <button type="button" aria-label={`${item.name} 장바구니 담기`}>
                               <img src={Cart_straight} alt="" />
                             </button>
-                            <LikeCircle className={startIndex > 0 ? "like-circle--sm" : ""} />
+                            <LikeCircle />
                           </div>
                         </div>
                         <div className="item_texts">

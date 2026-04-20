@@ -55,7 +55,7 @@ function ChatMessageList({ messages, isInitialView }) {
         <article key={message.id} className={`chat-widget__message-row is-${message.sender}`}>
           {message.sender === "bot" && (
             <div className="chat-widget__avatar" aria-hidden="true">
-              <AICharacter title="AI 고르미" />
+              <AICharacter title="AI 고르미" animated={false} />
             </div>
           )}
 

@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import ChatPanel from "./ChatPanel";
 import ChatTriggerButton from "./ChatTriggerButton";
 import {
@@ -24,6 +25,7 @@ const createStatusState = () => ({
 });
 
 function FloatingChatWidget() {
+  const location = useLocation();
   const widgetRef = useRef(null);
   const initialMessagesRef = useRef(createInitialMessages());
   const timeoutIdsRef = useRef([]);
@@ -35,6 +37,7 @@ function FloatingChatWidget() {
   const [draft, setDraft] = useState("");
   const [messages, setMessages] = useState(initialMessagesRef.current);
   const [status, setStatus] = useState(createStatusState());
+  const [isSuppressed, setIsSuppressed] = useState(false);
 
   const isOpen = mode === CHAT_MODE.INITIAL || mode === CHAT_MODE.CHATTING;
   const isPreviewVisible = mode === CHAT_MODE.PREVIEW;
@@ -86,8 +89,60 @@ function FloatingChatWidget() {
 
   useEffect(() => () => clearResponseTimers(), []);
 
+  useLayoutEffect(() => {
+    const hiddenSections = Array.from(document.querySelectorAll("[data-hide-floating-chat]"));
+
+    if (hiddenSections.length === 0 || !("IntersectionObserver" in window)) {
+      setIsSuppressed(false);
+      return undefined;
+    }
+
+    const visibleSections = new Set();
+    const updateSuppressedState = () => {
+      setIsSuppressed(visibleSections.size > 0);
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            visibleSections.add(entry.target);
+          } else {
+            visibleSections.delete(entry.target);
+          }
+        });
+
+        updateSuppressedState();
+      },
+      {
+        threshold: 0.01,
+      },
+    );
+
+    hiddenSections.forEach((section) => {
+      const rect = section.getBoundingClientRect();
+
+      if (rect.bottom > 0 && rect.top < window.innerHeight) {
+        visibleSections.add(section);
+      }
+
+      observer.observe(section);
+    });
+    updateSuppressedState();
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [location.pathname, location.search]);
+
   useEffect(() => {
-    if (!isTouchDevice || hasOpenedOnce || mode !== CHAT_MODE.IDLE) {
+    if (isSuppressed) {
+      setMode(CHAT_MODE.IDLE);
+    }
+  }, [isSuppressed]);
+
+  useEffect(() => {
+    if (isSuppressed || !isTouchDevice || hasOpenedOnce || mode !== CHAT_MODE.IDLE) {
       return undefined;
     }
 
@@ -100,7 +155,7 @@ function FloatingChatWidget() {
     return () => {
       window.clearTimeout(previewTimerId);
     };
-  }, [hasOpenedOnce, isTouchDevice, mode]);
+  }, [hasOpenedOnce, isSuppressed, isTouchDevice, mode]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -131,6 +186,10 @@ function FloatingChatWidget() {
   }, [isOpen]);
 
   const handleOpen = () => {
+    if (isSuppressed) {
+      return;
+    }
+
     setHasOpenedOnce(true);
     setMode(hasChatHistory ? CHAT_MODE.CHATTING : CHAT_MODE.INITIAL);
   };
@@ -145,7 +204,7 @@ function FloatingChatWidget() {
   };
 
   const handleMouseEnter = () => {
-    if (!isTouchDevice && mode === CHAT_MODE.IDLE) {
+    if (!isSuppressed && !isTouchDevice && mode === CHAT_MODE.IDLE) {
       setMode(CHAT_MODE.PREVIEW);
     }
   };
@@ -269,6 +328,10 @@ function FloatingChatWidget() {
 
     timeoutIdsRef.current.push(loadingTimerId);
   };
+
+  if (isSuppressed) {
+    return null;
+  }
 
   return (
     <div

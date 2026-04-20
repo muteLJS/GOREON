@@ -92,7 +92,8 @@ const SEARCH_STOP_WORDS = new Set([
   "\uC0C1\uD488",
 ]);
 
-const escapeRegex = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const escapeRegex = (value) =>
+  String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const createLooseRegex = (value) => {
   const escaped = escapeRegex(String(value).trim());
@@ -135,21 +136,30 @@ const getProducts = async (req, res, next) => {
     const { category, keyword, type } = req.query;
     const query = {};
     const andConditions = [];
-    const typeTags = TYPE_FILTER_MAP[String(type || "").trim().toLowerCase()];
+    const typeTags =
+      TYPE_FILTER_MAP[
+        String(type || "")
+          .trim()
+          .toLowerCase()
+      ];
 
     if (typeTags?.length) {
       andConditions.push({ $or: createTagConditions(typeTags) });
     }
 
     if (category) {
-      andConditions.push({ $or: createProductSearchConditions(createLooseRegex(category)) });
+      andConditions.push({
+        $or: createProductSearchConditions(createLooseRegex(category)),
+      });
     }
 
     if (keyword) {
       const keywordTokens = tokenizeKeyword(keyword);
       const keywordConditions =
         keywordTokens.length > 0
-          ? keywordTokens.flatMap((token) => createProductSearchConditions(createLooseRegex(token)))
+          ? keywordTokens.flatMap((token) =>
+              createProductSearchConditions(createLooseRegex(token)),
+            )
           : createProductSearchConditions(createLooseRegex(keyword));
 
       andConditions.push({ $or: keywordConditions });

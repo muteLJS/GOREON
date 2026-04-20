@@ -56,7 +56,7 @@ const normalizeProduct = (product) => ({
   id: product._id ?? product.id,
   image: product.image || ProductImage,
   price: parseProductPrice(product.price),
-  rating: Number(product.averageRating ?? product.rating) || 0,
+  rating: Number(product.rating) || 0,
 });
 
 const FilterMenuList = ({ children }) => {

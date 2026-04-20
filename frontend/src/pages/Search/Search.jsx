@@ -6,12 +6,17 @@ import ProductCardVertical from "@/components/ProductCard/ProductCardVertical";
 import ProductImage from "@/assets/products/product-example.jpg";
 import api from "@/utils/api";
 
+const parseProductPrice = (price) => {
+  const parsed = Number(String(price ?? "").replace(/[^\d]/g, ""));
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
 const normalizeProduct = (product) => ({
   ...product,
   id: product._id ?? product.id,
   image: product.image || ProductImage,
-  price: Number(product.price) || 0,
-  rating: Number(product.averageRating ?? product.rating) || 0,
+  price: parseProductPrice(product.price),
+  rating: Number(product.rating) || 0,
 });
 
 function Search() {
