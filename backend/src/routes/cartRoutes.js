@@ -1,11 +1,10 @@
 const express = require("express");
-
-const asyncHandler = require("../utils/asyncHandler");
-const cartController = require("../controllers/cartController");
+const auth = require("../middleware/auth");
+const { getCart, addToCart } = require("../controllers/cartController");
 
 const router = express.Router();
 
-router.get("/:userId", asyncHandler(cartController.getCart));
-router.put("/:userId", asyncHandler(cartController.upsertCart));
+router.get("/", auth, getCart);
+router.post("/", auth, addToCart);
 
 module.exports = router;

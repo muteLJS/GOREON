@@ -1,12 +1,14 @@
 const express = require("express");
-
-const asyncHandler = require("../utils/asyncHandler");
-const productController = require("../controllers/productController");
+const {
+  getProducts,
+  getProductById,
+  createProduct,
+} = require("../controllers/productController");
 
 const router = express.Router();
 
-router.get("/", asyncHandler(productController.getProducts));
-router.post("/", asyncHandler(productController.createProduct));
-router.get("/:productId", asyncHandler(productController.getProduct));
+router.get("/", getProducts);
+router.get("/:id", getProductById);
+router.post("/", createProduct);
 
 module.exports = router;

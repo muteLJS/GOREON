@@ -1,38 +1,28 @@
 const express = require("express");
 const cors = require("cors");
-const path = require("path");
-
-const env = require("./config/env");
-const apiRoutes = require("./routes");
+const routes = require("./routes");
 const errorHandler = require("./middleware/errorHandler");
 const notFound = require("./middleware/notFound");
 
-function createApp() {
-  const app = express();
+const app = express();
 
-  app.use(
-    cors({
-      origin: env.clientOrigin,
-      credentials: true,
-    })
-  );
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
-  app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+app.use(
+  cors({
+    origin: process.env.CLIENT_ORIGIN,
+    credentials: true,
+  }),
+);
 
-  app.get("/health", (req, res) => {
-    res.status(200).json({
-      status: "ok",
-      timestamp: new Date().toISOString(),
-      env: env.nodeEnv,
-    });
-  });
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-  app.use("/api", apiRoutes);
-  app.use(notFound);
-  app.use(errorHandler);
+app.get("/", (req, res) => {
+  res.json({ message: "GOREON backend is running" });
+});
 
-  return app;
-}
+app.use("/api", routes);
 
-module.exports = { createApp };
+app.use(notFound);
+app.use(errorHandler);
+
+module.exports = app;

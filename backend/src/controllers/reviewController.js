@@ -1,16 +1,33 @@
-const reviewService = require("../services/reviewService");
+const Review = require("../models/Review");
 
-async function getReviews(req, res) {
-  const reviews = await reviewService.listReviews(req.query);
-  res.status(200).json({ data: reviews });
-}
+const getReviewsByProduct = async (req, res, next) => {
+  try {
+    const reviews = await Review.find({ product: req.params.productId })
+      .populate("user", "name profileImage")
+      .sort({ createdAt: -1 });
 
-async function createReview(req, res) {
-  const review = await reviewService.createReview(req.body);
-  res.status(201).json({ data: review });
-}
+    res.json(reviews);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const createReview = async (req, res, next) => {
+  try {
+    const review = await Review.create({
+      user: req.user._id,
+      product: req.body.product,
+      rating: req.body.rating,
+      content: req.body.content,
+    });
+
+    res.status(201).json(review);
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
-  getReviews,
+  getReviewsByProduct,
   createReview,
 };

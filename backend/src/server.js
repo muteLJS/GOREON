@@ -1,17 +1,16 @@
-const env = require("./config/env");
-const { connectDb } = require("./config/db");
-const { createApp } = require("./app");
+require("dotenv").config();
 
-async function startServer() {
-  await connectDb();
+const app = require("./app");
+const connectDB = require("./config/db");
 
-  const app = createApp();
-  app.listen(env.port, () => {
-    console.log(`Backend server listening on port ${env.port}`);
+const PORT = process.env.PORT || 8081;
+
+const startServer = async () => {
+  await connectDB();
+
+  app.listen(PORT, () => {
+    console.log(`Backend server listening on port ${PORT}`);
   });
-}
+};
 
-startServer().catch((error) => {
-  console.error("Failed to start backend server", error);
-  process.exit(1);
-});
+startServer();

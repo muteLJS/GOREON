@@ -1,28 +1,28 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
-const env = require("../config/env");
-const ApiError = require("../utils/ApiError");
-
-function auth(req, res, next) {
-  const authorization = req.header("authorization") || "";
-  const [scheme, token] = authorization.split(" ");
-
-  if (scheme !== "Bearer" || !token) {
-    return next(new ApiError(401, "Authentication required"));
-  }
-
+const auth = async (req, res, next) => {
   try {
-    const decoded = jwt.verify(token, env.jwtSecret);
-    req.user = {
-      id: decoded.sub,
-      email: decoded.email,
-      role: decoded.role,
-    };
+    const authHeader = req.headers.authorization;
 
-    return next();
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "인증 토큰이 없습니다." });
+    }
+
+    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findById(decoded.userId).select("-password");
+
+    if (!user) {
+      return res.status(401).json({ message: "유효하지 않은 사용자입니다." });
+    }
+
+    req.user = user;
+    next();
   } catch (error) {
-    return next(new ApiError(401, "Invalid or expired token"));
+    return res.status(401).json({ message: "인증에 실패했습니다." });
   }
-}
+};
 
 module.exports = auth;

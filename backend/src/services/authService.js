@@ -1,100 +1,86 @@
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 
-const env = require("../config/env");
 const User = require("../models/User");
-const ApiError = require("../utils/ApiError");
+const generateToken = require("../utils/generateToken");
 
-function createToken(user) {
-  return jwt.sign(
-    {
-      sub: user._id.toString(),
-      email: user.email,
-      role: user.role,
-    },
-    env.jwtSecret,
-    { expiresIn: "7d" }
-  );
-}
+const sanitizeUser = (user) => ({
+  id: user._id.toString(),
+  name: user.name,
+  email: user.email,
+  phone: user.phone,
+  role: user.role,
+});
 
-function sanitizeUser(user) {
-  return {
-    id: user._id.toString(),
-    email: user.email,
-    name: user.name,
-    phone: user.phone,
-    role: user.role,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
-  };
-}
+const registerUser = async ({ name, email, password, phone }) => {
+  const normalizedEmail = email?.trim().toLowerCase();
 
-async function register(payload) {
-  const email = payload.email?.trim().toLowerCase();
-  const { password, name, phone = "" } = payload;
-
-  if (!email || !password || !name) {
-    throw new ApiError(400, "Email, password, and name are required");
+  if (!name || !normalizedEmail || !password) {
+    const error = new Error("Email, password, and name are required");
+    error.statusCode = 400;
+    throw error;
   }
 
   if (password.length < 8) {
-    throw new ApiError(400, "Password must be at least 8 characters");
+    const error = new Error("Password must be at least 8 characters");
+    error.statusCode = 400;
+    throw error;
   }
 
-  const existingUser = await User.findOne({ email });
+  const existingUser = await User.findOne({ email: normalizedEmail });
+
   if (existingUser) {
-    throw new ApiError(409, "Email already in use");
+    const error = new Error("Email already in use");
+    error.statusCode = 409;
+    throw error;
   }
 
-  const passwordHash = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, 10);
+
   const user = await User.create({
-    email,
-    password: passwordHash,
     name,
-    phone,
+    email: normalizedEmail,
+    password: hashedPassword,
+    phone: phone || "",
   });
 
   return {
-    token: createToken(user),
     user: sanitizeUser(user),
+    token: generateToken(user._id),
   };
-}
+};
 
-async function login(payload) {
-  const email = payload.email?.trim().toLowerCase();
-  const { password } = payload;
+const loginUser = async ({ email, password }) => {
+  const normalizedEmail = email?.trim().toLowerCase();
 
-  if (!email || !password) {
-    throw new ApiError(400, "Email and password are required");
+  if (!normalizedEmail || !password) {
+    const error = new Error("Email and password are required");
+    error.statusCode = 400;
+    throw error;
   }
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email: normalizedEmail });
+
   if (!user) {
-    throw new ApiError(401, "Invalid email or password");
+    const error = new Error("Invalid email or password");
+    error.statusCode = 401;
+    throw error;
   }
 
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) {
-    throw new ApiError(401, "Invalid email or password");
+  const isMatch = await bcrypt.compare(password, user.password);
+
+  if (!isMatch) {
+    const error = new Error("Invalid email or password");
+    error.statusCode = 401;
+    throw error;
   }
 
   return {
-    token: createToken(user),
     user: sanitizeUser(user),
+    token: generateToken(user._id),
   };
-}
-
-async function getCurrentUser(userId) {
-  const user = await User.findById(userId);
-  if (!user) {
-    throw new ApiError(404, "User not found");
-  }
-
-  return sanitizeUser(user);
-}
+};
 
 module.exports = {
-  register,
-  login,
-  getCurrentUser,
+  registerUser,
+  loginUser,
 };
