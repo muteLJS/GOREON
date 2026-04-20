@@ -66,6 +66,7 @@ function Main() {
       잘 쓰고 계세요!
     </>
   );
+
   const packageItems = [
     {
       label: "CPU",
