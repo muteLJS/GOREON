@@ -61,7 +61,7 @@ export default function Wishlist() {
                       key={product.id}
                       product={product}
                       action={
-                        <div className="list-assembly__button_container">
+                        <div className="list-assembly__button-container">
                           <CartIconButton product={product} className="cart-add-button" />
                           <WishlistIconButton product={product} className="cart-add-button" />
                         </div>
