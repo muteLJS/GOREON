@@ -6,31 +6,27 @@
 import "./Cart.scss";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 import AddressModal from "../../components/AddressModal/AddressModal";
 import ProductList from "../../components/ProductList/ProductList";
-import {
-  EMPTY_SHIPPING_FORM,
-  formatPrice,
-  getCartItems,
-  summarizeOrder,
-} from "../../utils/cart";
+import { removeCartItems, updateCartQuantity } from "../../store/slices/cartSlice";
+import { EMPTY_SHIPPING_FORM, formatPrice, getCartItems, summarizeOrder } from "../../utils/cart";
 
 export default function Cart() {
+  const dispatch = useDispatch();
   const storedCartItems = useSelector((state) => state.cart.items);
-  const initialCartItems = useMemo(() => getCartItems(storedCartItems), [storedCartItems]);
+  const cartItems = useMemo(() => getCartItems(storedCartItems), [storedCartItems]);
 
-  const [cartItems, setCartItems] = useState(initialCartItems);
-  const [selectedItemIds, setSelectedItemIds] = useState(initialCartItems.map((item) => item.id));
+  const [selectedItemIds, setSelectedItemIds] = useState(cartItems.map((item) => item.id));
   const [shippingForm, setShippingForm] = useState(EMPTY_SHIPPING_FORM);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
 
   useEffect(() => {
-    setCartItems(initialCartItems);
-    setSelectedItemIds(initialCartItems.map((item) => item.id));
-  }, [initialCartItems]);
+    const cartItemIds = new Set(cartItems.map((item) => item.id));
+    setSelectedItemIds((prevIds) => prevIds.filter((id) => cartItemIds.has(id)));
+  }, [cartItems]);
 
   const selectedItems = useMemo(
     () => cartItems.filter((item) => selectedItemIds.includes(item.id)),
@@ -42,27 +38,8 @@ export default function Cart() {
     [selectedItems],
   );
 
-  const removeItem = (itemId) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
-    setSelectedItemIds((prevIds) => prevIds.filter((id) => id !== itemId));
-  };
-
   const handleQuantityChange = (itemId, nextQuantity) => {
-    if (nextQuantity < 1) {
-      removeItem(itemId);
-      return;
-    }
-
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === itemId
-          ? {
-              ...item,
-              quantity: nextQuantity,
-            }
-          : item,
-      ),
-    );
+    dispatch(updateCartQuantity({ id: itemId, quantity: nextQuantity }));
   };
 
   const handleItemSelect = (itemId) => {
@@ -80,7 +57,7 @@ export default function Cart() {
       return;
     }
 
-    setCartItems((prevItems) => prevItems.filter((item) => !selectedItemIds.includes(item.id)));
+    dispatch(removeCartItems(selectedItemIds));
     setSelectedItemIds([]);
   };
 
@@ -151,7 +128,11 @@ export default function Cart() {
               <span>전체선택</span>
             </label>
 
-            <button type="button" className="cart-page__delete-button" onClick={handleDeleteSelected}>
+            <button
+              type="button"
+              className="cart-page__delete-button"
+              onClick={handleDeleteSelected}
+            >
               삭제
             </button>
           </div>

@@ -2,71 +2,15 @@
 /* [페이지] 찜하기 (Wishlist)                                                 */
 /* 찜하기: 하트를 누른 관심 상품 목록 모아보기                                */
 /* -------------------------------------------------------------------------- */
-import { useState } from "react";
+import { useSelector } from "react-redux";
 import "./Wishlist.scss";
 import banner1 from "@/assets/banner/banner-1.jpg";
 import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
+import CartIconButton from "@/components/CartIconButton/CartIconButton";
 import ProductCardVertical from "@/components/ProductCard/ProductCardVertical";
-import ProductImage from "@/assets/products/product-example.jpg";
-import cartIcon from "@/assets/icons/cart-straight.svg";
-import likeAffterIcon from "@/assets/icons/like-after.svg";
+import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 
-/* productList 더미데이터 */
-const productList = [
-  {
-    id: 1,
-    name: "LG전자 2026 그램 프로16 16Z95U-GS5WK",
-    rating: 4,
-    image: ProductImage,
-    price: 1000000,
-  },
-  {
-    id: 2,
-    name: "삼성전자 갤럭시북5 프로 NT960XHA-KD72G",
-    rating: 5,
-    image: ProductImage,
-    price: 1489000,
-  },
-  {
-    id: 3,
-    name: "레노버 아이디어패드 슬림5 16AHP9",
-    rating: 4,
-    image: ProductImage,
-    price: 849000,
-  },
-  {
-    id: 4,
-    name: "ASUS 비보북 S 15 OLED S5507QA",
-    rating: 3,
-    image: ProductImage,
-    price: 1249000,
-  },
-  {
-    id: 5,
-    name: "HP 파빌리온 Aero 13-bg0010AU",
-    rating: 4,
-    image: ProductImage,
-    price: 929000,
-  },
-  {
-    id: 6,
-    name: "MSI 모던 15 H AI C1MG-U7",
-    rating: 5,
-    image: ProductImage,
-    price: 1159000,
-  },
-];
-
-const FilterMenuList = ({ children }) => {
-  return (
-    <li>
-      <input type="checkbox" />
-      <p>{children}</p>
-    </li>
-  );
-};
-
-const FilterMenuBox = ({ title, items }) => {
+const FilterMenuBox = ({ title }) => {
   return (
     <div className="side_menu_bottom">
       <div className="side_menu_bottom_filter_container">
@@ -76,26 +20,9 @@ const FilterMenuBox = ({ title, items }) => {
   );
 };
 
-export default function List() {
-  const MIN = 10000;
-  const MAX = 1600000 * 2;
-  const [minValue, setMinValue] = useState(0);
-  const [maxValue, setMaxValue] = useState(160000);
-
-  const handleChange = (e) => {
-    if (e.target.name === "min") {
-      setMinValue(e.target.value);
-    } else {
-      setMaxValue(e.target.value);
-    }
-  };
-
-  const productLength = productList.length;
-  const manufacturerList = ["APPLE", "SAMSUNG", "ASUS", "LENOVO"];
-  // 무게 영어로
-  const weightList = ["1Kg 미만", "1Kg ~ 2Kg", "2Kg ~ 3Kg", "3Kg 이상"];
-  const screenSizeList = ["13인치", "14인치", "15인치", "16인치", "17인치 이상"];
-  const gpulist = ["내장그래픽", "외장그래픽"];
+export default function Wishlist() {
+  const wishlistItems = useSelector((state) => state.wishlist.items);
+  const productLength = wishlistItems.length;
 
   return (
     <>
@@ -127,24 +54,24 @@ export default function List() {
               </div>
             </section>
             <section className="list-assembly__content">
-              <div className="list-assembly__product-grid">
-                {productList.map((product) => (
-                  <ProductCardVertical
-                    key={product.id}
-                    product={product}
-                    action={
-                      <div className="list-assembly__button_container">
-                        <button className="cart-add-button" type="button">
-                          <img src={cartIcon} alt="" />
-                        </button>
-                        <button className="cart-add-button" type="button">
-                          <img src={likeAffterIcon} alt="" />
-                        </button>
-                      </div>
-                    }
-                  />
-                ))}
-              </div>
+              {wishlistItems.length > 0 ? (
+                <div className="list-assembly__product-grid">
+                  {wishlistItems.map((product) => (
+                    <ProductCardVertical
+                      key={product.id}
+                      product={product}
+                      action={
+                        <div className="list-assembly__button_container">
+                          <CartIconButton product={product} className="cart-add-button" />
+                          <WishlistIconButton product={product} className="cart-add-button" />
+                        </div>
+                      }
+                    />
+                  ))}
+                </div>
+              ) : (
+                <p className="list-assembly__state">찜한 상품이 없습니다.</p>
+              )}
             </section>
           </section>
         </section>

@@ -6,10 +6,10 @@ import { useEffect, useMemo, useState } from "react";
 import "./List.scss";
 import banner1 from "@/assets/banner/banner-1.jpg";
 import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
+import CartIconButton from "@/components/CartIconButton/CartIconButton";
 import ProductCardVertical from "@/components/ProductCard/ProductCardVertical";
+import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 import ProductImage from "@/assets/products/product-example.jpg";
-import cartIcon from "@/assets/icons/cart-straight.svg";
-import likeAffterIcon from "@/assets/icons/like-after.svg";
 import resetIcon from "@/assets/icons/reset.svg";
 import { useSearchParams } from "react-router-dom";
 import api from "@/utils/api";
@@ -187,7 +187,9 @@ export default function List() {
               </div>
             </section>
             <section className="list-assembly__content">
-              {status === "loading" ? <p className="list-assembly__state">상품을 불러오는 중입니다.</p> : null}
+              {status === "loading" ? (
+                <p className="list-assembly__state">상품을 불러오는 중입니다.</p>
+              ) : null}
               {status === "error" ? <p className="list-assembly__state">{errorMessage}</p> : null}
               {status === "success" && filteredProducts.length === 0 ? (
                 <p className="list-assembly__state">조건에 맞는 상품이 없습니다.</p>
@@ -195,20 +197,16 @@ export default function List() {
               {status === "success" && filteredProducts.length > 0 ? (
                 <div className="list-assembly__product-grid">
                   {filteredProducts.map((product) => (
-                  <ProductCardVertical
-                    key={product.id}
-                    product={product}
-                    action={
-                      <div className="list-assembly__button_container">
-                        <button className="cart-add-button" type="button">
-                          <img src={cartIcon} alt="" />
-                        </button>
-                        <button className="cart-add-button" type="button">
-                          <img src={likeAffterIcon} alt="" />
-                        </button>
-                      </div>
-                    }
-                  />
+                    <ProductCardVertical
+                      key={product.id}
+                      product={product}
+                      action={
+                        <div className="list-assembly__button_container">
+                          <CartIconButton product={product} className="cart-add-button" />
+                          <WishlistIconButton product={product} className="cart-add-button" />
+                        </div>
+                      }
+                    />
                   ))}
                 </div>
               ) : null}

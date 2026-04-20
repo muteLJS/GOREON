@@ -1,14 +1,12 @@
 ﻿import "./ProductDetail.scss";
 import productList from "@/data/products_list.json";
 import { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
+import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 import ReviewSection from "../../components/ReviewSection/ReviewSection";
 import { addToCart } from "../../store/slices/cartSlice";
-import { addToWishlist, removeFromWishlist } from "../../store/slices/wishlistSlice";
-import LikeBefore from "../../assets/icons/like-before.svg";
-import LikeAfter from "../../assets/icons/like-after.svg";
 import ChevronDown from "../../assets/icons/chevron-down.svg";
 import api from "../../utils/api";
 
@@ -136,7 +134,9 @@ function getProductDetailFromApi(product) {
     ? product.specs.detailImages.map((src) => normalizeImageUrl(src)).filter(Boolean)
     : [];
   const gallery =
-    detailImages.length > 0 ? detailImages : [heroImage, heroImage, heroImage, heroImage, heroImage];
+    detailImages.length > 0
+      ? detailImages
+      : [heroImage, heroImage, heroImage, heroImage, heroImage];
   const options =
     Array.isArray(product.specs?.priceOptions) && product.specs.priceOptions.length > 0
       ? product.specs.priceOptions.map((option, index) => ({
@@ -183,7 +183,6 @@ function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const wishlistItems = useSelector((state) => state.wishlist.items);
 
   const overviewRef = useRef(null);
   const reviewsRef = useRef(null);
@@ -257,23 +256,6 @@ function ProductDetail() {
   const selectedOption = product.options.find((option) => option.id === selectedOptionId) || null;
   const displayOption = selectedOption || product.options[0];
   const totalPrice = displayOption.price * quantity;
-  const isWishlisted = wishlistItems.some((item) => item.id === product.id);
-
-  const handleWishlistToggle = () => {
-    if (isWishlisted) {
-      dispatch(removeFromWishlist(product.id));
-      return;
-    }
-
-    dispatch(
-      addToWishlist({
-        id: product.id,
-        name: product.title,
-        price: product.price,
-        image: product.heroImage,
-      }),
-    );
-  };
 
   const handleAddToCart = () => {
     dispatch(
@@ -337,20 +319,16 @@ function ProductDetail() {
               }}
             />
 
-            <button
-              type="button"
+            <WishlistIconButton
+              product={{
+                id: product.id,
+                name: product.title,
+                price: product.price,
+                image: product.heroImage,
+              }}
               className="product-detail__favorite"
-              aria-label={isWishlisted ? "찜 해제" : "찜하기"}
-              onClick={handleWishlistToggle}
-            >
-              <img
-                src={isWishlisted ? LikeAfter : LikeBefore}
-                alt=""
-                className={`product-detail__favorite-icon ${
-                  isWishlisted ? "is-active" : "is-idle"
-                }`}
-              />
-            </button>
+              iconClassName="product-detail__favorite-icon"
+            />
           </div>
         </div>
 

@@ -189,8 +189,8 @@
   height: 6px;
   margin-left: 8px;
   border-radius: 999px;
-  background:
-    radial-gradient(circle, rgba($color-text-sub, 0.95) 0 1px, transparent 1.4px) left center / 6px 6px repeat-x;
+  background: radial-gradient(circle, rgba($color-text-sub, 0.95) 0 1px, transparent 1.4px) left
+    center / 6px 6px repeat-x;
   animation: chat-widget-loading 1s linear infinite;
 }
 
@@ -306,11 +306,11 @@
   }
 }
 
-.chat-widget__favorite-button.like-circle {
+.chat-widget__favorite-button.wishlist-icon-button {
   box-shadow: none;
 }
 
-.chat-widget__favorite-button .like-circle__button {
+.chat-widget__favorite-button {
   width: 30px;
   height: 30px;
 }

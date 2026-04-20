@@ -14,9 +14,22 @@ import PackageCard from "components/PackageCard/PackageCard";
 import PromptButtonList from "components/PromptButtonList/PromptButtonList";
 import ReviewCard from "components/ReviewCard/ReviewCard";
 import UpdateSubCard from "components/UpdateSubCard/UpdateSubCard";
+import CartIconButton from "components/CartIconButton/CartIconButton";
+import WishlistIconButton from "components/WishlistIconButton/WishlistIconButton";
 
-import LikeCircle from "components/like/like_circle";
-import Cart_straight from "assets/Icons/cart-straight.svg";
+const MAIN_PRODUCT_ID = 1;
+const MAIN_PRODUCT_IMAGE =
+  "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png";
+const MAIN_PACKAGE_IMAGE =
+  "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png";
+
+const createMainProduct = ({ name, title, price, image, spec }) => ({
+  id: MAIN_PRODUCT_ID,
+  name: name ?? title ?? "상품명",
+  price,
+  image: image ?? MAIN_PRODUCT_IMAGE,
+  spec,
+});
 
 function Main() {
   const [showAiResult, setShowAiResult] = useState(false);
@@ -135,19 +148,22 @@ function Main() {
       name: "갤럭시 탭 S10",
       spec: "128/256GB, WiFi,그레이",
       price: "632,000원",
-      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/product_detail_main_img.png",
+      image:
+        "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/product_detail_main_img.png",
     },
     {
       name: "갤럭시 탭 S10",
       spec: "128/256GB, WiFi,그레이",
       price: "632,000원",
-      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/product_detail_main_img.png",
+      image:
+        "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/product_detail_main_img.png",
     },
     {
       name: "갤럭시 탭 S10",
       spec: "128/256GB, WiFi,그레이",
       price: "632,000원",
-      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/product_detail_main_img.png",
+      image:
+        "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/product_detail_main_img.png",
     },
   ];
   const handleInput = (e) => {
@@ -432,36 +448,34 @@ function Main() {
               },
             }}
           >
-            {categoryItems.map((item) => (
-              <SwiperSlide key={item.name}>
-                <div className="items pointer">
-                  <div className="item_img_box">
-                    <img
-                      src="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png"
-                      alt="items"
-                      className="item_img"
-                    />
-                    <div className="icons">
-                      <button type="button">
-                        <img src={Cart_straight} alt="cart" />
-                      </button>
-                      <LikeCircle />
+            {categoryItems.map((item) => {
+              const product = createMainProduct({ ...item, image: MAIN_PRODUCT_IMAGE });
+
+              return (
+                <SwiperSlide key={item.name}>
+                  <div className="items pointer">
+                    <div className="item_img_box">
+                      <img src={MAIN_PRODUCT_IMAGE} alt="items" className="item_img" />
+                      <div className="icons">
+                        <CartIconButton product={product} />
+                        <WishlistIconButton product={product} />
+                      </div>
+                    </div>
+                    <p className="item_name">{item.name}</p>
+                    <div className="options">
+                      {item.tags.map((tag) => (
+                        <p key={tag}>{tag}</p>
+                      ))}
+                    </div>
+                    <p className="item_price">{item.price}</p>
+                    <div className="item_colors">
+                      <div className="color1 colors"></div>
+                      <div className="color2 colors"></div>
                     </div>
                   </div>
-                  <p className="item_name">{item.name}</p>
-                  <div className="options">
-                    {item.tags.map((tag) => (
-                      <p key={tag}>{tag}</p>
-                    ))}
-                  </div>
-                  <p className="item_price">{item.price}</p>
-                  <div className="item_colors">
-                    <div className="color1 colors"></div>
-                    <div className="color2 colors"></div>
-                  </div>
-                </div>
-              </SwiperSlide>
-            ))}
+                </SwiperSlide>
+              );
+            })}
           </Swiper>
           <div className="unfilled">
             <div
@@ -494,7 +508,7 @@ function Main() {
                 </>
               }
               price="￦ 2,419,000"
-              mainImage="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
+              mainImage={MAIN_PACKAGE_IMAGE}
               detailItems={packageItems}
             />
             <PackageCard
@@ -506,7 +520,7 @@ function Main() {
                 </>
               }
               price="￦ 2,419,000"
-              mainImage="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
+              mainImage={MAIN_PACKAGE_IMAGE}
               detailItems={packageItems.slice(0, 1)}
             />
             <PackageCard
@@ -518,7 +532,7 @@ function Main() {
                 </>
               }
               price="￦ 2,419,000"
-              mainImage="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
+              mainImage={MAIN_PACKAGE_IMAGE}
               detailItems={packageItems.slice(0, 2)}
             />
           </div>
@@ -535,11 +549,7 @@ function Main() {
           <div className="desktop">
             <div className="main_item">
               <div className="back_img">
-                <img
-                  src="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
-                  alt="pakage_img"
-                  className="pakage_img"
-                />
+                <img src={MAIN_PACKAGE_IMAGE} alt="pakage_img" className="pakage_img" />
               </div>
               <div className="modal_info">
                 <div className="options">
@@ -569,10 +579,20 @@ function Main() {
                   </div>
                 </div>
                 <div className="icons">
-                  <button>
-                    <img src={Cart_straight} alt="cart" />
-                  </button>
-                  <LikeCircle />
+                  <CartIconButton
+                    product={createMainProduct({
+                      title: "영상편집 패키지",
+                      price: "￦ 2,419,000",
+                      image: MAIN_PACKAGE_IMAGE,
+                    })}
+                  />
+                  <WishlistIconButton
+                    product={createMainProduct({
+                      title: "영상편집 패키지",
+                      price: "￦ 2,419,000",
+                      image: MAIN_PACKAGE_IMAGE,
+                    })}
+                  />
                 </div>
               </div>
             </div>
@@ -593,16 +613,22 @@ function Main() {
                 <div className="item_box">
                   <div className="items">
                     <div className="item_img_box">
-                      <img
-                        src="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png"
-                        alt="items"
-                        className="item_img"
-                      />
+                      <img src={MAIN_PRODUCT_IMAGE} alt="items" className="item_img" />
                       <div className="icons">
-                        <button>
-                          <img src={Cart_straight} alt="cart" />
-                        </button>
-                        <LikeCircle />
+                        <CartIconButton
+                          product={createMainProduct({
+                            name: "MacBook Pro 14 M3",
+                            price: "￦2,419,000",
+                            image: MAIN_PRODUCT_IMAGE,
+                          })}
+                        />
+                        <WishlistIconButton
+                          product={createMainProduct({
+                            name: "MacBook Pro 14 M3",
+                            price: "￦2,419,000",
+                            image: MAIN_PRODUCT_IMAGE,
+                          })}
+                        />
                       </div>
                     </div>
                     <div className="item_texts">
@@ -615,16 +641,22 @@ function Main() {
                 <div className="item_box">
                   <div className="items">
                     <div className="item_img_box">
-                      <img
-                        src="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png"
-                        alt="items"
-                        className="item_img"
-                      />
+                      <img src={MAIN_PRODUCT_IMAGE} alt="items" className="item_img" />
                       <div className="icons">
-                        <button>
-                          <img src={Cart_straight} alt="cart" />
-                        </button>
-                        <LikeCircle />
+                        <CartIconButton
+                          product={createMainProduct({
+                            name: "MacBook Pro 14 M3",
+                            price: "￦2,419,000",
+                            image: MAIN_PRODUCT_IMAGE,
+                          })}
+                        />
+                        <WishlistIconButton
+                          product={createMainProduct({
+                            name: "MacBook Pro 14 M3",
+                            price: "￦2,419,000",
+                            image: MAIN_PRODUCT_IMAGE,
+                          })}
+                        />
                       </div>
                     </div>
                     <div className="item_texts">
@@ -639,16 +671,22 @@ function Main() {
                 <div className="item_box">
                   <div className="items">
                     <div className="item_img_box">
-                      <img
-                        src="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png"
-                        alt="items"
-                        className="item_img"
-                      />
+                      <img src={MAIN_PRODUCT_IMAGE} alt="items" className="item_img" />
                       <div className="icons">
-                        <button>
-                          <img src={Cart_straight} alt="cart" />
-                        </button>
-                        <LikeCircle className="like-circle--sm" />
+                        <CartIconButton
+                          product={createMainProduct({
+                            name: "MacBook Pro 14 M3",
+                            price: "￦2,419,000",
+                            image: MAIN_PRODUCT_IMAGE,
+                          })}
+                        />
+                        <WishlistIconButton
+                          product={createMainProduct({
+                            name: "MacBook Pro 14 M3",
+                            price: "￦2,419,000",
+                            image: MAIN_PRODUCT_IMAGE,
+                          })}
+                        />
                       </div>
                     </div>
                     <div className="item_texts">
@@ -661,16 +699,22 @@ function Main() {
                 <div className="item_box">
                   <div className="items">
                     <div className="item_img_box">
-                      <img
-                        src="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png"
-                        alt="items"
-                        className="item_img"
-                      />
+                      <img src={MAIN_PRODUCT_IMAGE} alt="items" className="item_img" />
                       <div className="icons">
-                        <button>
-                          <img src={Cart_straight} alt="cart" />
-                        </button>
-                        <LikeCircle className="like-circle--sm" />
+                        <CartIconButton
+                          product={createMainProduct({
+                            name: "MacBook Pro 14 M3",
+                            price: "￦2,419,000",
+                            image: MAIN_PRODUCT_IMAGE,
+                          })}
+                        />
+                        <WishlistIconButton
+                          product={createMainProduct({
+                            name: "MacBook Pro 14 M3",
+                            price: "￦2,419,000",
+                            image: MAIN_PRODUCT_IMAGE,
+                          })}
+                        />
                       </div>
                     </div>
                     <div className="item_texts">

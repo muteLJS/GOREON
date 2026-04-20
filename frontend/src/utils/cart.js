@@ -1,13 +1,3 @@
-export const FALLBACK_CART_ITEMS = Array.from({ length: 6 }, (_, index) => ({
-  id: `fallback-cart-item-${index + 1}`,
-  productId: index + 1,
-  category: "CPU",
-  name: "인텔 코어 i5-14세대 14400F (랩터레이크 리프레시) (벌크팩 정품)",
-  option: "옵션명:용량,뷰 등등",
-  price: 20000,
-  quantity: 1,
-}));
-
 export const EMPTY_SHIPPING_FORM = {
   postalCode: "",
   recipient: "",
@@ -52,7 +42,6 @@ export function mergeCartItems(items) {
 
     itemsByKey.set(key, {
       ...item,
-      id: key,
     });
   });
 
@@ -64,9 +53,7 @@ export function createCartItems(items) {
 }
 
 export function getCartItems(storeCartItems) {
-  const sourceItems = storeCartItems.length > 0 ? storeCartItems : FALLBACK_CART_ITEMS;
-
-  return createCartItems(sourceItems);
+  return createCartItems(storeCartItems);
 }
 
 export function summarizeOrder(items) {
