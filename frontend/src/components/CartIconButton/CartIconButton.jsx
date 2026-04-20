@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
 
-import CartIcon from "@/assets/icons/cart.svg";
+import CartIcon from "@/assets/icons/cart-straight.svg";
 import { addToCart } from "@/store/slices/cartSlice";
 import "./CartIconButton.scss";
 
