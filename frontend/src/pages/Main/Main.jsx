@@ -3,12 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import AI_Logo from "assets/logo/ai/character.svg";
-import Review_user from "assets/Icons/review_user.svg";
-import Book from "assets/Icons/main/book.svg";
-import Direct from "assets/Icons/main/direct.svg";
-import Game from "assets/Icons/main/game.svg";
-import Lighting from "assets/Icons/main/lighting.svg";
-import Together from "assets/Icons/main/together.svg";
+import Review_user from "assets/icons/review_user.svg";
+import Book from "assets/icons/main/book.svg";
+import Direct from "assets/icons/main/direct.svg";
+import Game from "assets/icons/main/game.svg";
+import Lighting from "assets/icons/main/lighting.svg";
+import Together from "assets/icons/main/together.svg";
 import More from "components/more/More";
 import PackageCard from "components/PackageCard/PackageCard";
 import PromptButtonList from "components/PromptButtonList/PromptButtonList";
@@ -16,7 +16,7 @@ import ReviewCard from "components/ReviewCard/ReviewCard";
 import UpdateSubCard from "components/UpdateSubCard/UpdateSubCard";
 
 import LikeCircle from "components/like/like_circle";
-import Cart_straight from "assets/Icons/cart-straight.svg";
+import Cart_straight from "assets/icons/cart-straight.svg";
 
 function Main() {
   const [showAiResult, setShowAiResult] = useState(false);
