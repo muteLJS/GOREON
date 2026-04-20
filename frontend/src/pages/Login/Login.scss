@@ -7,7 +7,7 @@
   // 섹션 기본 레이아웃
   @include flex(center, center, column);
   width: 100%;
-  padding-top: 40px;
+  padding-top: $page-content-start-mobile;
   padding-bottom: 135px;
   gap: 50px;
 
@@ -130,7 +130,7 @@
   align-items: flex-start;
   justify-content: center;
   overflow-y: auto;
-  padding: 100px;
+  padding: $page-content-start-desktop 100px 100px;
 
   @media (max-height: 900px) {
     padding-top: 32px;
@@ -407,6 +407,13 @@
   }
   @include desktop-up {
     display: none;
+  }
+}
+
+@include tablet-up {
+  .mobile-login,
+  .mobile-register {
+    padding-top: $page-content-start-tablet;
   }
 }
 

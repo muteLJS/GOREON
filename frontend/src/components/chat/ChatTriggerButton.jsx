@@ -1,4 +1,4 @@
-import AICharacter from "../../assets/logo/ai/character.svg";
+import AICharacter from "../AICharacter/AICharacter";
 
 function ChatTriggerButton({ isOpen, isPreviewVisible, onToggle }) {
   return (
@@ -16,7 +16,7 @@ function ChatTriggerButton({ isOpen, isPreviewVisible, onToggle }) {
         aria-label={isOpen ? "채팅창 닫기" : "채팅창 열기"}
       >
         <span className="chat-widget__trigger-icon" aria-hidden="true">
-          <img src={AICharacter} alt="" />
+          <AICharacter title="AI 고르미" />
         </span>
       </button>
     </div>

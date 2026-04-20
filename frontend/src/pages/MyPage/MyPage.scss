@@ -1,20 +1,19 @@
-﻿
 @import "styles/variables";
 @import "styles/mixins";
 
-.category-page {
+.my-page {
   width: 100%;
   padding-top: $page-content-start-mobile;
 }
 
 @include tablet-up {
-  .category-page {
+  .my-page {
     padding-top: $page-content-start-tablet;
   }
 }
 
 @include desktop-up {
-  .category-page {
+  .my-page {
     padding-top: $page-content-start-desktop;
   }
 }

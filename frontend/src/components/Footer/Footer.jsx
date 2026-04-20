@@ -1,6 +1,5 @@
 import "./Footer.scss";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import FacebookIcon from "../../assets/footer/pc/facebook.svg";
 import YoutubeIcon from "../../assets/footer/pc/youtube.svg";
@@ -13,18 +12,7 @@ import SearchIcon from "../../assets/footer/mobile/search.svg";
 import CartIcon from "../../assets/footer/mobile/cart.svg";
 import HamburgerIcon from "../../assets/footer/mobile/hamburger.svg";
 
-const searchSuggestions = [
-  "유튜브용 편집용 노트북",
-  "FPS 게임에 맞는 모니터",
-  "대학생 첫 노트북 50만원 이하",
-  "부모님 쉽게 쓸 태블릿",
-];
-
 function Footer() {
-  const navigate = useNavigate();
-  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-
   const desktopColumns = [
     {
       title: "서비스 정보",
@@ -61,20 +49,7 @@ function Footer() {
   };
 
   const handleMobileSearchToggle = () => {
-    setIsMobileSearchOpen((prev) => !prev);
-  };
-
-  const submitSearch = (keyword = searchQuery) => {
-    const nextQuery = keyword.trim();
-
-    navigate(nextQuery ? `/search?q=${encodeURIComponent(nextQuery)}` : "/search");
-    setSearchQuery(nextQuery);
-    setIsMobileSearchOpen(false);
-  };
-
-  const handleSearchSubmit = (event) => {
-    event.preventDefault();
-    submitSearch();
+    window.dispatchEvent(new Event("toggle-mobile-search"));
   };
 
   return (
@@ -181,57 +156,25 @@ function Footer() {
         </div>
       </div>
 
-      <div className={`footer__mobile-search ${isMobileSearchOpen ? "is-open" : ""}`}>
-        <div className="footer__mobile-search-sheet">
-          <form className="footer__mobile-search-form" onSubmit={handleSearchSubmit}>
-            <div className="footer__mobile-search-input-wrap">
-              <button type="submit" className="footer__mobile-search-icon-button" aria-label="검색 실행">
-                <img src={SearchIcon} alt="" className="footer__mobile-search-icon" />
-              </button>
-              <input
-                type="text"
-                value={searchQuery}
-                placeholder="검색어를 입력하세요"
-                onChange={(event) => setSearchQuery(event.target.value)}
-              />
-            </div>
-
-            <div className="footer__mobile-search-suggestions">
-              {searchSuggestions.map((suggestion) => (
-                <button
-                  key={suggestion}
-                  type="button"
-                  className="footer__mobile-search-suggestion"
-                  onClick={() => submitSearch(suggestion)}
-                >
-                  {suggestion}
-                </button>
-              ))}
-            </div>
-
-            <button type="submit" className="footer__mobile-search-submit">
-              검색
-            </button>
-          </form>
-        </div>
-      </div>
-
       <div className="footer__mobile-nav">
         {mobileQuickLinks.map((item) =>
           item.name === "search" ? (
             <button
               type="button"
               key={item.id}
-              className={`footer__mobile-link footer__mobile-link--search ${
-                isMobileSearchOpen ? "is-active" : ""
-              }`}
+              className="footer__mobile-link footer__mobile-link--search"
               aria-label={item.name}
               onClick={handleMobileSearchToggle}
             >
               <img src={item.src} alt={item.name} />
             </button>
           ) : (
-            <Link to={item.link} key={item.id} className="footer__mobile-link" aria-label={item.name}>
+            <Link
+              to={item.link}
+              key={item.id}
+              className="footer__mobile-link"
+              aria-label={item.name}
+            >
               <img src={item.src} alt={item.name} />
             </Link>
           ),

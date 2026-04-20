@@ -3,7 +3,7 @@
 
 .list-wrap-wishlist {
   width: 100%;
-  padding: 40px 0;
+  padding: $page-content-start-mobile 0 40px;
 
   .list-assembly__baner {
     width: 100%;
@@ -140,6 +140,8 @@
 }
 @include tablet-up {
   .list-wrap-wishlist {
+    padding-top: $page-content-start-tablet;
+
     .list-assembly__banner {
       img {
         width: 100%;
@@ -170,6 +172,8 @@
 
 @include desktop-up {
   .list-wrap-wishlist {
+    padding-top: $page-content-start-desktop;
+
     .list-assembly__banner {
       img {
         width: 100%;
