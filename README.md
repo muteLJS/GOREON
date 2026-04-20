@@ -15,8 +15,9 @@
       />
     </a>
   </p>
-  
 </div>
+
+<br/>
 
 ## 주요 기능 & 화면
 
@@ -58,6 +59,8 @@
     </td>
   </tr>
 </table>
+
+<br/>
 
 ## 기술 스택
 
@@ -111,12 +114,6 @@ GOREON/
 <br/>
 
 ## 실행 방법
-
-| 구분     | 경로       | 설치          | 실행          |
-| -------- | ---------- | ------------- | ------------- |
-| Frontend | `frontend` | `npm install` | `npm run dev` |
-| Backend  | `backend`  | `npm install` | `npm run dev` |
-
 ```bash
 # frontend
 cd frontend
@@ -128,6 +125,4 @@ cd backend
 npm install
 npm run dev
 ```
-
 프론트엔드는 브라우저에서 `http://localhost:3000`으로 접속합니다.
-<img width="512" height="529" alt="Gemini_Generated_Image_ltmklltmklltmkll-removebg-preview 1" src="https://github.com/user-attachments/assets/9e5d6643-25b5-4d38-9162-ad0dcc568913" />
