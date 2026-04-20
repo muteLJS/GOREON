@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import LikeCircle from "../like/like_circle";
-import CartStraightIcon from "../../assets/icons/cart-straight.svg";
+import CartIconButton from "../CartIconButton/CartIconButton";
+import WishlistIconButton from "../WishlistIconButton/WishlistIconButton";
 
 function ChatProductCard({ product }) {
   return (
@@ -9,15 +9,9 @@ function ChatProductCard({ product }) {
         <img src={product.image} alt={product.name} className="chat-widget__product-image" />
 
         <div className="chat-widget__product-actions">
-          <button
-            type="button"
-            className="chat-widget__icon-button"
-            aria-label={`${product.name} 장바구니`}
-          >
-            <img src={CartStraightIcon} alt="" />
-          </button>
+          <CartIconButton product={product} className="chat-widget__icon-button" />
 
-          <LikeCircle className="chat-widget__favorite-button" />
+          <WishlistIconButton product={product} className="chat-widget__favorite-button" />
         </div>
       </div>
 

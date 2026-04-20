@@ -2,14 +2,7 @@ import "./ProductList.scss";
 
 import ProductListRow from "../ProductList-row/ProductList-row";
 
-function ProductList({
-  items,
-  selectedIds,
-  onSelectItem,
-  onChangeQuantity,
-  onCartClick,
-  onWishClick,
-}) {
+function ProductList({ items, selectedIds, onSelectItem, onChangeQuantity }) {
   return (
     <div className="product-list">
       {items.map((item) => (
@@ -20,8 +13,6 @@ function ProductList({
           onSelect={() => onSelectItem(item.id)}
           onDecrease={() => onChangeQuantity(item.id, item.quantity - 1)}
           onIncrease={() => onChangeQuantity(item.id, item.quantity + 1)}
-          onCartClick={() => onCartClick?.(item)}
-          onWishClick={() => onWishClick?.(item)}
         />
       ))}
     </div>

@@ -15,18 +15,27 @@ import PackageCard from "components/PackageCard/PackageCard";
 import PromptButtonList from "components/PromptButtonList/PromptButtonList";
 import ReviewCard from "components/ReviewCard/ReviewCard";
 import UpdateSubCard from "components/UpdateSubCard/UpdateSubCard";
-import Modal from "components/Modal/Modal";
+import CartIconButton from "components/CartIconButton/CartIconButton";
+import WishlistIconButton from "components/WishlistIconButton/WishlistIconButton";
 
-import LikeCircle from "components/like/like_circle";
-import Cart_straight from "assets/icons/cart-straight.svg";
+const MAIN_PRODUCT_ID = 1;
+const MAIN_PRODUCT_IMAGE =
+  "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png";
+const MAIN_PACKAGE_IMAGE =
+  "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png";
+
+const createMainProduct = ({ name, title, price, image, spec }) => ({
+  id: MAIN_PRODUCT_ID,
+  name: name ?? title ?? "상품명",
+  price,
+  image: image ?? MAIN_PRODUCT_IMAGE,
+  spec,
+});
 
 function Main() {
   const [showAiResult, setShowAiResult] = useState(false);
   const [isAiSwitching, setIsAiSwitching] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("direct");
-  const [selectedSpecProduct, setSelectedSpecProduct] = useState(null);
-  const [isDesktopCategory, setIsDesktopCategory] = useState(false);
-  const [isTabletCategory, setIsTabletCategory] = useState(false);
+  const [isEventModalOpen, setIsEventModalOpen] = useState(true);
   const [categorySwiperState, setCategorySwiperState] = useState({
     progress: 0,
     thumbWidth: 25,
@@ -698,7 +707,57 @@ function Main() {
               </label>
             </form>
           </div>
-          {renderCategoryItems()}
+          <Swiper
+            className="item_box category_swiper"
+            spaceBetween={6}
+            slidesPerView={2.1}
+            onSwiper={handleCategorySwiperChange}
+            onSlideChange={handleCategorySwiperChange}
+            breakpoints={{
+              1024: {
+                slidesPerView: 3.1,
+                spaceBetween: 20,
+              },
+            }}
+          >
+            {categoryItems.map((item) => {
+              const product = createMainProduct({ ...item, image: MAIN_PRODUCT_IMAGE });
+
+              return (
+                <SwiperSlide key={item.name}>
+                  <div className="items pointer">
+                    <div className="item_img_box">
+                      <img src={MAIN_PRODUCT_IMAGE} alt="items" className="item_img" />
+                      <div className="icons">
+                        <CartIconButton product={product} />
+                        <WishlistIconButton product={product} />
+                      </div>
+                    </div>
+                    <p className="item_name">{item.name}</p>
+                    <div className="options">
+                      {item.tags.map((tag) => (
+                        <p key={tag}>{tag}</p>
+                      ))}
+                    </div>
+                    <p className="item_price">{item.price}</p>
+                    <div className="item_colors">
+                      <div className="color1 colors"></div>
+                      <div className="color2 colors"></div>
+                    </div>
+                  </div>
+                </SwiperSlide>
+              );
+            })}
+          </Swiper>
+          <div className="unfilled">
+            <div
+              className="filled"
+              style={{
+                width: `${categorySwiperState.thumbWidth}%`,
+                left: `calc((100% - ${categorySwiperState.thumbWidth}%) * ${categorySwiperState.progress})`,
+              }}
+            ></div>
+          </div>
         </div>
       </section>
       <section className="main-page__section">
@@ -721,7 +780,7 @@ function Main() {
                 </>
               }
               price="￦ 2,419,000"
-              mainImage="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
+              mainImage={MAIN_PACKAGE_IMAGE}
               detailItems={packageItems}
             />
             <PackageCard
@@ -733,7 +792,7 @@ function Main() {
                 </>
               }
               price="￦ 2,419,000"
-              mainImage="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
+              mainImage={MAIN_PACKAGE_IMAGE}
               detailItems={packageItems.slice(0, 1)}
             />
             <PackageCard
@@ -745,7 +804,7 @@ function Main() {
                 </>
               }
               price="￦ 2,419,000"
-              mainImage="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
+              mainImage={MAIN_PACKAGE_IMAGE}
               detailItems={packageItems.slice(0, 2)}
             />
           </div>
@@ -762,11 +821,7 @@ function Main() {
           <div className="desktop">
             <div className="main_item">
               <div className="back_img">
-                <img
-                  src="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
-                  alt="pakage_img"
-                  className="pakage_img"
-                />
+                <img src={MAIN_PACKAGE_IMAGE} alt="pakage_img" className="pakage_img" />
               </div>
               <div className="modal_info">
                 <div className="options">
@@ -796,10 +851,20 @@ function Main() {
                   </div>
                 </div>
                 <div className="icons">
-                  <button>
-                    <img src={Cart_straight} alt="cart" />
-                  </button>
-                  <LikeCircle />
+                  <CartIconButton
+                    product={createMainProduct({
+                      title: "영상편집 패키지",
+                      price: "￦ 2,419,000",
+                      image: MAIN_PACKAGE_IMAGE,
+                    })}
+                  />
+                  <WishlistIconButton
+                    product={createMainProduct({
+                      title: "영상편집 패키지",
+                      price: "￦ 2,419,000",
+                      image: MAIN_PACKAGE_IMAGE,
+                    })}
+                  />
                 </div>
               </div>
             </div>
@@ -816,31 +881,112 @@ function Main() {
           </div>
           <div className="mobile">
             <div className="item_boxs">
-              {[0, 2].map((startIndex) => (
-                <div className="item_row" key={`update-mobile-row-${startIndex}`}>
-                  {updateMobileItems.slice(startIndex, startIndex + 2).map((item) => (
-                    <div className="item_box" key={item.name}>
-                      <div className="items">
-                        <div className="item_img_box">
-                          <img src={item.image} alt={item.name} className="item_img" />
-                          <div className="icons">
-                            <button type="button" aria-label={`${item.name} 장바구니 담기`}>
-                              <img src={Cart_straight} alt="" />
-                            </button>
-                            <LikeCircle className={startIndex > 0 ? "like-circle--sm" : ""} />
-                          </div>
-                        </div>
-                        <div className="item_texts">
-                          <p className="item_name">{item.name}</p>
-                          <p className="item_price">{item.price}</p>
-                          <button
-                            type="button"
-                            className="item_spec"
-                            onClick={() => setSelectedSpecProduct(item)}
-                          >
-                            주요스펙
-                          </button>
-                        </div>
+              <div className="item_row">
+                <div className="item_box">
+                  <div className="items">
+                    <div className="item_img_box">
+                      <img src={MAIN_PRODUCT_IMAGE} alt="items" className="item_img" />
+                      <div className="icons">
+                        <CartIconButton
+                          product={createMainProduct({
+                            name: "MacBook Pro 14 M3",
+                            price: "￦2,419,000",
+                            image: MAIN_PRODUCT_IMAGE,
+                          })}
+                        />
+                        <WishlistIconButton
+                          product={createMainProduct({
+                            name: "MacBook Pro 14 M3",
+                            price: "￦2,419,000",
+                            image: MAIN_PRODUCT_IMAGE,
+                          })}
+                        />
+                      </div>
+                    </div>
+                    <div className="item_texts">
+                      <p className="item_name">MacBook Pro 14 M3</p>
+                      <p className="item_price">￦2,419,000</p>
+                      <p className="item_spec">주요스펙</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="item_box">
+                  <div className="items">
+                    <div className="item_img_box">
+                      <img src={MAIN_PRODUCT_IMAGE} alt="items" className="item_img" />
+                      <div className="icons">
+                        <CartIconButton
+                          product={createMainProduct({
+                            name: "MacBook Pro 14 M3",
+                            price: "￦2,419,000",
+                            image: MAIN_PRODUCT_IMAGE,
+                          })}
+                        />
+                        <WishlistIconButton
+                          product={createMainProduct({
+                            name: "MacBook Pro 14 M3",
+                            price: "￦2,419,000",
+                            image: MAIN_PRODUCT_IMAGE,
+                          })}
+                        />
+                      </div>
+                    </div>
+                    <div className="item_texts">
+                      <p className="item_name">MacBook Pro 14 M3</p>
+                      <p className="item_price">￦2,419,000</p>
+                      <p className="item_spec">주요스펙</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="item_row">
+                <div className="item_box">
+                  <div className="items">
+                    <div className="item_img_box">
+                      <img src={MAIN_PRODUCT_IMAGE} alt="items" className="item_img" />
+                      <div className="icons">
+                        <CartIconButton
+                          product={createMainProduct({
+                            name: "MacBook Pro 14 M3",
+                            price: "￦2,419,000",
+                            image: MAIN_PRODUCT_IMAGE,
+                          })}
+                        />
+                        <WishlistIconButton
+                          product={createMainProduct({
+                            name: "MacBook Pro 14 M3",
+                            price: "￦2,419,000",
+                            image: MAIN_PRODUCT_IMAGE,
+                          })}
+                        />
+                      </div>
+                    </div>
+                    <div className="item_texts">
+                      <p className="item_name">MacBook Pro 14 M3</p>
+                      <p className="item_price">￦2,419,000</p>
+                      <p className="item_spec">주요스펙</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="item_box">
+                  <div className="items">
+                    <div className="item_img_box">
+                      <img src={MAIN_PRODUCT_IMAGE} alt="items" className="item_img" />
+                      <div className="icons">
+                        <CartIconButton
+                          product={createMainProduct({
+                            name: "MacBook Pro 14 M3",
+                            price: "￦2,419,000",
+                            image: MAIN_PRODUCT_IMAGE,
+                          })}
+                        />
+                        <WishlistIconButton
+                          product={createMainProduct({
+                            name: "MacBook Pro 14 M3",
+                            price: "￦2,419,000",
+                            image: MAIN_PRODUCT_IMAGE,
+                          })}
+                        />
                       </div>
                     </div>
                   ))}
@@ -850,44 +996,8 @@ function Main() {
           </div>
         </div>
       </section>
-      {selectedSpecProduct ? (
-        <Modal title="주요 스펙" onClose={() => setSelectedSpecProduct(null)}>
-          <div className="main-spec-modal">
-            <div className="main-spec-modal__summary">
-              <div className="main-spec-modal__image">
-                <img src={selectedSpecProduct.image} alt={selectedSpecProduct.name} />
-              </div>
-              <div className="main-spec-modal__product">
-                <p className="main-spec-modal__name">{selectedSpecProduct.name}</p>
-                <p className="main-spec-modal__price">{selectedSpecProduct.price}</p>
-              </div>
-            </div>
-            <dl className="main-spec-modal__list">
-              {selectedSpecProduct.specs.map((spec) => (
-                <div className="main-spec-modal__row" key={spec.label}>
-                  <dt>{spec.label}</dt>
-                  <dd>{spec.value}</dd>
-                </div>
-              ))}
-            </dl>
-            <div className="main-spec-modal__actions">
-              <button
-                type="button"
-                className="main-spec-modal__button main-spec-modal__button--ghost"
-                onClick={() => setSelectedSpecProduct(null)}
-              >
-                닫기
-              </button>
-              <button
-                type="button"
-                className="main-spec-modal__button main-spec-modal__button--primary"
-              >
-                상세페이지로 이동
-              </button>
-            </div>
-          </div>
-        </Modal>
-      ) : null}
+
+      <EventModal isOpen={isEventModalOpen} onClose={() => setIsEventModalOpen(false)} />
     </main>
   );
 }
