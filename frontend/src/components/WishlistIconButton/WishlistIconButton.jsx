@@ -35,7 +35,7 @@ function WishlistIconButton({ product, className = "", iconClassName = "" }) {
   return (
     <button
       type="button"
-      className={`wishlist-icon-button ${isWishlisted ? "is-active" : ""} ${className}`.trim()}
+      className={`wishlist-icon-button ${className}`.trim()}
       aria-label={isWishlisted ? "찜 해제" : "찜하기"}
       onClick={handleClick}
     >
