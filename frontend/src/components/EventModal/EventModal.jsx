@@ -52,29 +52,39 @@ function EventModal({
   const navigate = useNavigate();
   const location = useLocation();
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+
   const [isDismissedForToday, setIsDismissedForToday] = useState(() => Boolean(getDismissUntil()));
   const [selectedCoupon, setSelectedCoupon] = useState(DEFAULT_EVENT_COUPON);
   const [currentStep, setCurrentStep] = useState(initialStep);
   const [previousStep, setPreviousStep] = useState(null);
+
+  const shouldRenderModal = isOpen && !isDismissedForToday;
 
   useEffect(() => {
     if (!isOpen) {
       return;
     }
 
-    setIsDismissedForToday(Boolean(getDismissUntil()));
+    const dismissed = Boolean(getDismissUntil());
+
+    setIsDismissedForToday(dismissed);
     setSelectedCoupon(DEFAULT_EVENT_COUPON);
     setCurrentStep(initialStep);
     setPreviousStep(null);
   }, [initialStep, isOpen]);
 
   useEffect(() => {
-    if (!isOpen) {
+    if (!shouldRenderModal) {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
       return undefined;
     }
 
-    const previousOverflow = document.body.style.overflow;
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
@@ -85,10 +95,11 @@ function EventModal({
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow = previousOverflow;
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousHtmlOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, onClose]);
+  }, [shouldRenderModal, onClose]);
 
   const moveToStep = useCallback(
     (nextStep) => {
@@ -133,17 +144,22 @@ function EventModal({
 
     window.localStorage.setItem(EVENT_MODAL_DISMISS_STORAGE_KEY, String(dismissUntil.getTime()));
     setIsDismissedForToday(true);
+
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
+
     onDismissToday?.(dismissUntil);
     onClose?.();
   }, [onClose, onDismissToday]);
 
-  if (!isOpen || isDismissedForToday) {
+  if (!shouldRenderModal) {
     return null;
   }
 
   const isDrawingStep = currentStep === EVENT_MODAL_STEPS.DRAWING;
   const isBenefitStep = currentStep === EVENT_MODAL_STEPS.MY_BENEFIT;
   const shouldHideCloseButton = isDrawingStep || isBenefitStep;
+
   const frameClassName = [
     "event-modal__frame",
     isDrawingStep ? "event-modal__frame--drawing" : "",
@@ -154,14 +170,14 @@ function EventModal({
 
   const stepViews = {
     [EVENT_MODAL_STEPS.INTRO]: (
-      <EventModalIntro titleId={titleId} onStart={handleStart} onDismissToday={handleDismissToday} />
+      <EventModalIntro
+        titleId={titleId}
+        onStart={handleStart}
+        onDismissToday={handleDismissToday}
+      />
     ),
     [EVENT_MODAL_STEPS.DRAWING]: (
-      <EventModalDrawing
-        titleId={titleId}
-        onComplete={handleDrawingComplete}
-        shouldAutoComplete
-      />
+      <EventModalDrawing titleId={titleId} onComplete={handleDrawingComplete} shouldAutoComplete />
     ),
     [EVENT_MODAL_STEPS.RESULT]: (
       <EventModalResult
@@ -192,10 +208,20 @@ function EventModal({
       />
 
       <div className="event-modal__container">
-        <div className="event-modal__dialog" role="dialog" aria-modal="true" aria-labelledby={titleId}>
+        <div
+          className="event-modal__dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={titleId}
+        >
           <div className={frameClassName}>
             {!shouldHideCloseButton ? (
-              <button type="button" className="event-modal__close" onClick={onClose} aria-label="이벤트 모달 닫기">
+              <button
+                type="button"
+                className="event-modal__close"
+                onClick={onClose}
+                aria-label="이벤트 모달 닫기"
+              >
                 <img src={CloseIcon} alt="" />
               </button>
             ) : null}

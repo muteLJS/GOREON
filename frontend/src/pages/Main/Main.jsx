@@ -1,7 +1,7 @@
 ﻿import "./Main.scss";
 import { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay } from "swiper/modules";
+import { Autoplay, FreeMode } from "swiper/modules";
 import "swiper/css";
 import AICharacter from "components/AICharacter/AICharacter";
 import Review_user from "assets/Icons/review_user.svg";
@@ -17,6 +17,9 @@ import ReviewCard from "components/ReviewCard/ReviewCard";
 import UpdateSubCard from "components/UpdateSubCard/UpdateSubCard";
 import CartIconButton from "components/CartIconButton/CartIconButton";
 import WishlistIconButton from "components/WishlistIconButton/WishlistIconButton";
+import EventModal from "components/EventModal/EventModal";
+import Cart_straight from "assets/icons/cart-straight.svg";
+import LikeCircle from "components/Likecircle/Likecircle";
 
 const MAIN_PRODUCT_ID = 1;
 const MAIN_PRODUCT_IMAGE =
@@ -35,6 +38,11 @@ const createMainProduct = ({ name, title, price, image, spec }) => ({
 function Main() {
   const [showAiResult, setShowAiResult] = useState(false);
   const [isAiSwitching, setIsAiSwitching] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("direct");
+  const [selectedSpecProduct, setSelectedSpecProduct] = useState(null);
+  const [selectedUpdateIndex, setSelectedUpdateIndex] = useState(0);
+  const [isDesktopCategory, setIsDesktopCategory] = useState(false);
+  const [isTabletCategory, setIsTabletCategory] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(true);
   const [categorySwiperState, setCategorySwiperState] = useState({
     progress: 0,
@@ -42,7 +50,8 @@ function Main() {
   });
   const aiSwitchTimeoutRef = useRef(null);
   const categorySwiperRef = useRef(null);
-  const desktopCategoryTrackRef = useRef(null);
+  const categoryProgressRef = useRef(null);
+  const categoryProgressFrameRef = useRef(null);
   const promptItems = [
     "🎬 유튜브용 편집용 노트북",
     "🎮 FPS 게임에 맞는 모니터",
@@ -57,6 +66,7 @@ function Main() {
       잘 쓰고 계세요!
     </>
   );
+
   const packageItems = [
     {
       label: "CPU",
@@ -93,6 +103,14 @@ function Main() {
         </>
       ),
       image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png",
+      price: "￦ 2,419,000",
+      specs: [
+        { label: "CPU", value: "인텔 코어 i5 14400F" },
+        { label: "RAM", value: "16 GB" },
+        { label: "VGA", value: "RTX 5060" },
+        { label: "OS", value: "Window 11 (home)" },
+        { label: "모니터", value: "FHD / 144 Hz" },
+      ],
     },
     {
       title: "영상편집 패키지",
@@ -103,6 +121,14 @@ function Main() {
         </>
       ),
       image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png",
+      price: "￦ 1,989,000",
+      specs: [
+        { label: "CPU", value: "Intel Core Ultra 7" },
+        { label: "RAM", value: "16 GB LPDDR5x" },
+        { label: "VGA", value: "Intel Arc Graphics" },
+        { label: "OS", value: "Window 11 (home)" },
+        { label: "모니터", value: "WQXGA / OLED" },
+      ],
     },
     {
       title: "영상편집 패키지",
@@ -113,8 +139,17 @@ function Main() {
         </>
       ),
       image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png",
+      price: "￦ 2,699,000",
+      specs: [
+        { label: "CPU", value: "AMD Ryzen AI 9 HX" },
+        { label: "RAM", value: "32 GB" },
+        { label: "VGA", value: "RTX 4060" },
+        { label: "OS", value: "Window 11 (home)" },
+        { label: "모니터", value: "4K / OLED" },
+      ],
     },
   ];
+  const selectedUpdateItem = updateSubItems[selectedUpdateIndex] ?? updateSubItems[0];
   const updateMobileItems = [
     {
       name: "MacBook Pro 14 M3",
@@ -245,7 +280,7 @@ function Main() {
     el.style.height = `${el.scrollHeight}px`;
   };
 
-  const handleCategorySwiperChange = (swiper) => {
+  const handleCategorySwiperChange = (swiper, progressValue) => {
     if (!swiper || swiper.destroyed || !swiper.params) {
       return;
     }
@@ -255,13 +290,101 @@ function Main() {
     const clampedVisibleSlides = Math.min(visibleSlides, categoryItems.length);
     const maxIndex = Math.max(categoryItems.length - clampedVisibleSlides, 0);
     const activeIndex = swiper.params.loop ? swiper.realIndex : swiper.activeIndex;
-    const nextProgress = maxIndex === 0 ? 0 : Math.min(activeIndex, maxIndex) / maxIndex;
+    const rawProgress =
+      typeof progressValue === "number"
+        ? progressValue
+        : typeof swiper.progress === "number"
+          ? swiper.progress
+          : maxIndex === 0
+            ? 0
+            : Math.min(activeIndex, maxIndex) / maxIndex;
+    const nextProgress = Math.max(0, Math.min(rawProgress, 1));
     const nextThumbWidth = (clampedVisibleSlides / categoryItems.length) * 100 * 0.78;
 
     setCategorySwiperState({
       progress: nextProgress,
       thumbWidth: nextThumbWidth,
     });
+  };
+
+  const getCategorySwiperProgress = (swiper) => {
+    if (!swiper || swiper.destroyed || !Array.isArray(swiper.slidesGrid)) {
+      return typeof swiper?.progress === "number" ? swiper.progress : 0;
+    }
+
+    const translate = -swiper.getTranslate();
+    const slidesGrid = swiper.slidesGrid;
+    let slideIndex = swiper.activeIndex ?? 0;
+
+    for (let index = 0; index < slidesGrid.length - 1; index += 1) {
+      if (translate >= slidesGrid[index] && translate < slidesGrid[index + 1]) {
+        slideIndex = index;
+        break;
+      }
+    }
+
+    const currentStart = slidesGrid[slideIndex] ?? 0;
+    const nextStart = slidesGrid[slideIndex + 1] ?? currentStart + 1;
+    const distance = Math.max(nextStart - currentStart, 1);
+    const intraSlideProgress = Math.max(0, Math.min((translate - currentStart) / distance, 1));
+    const slideEl = swiper.slides?.[slideIndex];
+    const realIndexFromSlide = Number(slideEl?.getAttribute("data-swiper-slide-index"));
+    const realIndex = Number.isFinite(realIndexFromSlide)
+      ? realIndexFromSlide
+      : swiper.params.loop
+        ? swiper.realIndex
+        : slideIndex;
+
+    return ((realIndex + intraSlideProgress) % categoryItems.length) / categoryItems.length;
+  };
+
+  const moveCategorySwiperByProgress = (progress) => {
+    const swiper = categorySwiperRef.current;
+
+    if (!swiper || swiper.destroyed) {
+      return;
+    }
+
+    const clampedProgress = Math.max(0, Math.min(progress, 1));
+    const targetIndex = Math.round(clampedProgress * Math.max(categoryItems.length - 1, 0));
+
+    if (swiper.params.loop && typeof swiper.slideToLoop === "function") {
+      swiper.slideToLoop(targetIndex, 300);
+    } else {
+      swiper.slideTo(targetIndex, 300);
+    }
+
+    if (swiper.autoplay) {
+      swiper.autoplay.start();
+    }
+  };
+
+  const handleCategoryProgressPointerDown = (event) => {
+    const progressBar = categoryProgressRef.current;
+
+    if (!progressBar) {
+      return;
+    }
+
+    const updateFromPointer = (pointerEvent) => {
+      const rect = progressBar.getBoundingClientRect();
+      const progress = rect.width === 0 ? 0 : (pointerEvent.clientX - rect.left) / rect.width;
+      moveCategorySwiperByProgress(progress);
+    };
+
+    const handlePointerMove = (pointerEvent) => {
+      updateFromPointer(pointerEvent);
+    };
+
+    const handlePointerUp = () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+
+    event.preventDefault();
+    updateFromPointer(event);
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
   };
 
   const handleAiSubmit = (e) => {
@@ -281,6 +404,10 @@ function Main() {
     () => () => {
       if (aiSwitchTimeoutRef.current) {
         window.clearTimeout(aiSwitchTimeoutRef.current);
+      }
+
+      if (categoryProgressFrameRef.current) {
+        window.cancelAnimationFrame(categoryProgressFrameRef.current);
       }
     },
     [],
@@ -323,35 +450,54 @@ function Main() {
   }, []);
 
   useEffect(() => {
-    if (isDesktopCategory) {
-      setCategorySwiperState({
-        progress: 0,
-        thumbWidth: (3.1 / categoryItems.length) * 100 * 0.78,
-      });
-      return;
-    }
-
-    if (isTabletCategory) {
-      categorySwiperRef.current = null;
-      setCategorySwiperState({
-        progress: 0,
-        thumbWidth: 100,
-      });
-      return;
-    }
-
     const swiper = categorySwiperRef.current;
     if (!swiper || swiper.destroyed || !swiper.params) {
       return;
     }
 
-    if (swiper.autoplay) {
+    if (!isDesktopCategory && swiper.autoplay) {
       swiper.autoplay.stop();
     }
-    swiper.slideTo(0, 0, false);
+
+    if (swiper.params.loop && typeof swiper.slideToLoop === "function") {
+      swiper.slideToLoop(0, 0, false);
+    } else {
+      swiper.slideTo(0, 0, false);
+    }
+
     swiper.update();
     handleCategorySwiperChange(swiper);
-  }, [isDesktopCategory, isTabletCategory, selectedCategory, categoryItems.length]);
+  }, [isDesktopCategory, selectedCategory, categoryItems.length]);
+
+  useEffect(() => {
+    if (categoryProgressFrameRef.current) {
+      window.cancelAnimationFrame(categoryProgressFrameRef.current);
+      categoryProgressFrameRef.current = null;
+    }
+
+    if (!isDesktopCategory) {
+      return undefined;
+    }
+
+    const tick = () => {
+      const swiper = categorySwiperRef.current;
+
+      if (swiper && !swiper.destroyed) {
+        handleCategorySwiperChange(swiper, getCategorySwiperProgress(swiper));
+      }
+
+      categoryProgressFrameRef.current = window.requestAnimationFrame(tick);
+    };
+
+    categoryProgressFrameRef.current = window.requestAnimationFrame(tick);
+
+    return () => {
+      if (categoryProgressFrameRef.current) {
+        window.cancelAnimationFrame(categoryProgressFrameRef.current);
+        categoryProgressFrameRef.current = null;
+      }
+    };
+  }, [isDesktopCategory, selectedCategory, categoryItems.length]);
 
   const renderAiReviewSection = () => (
     <section className="main-page__section main-page__section--ai-review">
@@ -484,51 +630,32 @@ function Main() {
   );
 
   const renderCategoryItems = () => {
-    if (isDesktopCategory) {
-      return (
-        <>
-          <div className="item_box category_marquee" ref={desktopCategoryTrackRef}>
-            <div className="category_marquee__track">
-              {[...categoryItems, ...categoryItems].map((item, index) => (
-                <div className="category_marquee__slide" key={`${item.name}-${index}`}>
-                  {renderCategoryCard(item)}
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="unfilled unfilled--desktop">
-            <div
-              className="filled filled--desktop"
-              style={{
-                "--thumb-width": `${(3.1 / categoryItems.length) * 100 * 0.78}%`,
-                width: `${(3.1 / categoryItems.length) * 100 * 0.78}%`,
-              }}
-            ></div>
-          </div>
-        </>
-      );
-    }
-
-    if (isTabletCategory) {
-      return (
-        <div className="item_box category_grid">
-          {categoryItems.map((item) => (
-            <div className="category_grid__cell" key={item.name}>
-              {renderCategoryCard(item)}
-            </div>
-          ))}
-        </div>
-      );
-    }
+    const isDesktop = isDesktopCategory;
 
     return (
       <>
         <Swiper
-          key={`category-swiper-${selectedCategory}-mobile`}
+          key={`category-swiper-${selectedCategory}-${
+            isDesktop ? "desktop" : isTabletCategory ? "tablet" : "mobile"
+          }`}
           className="item_box category_swiper"
-          spaceBetween={12}
-          slidesPerView={2.1}
+          modules={isDesktop ? [Autoplay, FreeMode] : undefined}
+          spaceBetween={isDesktop ? 20 : isTabletCategory ? 24 : 16}
+          slidesPerView={isDesktop ? 3.1 : isTabletCategory ? 3.1 : 2.1}
           allowTouchMove={true}
+          grabCursor={isDesktop}
+          loop={isDesktop}
+          speed={isDesktop ? 6500 : 300}
+          freeMode={isDesktop ? { enabled: true, momentum: false } : false}
+          autoplay={
+            isDesktop
+              ? {
+                  delay: 0,
+                  disableOnInteraction: false,
+                  pauseOnMouseEnter: false,
+                }
+              : false
+          }
           onSwiper={(swiper) => {
             categorySwiperRef.current = swiper;
             handleCategorySwiperChange(swiper);
@@ -540,9 +667,19 @@ function Main() {
             <SwiperSlide key={item.name}>{renderCategoryCard(item)}</SwiperSlide>
           ))}
         </Swiper>
-        <div className="unfilled">
+        <div
+          className={`unfilled ${isDesktop ? "unfilled--desktop" : ""}`}
+          ref={categoryProgressRef}
+          onPointerDown={handleCategoryProgressPointerDown}
+          role="slider"
+          aria-label="목적별 추천 카테고리 위치"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(categorySwiperState.progress * 100)}
+          tabIndex={0}
+        >
           <div
-            className="filled"
+            className={`filled ${isDesktop ? "filled--desktop" : ""}`}
             style={{
               width: `${categorySwiperState.thumbWidth}%`,
               left: `calc((100% - ${categorySwiperState.thumbWidth}%) * ${categorySwiperState.progress})`,
@@ -550,6 +687,80 @@ function Main() {
           ></div>
         </div>
       </>
+    );
+  };
+
+  const renderPackageCards = () => (
+    <>
+      <PackageCard
+        title="영상편집 패키지"
+        description={
+          <>
+            큰 화면, 직관적 UI <br />
+            영상통화 · 유튜브에 딱 맞게
+          </>
+        }
+        price="￦ 2,419,000"
+        mainImage="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
+        detailItems={packageItems}
+      />
+      <PackageCard
+        title="영상편집 패키지"
+        description={
+          <>
+            큰 화면, 직관적 UI <br />
+            영상통화 · 유튜브에 딱 맞게
+          </>
+        }
+        price="￦ 2,419,000"
+        mainImage="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
+        detailItems={packageItems.slice(0, 1)}
+      />
+      <PackageCard
+        title="영상편집 패키지"
+        description={
+          <>
+            큰 화면, 직관적 UI <br />
+            영상통화 · 유튜브에 딱 맞게
+          </>
+        }
+        price="￦ 2,419,000"
+        mainImage="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
+        detailItems={packageItems.slice(0, 2)}
+      />
+    </>
+  );
+
+  const renderPackageSectionItems = () => {
+    if (isDesktopCategory) {
+      return <div className="pakage_boxs">{renderPackageCards()}</div>;
+    }
+
+    return (
+      <Swiper
+        className="pakage_boxs pakage_swiper"
+        slidesPerView="auto"
+        spaceBetween={isTabletCategory ? 28 : 24}
+      >
+        {[packageItems, packageItems.slice(0, 1), packageItems.slice(0, 2)].map(
+          (detailItems, index) => (
+            <SwiperSlide key={`package-${index}`}>
+              <PackageCard
+                title="영상편집 패키지"
+                description={
+                  <>
+                    큰 화면, 직관적 UI <br />
+                    영상통화 · 유튜브에 딱 맞게
+                  </>
+                }
+                price="￦ 2,419,000"
+                mainImage="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
+                detailItems={detailItems}
+              />
+            </SwiperSlide>
+          ),
+        )}
+      </Swiper>
     );
   };
 
@@ -637,6 +848,7 @@ function Main() {
         className={`main-page__section main-page__section--ai ${
           showAiResult ? "is-ai-result" : "is-ai-initial"
         } ${isAiSwitching ? "is-ai-switching" : ""}`}
+        data-hide-floating-chat
       >
         <div className={`back ${showAiResult ? "back--ai-result" : "back--ai"}`} />
         <div className="ai-stage">
@@ -770,44 +982,7 @@ function Main() {
             </div>
             <More className="more--desktop-only" />
           </div>
-          <div className="pakage_boxs">
-            <PackageCard
-              title="영상편집 패키지"
-              description={
-                <>
-                  큰 화면, 직관적 UI <br />
-                  영상통화 · 유튜브에 딱 맞게
-                </>
-              }
-              price="￦ 2,419,000"
-              mainImage={MAIN_PACKAGE_IMAGE}
-              detailItems={packageItems}
-            />
-            <PackageCard
-              title="영상편집 패키지"
-              description={
-                <>
-                  큰 화면, 직관적 UI <br />
-                  영상통화 · 유튜브에 딱 맞게
-                </>
-              }
-              price="￦ 2,419,000"
-              mainImage={MAIN_PACKAGE_IMAGE}
-              detailItems={packageItems.slice(0, 1)}
-            />
-            <PackageCard
-              title="영상편집 패키지"
-              description={
-                <>
-                  큰 화면, 직관적 UI <br />
-                  영상통화 · 유튜브에 딱 맞게
-                </>
-              }
-              price="￦ 2,419,000"
-              mainImage={MAIN_PACKAGE_IMAGE}
-              detailItems={packageItems.slice(0, 2)}
-            />
-          </div>
+          {renderPackageSectionItems()}
         </div>
       </section>
       <section className="main-page__section">
@@ -821,33 +996,23 @@ function Main() {
           <div className="desktop">
             <div className="main_item">
               <div className="back_img">
-                <img src={MAIN_PACKAGE_IMAGE} alt="pakage_img" className="pakage_img" />
+                <img
+                  src={selectedUpdateItem.image}
+                  alt={selectedUpdateItem.title}
+                  className="pakage_img"
+                />
               </div>
               <div className="modal_info">
                 <div className="options">
-                  <div className="option">
-                    <p>CPU</p>
-                    <p className="item_info">인텔 코어 i5 14400F</p>
-                  </div>
-                  <div className="option">
-                    <p>RAM</p>
-                    <p className="item_info">16 GB</p>
-                  </div>
-                  <div className="option">
-                    <p>VGA</p>
-                    <p className="item_info">RTX 5060</p>
-                  </div>
-                  <div className="option">
-                    <p>OS</p>
-                    <p className="item_info">Window 11 (home)</p>
-                  </div>
-                  <div className="option">
-                    <p>모니터</p>
-                    <p className="item_info">FHD / 144 Hz</p>
-                  </div>
+                  {selectedUpdateItem.specs.map((spec) => (
+                    <div className="option" key={spec.label}>
+                      <p>{spec.label}</p>
+                      <p className="item_info">{spec.value}</p>
+                    </div>
+                  ))}
                   <div className="option">
                     <p>가격</p>
-                    <p className="item_info">￦ 2,419,000</p>
+                    <p className="item_info">{selectedUpdateItem.price}</p>
                   </div>
                 </div>
                 <div className="icons">
@@ -875,118 +1040,39 @@ function Main() {
                   image={item.image}
                   title={item.title}
                   description={item.description}
+                  isActive={selectedUpdateIndex === index}
+                  onClick={() => setSelectedUpdateIndex(index)}
                 />
               ))}
             </div>
           </div>
           <div className="mobile">
             <div className="item_boxs">
-              <div className="item_row">
-                <div className="item_box">
-                  <div className="items">
-                    <div className="item_img_box">
-                      <img src={MAIN_PRODUCT_IMAGE} alt="items" className="item_img" />
-                      <div className="icons">
-                        <CartIconButton
-                          product={createMainProduct({
-                            name: "MacBook Pro 14 M3",
-                            price: "￦2,419,000",
-                            image: MAIN_PRODUCT_IMAGE,
-                          })}
-                        />
-                        <WishlistIconButton
-                          product={createMainProduct({
-                            name: "MacBook Pro 14 M3",
-                            price: "￦2,419,000",
-                            image: MAIN_PRODUCT_IMAGE,
-                          })}
-                        />
-                      </div>
-                    </div>
-                    <div className="item_texts">
-                      <p className="item_name">MacBook Pro 14 M3</p>
-                      <p className="item_price">￦2,419,000</p>
-                      <p className="item_spec">주요스펙</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="item_box">
-                  <div className="items">
-                    <div className="item_img_box">
-                      <img src={MAIN_PRODUCT_IMAGE} alt="items" className="item_img" />
-                      <div className="icons">
-                        <CartIconButton
-                          product={createMainProduct({
-                            name: "MacBook Pro 14 M3",
-                            price: "￦2,419,000",
-                            image: MAIN_PRODUCT_IMAGE,
-                          })}
-                        />
-                        <WishlistIconButton
-                          product={createMainProduct({
-                            name: "MacBook Pro 14 M3",
-                            price: "￦2,419,000",
-                            image: MAIN_PRODUCT_IMAGE,
-                          })}
-                        />
-                      </div>
-                    </div>
-                    <div className="item_texts">
-                      <p className="item_name">MacBook Pro 14 M3</p>
-                      <p className="item_price">￦2,419,000</p>
-                      <p className="item_spec">주요스펙</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="item_row">
-                <div className="item_box">
-                  <div className="items">
-                    <div className="item_img_box">
-                      <img src={MAIN_PRODUCT_IMAGE} alt="items" className="item_img" />
-                      <div className="icons">
-                        <CartIconButton
-                          product={createMainProduct({
-                            name: "MacBook Pro 14 M3",
-                            price: "￦2,419,000",
-                            image: MAIN_PRODUCT_IMAGE,
-                          })}
-                        />
-                        <WishlistIconButton
-                          product={createMainProduct({
-                            name: "MacBook Pro 14 M3",
-                            price: "￦2,419,000",
-                            image: MAIN_PRODUCT_IMAGE,
-                          })}
-                        />
-                      </div>
-                    </div>
-                    <div className="item_texts">
-                      <p className="item_name">MacBook Pro 14 M3</p>
-                      <p className="item_price">￦2,419,000</p>
-                      <p className="item_spec">주요스펙</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="item_box">
-                  <div className="items">
-                    <div className="item_img_box">
-                      <img src={MAIN_PRODUCT_IMAGE} alt="items" className="item_img" />
-                      <div className="icons">
-                        <CartIconButton
-                          product={createMainProduct({
-                            name: "MacBook Pro 14 M3",
-                            price: "￦2,419,000",
-                            image: MAIN_PRODUCT_IMAGE,
-                          })}
-                        />
-                        <WishlistIconButton
-                          product={createMainProduct({
-                            name: "MacBook Pro 14 M3",
-                            price: "￦2,419,000",
-                            image: MAIN_PRODUCT_IMAGE,
-                          })}
-                        />
+              {[0, 2].map((startIndex) => (
+                <div className="item_row" key={`update-mobile-row-${startIndex}`}>
+                  {updateMobileItems.slice(startIndex, startIndex + 2).map((item) => (
+                    <div className="item_box" key={item.name}>
+                      <div className="items">
+                        <div className="item_img_box">
+                          <img src={item.image} alt={item.name} className="item_img" />
+                          <div className="icons">
+                            <button type="button" aria-label={`${item.name} 장바구니 담기`}>
+                              <img src={Cart_straight} alt="" />
+                            </button>
+                            <LikeCircle />
+                          </div>
+                        </div>
+                        <div className="item_texts">
+                          <p className="item_name">{item.name}</p>
+                          <p className="item_price">{item.price}</p>
+                          <button
+                            type="button"
+                            className="item_spec"
+                            onClick={() => setSelectedSpecProduct(item)}
+                          >
+                            주요스펙
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}

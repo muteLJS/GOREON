@@ -40,7 +40,7 @@ function ChatPanel({
 
         <div className="chat-widget__title">
           <span className="chat-widget__title-icon" aria-hidden="true">
-            <AICharacter title="AI 고르미" />
+            <AICharacter title="AI 고르미" animated={false} />
           </span>
           고르미와 채팅
         </div>

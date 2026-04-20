@@ -20,7 +20,7 @@ const categoryMenu = [
     key: "computer",
     title: "컴퓨터",
     items: [
-      { label: "노트북", type: "laptop" },
+      { label: "노트북", type: "notebook" },
       { label: "데스크탑", type: "desktop" },
       { label: "모니터", type: "monitor" },
       { label: "키보드", type: "keyboard" },
@@ -547,12 +547,6 @@ function Header() {
           </li>
         </ul>
       </nav>
-
-      {isSearchOpen && window.innerWidth < 1024 && (
-        <Modal title="검색" onClose={closeSearch}>
-          {mobileSearchModalContent}
-        </Modal>
-      )}
 
       <div className={`mobile-menu ${isMobileMenuOpen ? "is-open" : ""}`}>
         <div className="mobile-menu__tabs" role="tablist" aria-label="모바일 메뉴">
