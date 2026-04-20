@@ -10,6 +10,7 @@ import Like from "../../assets/header/header-icons/like.svg";
 import Search from "../../assets/header/header-icons/search.svg";
 import User from "../../assets/header/header-icons/user.svg";
 import ChevronDown from "../../assets/icons/chevron-down.svg";
+import Prev from "../../assets/icons/prev.svg";
 import { logout } from "../../store/slices/userSlice";
 
 const categoryMenu = [
@@ -124,7 +125,7 @@ function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMobileTab, setActiveMobileTab] = useState("category");
   const [expandedCategories, setExpandedCategories] = useState(() =>
-    createExpandedState(categoryMenu)
+    createExpandedState(categoryMenu),
   );
   const [expandedBrands, setExpandedBrands] = useState(() => createExpandedState(brandMenu));
   const [searchQuery, setSearchQuery] = useState("");
@@ -232,6 +233,14 @@ function Header() {
     }));
   };
 
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  };
+
   const handleLogout = () => {
     dispatch(logout());
     navigate("/");
@@ -300,10 +309,29 @@ function Header() {
     submitSearch();
   };
 
+  const isHomePage = location.pathname === "/";
+
   return (
     <header className="header">
       <div className="header__top">
-        <h1 className="header__logo">
+        {isHomePage ? (
+          <h1 className="header__logo header__logo--mobile">
+            <Link to="/" aria-label="GOREON 홈">
+              <img src={LogoIcon} alt="GOREON 아이콘" className="header__logo-icon" />
+              <img src={LogoFull} alt="GOREON 로고" className="header__logo-full" />
+            </Link>
+          </h1>
+        ) : (
+          <button
+            type="button"
+            className="header__mobile-back"
+            aria-label="뒤로가기"
+            onClick={handleBack}
+          >
+            <img src={Prev} alt="" />
+          </button>
+        )}
+        <h1 className="header__logo header__logo--desktop">
           <Link to="/" aria-label="GOREON 홈">
             <img src={LogoIcon} alt="GOREON 아이콘" className="header__logo-icon" />
             <img src={LogoFull} alt="GOREON 로고" className="header__logo-full" />
@@ -500,11 +528,7 @@ function Header() {
             }`}
             onMouseEnter={() => openDesktopMenu("brand")}
           >
-            <button
-              type="button"
-              className="gnb__button"
-              onClick={() => pinDesktopMenu("brand")}
-            >
+            <button type="button" className="gnb__button" onClick={() => pinDesktopMenu("brand")}>
               브랜드관
             </button>
 
