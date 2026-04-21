@@ -225,21 +225,39 @@
   grid-auto-columns: 124px;
   gap: 14px;
   overflow-x: auto;
+  overflow-y: hidden;
   scrollbar-width: none;
+  -ms-overflow-style: none;
   padding-bottom: 10px;
+  cursor: grab;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 
   &::-webkit-scrollbar {
     display: none;
+  }
+
+  &.is-dragging {
+    cursor: grabbing;
+    user-select: none;
   }
 }
 
 .my-page__rail-card {
   min-width: 0;
+  position: relative;
+  display: grid;
+  align-content: start;
 }
 
-.my-page__rail-card-media-wrap,
+.my-page__rail-card-media-wrap {
+  position: static;
+  padding-bottom: 0;
+  overflow: visible;
+}
+
 .my-page__ai-card-media-wrap {
-  position: relative;
+  position: static;
 }
 
 .my-page__rail-card-media {
@@ -263,17 +281,14 @@
 
 .my-page__rail-card-actions,
 .my-page__ai-card-actions {
-  position: absolute;
-  right: 6px;
-  bottom: 6px;
   display: flex;
-  gap: 4px;
+  gap: 2px;
   z-index: 1;
 
   button {
     @include flex-center;
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     padding: 0;
     border: 1px solid rgba($color-text-main, 0.12);
     border-radius: 50%;
@@ -282,16 +297,41 @@
   }
 
   img {
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     padding: 0;
     object-fit: contain;
   }
 }
 
+.my-page__rail-card-actions {
+  position: absolute;
+  right: 8px;
+  bottom: 0;
+  gap: 4px;
+
+  button {
+    width: 18px;
+    height: 18px;
+    box-shadow: 0 2px 6px rgba($color-text-main, 0.08);
+  }
+
+  img {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+.my-page__ai-card-actions {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
 .my-page__rail-card-copy {
   display: block;
   padding-top: 10px;
+  padding-right: 76px;
   color: $color-text-main;
   text-decoration: none;
 }
@@ -408,6 +448,7 @@
 
 .my-page__ai-card {
   min-width: 0;
+  position: relative;
   display: flex;
   flex-direction: column;
 }
@@ -437,6 +478,7 @@
   align-content: start;
   gap: 4px;
   padding-top: 10px;
+  padding-right: 26px;
   color: $color-text-main;
   text-decoration: none;
 }
@@ -481,6 +523,7 @@
 
 .my-page__ai-card-price {
   margin: 8px 0 0;
+  padding-right: 2px;
   font-size: 16px;
   font-weight: $font-black;
   line-height: 1.1;
@@ -574,7 +617,8 @@
   }
 
   .my-page__mobile-frame {
-    max-width: 694px;
+    width: 100%;
+    max-width: $layout-desktop-max-width;
   }
 
   .my-page__header {
@@ -651,7 +695,7 @@
 
   .my-page__overview-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
     gap: 28px;
     align-items: stretch;
   }
@@ -727,9 +771,10 @@
     gap: 18px;
     overflow-x: auto;
     overflow-y: hidden;
-    scrollbar-width: thin;
-    padding-bottom: 20px;
-    margin-bottom: 6px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 12px;
+    margin-bottom: 0;
   }
 
   .my-page__rail-card-media {
@@ -742,10 +787,14 @@
     }
   }
 
+  .my-page__rail-card-media-wrap {
+    padding-bottom: 0;
+  }
+
   .my-page__rail-card-actions {
-    right: 3px;
-    bottom: 3px;
-    gap: 2px;
+    right: 8px;
+    bottom: 0;
+    gap: 6px;
 
     button {
       width: 30px;
@@ -760,6 +809,7 @@
 
   .my-page__rail-card-copy {
     padding-top: 12px;
+    padding-right: 82px;
   }
 
   .my-page__rail-card-name {
@@ -807,7 +857,7 @@
 
   .my-page__history-subtitle {
     margin-top: 6px;
-    font-size: 11px;
+    font-size: 13px;
   }
 
   .my-page__ai-grid,
@@ -820,10 +870,15 @@
   }
 
   .my-page__ai-card {
+    position: relative;
     display: grid;
     grid-template-columns: 108px minmax(0, 1fr);
     gap: 22px;
     align-items: start;
+  }
+
+  .my-page__ai-card-media-wrap {
+    position: static;
   }
 
   .my-page__ai-card:nth-child(n + 4) {
@@ -847,9 +902,10 @@
   }
 
   .my-page__ai-card-actions {
-    right: 5px;
-    bottom: 5px;
-    gap: 3px;
+    right: 18px;
+    top: auto;
+    bottom: 0;
+    gap: 6px;
 
     button {
       width: 25px;
@@ -874,6 +930,8 @@
     row-gap: 6px;
     align-items: start;
     padding-top: 4px;
+    min-height: 108px;
+    padding-right: 24px;
   }
 
   .my-page__ai-card-name {
@@ -886,14 +944,14 @@
   .my-page__ai-card-desc {
     grid-area: desc;
     min-height: 0;
-    font-size: 11px;
+    font-size: 13px;
     line-height: 1.35;
   }
 
   .my-page__ai-card-spec {
     grid-area: spec;
     min-height: 0;
-    font-size: 11px;
+    font-size: 13px;
     line-height: 1.35;
   }
 
@@ -909,9 +967,9 @@
 
   .my-page__ai-card-price {
     grid-area: price;
-    align-self: center;
+    align-self: end;
     justify-self: end;
-    margin: 0;
+    margin: 0 0 38px;
     font-size: 18px;
     line-height: 1;
     white-space: nowrap;
