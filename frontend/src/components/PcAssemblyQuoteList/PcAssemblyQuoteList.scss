@@ -10,7 +10,7 @@
   padding: $space-sm;
   min-height: 0;
   overflow-y: auto;
-  scrollbar-color: $color-text-sub transparent;
+  scrollbar-color: $color-btn transparent;
   scrollbar-width: auto;
 
   &::-webkit-scrollbar {
@@ -28,7 +28,7 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background: $color-text-sub;
+    background: $color-btn;
     border-radius: $radius-full;
   }
 

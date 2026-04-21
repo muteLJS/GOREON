@@ -110,7 +110,7 @@
   }
 
   &__section-title {
-    margin: 0 0 6px;
+    margin: 0 0 12px;
     font-size: $font-lg;
     font-weight: $font-bold;
   }
@@ -129,7 +129,7 @@
       max-height: 148px;
       overflow-y: auto;
       padding-right: 10px;
-      scrollbar-color: $color-text-sub transparent;
+      scrollbar-color: $color-btn transparent;
       scrollbar-width: auto;
 
       &::-webkit-scrollbar {
@@ -147,7 +147,7 @@
       }
 
       &::-webkit-scrollbar-thumb {
-        background: $color-text-sub;
+        background: $color-btn;
         border-radius: $radius-full;
       }
 
@@ -181,11 +181,11 @@
   &__compatibility {
     display: grid;
     grid-template-columns: max-content minmax(0, 1fr) max-content;
-    gap: 12px;
+    gap: 16px;
     align-items: center;
     background-color: #0aa5a515;
     border-radius: 12px;
-    padding: 8px 10px;
+    padding: 10px 18px 8px;
     min-width: 0;
   }
 
@@ -193,15 +193,21 @@
     @include flex(center, flex-start);
     gap: 8px;
     min-width: 0;
-    font-size: $font-sm;
+    font-size: $font-md;
     font-weight: $font-bold;
     white-space: nowrap;
+
+    img {
+      width: $font-lg;
+      height: $font-lg;
+      display: block;
+    }
   }
 
   &__compatibility-status {
     @include flex(center, flex-end);
     min-width: 0;
-    font-size: $font-xs;
+    font-size: $font-sm;
     color: $color-text-sub;
     white-space: nowrap;
     overflow: hidden;
@@ -224,6 +230,7 @@
     @include button-base();
     height: 32px;
     min-width: 96px;
+    font-size: $font-sm;
     font-weight: $font-semibold;
     white-space: nowrap;
   }
@@ -369,13 +376,13 @@
 
       .pc-assembly-quote__right {
         height: 100%;
-        gap: 40px;
+        gap: 16px;
       }
 
       .pc-assembly-quote__insights {
         flex: 1;
-        justify-content: space-between;
-        gap: 24px;
+        justify-content: flex-start;
+        gap: 32px;
       }
 
       .pc-assembly-quote__panel {
@@ -384,7 +391,7 @@
 
       .pc-assembly-quote__section-title {
         font-size: $font-lg;
-        margin-bottom: 4px;
+        margin-bottom: 12px;
       }
 
       .pc-assembly-quote__recommend-list {
@@ -443,7 +450,22 @@
     &__compatibility {
       grid-column: 4 / -1;
       grid-row: 1;
+      grid-template-columns: repeat(9, minmax(0, 1fr));
       min-height: 56px;
+    }
+
+    &__compatibility-count {
+      grid-column: 1 / span 3;
+    }
+
+    &__compatibility-status {
+      grid-column: 4 / span 2;
+      justify-content: flex-end;
+    }
+
+    &__compatibility-check {
+      grid-column: 7 / -1;
+      justify-self: end;
     }
 
     &__list {

@@ -47,12 +47,15 @@ const shouldKeepProductForCategory = (product, category) => {
   return text.includes("PC부품") || /(^|\s)케이스(\s|$)/.test(text);
 };
 
+const getProductOption = (product) => product.priceOptions?.[0]?.optionName || "기본옵션";
+
 const normalizePcPartProduct = (product, category) => ({
   id: getProductKey(product),
   productId: product._id ?? product.id,
   sourceProductId: product.id,
   category: category.quoteCategory,
   name: product.name,
+  option: getProductOption(product),
   image: normalizeImageUrl(product.image) || ProductImage,
   rating: Number(product.rating) || 0,
   price: parsePrice(product.price),
@@ -179,7 +182,7 @@ function PcAssembly() {
         sourceProductId: product.sourceProductId,
         category: product.category,
         name: product.name,
-        option: "기본옵션",
+        option: product.option,
         price: product.price,
         quantity: 1,
         image: product.image,
