@@ -1119,6 +1119,14 @@
       .item_img_box {
         height: clamp(200px, 25vw, 260px);
       }
+
+      .item_name {
+        font-size: clamp(15px, 2.2vw, 18px);
+      }
+
+      .item_price {
+        font-size: clamp(16px, 2.3vw, 19px);
+      }
     }
   }
 
@@ -1315,7 +1323,7 @@
   }
 
   .item_name {
-    font-size: $font-lg-3;
+    font-size: clamp(13px, 3.4vw, 15px);
     width: 100%;
     min-width: 0;
     min-height: 44px;
@@ -1329,7 +1337,7 @@
     display: -webkit-box;
     overflow: hidden;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
   }
 
   .options {
@@ -1349,7 +1357,7 @@
   }
 
   .item_price {
-    font-size: $font-lg-3;
+    font-size: clamp(14px, 3.6vw, 16px);
     margin-top: auto;
   }
   .item_colors {
@@ -1618,7 +1626,7 @@
       position: relative;
       gap: 14px;
       width: 100%;
-      aspect-ratio: 1 / 0.86;
+      aspect-ratio: 1 / 1.08;
       padding: 8px 9px;
       box-sizing: border-box;
       border: 1px solid $color-gray-300;
@@ -1626,14 +1634,19 @@
       background-color: $color-gray-100;
       .item_img {
         position: absolute;
-        width: 64%;
-        top: 50%;
+        width: 58%;
+        max-height: 56%;
+        top: 44%;
         left: 50%;
         transform: translate(-50%, -50%);
+        z-index: 0;
       }
       .icons {
         @include flex(center, space-between);
         gap: 6px;
+        position: relative;
+        z-index: 1;
+        align-self: flex-end;
       }
     }
     .item_texts {
@@ -2400,6 +2413,8 @@
           aspect-ratio: 3 / 2;
           overflow: hidden;
           padding: 0;
+          border-radius: $radius-md;
+          background-color: $color-white;
           img {
             margin: 0 auto;
             width: 80%;

@@ -21,6 +21,8 @@ function PcAssemblyQuote({ isModal = false }) {
     () => [
       { id: 1, text: "CPU 대비 GPU 성능 부족", level: "warning" },
       { id: 2, text: "RAM 용량 충분", level: "ok" },
+      { id: 3, text: "파워 용량 확인 필요", level: "error" },
+      { id: 4, text: "저장장치 여유 공간 부족", level: "warning" },
     ],
     [],
   );
@@ -132,42 +134,44 @@ function PcAssemblyQuote({ isModal = false }) {
         </strong>
 
         <div className="pc-assembly-quote__right">
-          <section className="pc-assembly-quote__performance">
-            <h3 className="pc-assembly-quote__section-title">성능 분석</h3>
-            <div className="pc-assembly-quote__panel">
-              {performanceChecks.map((row) => (
-                <div className="pc-assembly-quote__panel-item" key={row.id}>
-                  <span className={`indicator indicator--${row.level}`} />
-                  {row.text}
-                </div>
-              ))}
-            </div>
-          </section>
+          <div className="pc-assembly-quote__insights">
+            <section className="pc-assembly-quote__performance">
+              <h3 className="pc-assembly-quote__section-title">성능 분석</h3>
+              <div className="pc-assembly-quote__panel">
+                {performanceChecks.map((row) => (
+                  <div className="pc-assembly-quote__panel-item" key={row.id}>
+                    <span className={`indicator indicator--${row.level}`} />
+                    {row.text}
+                  </div>
+                ))}
+              </div>
+            </section>
 
-          <section className="pc-assembly-quote__recommend">
-            <h3 className="pc-assembly-quote__section-title">업그레이드 추천</h3>
-            <div className="pc-assembly-quote__panel pc-assembly-quote__recommend-list">
-              {recommendItems.map((item) => (
-                <button
-                  type="button"
-                  className="pc-assembly-quote__recommend-card"
-                  key={item.id}
-                  onClick={() => handleRecommendClick(item.id)}
-                >
-                  <div className="pc-assembly-quote__recommend-thumb">
-                    <img src={item.image} alt={item.name} />
-                  </div>
-                  <div className="pc-assembly-quote__recommend-main">
-                    <div className="pc-assembly-quote__recommend-name">{item.name}</div>
-                    <p className="pc-assembly-quote__recommend-meta">{item.option}</p>
-                    <strong className="pc-assembly-quote__recommend-price">
-                      ₩{item.price.toLocaleString("ko-KR")}
-                    </strong>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </section>
+            <section className="pc-assembly-quote__recommend">
+              <h3 className="pc-assembly-quote__section-title">업그레이드 추천</h3>
+              <div className="pc-assembly-quote__recommend-list">
+                {recommendItems.map((item) => (
+                  <button
+                    type="button"
+                    className="pc-assembly-quote__recommend-card"
+                    key={item.id}
+                    onClick={() => handleRecommendClick(item.id)}
+                  >
+                    <div className="pc-assembly-quote__recommend-thumb">
+                      <img src={item.image} alt={item.name} />
+                    </div>
+                    <div className="pc-assembly-quote__recommend-main">
+                      <div className="pc-assembly-quote__recommend-name">{item.name}</div>
+                      <p className="pc-assembly-quote__recommend-meta">{item.option}</p>
+                      <strong className="pc-assembly-quote__recommend-price">
+                        ₩{item.price.toLocaleString("ko-KR")}
+                      </strong>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </section>
+          </div>
 
           <section className="pc-assembly-quote__action">
             <button

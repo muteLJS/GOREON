@@ -195,6 +195,8 @@ function PcAssembly() {
   const [isQuoteOpen, setIsQuoteOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("CPU");
   const [isDesktop, setIsDesktop] = useState(window.matchMedia("(min-width: 1024px)").matches);
+  const assemblyRef = useRef(null);
+  const [quotePanelWidth, setQuotePanelWidth] = useState(1216);
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 1024px)");
@@ -203,23 +205,27 @@ function PcAssembly() {
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
-  const assemblyRef = useRef(null);
-  const [quotePanelWidth, setQuotePanelWidth] = useState(1200);
-
   useEffect(() => {
-    if (!(isDesktop && isQuoteOpen)) return;
+    if (!(isDesktop && isQuoteOpen)) return undefined;
 
     const updateWidth = () => {
-      const el = assemblyRef.current;
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      setQuotePanelWidth(Math.round(r.width));
+      const width = assemblyRef.current?.getBoundingClientRect().width;
+      if (width) setQuotePanelWidth(Math.round(width));
     };
 
     updateWidth();
+
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", updateWidth);
+      return () => window.removeEventListener("resize", updateWidth);
+    }
+
+    const observer = new ResizeObserver(updateWidth);
+    if (assemblyRef.current) observer.observe(assemblyRef.current);
     window.addEventListener("resize", updateWidth);
 
     return () => {
+      observer.disconnect();
       window.removeEventListener("resize", updateWidth);
     };
   }, [isDesktop, isQuoteOpen]);
@@ -379,7 +385,12 @@ function PcAssembly() {
       )}
 
       {!isDesktop && isQuoteOpen && (
-        <Modal title="견적 리스트" onClose={() => setIsQuoteOpen(false)}>
+        <Modal
+          title="견적 리스트"
+          onClose={() => setIsQuoteOpen(false)}
+          className="modal--fullscreen pc-assembly__quote-modal"
+          overlayClassName="modal-overlay--fullscreen"
+        >
           <PcAssemblyQuote isModal />
         </Modal>
       )}
