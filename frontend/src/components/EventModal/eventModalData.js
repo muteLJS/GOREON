@@ -1,5 +1,5 @@
-import EventCoupon5Image from "assets/event/eventCoupon.png";
-import EventCoupon20Image from "assets/event/20discountCoupon.png";
+import EventCoupon5Image from "@/assets/event/eventCoupon.png";
+import EventCoupon20Image from "@/assets/event/20discountCoupon.png";
 
 export const EVENT_MODAL_STEPS = {
   INTRO: "intro",
