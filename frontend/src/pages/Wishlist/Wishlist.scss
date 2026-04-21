@@ -57,6 +57,12 @@
         margin-top: $space-md;
       }
 
+      &__state {
+        padding: $space-md 0;
+        color: $color-sub-category-text;
+        font-size: $font-md;
+      }
+
       &__product-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -172,7 +178,7 @@
 
 @include desktop-up {
   .list-wrap-wishlist {
-    padding-top: $page-content-start-desktop;
+    padding-top: $page-content-start-tablet;
 
     .list-assembly__banner {
       img {
@@ -184,7 +190,7 @@
       gap: 25px;
 
       .side_menu {
-        width: 20%;
+        width: 24%;
         display: block;
 
         &_top {
@@ -269,7 +275,7 @@
             font-size: $font-xl;
           }
           .filter-container {
-            display: none;
+            display: flex;
           }
         }
         &__content {

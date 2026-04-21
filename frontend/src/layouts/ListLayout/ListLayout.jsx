@@ -74,6 +74,7 @@ export default function ListLayout({
   errorMessage,
   selectedTypeLabel,
   searchLabel,
+  searchLabelSpan,
 }) {
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type");
@@ -138,8 +139,9 @@ export default function ListLayout({
             </section>
             <section className="list-assembly__top">
               <h2 className="list-assembly__title">
-                {selectedTypeLabel ?? "전체상품"}
+                {selectedTypeLabel ?? ""}
                 {searchLabel ?? ""}
+                <span>{searchLabelSpan}</span>
 
                 <span>({filteredLength}) </span>
               </h2>
