@@ -1,4 +1,16 @@
-function UpdateSubCard({ image, title, description, isActive = false, onClick }) {
+function UpdateSubCard({
+  image,
+  title,
+  description,
+  isActive = false,
+  onClick,
+  onChevronClick,
+}) {
+  const handleChevronClick = (event) => {
+    event.stopPropagation();
+    onChevronClick?.();
+  };
+
   return (
     <button
       type="button"
@@ -13,7 +25,7 @@ function UpdateSubCard({ image, title, description, isActive = false, onClick })
           <p className="gray_text">{description}</p>
         </div>
       </div>
-      <div className="chevron" aria-hidden="true">
+      <div className="chevron" aria-hidden="true" onClick={handleChevronClick}>
         <svg viewBox="0 0 24 12">
           <path d="M2 10L12 2L22 10" />
         </svg>

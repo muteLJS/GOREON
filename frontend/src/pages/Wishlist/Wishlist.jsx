@@ -9,7 +9,6 @@ import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
 import CartIconButton from "@/components/CartIconButton/CartIconButton";
 import ProductCardVertical from "@/components/ProductCard/ProductCardVertical";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
-import { useEffect, useState } from "react";
 
 const FilterMenuBox = ({ title }) => {
   return (
@@ -22,16 +21,8 @@ const FilterMenuBox = ({ title }) => {
 };
 
 export default function Wishlist() {
-  const [wishlist, setWishlist] = useState([]);
-  const wishlistLength = wishlist.length;
-
-  const fetchWishlist = () => {
-    const wishlist = JSON.parse(localStorage.getItem("wishlist"));
-    setWishlist(wishlist);
-  };
-  useEffect(() => {
-    fetchWishlist();
-  }, [wishlistLength]);
+  const wishlistItems = useSelector((state) => state.wishlist.items);
+  const productLength = wishlistItems.length;
 
   return (
     <>

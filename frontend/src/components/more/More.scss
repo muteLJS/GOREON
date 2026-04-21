@@ -4,6 +4,7 @@
 .more {
   @include flex(center, flex-start);
   gap: 8px;
+  cursor: pointer;
   p {
     color: $color-category-text;
     font-weight: $font-bold;

@@ -2,13 +2,29 @@
 @import "styles/mixins";
 
 .pc-assembly-quote {
-  padding-top: $page-content-start-mobile;
-  margin-bottom: $space-lg;
+  width: 100%;
+  padding-top: 0;
+  margin-bottom: 0;
+  color: $color-text-main;
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  &__title {
+    text-align: left;
+    font-size: $font-xl;
+    font-weight: $font-bold;
+    margin: 0 0 12px;
+  }
 
   &__layout {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: $space-lg 16px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    min-width: 0;
   }
 
   &__list,
@@ -16,38 +32,14 @@
   &__total,
   &__right {
     grid-column: 1 / -1;
+    min-width: 0;
   }
 
   &__right {
     display: flex;
     flex-direction: column;
-    gap: $space-lg;
-  }
-
-  .indicator {
-    display: inline-block;
-    border-radius: 999px;
-    width: $font-sm;
-    height: $font-sm;
-
-    &--ok {
-      background-color: green;
-    }
-
-    &--warning {
-      background-color: orange;
-    }
-
-    &--error {
-      background-color: red;
-    }
-  }
-
-  &__title {
-    text-align: center;
-    font-size: $font-xl;
-    font-weight: $font-bold;
-    margin: 0 0 $space-lg;
+    gap: 16px;
+    min-width: 0;
   }
 
   &__control {
@@ -60,7 +52,6 @@
   &__select-all {
     @include flex(center, flex-start);
     gap: 8px;
-    color: $color-text-main;
     font-size: $font-lg;
     font-weight: $font-bold;
     cursor: pointer;
@@ -74,15 +65,12 @@
 
   &__checkbox-mark {
     @include flex-center;
-    position: relative;
     width: 22px;
     height: 22px;
     border: 1px solid $color-text-main;
     border-radius: 8px;
     background: $color-white;
-    transition:
-      background-color $transition-fast,
-      border-color $transition-fast;
+    flex-shrink: 0;
 
     &::after {
       content: "";
@@ -91,15 +79,11 @@
       border-left: 2px solid transparent;
       border-bottom: 2px solid transparent;
       transform: translateY(-1px) rotate(-45deg);
-      transition:
-        border-color $transition-fast,
-        opacity $transition-fast;
       opacity: 0;
     }
   }
 
   &__select-all input:checked + &__checkbox-mark {
-    border-color: $color-text-main;
     background: $color-text-main;
 
     &::after {
@@ -109,132 +93,222 @@
   }
 
   &__delete-button {
-    padding: 0;
     border: 0;
     background: transparent;
-    color: $color-text-main;
+    padding: 0;
     font-size: $font-lg;
     font-weight: $font-bold;
     cursor: pointer;
   }
 
-  &__summary {
+  &__panel {
+    @include panel-card();
     display: flex;
     flex-direction: column;
-    gap: $space-md;
-  }
-
-  &__compatibility {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: $space-md;
-    background-color: #0aa5a515;
-    border-radius: $radius-md;
-  }
-
-  &__compatibility-count,
-  &__compatibility-status {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: $space-xs;
-  }
-
-  &__compatibility-count {
-    display: flex;
-    gap: $space-xs;
-    font-weight: $font-bold;
-    font-size: $font-sm;
-  }
-
-  &__compatibility-status {
-    font-size: $font-xs;
-    color: $color-text-sub;
-  }
-
-  &__total {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: $color-gray-100;
-    border-radius: $radius-md;
-    padding: $space-xs;
-    margin-top: -$space-md;
+    gap: 10px;
+    min-width: 0;
   }
 
   &__section-title {
+    margin: 0 0 6px;
     font-size: $font-lg;
     font-weight: $font-bold;
-    margin-bottom: $space-xs;
-  }
-
-  &__panel {
-    display: flex;
-    flex-direction: column;
-    gap: $space-xs;
-    border-radius: 16px;
-    border: 1px solid rgba(60, 60, 60, 0.24);
-    padding: $space-md;
   }
 
   &__panel-item {
     display: flex;
     align-items: center;
-    gap: $space-sm;
+    gap: 8px;
+    min-width: 0;
+    color: $color-text-main;
+  }
+
+  .indicator {
+    &--ok {
+      @include status-dot(10px, $color-success);
+    }
+    &--warning {
+      @include status-dot(10px, $color-warning);
+    }
+    &--error {
+      @include status-dot(10px, $color-error);
+    }
+  }
+
+  &__compatibility {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 10px;
+    align-items: center;
+    background-color: #0aa5a515;
+    border-radius: 12px;
+    padding: 8px 8px 8px 10px;
+    min-width: 0;
+  }
+
+  &__compatibility-count {
+    @include flex(center, center);
+    gap: 8px;
+    min-width: 0;
+    font-size: $font-sm;
+    font-weight: $font-bold;
+    white-space: nowrap;
+  }
+
+  &__compatibility-status {
+    @include flex(center, center);
+    min-width: 0;
+    font-size: $font-xs;
+    color: $color-text-sub;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__compatibility-check {
+    @include button-base();
+    height: 32px;
+    min-width: 96px;
+    white-space: nowrap;
+  }
+
+  &__total {
+    @include flex(center, center);
+    min-height: 46px;
+    border-radius: 12px;
+    background: $color-gray-100;
+    font-size: $font-lg;
+    font-weight: $font-bold;
+    white-space: nowrap;
+    padding: 6px 10px;
+  }
+
+  &__recommend-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 240px;
+    overflow: auto;
+    padding-right: 2px;
+  }
+
+  &__recommend-card {
+    width: 100%;
+    border: 1px solid rgba($color-text-main, 0.14);
+    border-radius: 16px;
+    background: $color-white;
+    padding: 12px;
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 14px;
+    align-items: center;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  &__recommend-thumb {
+    width: 96px;
+    height: 96px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #60606024;
+    background: #f8f8f6;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+  }
+
+  &__recommend-main {
+    min-width: 0;
+  }
+
+  &__recommend-name {
+    margin: 0;
+    color: $color-text-main;
+    font-size: $font-lg;
+    font-weight: $font-black;
+    line-height: 1.35;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__recommend-meta {
+    margin: 4px 0 0;
+    color: rgba($color-text-main, 0.78);
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+  }
+
+  &__recommend-price {
+    display: block;
+    margin: 10px 0 0;
+    color: $color-text-main;
+    font-size: 40px;
+    font-weight: $font-black;
+    line-height: 1;
+    letter-spacing: -0.02em;
   }
 
   &__action {
     display: flex;
     flex-direction: column;
-    gap: $space-md;
+    gap: 12px;
   }
 
   &__action-button {
     @include button-base();
+    height: 42px;
   }
 
   &__action-button--secondary {
     @include button-gray();
+    height: 42px;
   }
 
-  @include tablet-up {
-    padding-top: $page-content-start-tablet;
+  &--modal {
+    padding-right: 2px;
   }
 
   @include desktop-up {
-    padding-top: $page-content-start-desktop;
-
     &__layout {
-      grid-template-columns: repeat(12, 1fr);
-      gap: 24px;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 16px 20px;
+      align-items: start;
     }
 
     &__total {
       grid-column: 1 / span 3;
       grid-row: 1;
-      margin-top: 0;
+      min-height: 56px;
     }
 
     &__compatibility {
       grid-column: 4 / -1;
       grid-row: 1;
+      min-height: 56px;
     }
 
     &__list {
-      grid-column: 1 / 9;
+      grid-column: 1 / span 8;
       grid-row: 2;
     }
 
     &__right {
       grid-column: 9 / -1;
       grid-row: 2;
-      gap: $space-xxl;
+      gap: 16px;
     }
 
     &__action {
       flex-direction: row;
 
-      button {
+      .pc-assembly-quote__action-button,
+      .pc-assembly-quote__action-button--secondary {
         flex: 1;
       }
     }
