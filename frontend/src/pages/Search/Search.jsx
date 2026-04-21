@@ -44,7 +44,9 @@ const Search = () => {
         filteredProducts={products}
         status={status}
         errorMessage={errorMessage}
-        searchLabel={`‘${query}’ 대한 검색 결과입니다.`}
+        // searchLabel={`‘${query}’ `}
+        searchLabel={`‘${query}’ `}
+        searchLabelSpan={"에 대한 검색 결과입니다."}
       />
     </div>
   );
