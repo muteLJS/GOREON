@@ -209,3 +209,68 @@
     @content;
   }
 }
+
+/* -------------------------------------------------------------------------- */
+/* [10] 상태점 (ok / warning / error)                                         */
+/* 성능 분석, 호환성 상태 표시 점(dot) 재사용용                                */
+/* -------------------------------------------------------------------------- */
+@mixin status-dot($size: 10px, $color: $color-success) {
+  display: inline-block;
+  width: $size;
+  height: $size;
+  border-radius: 999px;
+  background-color: $color;
+  flex: 0 0 $size;
+}
+
+/* -------------------------------------------------------------------------- */
+/* [11] 패널 카드                                                             */
+/* 견적리스트 우측 분석/추천 영역 같은 박스 스타일 통합                       */
+/* -------------------------------------------------------------------------- */
+@mixin panel-card(
+  $radius: 16px,
+  $border: 1px solid rgba(60, 60, 60, 0.24),
+  $padding: $space-md,
+  $bg: $color-white
+) {
+  border-radius: $radius;
+  border: $border;
+  padding: $padding;
+  background: $bg;
+}
+
+/* -------------------------------------------------------------------------- */
+/* [12] 세로 스크롤 영역                                                      */
+/* 모달 내부 리스트/콘텐츠 스크롤 안정화                                      */
+/* -------------------------------------------------------------------------- */
+@mixin scroll-y($max-height: 70vh) {
+  max-height: $max-height;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* -------------------------------------------------------------------------- */
+/* [13] 버튼 variant 통합 (선택)                                              */
+/* 기존 button-base/reverse/gray 유지 + 신규 버튼용 공통                        */
+/* -------------------------------------------------------------------------- */
+@mixin button-variant(
+  $bg: $color-text-sub,
+  $color: $color-white,
+  $border-color: transparent,
+  $radius: 10px,
+  $height: 34px,
+  $padding: 0 16px
+) {
+  min-width: 78px;
+  height: $height;
+  padding: $padding;
+  border: 1px solid $border-color;
+  border-radius: $radius;
+  background: $bg;
+  color: $color;
+  font-size: $font-sm;
+  font-weight: $font-bold;
+  cursor: pointer;
+}

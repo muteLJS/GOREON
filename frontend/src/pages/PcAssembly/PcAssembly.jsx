@@ -1,10 +1,4 @@
-﻿/* -------------------------------------------------------------------------- */
-/* [페이지] PC 맞춤 견적 (PcAssembly)                                           */
-/* 설명: 사용 목적과 예산에 맞는 PC 견적을 안내하는 페이지입니다.             */
-/* -------------------------------------------------------------------------- */
-
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+﻿import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addQuoteItem } from "@/store/slices/quoteSlice";
 import "./PcAssembly.scss";
@@ -12,13 +6,14 @@ import "./PcAssembly.scss";
 import ProductCardVertical from "@/components/ProductCard/ProductCardVertical";
 import ProductCardHorizontal from "@/components/ProductCard/ProductCardHorizontal";
 import Modal from "@/components/Modal/Modal";
+import PcAssemblyQuote from "@/pages/PcAssemblyQuote/PcAssemblyQuote";
 
 import banner1 from "@/assets/banner/banner-1.jpg";
 import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
 import CheckIcon from "@/assets/icons/check.svg";
 import ProductImage from "@/assets/products/product-example.jpg";
+import CloseIcon from "@/assets/event/close.svg";
 
-/* productList 더미데이터 */
 const productList = [
   {
     id: 1,
@@ -95,7 +90,7 @@ const productList = [
   {
     id: 10,
     category: "그래픽카드",
-    name: "ZOTAC GAMING 지포스 RTX 4060 SOLO",
+    name: "ZOTAC RTX 4060 SOLO",
     rating: 4,
     image: ProductImage,
     price: 449000,
@@ -103,7 +98,7 @@ const productList = [
   {
     id: 11,
     category: "그래픽카드",
-    name: "MSI 지포스 RTX 4060 VENTUS 2X",
+    name: "MSI RTX 4060 VENTUS 2X",
     rating: 4,
     image: ProductImage,
     price: 479000,
@@ -111,7 +106,7 @@ const productList = [
   {
     id: 12,
     category: "그래픽카드",
-    name: "SAPPHIRE 라데온 RX 7600 PULSE",
+    name: "SAPPHIRE RX 7600 PULSE",
     rating: 4,
     image: ProductImage,
     price: 389000,
@@ -135,7 +130,7 @@ const productList = [
   {
     id: 15,
     category: "저장장치",
-    name: "Western Digital WD Blue SN580 1TB",
+    name: "WD Blue SN580 1TB",
     rating: 4,
     image: ProductImage,
     price: 99000,
@@ -143,7 +138,7 @@ const productList = [
   {
     id: 16,
     category: "케이스",
-    name: "darkFlash DS900 ARGB 강화유리",
+    name: "darkFlash DS900 ARGB",
     rating: 4,
     image: ProductImage,
     price: 69000,
@@ -159,7 +154,7 @@ const productList = [
   {
     id: 18,
     category: "케이스",
-    name: "마이크로닉스 COOLMAX 쉐도우 2",
+    name: "마이크로닉스 COOLMAX 섀도우2",
     rating: 4,
     image: ProductImage,
     price: 59000,
@@ -167,7 +162,7 @@ const productList = [
   {
     id: 19,
     category: "파워",
-    name: "마이크로닉스 Classic II 750W GOLD",
+    name: "마이크로닉스 Classic II 750W",
     rating: 4,
     image: ProductImage,
     price: 119000,
@@ -183,42 +178,89 @@ const productList = [
   {
     id: 21,
     category: "파워",
-    name: "시소닉 FOCUS GX-850 GOLD",
+    name: "시소닉 FOCUS GX-850",
     rating: 5,
     image: ProductImage,
     price: 189000,
   },
 ];
 
-/* 필터 더미데이터 */
 const categories = ["CPU", "램", "메인보드", "그래픽카드", "저장장치", "케이스", "파워"];
 
 function PcAssembly() {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const items = useSelector((state) => state.quote.items);
-  const totalPrice = items.reduce((sum, item) => {
-    return sum + item.price * item.quantity;
-  }, 0);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("CPU");
-  const filteredProducts = productList.filter((product) => product.category === selectedCategory);
 
-  const handleAddQuoteItem = (product) => {
-    const quoteItem = {
-      id: product.id,
-      productId: product.id,
-      category: product.category,
-      name: product.name,
-      option: null,
-      price: product.price,
-      quantity: 1,
-      image: product.image,
-      compatibility: "ok",
-      product,
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isQuoteOpen, setIsQuoteOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("CPU");
+  const [isDesktop, setIsDesktop] = useState(window.matchMedia("(min-width: 1024px)").matches);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const onChange = (e) => setIsDesktop(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  const assemblyRef = useRef(null);
+  const [quotePanelWidth, setQuotePanelWidth] = useState(1200);
+
+  useEffect(() => {
+    if (!(isDesktop && isQuoteOpen)) return;
+
+    const updateWidth = () => {
+      const el = assemblyRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      setQuotePanelWidth(Math.round(r.width));
     };
 
-    dispatch(addQuoteItem(quoteItem));
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+
+    return () => {
+      window.removeEventListener("resize", updateWidth);
+    };
+  }, [isDesktop, isQuoteOpen]);
+
+  useEffect(() => {
+    if (!(isDesktop && isQuoteOpen)) return;
+    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+    const prevOverflow = document.body.style.overflow;
+    const prevPaddingRight = document.body.style.paddingRight;
+
+    document.body.style.overflow = "hidden";
+    document.body.style.paddingRight = `${scrollBarWidth}px`;
+
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.body.style.paddingRight = prevPaddingRight;
+    };
+  }, [isDesktop, isQuoteOpen]);
+
+  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  const filteredProducts = useMemo(
+    () => productList.filter((product) => product.category === selectedCategory),
+    [selectedCategory],
+  );
+
+  const handleAddQuoteItem = (product) => {
+    dispatch(
+      addQuoteItem({
+        id: `${product.category}-${product.id}`,
+        productId: product.id,
+        category: product.category,
+        name: product.name,
+        option: "기본옵션",
+        price: product.price,
+        quantity: 1,
+        image: product.image,
+        compatibility: "ok",
+        status: "ok",
+      }),
+    );
   };
 
   const filterContent = (
@@ -237,7 +279,7 @@ function PcAssembly() {
   );
 
   return (
-    <main className="pc-assembly">
+    <main className="pc-assembly" ref={assemblyRef}>
       <section className="pc-assembly__banner">
         <img src={banner1} alt="광고 배너 1" />
       </section>
@@ -258,7 +300,6 @@ function PcAssembly() {
               action={
                 <button
                   className="pc-assembly__add-button"
-                  type="button"
                   onClick={() => handleAddQuoteItem(product)}
                 >
                   담기
@@ -273,10 +314,7 @@ function PcAssembly() {
             <button className="pc-assembly__total">
               TOTAL : ₩{totalPrice.toLocaleString("ko-KR")}
             </button>
-            <button
-              className="pc-assembly__list-button"
-              onClick={() => navigate("/pc-assembly-quote")}
-            >
+            <button className="pc-assembly__list-button" onClick={() => setIsQuoteOpen(true)}>
               견적 리스트
             </button>
           </div>
@@ -295,7 +333,6 @@ function PcAssembly() {
           <button className="pc-assembly__total">
             TOTAL : ₩{totalPrice.toLocaleString("ko-KR")}
           </button>
-
           <div className="pc-assembly__desktop-filter">
             <div className="pc-assembly__desktop-filter-title">카테고리</div>
             <div className="pc-assembly__desktop-filter-list">{filterContent}</div>
@@ -311,11 +348,7 @@ function PcAssembly() {
               </div>
               <div className="pc-assembly__compatibility-status">호환성 모두 이상 없음</div>
             </div>
-
-            <button
-              className="pc-assembly__list-button"
-              onClick={() => navigate("/pc-assembly-quote")}
-            >
+            <button className="pc-assembly__list-button" onClick={() => setIsQuoteOpen(true)}>
               견적 리스트
             </button>
           </section>
@@ -328,7 +361,6 @@ function PcAssembly() {
                 action={
                   <button
                     className="pc-assembly__add-button"
-                    type="button"
                     onClick={() => handleAddQuoteItem(product)}
                   >
                     담기
@@ -344,6 +376,37 @@ function PcAssembly() {
         <Modal title="필터" onClose={() => setIsFilterOpen(false)}>
           {filterContent}
         </Modal>
+      )}
+
+      {!isDesktop && isQuoteOpen && (
+        <Modal title="견적 리스트" onClose={() => setIsQuoteOpen(false)}>
+          <PcAssemblyQuote isModal />
+        </Modal>
+      )}
+
+      {isDesktop && isQuoteOpen && (
+        <div className="pc-assembly__desktop-quote-layer" role="dialog" aria-modal="true">
+          <div className="pc-assembly__desktop-quote-dim" onClick={() => setIsQuoteOpen(false)} />
+          <section
+            className="pc-assembly__desktop-quote-panel"
+            style={{ "--quote-w": `${quotePanelWidth}px` }}
+          >
+            <header className="pc-assembly__desktop-quote-header">
+              <h3>견적 리스트</h3>
+              <button
+                type="button"
+                className="pc-assembly__desktop-quote-close"
+                onClick={() => setIsQuoteOpen(false)}
+                aria-label="닫기"
+              >
+                <img src={CloseIcon} alt="" />
+              </button>
+            </header>
+            <div className="pc-assembly__desktop-quote-body">
+              <PcAssemblyQuote isModal />
+            </div>
+          </section>
+        </div>
       )}
     </main>
   );

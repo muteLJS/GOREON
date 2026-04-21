@@ -2,17 +2,21 @@
 @import "styles/mixins";
 
 .wishlist-icon-button {
-  @include flex-center;
+  display: inline-grid;
+  place-items: center;
   padding: 0;
   border: 0;
   border-radius: $radius-full;
   background-color: $color-white;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+  line-height: 0;
+  box-sizing: border-box;
   cursor: pointer;
 
   img {
     display: block;
-    margin: 0 auto;
+    margin: 0;
+    object-fit: contain;
   }
 
   &:disabled {

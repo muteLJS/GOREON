@@ -9,7 +9,6 @@ import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
 import CartIconButton from "@/components/CartIconButton/CartIconButton";
 import ProductCardVertical from "@/components/ProductCard/ProductCardVertical";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
-import "./Wishlist.scss";
 
 const FilterMenuBox = ({ title }) => {
   return (
@@ -23,7 +22,7 @@ const FilterMenuBox = ({ title }) => {
 
 export default function Wishlist() {
   const wishlistItems = useSelector((state) => state.wishlist.items);
-  const wishlistLength = wishlistItems.length;
+  const productLength = wishlistItems.length;
 
   return (
     <main className="list-wrap-wishlist">
