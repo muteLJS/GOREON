@@ -9,6 +9,7 @@ import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
 import CartIconButton from "@/components/CartIconButton/CartIconButton";
 import ProductCardVertical from "@/components/ProductCard/ProductCardVertical";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
+import { useEffect, useState } from "react";
 
 const FilterMenuBox = ({ title }) => {
   return (
@@ -21,15 +22,20 @@ const FilterMenuBox = ({ title }) => {
 };
 
 export default function Wishlist() {
-  const wishlistItems = useSelector((state) => state.wishlist.items);
-  const productLength = wishlistItems.length;
+  const [wishlist, setWishlist] = useState([]);
+  const wishlistLength = wishlist.length;
+
+  const fetchWishlist = () => {
+    const wishlist = JSON.parse(localStorage.getItem("wishlist"));
+    setWishlist(wishlist);
+  };
+  useEffect(() => {
+    fetchWishlist();
+  }, [wishlistLength]);
 
   return (
     <>
       <main className="list-wrap-wishlist">
-        <section className="list-assembly__banner">
-          <img src={banner1} alt="광고 배너 1" />
-        </section>
         <section className="list-wrap-content">
           <section className="side_menu">
             <div className="side_menu_top">
@@ -43,6 +49,9 @@ export default function Wishlist() {
             </div>
           </section>
           <section className="list-assembly">
+            <section className="list-assembly__banner">
+              <img src={banner1} alt="광고 배너 1" />
+            </section>
             <section className="list-assembly__top">
               <h2 className="list-assembly__title">
                 찜한 상품 <span>({productLength})</span>

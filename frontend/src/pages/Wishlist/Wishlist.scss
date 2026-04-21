@@ -122,6 +122,18 @@
       &__button-container {
         display: flex;
         gap: 5px;
+
+        .cart-add-button {
+          padding: 5px;
+          background-color: #ffffff;
+          box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.25);
+          border-radius: $radius-full;
+
+          img {
+            width: 10px;
+            height: 11px;
+          }
+        }
       }
     }
   }
@@ -165,7 +177,6 @@
     .list-assembly__banner {
       img {
         width: 100%;
-        margin-bottom: 120px;
       }
     }
     .list-wrap-content {
