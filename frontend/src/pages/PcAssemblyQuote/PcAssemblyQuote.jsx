@@ -2,6 +2,7 @@ import "./PcAssemblyQuote.scss";
 import PcAssemblyQuoteList from "@/components/PcAssemblyQuoteList/PcAssemblyQuoteList";
 import CheckIcon from "@/assets/icons/check.svg";
 import ProductImage from "@/assets/products/product-example.jpg";
+import { analyzePcCompatibility } from "@/utils/pcCompatibility";
 import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -17,15 +18,8 @@ function PcAssemblyQuote({ isModal = false }) {
 
   const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  const performanceChecks = useMemo(
-    () => [
-      { id: 1, text: "CPU 대비 GPU 성능 부족", level: "warning" },
-      { id: 2, text: "RAM 용량 충분", level: "ok" },
-      { id: 3, text: "파워 용량 확인 필요", level: "error" },
-      { id: 4, text: "저장장치 여유 공간 부족", level: "warning" },
-    ],
-    [],
-  );
+  const compatibility = useMemo(() => analyzePcCompatibility(items), [items]);
+  const performanceChecks = compatibility.checks;
 
   const recommendItems = useMemo(
     () => [
@@ -119,7 +113,9 @@ function PcAssemblyQuote({ isModal = false }) {
             <img src={CheckIcon} alt="체크" />
             부품 {items.length}개 선택
           </div>
-          <div className="pc-assembly-quote__compatibility-status">호환성 모두 이상 없음</div>
+          <div className={`pc-assembly-quote__compatibility-status is-${compatibility.level}`}>
+            {compatibility.message}
+          </div>
           <button
             className="pc-assembly-quote__compatibility-check"
             type="button"
@@ -138,12 +134,19 @@ function PcAssemblyQuote({ isModal = false }) {
             <section className="pc-assembly-quote__performance">
               <h3 className="pc-assembly-quote__section-title">성능 분석</h3>
               <div className="pc-assembly-quote__panel">
-                {performanceChecks.map((row) => (
-                  <div className="pc-assembly-quote__panel-item" key={row.id}>
-                    <span className={`indicator indicator--${row.level}`} />
-                    {row.text}
+                {performanceChecks.length > 0 ? (
+                  performanceChecks.map((row) => (
+                    <div className="pc-assembly-quote__panel-item" key={row.id}>
+                      <span className={`indicator indicator--${row.level}`} />
+                      {row.text}
+                    </div>
+                  ))
+                ) : (
+                  <div className="pc-assembly-quote__panel-item">
+                    <span className="indicator indicator--warning" />
+                    부품을 선택하면 호환성 검사를 시작합니다.
                   </div>
-                ))}
+                )}
               </div>
             </section>
 
