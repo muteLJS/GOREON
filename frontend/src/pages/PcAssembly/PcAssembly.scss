@@ -123,6 +123,10 @@
     position: fixed;
     inset: 0;
     z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
   }
 
   &__desktop-quote-dim {
@@ -132,12 +136,11 @@
   }
 
   &__desktop-quote-panel {
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: min(var(--quote-w, 1200px), calc(100vw - 48px));
-    max-height: 88vh;
+    position: relative;
+    z-index: 1;
+    transform: translateX(clamp(-7px, -0.55vw, -2px));
+    width: min(var(--quote-w, 1216px), calc(100vw - 48px));
+    height: min(840px, calc(100dvh - 48px));
     background: $color-white;
     border-radius: 20px;
     overflow: hidden;
@@ -179,8 +182,14 @@
   &__desktop-quote-body {
     flex: 1;
     min-height: 0;
-    overflow: auto;
+    overflow: hidden;
     padding: 16px 20px 20px;
+  }
+
+  &__quote-modal {
+    .modal__title {
+      flex-shrink: 0;
+    }
   }
 }
 

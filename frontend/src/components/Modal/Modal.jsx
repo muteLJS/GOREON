@@ -9,7 +9,7 @@ import "./Modal.scss";
  * @param {React.ReactNode} children 모달 내부에 렌더링될 내용
  * @param {Function} onClose 모달창 닫기 클릭할 때 실행될 함수
  */
-function Modal({ title, children, onClose }) {
+function Modal({ title, children, onClose, className = "", overlayClassName = "" }) {
   useEffect(() => {
     document.body.style.overflow = "hidden";
 
@@ -18,8 +18,8 @@ function Modal({ title, children, onClose }) {
     };
   }, []);
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
+    <div className={`modal-overlay ${overlayClassName}`.trim()} onClick={onClose}>
+      <div className={`modal ${className}`.trim()} onClick={(e) => e.stopPropagation()}>
         <div className="modal__title">{title}</div>
         {children}
       </div>
