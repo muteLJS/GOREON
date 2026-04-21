@@ -197,8 +197,12 @@ function ProductRailCard({ product }) {
   return (
     <article className="my-page__rail-card">
       <div className="my-page__rail-card-media-wrap">
-        <Link to={`/product/${product.id}`} className="my-page__rail-card-media">
-          <img src={product.image} alt={product.name} />
+        <Link
+          to={`/product/${product.id}`}
+          className="my-page__rail-card-media"
+          draggable={false}
+        >
+          <img src={product.image} alt={product.name} draggable={false} />
         </Link>
         <div className="my-page__rail-card-actions">
           <button type="button" aria-label="장바구니 담기" onClick={handleAddToCart}>
@@ -213,7 +217,11 @@ function ProductRailCard({ product }) {
           </button>
         </div>
       </div>
-      <Link to={`/product/${product.id}`} className="my-page__rail-card-copy">
+      <Link
+        to={`/product/${product.id}`}
+        className="my-page__rail-card-copy"
+        draggable={false}
+      >
         <p className="my-page__rail-card-name">{product.name}</p>
         <p className="my-page__rail-card-price">{product.price}</p>
       </Link>
@@ -419,8 +427,6 @@ export default function MyPage() {
       startScrollLeft: rail.scrollLeft,
       isDragging: false,
     };
-
-    rail.setPointerCapture?.(event.pointerId);
   };
 
   const handleRecentRailPointerMove = (event) => {
@@ -446,9 +452,11 @@ export default function MyPage() {
 
       dragState.isDragging = true;
       recentRailDidDragRef.current = true;
+      rail.setPointerCapture?.(event.pointerId);
       rail.classList.add("is-dragging");
     }
 
+    event.preventDefault();
     rail.scrollLeft = dragState.startScrollLeft - deltaX;
   };
 
@@ -460,12 +468,8 @@ export default function MyPage() {
       return;
     }
 
-    rail.releasePointerCapture?.(event.pointerId);
-
     if (dragState.isDragging) {
-      window.requestAnimationFrame(() => {
-        recentRailDidDragRef.current = false;
-      });
+      rail.releasePointerCapture?.(event.pointerId);
     }
 
     resetRecentRailDrag();
@@ -478,6 +482,7 @@ export default function MyPage() {
 
     event.preventDefault();
     event.stopPropagation();
+    recentRailDidDragRef.current = false;
   };
 
   const getCurrentHistoryHeight = () => {
@@ -602,7 +607,7 @@ export default function MyPage() {
                   <MetricIcon type={metric.key} />
                 </span>
                 <strong>{metric.value}</strong>
-                <span>{metric.label}</span>
+                <span className="my-page__metric-label">{metric.label}</span>
                 {index < metrics.length - 1 ? <i className="my-page__metric-divider" /> : null}
               </Link>
             ))}
