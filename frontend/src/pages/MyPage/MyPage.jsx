@@ -1,13 +1,16 @@
 import "./MyPage.scss";
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 import AiBadgeIcon from "@/assets/icons/mypage_ai.png";
 import CartStraightIcon from "@/assets/icons/cart-straight.svg";
+import LikeAfterIcon from "@/assets/icons/like-after.svg";
 import LikeBeforeIcon from "@/assets/icons/like-before.svg";
 import ReviewIcon from "@/assets/icons/review.png";
 import products from "@/data/products_list.json";
+import { addToCart } from "@/store/slices/cartSlice";
+import { addToWishlist, removeFromWishlist } from "@/store/slices/wishlistSlice";
 
 const FALLBACK_USER = {
   name: "NickName",
@@ -24,9 +27,45 @@ const INFO_FIELDS = [
 const INITIAL_HISTORY_COUNT = 2;
 
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
+const getProductId = (product) => product?._id ?? product?.productId ?? product?.id ?? 1;
 
 const formatPrice = (value) =>
   `₩${new Intl.NumberFormat("ko-KR").format(parsePrice(value))}`;
+
+const buildCartPayload = (product) => {
+  const productId = getProductId(product);
+
+  return {
+    id: product.id ?? productId,
+    productId,
+    category: product?.category ?? "상품",
+    name: product?.name ?? product?.title ?? "상품명",
+    option: product?.option ?? product?.spec ?? "기본 옵션",
+    price: parsePrice(product?.price),
+    image: product?.image ?? product?.heroImage ?? "",
+    quantity: 1,
+  };
+};
+
+const buildWishlistPayload = (product) => {
+  const productId = getProductId(product);
+
+  return {
+    id: productId,
+    name: product?.name ?? product?.title ?? "상품명",
+    price: parsePrice(product?.price),
+    image: product?.image ?? product?.heroImage ?? "",
+    rating: Number(product?.rating) || 0,
+  };
+};
+
+const showActionAlert = (message) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.alert(message);
+};
 
 const mappedProducts = products.slice(0, 24).map((product, index) => ({
   id: product.id ?? index + 1,
@@ -128,43 +167,109 @@ function EditableField({ field, value, activeField, onChange, onToggle }) {
 }
 
 function ProductRailCard({ product }) {
+  const dispatch = useDispatch();
+  const wishlistItems = useSelector((state) => state.wishlist.items);
+  const productId = getProductId(product);
+  const isWishlisted = wishlistItems.some((item) => item.id === productId);
+
+  const handleAddToCart = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    dispatch(addToCart(buildCartPayload(product)));
+    showActionAlert("장바구니에 추가되었습니다.");
+  };
+
+  const handleToggleWishlist = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (isWishlisted) {
+      dispatch(removeFromWishlist(productId));
+      showActionAlert("찜한 상품에서 제거되었습니다.");
+      return;
+    }
+
+    dispatch(addToWishlist(buildWishlistPayload(product)));
+    showActionAlert("찜한 상품에 추가 되었습니다.");
+  };
+
   return (
     <article className="my-page__rail-card">
-      <Link to={`/product/${product.id}`} className="my-page__rail-card-media">
-        <img src={product.image} alt={product.name} />
-        <div className="my-page__rail-card-actions" aria-hidden="true">
-          <span>
+      <div className="my-page__rail-card-media-wrap">
+        <Link to={`/product/${product.id}`} className="my-page__rail-card-media">
+          <img src={product.image} alt={product.name} />
+        </Link>
+        <div className="my-page__rail-card-actions">
+          <button type="button" aria-label="장바구니 담기" onClick={handleAddToCart}>
             <img src={CartStraightIcon} alt="" />
-          </span>
-          <span>
-            <img src={LikeBeforeIcon} alt="" />
-          </span>
+          </button>
+          <button
+            type="button"
+            aria-label={isWishlisted ? "찜 해제" : "찜하기"}
+            onClick={handleToggleWishlist}
+          >
+            <img src={isWishlisted ? LikeAfterIcon : LikeBeforeIcon} alt="" />
+          </button>
         </div>
-      </Link>
-      <div className="my-page__rail-card-copy">
+      </div>
+      <Link to={`/product/${product.id}`} className="my-page__rail-card-copy">
         <p className="my-page__rail-card-name">{product.name}</p>
         <p className="my-page__rail-card-price">{product.price}</p>
-      </div>
+      </Link>
     </article>
   );
 }
 
 function AiRecommendationCard({ product }) {
+  const dispatch = useDispatch();
+  const wishlistItems = useSelector((state) => state.wishlist.items);
+  const productId = getProductId(product);
+  const isWishlisted = wishlistItems.some((item) => item.id === productId);
+
+  const handleAddToCart = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    dispatch(addToCart(buildCartPayload(product)));
+    showActionAlert("장바구니에 추가되었습니다.");
+  };
+
+  const handleToggleWishlist = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (isWishlisted) {
+      dispatch(removeFromWishlist(productId));
+      showActionAlert("찜한 상품에서 제거되었습니다.");
+      return;
+    }
+
+    dispatch(addToWishlist(buildWishlistPayload(product)));
+    showActionAlert("찜한 상품에 추가 되었습니다.");
+  };
+
   return (
     <article className="my-page__ai-card">
-      <Link to={`/product/${product.id}`} className="my-page__ai-card-media">
-        <img src={product.image} alt={product.name} />
-        <div className="my-page__ai-card-actions" aria-hidden="true">
-          <span>
+      <div className="my-page__ai-card-media-wrap">
+        <Link to={`/product/${product.id}`} className="my-page__ai-card-media">
+          <img src={product.image} alt={product.name} />
+        </Link>
+        <div className="my-page__ai-card-actions">
+          <button type="button" aria-label="장바구니 담기" onClick={handleAddToCart}>
             <img src={CartStraightIcon} alt="" />
-          </span>
-          <span>
-            <img src={LikeBeforeIcon} alt="" />
-          </span>
+          </button>
+          <button
+            type="button"
+            aria-label={isWishlisted ? "찜 해제" : "찜하기"}
+            onClick={handleToggleWishlist}
+          >
+            <img src={isWishlisted ? LikeAfterIcon : LikeBeforeIcon} alt="" />
+          </button>
         </div>
-      </Link>
+      </div>
 
-      <div className="my-page__ai-card-copy">
+      <Link to={`/product/${product.id}`} className="my-page__ai-card-copy">
         <p className="my-page__ai-card-name">{product.name}</p>
         <p className="my-page__ai-card-desc">{product.desc}</p>
         <p className="my-page__ai-card-spec">{product.spec}</p>
@@ -174,7 +279,7 @@ function AiRecommendationCard({ product }) {
           ))}
         </div>
         <p className="my-page__ai-card-price">{product.price}</p>
-      </div>
+      </Link>
     </article>
   );
 }
@@ -226,6 +331,27 @@ export default function MyPage() {
     }
 
     setHistoryListHeight(historyListRef.current.scrollHeight);
+  }, [isHistoryAnimating, renderedHistoryCount]);
+
+  useEffect(() => {
+    if (!historyListRef.current || isHistoryAnimating || typeof ResizeObserver === "undefined") {
+      return;
+    }
+
+    const list = historyListRef.current;
+    const observer = new ResizeObserver(() => {
+      if (isHistoryAnimating || !historyListRef.current) {
+        return;
+      }
+
+      setHistoryListHeight(historyListRef.current.scrollHeight);
+    });
+
+    observer.observe(list);
+
+    return () => {
+      observer.disconnect();
+    };
   }, [isHistoryAnimating, renderedHistoryCount]);
 
   const metrics = [

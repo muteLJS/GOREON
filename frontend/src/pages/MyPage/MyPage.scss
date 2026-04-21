@@ -237,8 +237,12 @@
   min-width: 0;
 }
 
-.my-page__rail-card-media {
+.my-page__rail-card-media-wrap,
+.my-page__ai-card-media-wrap {
   position: relative;
+}
+
+.my-page__rail-card-media {
   display: block;
   width: 124px;
   height: 142px;
@@ -264,14 +268,17 @@
   bottom: 6px;
   display: flex;
   gap: 4px;
+  z-index: 1;
 
-  span {
+  button {
     @include flex-center;
     width: 16px;
     height: 16px;
+    padding: 0;
     border: 1px solid rgba($color-text-main, 0.12);
     border-radius: 50%;
     background: $color-white;
+    cursor: pointer;
   }
 
   img {
@@ -283,7 +290,10 @@
 }
 
 .my-page__rail-card-copy {
+  display: block;
   padding-top: 10px;
+  color: $color-text-main;
+  text-decoration: none;
 }
 
 .my-page__rail-card-name {
@@ -345,11 +355,20 @@
 .my-page__history-head {
   @include flex(flex-start, flex-start);
   gap: 8px;
+
+  > div {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
 }
 
 .my-page__history-badge {
+  display: block;
+  flex: 0 0 auto;
+  flex-shrink: 0;
   width: 18px;
   height: 18px;
+  max-width: none;
   object-fit: contain;
   margin-top: 3px;
 }
@@ -418,6 +437,8 @@
   align-content: start;
   gap: 4px;
   padding-top: 10px;
+  color: $color-text-main;
+  text-decoration: none;
 }
 
 .my-page__ai-card-name {
@@ -726,7 +747,7 @@
     bottom: 3px;
     gap: 2px;
 
-    span {
+    button {
       width: 30px;
       height: 30px;
     }
@@ -773,8 +794,10 @@
   }
 
   .my-page__history-badge {
+    flex: 0 0 auto;
     width: 20px;
     height: 20px;
+    max-width: none;
     margin-top: 2px;
   }
 
@@ -824,18 +847,18 @@
   }
 
   .my-page__ai-card-actions {
-    right: 4px;
-    bottom: 4px;
+    right: 5px;
+    bottom: 5px;
     gap: 3px;
 
-    span {
-      width: 11px;
-      height: 11px;
+    button {
+      width: 25px;
+      height: 25px;
     }
 
     img {
-      width: 6px;
-      height: 6px;
+      width: 12px;
+      height: 12px;
     }
   }
 
