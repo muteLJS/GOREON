@@ -3,7 +3,11 @@ import productList from "@/data/products_list.json";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-
+import { FreeMode } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import arrowIcon from "@/assets/icons/prev.svg"
+import downIcon from "@/assets/icons/chevron-down.svg"
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 import ReviewSection from "../../components/ReviewSection/ReviewSection";
 import { addToCart } from "../../store/slices/cartSlice";
@@ -12,7 +16,7 @@ import api from "../../utils/api";
 
 import ProductHeroImage from "../../assets/img/intel-core-ultra5-250kf-plus-product-image-genuine.jpg";
 
-const formatPrice = (price) => `W ${price.toLocaleString("ko-KR")}`;
+const formatPrice = (price) => `￦ ${price.toLocaleString("ko-KR")}`;
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
 const normalizeImageUrl = (value) => {
   const raw = String(value ?? "").trim();
@@ -217,6 +221,7 @@ function ProductDetail() {
   const selectedOption = product.options.find((option) => option.id === selectedOptionId) || null;
   const displayOption = selectedOption || product.options[0];
   const totalPrice = displayOption.price * quantity;
+  const categoryLabel = product.subtitle.split(" 카테고리")[0] || "상품";
 
   const handleAddToCart = () => {
     dispatch(
@@ -247,18 +252,18 @@ function ProductDetail() {
     targetRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const renderTabs = () => (
+  const renderTabs = (visualActiveTab = activeTab) => (
     <div className="product-detail__tabs">
       <button
         type="button"
-        className={activeTab === "overview" ? "is-active" : ""}
+        className={visualActiveTab === "overview" ? "is-active" : ""}
         onClick={() => handleTabClick("overview")}
       >
         상품 설명
       </button>
       <button
         type="button"
-        className={activeTab === "reviews" ? "is-active" : ""}
+        className={visualActiveTab === "reviews" ? "is-active" : ""}
         onClick={() => handleTabClick("reviews")}
       >
         리뷰
@@ -266,8 +271,40 @@ function ProductDetail() {
     </div>
   );
 
+  const renderReviewPhotoSwiper = () =>
+    product.gallery?.length ? (
+      <div className="product-detail__review-photo-swiper" aria-label="리뷰 이미지 모음">
+        <Swiper
+          modules={[FreeMode]}
+          slidesPerView="auto"
+          spaceBetween={12}
+          freeMode
+          grabCursor
+          watchOverflow
+        >
+          {product.gallery.map((image, index) => (
+            <SwiperSlide key={`${product.id}-review-photo-${index}`}>
+              <img
+                src={image}
+                alt={`리뷰 이미지 ${index + 1}`}
+                onError={(event) => {
+                  event.currentTarget.src = ProductHeroImage;
+                }}
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
+    ) : null;
+
   return (
     <main className="product-detail">
+      <nav className="product-detail__breadcrumb" aria-label="상품 경로">
+        <span>PC</span>
+        <img src={arrowIcon} alt="arrow" className="product-detail__arrow" />
+        <span>{categoryLabel}</span>
+      </nav>
+
       <section className="product-detail__hero">
         <div className="product-detail__visual">
           <div className="product-detail__visual-frame">
@@ -296,14 +333,13 @@ function ProductDetail() {
         <div className="product-detail__content">
           <h1 className="product-detail__title">{product.title}</h1>
           <p className="product-detail__price">{formatPrice(product.price)}</p>
-          <p className="product-detail__feature-body">{product.shortDescription}</p>
-
           <div className="product-detail__purchase-box">
             <label className="product-detail__field" aria-label="옵션명">
               <select
                 value={selectedOptionId}
                 onChange={(event) => setSelectedOptionId(event.target.value)}
               >
+               
                 <option value="" disabled>
                   옵션명
                 </option>
@@ -346,7 +382,7 @@ function ProductDetail() {
                 className="product-detail__button product-detail__button--ghost"
                 onClick={handleAddToCart}
               >
-                장바구니 넣기
+                장바구니 담기
               </button>
               <button
                 type="button"
@@ -408,7 +444,10 @@ function ProductDetail() {
         </button>
       </section>
 
+      {renderTabs("reviews")}
+
       <section className="product-detail__reviews" ref={reviewsRef}>
+        {renderReviewPhotoSwiper()}
         <ReviewSection
           rating={product.rating}
           reviewCount={product.reviewCount}

@@ -1,5 +1,5 @@
 .omx/
-.codex/
+.codex
 .codex/*
 !.codex/agents/
 !.codex/agents/**
