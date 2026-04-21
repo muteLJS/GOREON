@@ -5,8 +5,35 @@
 
 import { createSlice } from "@reduxjs/toolkit";
 
+const CART_STORAGE_KEY = "cartItems";
+
+const loadCartItems = () => {
+  if (typeof window === "undefined") {
+    return [];
+  }
+
+  try {
+    const storedItems = window.localStorage.getItem(CART_STORAGE_KEY);
+    return storedItems ? JSON.parse(storedItems) : [];
+  } catch {
+    return [];
+  }
+};
+
+const persistCartItems = (items) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+  } catch {
+    // Ignore localStorage write failures and keep in-memory state working.
+  }
+};
+
 const initialState = {
-  items: [],
+  items: loadCartItems(),
 };
 
 const cartSlice = createSlice({
@@ -21,13 +48,17 @@ const cartSlice = createSlice({
       } else {
         state.items.push({ ...action.payload, quantity: nextQuantity });
       }
+
+      persistCartItems(state.items);
     },
     removeFromCart: (state, action) => {
       state.items = state.items.filter((item) => item.id !== action.payload);
+      persistCartItems(state.items);
     },
     removeCartItems: (state, action) => {
       const removeIds = new Set(action.payload);
       state.items = state.items.filter((item) => !removeIds.has(item.id));
+      persistCartItems(state.items);
     },
     updateCartQuantity: (state, action) => {
       const { id, quantity } = action.payload;
@@ -35,6 +66,7 @@ const cartSlice = createSlice({
 
       if (nextQuantity < 1) {
         state.items = state.items.filter((item) => item.id !== id);
+        persistCartItems(state.items);
         return;
       }
 
@@ -42,9 +74,12 @@ const cartSlice = createSlice({
       if (item) {
         item.quantity = nextQuantity;
       }
+
+      persistCartItems(state.items);
     },
     clearCart: (state) => {
       state.items = [];
+      persistCartItems(state.items);
     },
   },
 });
