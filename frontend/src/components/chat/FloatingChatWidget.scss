@@ -470,6 +470,10 @@
   pointer-events: auto;
 }
 
+.chat-widget__scroll-top {
+  flex-shrink: 0;
+}
+
 .chat-widget__tooltip {
   @include flex-center;
   width: 164px;
