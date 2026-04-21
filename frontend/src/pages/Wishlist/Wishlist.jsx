@@ -2,6 +2,7 @@
 /* [페이지] 찜하기 (Wishlist)                                                 */
 /* 찜하기: 하트를 누른 관심 상품 목록 모아보기                                */
 /* -------------------------------------------------------------------------- */
+import "./Wishlist.scss";
 import { useSelector } from "react-redux";
 
 import banner1 from "@/assets/banner/banner-1.jpg";
@@ -22,7 +23,7 @@ const FilterMenuBox = ({ title }) => {
 
 export default function Wishlist() {
   const wishlistItems = useSelector((state) => state.wishlist.items);
-  const productLength = wishlistItems.length;
+  const wishlistLength = wishlistItems.length;
 
   return (
     <main className="list-wrap-wishlist">
