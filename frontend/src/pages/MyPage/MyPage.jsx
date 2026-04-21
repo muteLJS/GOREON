@@ -300,6 +300,15 @@ export default function MyPage() {
   const [isHistoryAnimating, setIsHistoryAnimating] = useState(false);
   const historyShellRef = useRef(null);
   const historyListRef = useRef(null);
+  const recentRailRef = useRef(null);
+  const recentRailDragRef = useRef({
+    pointerId: null,
+    startX: 0,
+    startY: 0,
+    startScrollLeft: 0,
+    isDragging: false,
+  });
+  const recentRailDidDragRef = useRef(false);
   const historyAnimationFrameRef = useRef(null);
   const pendingHistoryCountRef = useRef(null);
   const pendingHistoryHeightRef = useRef(null);
@@ -369,6 +378,106 @@ export default function MyPage() {
 
   const handleFieldToggle = (field) => {
     setEditingField((prev) => (prev === field ? "" : field));
+  };
+
+  const resetRecentRailDrag = () => {
+    const rail = recentRailRef.current;
+
+    if (rail) {
+      rail.classList.remove("is-dragging");
+    }
+
+    recentRailDragRef.current = {
+      pointerId: null,
+      startX: 0,
+      startY: 0,
+      startScrollLeft: 0,
+      isDragging: false,
+    };
+  };
+
+  const handleRecentRailPointerDown = (event) => {
+    const rail = recentRailRef.current;
+
+    if (!rail) {
+      return;
+    }
+
+    if (event.pointerType === "mouse" && event.button !== 0) {
+      return;
+    }
+
+    if (event.target.closest("button")) {
+      return;
+    }
+
+    recentRailDidDragRef.current = false;
+    recentRailDragRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      startScrollLeft: rail.scrollLeft,
+      isDragging: false,
+    };
+
+    rail.setPointerCapture?.(event.pointerId);
+  };
+
+  const handleRecentRailPointerMove = (event) => {
+    const rail = recentRailRef.current;
+    const dragState = recentRailDragRef.current;
+
+    if (!rail || dragState.pointerId !== event.pointerId) {
+      return;
+    }
+
+    const deltaX = event.clientX - dragState.startX;
+    const deltaY = event.clientY - dragState.startY;
+
+    if (!dragState.isDragging) {
+      if (Math.abs(deltaX) < 6 && Math.abs(deltaY) < 6) {
+        return;
+      }
+
+      if (Math.abs(deltaX) <= Math.abs(deltaY)) {
+        resetRecentRailDrag();
+        return;
+      }
+
+      dragState.isDragging = true;
+      recentRailDidDragRef.current = true;
+      rail.classList.add("is-dragging");
+    }
+
+    rail.scrollLeft = dragState.startScrollLeft - deltaX;
+  };
+
+  const handleRecentRailPointerEnd = (event) => {
+    const rail = recentRailRef.current;
+    const dragState = recentRailDragRef.current;
+
+    if (!rail || dragState.pointerId !== event.pointerId) {
+      return;
+    }
+
+    rail.releasePointerCapture?.(event.pointerId);
+
+    if (dragState.isDragging) {
+      window.requestAnimationFrame(() => {
+        recentRailDidDragRef.current = false;
+      });
+    }
+
+    resetRecentRailDrag();
+  };
+
+  const handleRecentRailClickCapture = (event) => {
+    if (!recentRailDidDragRef.current) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
   };
 
   const getCurrentHistoryHeight = () => {
@@ -520,7 +629,15 @@ export default function MyPage() {
           <section className="my-page__section">
             <h2 className="my-page__section-title">최근 본 상품</h2>
             <div className="my-page__recent-panel">
-              <div className="my-page__rail">
+              <div
+                ref={recentRailRef}
+                className="my-page__rail"
+                onPointerDown={handleRecentRailPointerDown}
+                onPointerMove={handleRecentRailPointerMove}
+                onPointerUp={handleRecentRailPointerEnd}
+                onPointerCancel={handleRecentRailPointerEnd}
+                onClickCapture={handleRecentRailClickCapture}
+              >
                 {recentProducts.map((product) => (
                   <ProductRailCard key={product.id} product={product} />
                 ))}
