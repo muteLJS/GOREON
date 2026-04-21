@@ -15,7 +15,7 @@
 }
 
 .my-page__header {
-  padding: 20px 0 0;
+  padding-top: 0;
 
   h1 {
     margin: 0;
@@ -76,18 +76,20 @@
   strong {
     display: none;
   }
+}
 
-  span:last-child {
-    font-size: 15px;
-    font-weight: $font-semibold;
-    line-height: 1.2;
-    text-align: center;
-    word-break: keep-all;
-  }
+.my-page__metric-label {
+  font-size: 15px;
+  font-weight: $font-semibold;
+  line-height: 1.2;
+  text-align: center;
+  word-break: keep-all;
 }
 
 .my-page__metric-icon {
   @include flex-center;
+  width: 42px;
+  height: 42px;
 
   svg,
   img {
@@ -612,7 +614,7 @@
 
 @include desktop-up {
   .my-page {
-    padding-top: $page-content-start-desktop;
+    padding-top: $page-content-start-tablet;
     padding-bottom: 172px;
   }
 
@@ -622,7 +624,7 @@
   }
 
   .my-page__header {
-    padding-top: 54px;
+    padding-top: 0;
 
     h1 {
       font-size: 42px;
@@ -671,25 +673,32 @@
   .my-page__metric {
     gap: 8px;
     padding: 14px 10px;
+  }
 
-    span:last-child {
-      font-size: 11px;
-      font-weight: $font-bold;
-    }
+  .my-page__metric-label {
+    font-size: 15px;
+    font-weight: $font-bold;
+    line-height: 1.2;
   }
 
   .my-page__metric-icon {
+    width: 44px;
+    height: 44px;
+
     svg,
     img {
-      width: 30px;
-      height: 30px;
+      width: 44px;
+      height: 44px;
     }
   }
 
   .my-page__metric-icon--review {
+    box-sizing: border-box;
+    padding-bottom: 4px;
+
     img {
-      width: 22px;
-      height: 22px;
+      width: 34px;
+      height: 34px;
     }
   }
 
@@ -797,13 +806,13 @@
     gap: 6px;
 
     button {
-      width: 30px;
-      height: 30px;
+      width: 24px;
+      height: 24px;
     }
 
     img {
-      width: 15px;
-      height: 15px;
+      width: 12px;
+      height: 12px;
     }
   }
 
@@ -908,13 +917,13 @@
     gap: 6px;
 
     button {
-      width: 25px;
-      height: 25px;
+      width: 30px;
+      height: 30px;
     }
 
     img {
-      width: 12px;
-      height: 12px;
+      width: 14px;
+      height: 14px;
     }
   }
 
@@ -944,14 +953,14 @@
   .my-page__ai-card-desc {
     grid-area: desc;
     min-height: 0;
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.35;
   }
 
   .my-page__ai-card-spec {
     grid-area: spec;
     min-height: 0;
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.35;
   }
 
@@ -961,7 +970,7 @@
     margin-top: 0;
 
     span {
-      font-size: 8px;
+      font-size: 10px;
     }
   }
 
