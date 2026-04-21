@@ -11,181 +11,8 @@ import PcAssemblyQuote from "@/pages/PcAssemblyQuote/PcAssemblyQuote";
 import banner1 from "@/assets/banner/banner-1.jpg";
 import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
 import CheckIcon from "@/assets/icons/check.svg";
-import ProductImage from "@/assets/products/product-example.jpg";
 import CloseIcon from "@/assets/event/close.svg";
-
-const productList = [
-  {
-    id: 1,
-    category: "CPU",
-    name: "인텔 코어 i5-14400F",
-    rating: 4,
-    image: ProductImage,
-    price: 200000,
-  },
-  {
-    id: 2,
-    category: "CPU",
-    name: "AMD 라이젠5 7500F",
-    rating: 5,
-    image: ProductImage,
-    price: 230000,
-  },
-  {
-    id: 3,
-    category: "CPU",
-    name: "AMD 라이젠7 7700",
-    rating: 4,
-    image: ProductImage,
-    price: 329000,
-  },
-  {
-    id: 4,
-    category: "램",
-    name: "삼성전자 DDR5-5600 16GB",
-    rating: 4,
-    image: ProductImage,
-    price: 59000,
-  },
-  {
-    id: 5,
-    category: "램",
-    name: "SK하이닉스 DDR5-5600 16GB",
-    rating: 4,
-    image: ProductImage,
-    price: 62000,
-  },
-  {
-    id: 6,
-    category: "램",
-    name: "G.SKILL Ripjaws S5 DDR5-6000 32GB",
-    rating: 5,
-    image: ProductImage,
-    price: 159000,
-  },
-  {
-    id: 7,
-    category: "메인보드",
-    name: "MSI PRO B760M-A WIFI",
-    rating: 4,
-    image: ProductImage,
-    price: 189000,
-  },
-  {
-    id: 8,
-    category: "메인보드",
-    name: "ASUS PRIME B760M-A",
-    rating: 4,
-    image: ProductImage,
-    price: 169000,
-  },
-  {
-    id: 9,
-    category: "메인보드",
-    name: "GIGABYTE B650M K",
-    rating: 4,
-    image: ProductImage,
-    price: 155000,
-  },
-  {
-    id: 10,
-    category: "그래픽카드",
-    name: "ZOTAC RTX 4060 SOLO",
-    rating: 4,
-    image: ProductImage,
-    price: 449000,
-  },
-  {
-    id: 11,
-    category: "그래픽카드",
-    name: "MSI RTX 4060 VENTUS 2X",
-    rating: 4,
-    image: ProductImage,
-    price: 479000,
-  },
-  {
-    id: 12,
-    category: "그래픽카드",
-    name: "SAPPHIRE RX 7600 PULSE",
-    rating: 4,
-    image: ProductImage,
-    price: 389000,
-  },
-  {
-    id: 13,
-    category: "저장장치",
-    name: "삼성전자 990 EVO Plus 1TB",
-    rating: 5,
-    image: ProductImage,
-    price: 129000,
-  },
-  {
-    id: 14,
-    category: "저장장치",
-    name: "SK하이닉스 Platinum P41 1TB",
-    rating: 5,
-    image: ProductImage,
-    price: 139000,
-  },
-  {
-    id: 15,
-    category: "저장장치",
-    name: "WD Blue SN580 1TB",
-    rating: 4,
-    image: ProductImage,
-    price: 99000,
-  },
-  {
-    id: 16,
-    category: "케이스",
-    name: "darkFlash DS900 ARGB",
-    rating: 4,
-    image: ProductImage,
-    price: 69000,
-  },
-  {
-    id: 17,
-    category: "케이스",
-    name: "3RSYS L600 Quiet",
-    rating: 4,
-    image: ProductImage,
-    price: 79000,
-  },
-  {
-    id: 18,
-    category: "케이스",
-    name: "마이크로닉스 COOLMAX 섀도우2",
-    rating: 4,
-    image: ProductImage,
-    price: 59000,
-  },
-  {
-    id: 19,
-    category: "파워",
-    name: "마이크로닉스 Classic II 750W",
-    rating: 4,
-    image: ProductImage,
-    price: 119000,
-  },
-  {
-    id: 20,
-    category: "파워",
-    name: "FSP HYDRO G PRO 750W",
-    rating: 5,
-    image: ProductImage,
-    price: 139000,
-  },
-  {
-    id: 21,
-    category: "파워",
-    name: "시소닉 FOCUS GX-850",
-    rating: 5,
-    image: ProductImage,
-    price: 189000,
-  },
-];
-
-const categories = ["CPU", "램", "메인보드", "그래픽카드", "저장장치", "케이스", "파워"];
+import { PC_ASSEMBLY_CATEGORIES, pcAssemblyProducts } from "@/utils/pcAssemblyProducts";
 
 function PcAssembly() {
   const dispatch = useDispatch();
@@ -248,7 +75,7 @@ function PcAssembly() {
   const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const filteredProducts = useMemo(
-    () => productList.filter((product) => product.category === selectedCategory),
+    () => pcAssemblyProducts.filter((product) => product.category === selectedCategory),
     [selectedCategory],
   );
 
@@ -259,7 +86,7 @@ function PcAssembly() {
         productId: product.id,
         category: product.category,
         name: product.name,
-        option: "기본옵션",
+        option: product.option,
         price: product.price,
         quantity: 1,
         image: product.image,
@@ -271,7 +98,7 @@ function PcAssembly() {
 
   const filterContent = (
     <div className="pc-assembly__filter">
-      {categories.map((category) => (
+      {PC_ASSEMBLY_CATEGORIES.map((category) => (
         <button
           key={category}
           type="button"

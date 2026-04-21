@@ -1,11 +1,11 @@
 import "./PcAssemblyQuote.scss";
 import PcAssemblyQuoteList from "@/components/PcAssemblyQuoteList/PcAssemblyQuoteList";
 import CheckIcon from "@/assets/icons/check.svg";
-import ProductImage from "@/assets/products/product-example.jpg";
 import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { removeQuoteItems, clearQuoteItems } from "@/store/slices/quoteSlice";
+import { getPcAssemblyRecommendations } from "@/utils/pcAssemblyProducts";
 
 function PcAssemblyQuote({ isModal = false }) {
   const dispatch = useDispatch();
@@ -27,32 +27,7 @@ function PcAssemblyQuote({ isModal = false }) {
     [],
   );
 
-  const recommendItems = useMemo(
-    () => [
-      {
-        id: 1001,
-        name: "AMD 라이젠7 9700X",
-        option: "기본 옵션",
-        price: 1000,
-        image: ProductImage,
-      },
-      {
-        id: 1002,
-        name: "FSP HYDRO G PRO 850W",
-        option: "기본 옵션",
-        price: 1000,
-        image: ProductImage,
-      },
-      {
-        id: 1003,
-        name: "SK하이닉스 P41 2TB",
-        option: "기본 옵션",
-        price: 1000,
-        image: ProductImage,
-      },
-    ],
-    [],
-  );
+  const recommendItems = useMemo(() => getPcAssemblyRecommendations(items), [items]);
 
   const handleSelectAll = () => {
     setSelectedIds(isAllSelected ? [] : items.map((item) => item.id));
