@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import ChatPanel from "./ChatPanel";
 import ChatTriggerButton from "./ChatTriggerButton";
+import ScrollTopButton from "../ScrollTopButton/ScrollTopButton";
 import {
   CHAT_MODE,
   CHAT_SUGGESTIONS,
@@ -356,6 +357,8 @@ function FloatingChatWidget() {
           onClose={handleClose}
         />
       )}
+
+      <ScrollTopButton className="chat-widget__scroll-top" />
 
       <ChatTriggerButton
         isOpen={isOpen}

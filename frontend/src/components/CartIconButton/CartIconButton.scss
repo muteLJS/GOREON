@@ -3,15 +3,42 @@
 
 .cart-icon-button {
   @include flex-center;
+  padding: 0;
   border: 0;
+  border-radius: $radius-full;
+  background-color: $color-white;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
   cursor: pointer;
 
   img {
     display: block;
+    margin: 0 auto;
   }
 
   &:disabled {
     cursor: not-allowed;
     opacity: 0.5;
+  }
+}
+
+.cart-icon-button--md {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+
+  img {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.cart-icon-button--sm {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+
+  img {
+    width: 15px;
+    height: 15px;
   }
 }

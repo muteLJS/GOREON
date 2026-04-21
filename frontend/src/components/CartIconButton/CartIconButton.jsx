@@ -6,7 +6,7 @@ import "./CartIconButton.scss";
 
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
 
-function CartIconButton({ product, className = "" }) {
+function CartIconButton({ product, className = "", size = "md" }) {
   const dispatch = useDispatch();
 
   const handleClick = (event) => {
@@ -32,7 +32,7 @@ function CartIconButton({ product, className = "" }) {
   return (
     <button
       type="button"
-      className={`cart-icon-button ${className}`.trim()}
+      className={`cart-icon-button cart-icon-button--${size} ${className}`.trim()}
       aria-label="장바구니 담기"
       onClick={handleClick}
     >

@@ -4,12 +4,12 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, FreeMode } from "swiper/modules";
 import "swiper/css";
 import AICharacter from "components/AICharacter/AICharacter";
-import Review_user from "assets/Icons/review_user.svg";
-import Book from "assets/Icons/main/book.svg";
-import Direct from "assets/Icons/main/direct.svg";
-import Game from "assets/Icons/main/game.svg";
-import Lighting from "assets/Icons/main/lighting.svg";
-import Together from "assets/Icons/main/together.svg";
+import Review_user from "assets/icons/review_user.svg";
+import Book from "assets/icons/main/book.svg";
+import Direct from "assets/icons/main/direct.svg";
+import Game from "assets/icons/main/game.svg";
+import Lighting from "assets/icons/main/lighting.svg";
+import Together from "assets/icons/main/together.svg";
 import More from "components/more/More";
 import PackageCard from "components/PackageCard/PackageCard";
 import PromptButtonList from "components/PromptButtonList/PromptButtonList";
@@ -18,8 +18,6 @@ import UpdateSubCard from "components/UpdateSubCard/UpdateSubCard";
 import CartIconButton from "components/CartIconButton/CartIconButton";
 import WishlistIconButton from "components/WishlistIconButton/WishlistIconButton";
 import EventModal from "components/EventModal/EventModal";
-import Cart_straight from "assets/icons/cart-straight.svg";
-import LikeCircle from "components/Likecircle/Likecircle";
 
 const MAIN_PRODUCT_ID = 1;
 const MAIN_PRODUCT_IMAGE =
@@ -600,34 +598,32 @@ function Main() {
     </div>
   );
 
-  const renderCategoryCard = (item) => (
-    <div className="items pointer" key={item.name}>
-      <div className="item_img_box">
-        <img
-          src="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png"
-          alt="items"
-          className="item_img"
-        />
-        <div className="icons">
-          <button type="button" aria-label={`${item.name} 장바구니 담기`}>
-            <img src={Cart_straight} alt="" />
-          </button>
-          <LikeCircle />
+  const renderCategoryCard = (item) => {
+    const product = createMainProduct({ ...item, image: MAIN_PRODUCT_IMAGE });
+
+    return (
+      <div className="items pointer" key={item.name}>
+        <div className="item_img_box">
+          <img src={MAIN_PRODUCT_IMAGE} alt="items" className="item_img" />
+          <div className="icons">
+            <CartIconButton product={product} />
+            <WishlistIconButton product={product} />
+          </div>
+        </div>
+        <p className="item_name">{item.name}</p>
+        <div className="options">
+          {item.tags.map((tag) => (
+            <p key={tag}>{tag}</p>
+          ))}
+        </div>
+        <p className="item_price">{item.price}</p>
+        <div className="item_colors">
+          <div className="color1 colors"></div>
+          <div className="color2 colors"></div>
         </div>
       </div>
-      <p className="item_name">{item.name}</p>
-      <div className="options">
-        {item.tags.map((tag) => (
-          <p key={tag}>{tag}</p>
-        ))}
-      </div>
-      <p className="item_price">{item.price}</p>
-      <div className="item_colors">
-        <div className="color1 colors"></div>
-        <div className="color2 colors"></div>
-      </div>
-    </div>
-  );
+    );
+  };
 
   const renderCategoryItems = () => {
     const isDesktop = isDesktopCategory;
@@ -1056,10 +1052,12 @@ function Main() {
                         <div className="item_img_box">
                           <img src={item.image} alt={item.name} className="item_img" />
                           <div className="icons">
-                            <button type="button" aria-label={`${item.name} 장바구니 담기`}>
-                              <img src={Cart_straight} alt="" />
-                            </button>
-                            <LikeCircle />
+                            <CartIconButton
+                              product={createMainProduct({ ...item, image: item.image })}
+                            />
+                            <WishlistIconButton
+                              product={createMainProduct({ ...item, image: item.image })}
+                            />
                           </div>
                         </div>
                         <div className="item_texts">
