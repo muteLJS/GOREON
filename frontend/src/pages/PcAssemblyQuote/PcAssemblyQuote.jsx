@@ -5,54 +5,118 @@ import { analyzePcCompatibility } from "@/utils/pcCompatibility";
 import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { removeQuoteItems, clearQuoteItems } from "@/store/slices/quoteSlice";
-import { getPcAssemblyRecommendations } from "@/utils/pcAssemblyProducts";
+import {
+  addQuoteItem,
+  updateQuoteItemQuantity,
+  removeQuoteItems,
+  clearQuoteItems,
+} from "@/store/slices/quoteSlice";
+import {
+  getPcAssemblyPerformanceChecks,
+  getPcAssemblyRecommendations,
+} from "@/utils/pcAssemblyProducts";
 
 function PcAssemblyQuote({ isModal = false }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const items = useSelector((state) => state.quote.items);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [analysisIds, setAnalysisIds] = useState([]);
   const isAllSelected = items.length > 0 && selectedIds.length === items.length;
   const Root = isModal ? "div" : "main";
 
-  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const getItemQuantity = (item) => Number(item.quantity) || 1;
+  const totalPrice = items.reduce((sum, item) => sum + item.price * getItemQuantity(item), 0);
+  const selectedCount = selectedIds.length;
+  const hasSelectedItems = selectedCount > 0;
+  const selectedItemSet = useMemo(() => new Set(selectedIds), [selectedIds]);
+  const analysisItemSet = useMemo(() => new Set(analysisIds), [analysisIds]);
+  const analyzedItems = useMemo(
+    () => items.filter((item) => selectedItemSet.has(item.id) && analysisItemSet.has(item.id)),
+    [items, selectedItemSet, analysisItemSet],
+  );
+  const hasAnalyzedItems = analyzedItems.length > 0;
 
   const compatibility = useMemo(() => analyzePcCompatibility(items), [items]);
   const performanceChecks = compatibility.checks;
 
   const recommendItems = useMemo(() => getPcAssemblyRecommendations(items), [items]);
 
+  useEffect(() => {
+    const itemIds = new Set(items.map((item) => item.id));
+    setSelectedIds((prev) => prev.filter((id) => itemIds.has(id)));
+    setAnalysisIds((prev) => prev.filter((id) => itemIds.has(id)));
+  }, [items]);
+
   const handleSelectAll = () => {
     setSelectedIds(isAllSelected ? [] : items.map((item) => item.id));
+    setAnalysisIds([]);
   };
 
   const handleSelectItem = (id) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id],
     );
+    setAnalysisIds([]);
   };
 
   const handleDeleteSelected = () => {
     dispatch(removeQuoteItems(selectedIds));
     setSelectedIds([]);
+    setAnalysisIds([]);
   };
 
   const handleClear = () => {
     dispatch(clearQuoteItems());
     setSelectedIds([]);
+    setAnalysisIds([]);
   };
 
   const handleCompatibilityCheck = () => {
-    console.log("호환성 검사");
+    setAnalysisIds(selectedIds);
   };
 
   const handleAddCart = () => {
     console.log("장바구니 담기", items);
   };
 
+  const handleDecreaseQuantity = (item) => {
+    dispatch(updateQuoteItemQuantity({ id: item.id, quantity: getItemQuantity(item) - 1 }));
+  };
+
+  const handleIncreaseQuantity = (item) => {
+    dispatch(updateQuoteItemQuantity({ id: item.id, quantity: getItemQuantity(item) + 1 }));
+  };
+
   const handleRecommendClick = (productId) => {
     navigate(`/product/${productId}`);
+  };
+
+  const createRecommendationQuoteId = (product) => {
+    const randomId =
+      typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+    return `${product.category}-${product.id}-${randomId}`;
+  };
+
+  const handleRecommendAdd = (product) => {
+    dispatch(
+      addQuoteItem({
+        id: createRecommendationQuoteId(product),
+        productId: product.id,
+        category: product.category,
+        name: product.name,
+        option: product.option,
+        price: product.price,
+        quantity: 1,
+        image: product.image,
+        rating: product.rating,
+        compatibility: "ok",
+        status: "ok",
+      }),
+    );
   };
 
   return (
@@ -79,14 +143,17 @@ function PcAssemblyQuote({ isModal = false }) {
           <PcAssemblyQuoteList
             productList={items}
             selectedIds={selectedIds}
+            compatibilityLevels={compatibilityLevelMap}
             onSelectItem={handleSelectItem}
+            onDecreaseQuantity={handleDecreaseQuantity}
+            onIncreaseQuantity={handleIncreaseQuantity}
           />
         </section>
 
         <section className="pc-assembly-quote__compatibility">
           <div className="pc-assembly-quote__compatibility-count">
             <img src={CheckIcon} alt="체크" />
-            부품 {items.length}개 선택
+            부품 {selectedCount}개 선택
           </div>
           <div className={`pc-assembly-quote__compatibility-status is-${compatibility.level}`}>
             {compatibility.message}
@@ -95,6 +162,7 @@ function PcAssemblyQuote({ isModal = false }) {
             className="pc-assembly-quote__compatibility-check"
             type="button"
             onClick={handleCompatibilityCheck}
+            disabled={!hasSelectedItems}
           >
             호환성 검사
           </button>
@@ -129,23 +197,33 @@ function PcAssemblyQuote({ isModal = false }) {
               <h3 className="pc-assembly-quote__section-title">업그레이드 추천</h3>
               <div className="pc-assembly-quote__recommend-list">
                 {recommendItems.map((item) => (
-                  <button
-                    type="button"
-                    className="pc-assembly-quote__recommend-card"
-                    key={item.id}
-                    onClick={() => handleRecommendClick(item.id)}
-                  >
+                  <article className="pc-assembly-quote__recommend-card" key={item.id}>
                     <div className="pc-assembly-quote__recommend-thumb">
                       <img src={item.image} alt={item.name} />
                     </div>
                     <div className="pc-assembly-quote__recommend-main">
-                      <div className="pc-assembly-quote__recommend-name">{item.name}</div>
+                      <button
+                        type="button"
+                        className="pc-assembly-quote__recommend-name"
+                        onClick={() => handleRecommendClick(item.id)}
+                      >
+                        {item.name}
+                      </button>
                       <p className="pc-assembly-quote__recommend-meta">{item.option}</p>
-                      <strong className="pc-assembly-quote__recommend-price">
-                        ₩{item.price.toLocaleString("ko-KR")}
-                      </strong>
+                      <div className="pc-assembly-quote__recommend-bottom">
+                        <strong className="pc-assembly-quote__recommend-price">
+                          ₩{item.price.toLocaleString("ko-KR")}
+                        </strong>
+                        <button
+                          type="button"
+                          className="pc-assembly-quote__recommend-add"
+                          onClick={() => handleRecommendAdd(item)}
+                        >
+                          담기
+                        </button>
+                      </div>
                     </div>
-                  </button>
+                  </article>
                 ))}
               </div>
             </section>

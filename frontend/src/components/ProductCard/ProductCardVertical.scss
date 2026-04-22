@@ -10,7 +10,6 @@
   font-size: $font-xs;
   padding: $space-md;
   font-weight: $font-bold;
-  cursor: pointer;
 
   &__thumbnail {
     width: 100%;
@@ -21,6 +20,14 @@
   &__title {
     @include ellipsis-multi(2);
     min-height: $font-xs * $line-height-base * 2;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: $color-text-main;
+    font: inherit;
+    font-weight: $font-bold;
+    text-align: left;
+    cursor: pointer;
   }
 
   &__bottom {
@@ -29,4 +36,3 @@
     align-items: center;
   }
 }
-

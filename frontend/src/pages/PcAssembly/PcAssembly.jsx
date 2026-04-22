@@ -240,6 +240,32 @@ function PcAssembly() {
     </div>
   );
 
+  const renderSectionBar = () => (
+    <section className="pc-assembly__section-bar" aria-label="견적 요약">
+      <strong className="pc-assembly__total">TOTAL : ₩{formattedTotalPrice}</strong>
+      <div className="pc-assembly__compatibility">
+        <div className="pc-assembly__compatibility-count">
+          <img src={CheckIcon} alt="체크" />
+          부품 {quoteItemCount}개 선택
+        </div>
+        {compatibilityStatus && (
+          <div
+            className={`pc-assembly__compatibility-status pc-assembly__compatibility-status--${compatibilityStatus.level}`}
+          >
+            {compatibilityStatus.text}
+          </div>
+        )}
+        <button
+          type="button"
+          className="pc-assembly__list-button"
+          onClick={() => setIsQuoteOpen(true)}
+        >
+          견적 리스트
+        </button>
+      </div>
+    </section>
+  );
+
   return (
     <main className="pc-assembly" ref={assemblyRef}>
       <section className="pc-assembly__banner">
@@ -278,10 +304,9 @@ function PcAssembly() {
       </section>
 
       <section className="pc-assembly__desktop">
+        {renderSectionBar()}
+
         <aside className="pc-assembly__sidebar">
-          <button className="pc-assembly__total">
-            TOTAL : ₩{totalPrice.toLocaleString("ko-KR")}
-          </button>
           <div className="pc-assembly__desktop-filter">
             <div className="pc-assembly__desktop-filter-title">카테고리</div>
             <div className="pc-assembly__desktop-filter-list">{filterContent}</div>
@@ -319,7 +344,7 @@ function PcAssembly() {
           title="견적 리스트"
           onClose={() => setIsQuoteOpen(false)}
           className="modal--fullscreen pc-assembly__quote-modal"
-          overlayClassName="modal-overlay--fullscreen"
+          overlayClassName="modal-overlay--fullscreen pc-assembly__quote-overlay"
         >
           <PcAssemblyQuote isModal />
         </Modal>
