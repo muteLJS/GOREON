@@ -15,14 +15,44 @@ dotenv.config({
 
 const REVIEWER_DEFINITIONS = [
   {
-    name: "고런 리뷰어 1",
+    name: "김민준",
     email: "seed-reviewer-1@goreon.local",
-    phone: "010-0000-0001",
+    phone: "010-2451-1032",
   },
   {
-    name: "고런 리뷰어 2",
+    name: "박서연",
     email: "seed-reviewer-2@goreon.local",
-    phone: "010-0000-0002",
+    phone: "010-3187-4421",
+  },
+  {
+    name: "이도윤",
+    email: "seed-reviewer-3@goreon.local",
+    phone: "010-5714-8250",
+  },
+  {
+    name: "최지우",
+    email: "seed-reviewer-4@goreon.local",
+    phone: "010-8042-6613",
+  },
+  {
+    name: "정하윤",
+    email: "seed-reviewer-5@goreon.local",
+    phone: "010-4628-1995",
+  },
+  {
+    name: "한예준",
+    email: "seed-reviewer-6@goreon.local",
+    phone: "010-7365-2804",
+  },
+  {
+    name: "윤서진",
+    email: "seed-reviewer-7@goreon.local",
+    phone: "010-5293-7146",
+  },
+  {
+    name: "오지호",
+    email: "seed-reviewer-8@goreon.local",
+    phone: "010-6834-5527",
   },
 ];
 
@@ -30,12 +60,42 @@ const REVIEW_VARIANTS = [
   {
     rating: 5,
     content: (product) =>
-      `${product.name} 만족도가 높아요. 배송 이후 바로 써봤는데 성능이 안정적이고 전반적으로 기대한 느낌과 잘 맞았습니다.`,
+      `${product.name} 마감이나 체감 성능이 기대 이상이었습니다. 처음 세팅하고 바로 써봤는데 반응이 빠르고 전체적으로 완성도가 높게 느껴졌어요.`,
   },
   {
     rating: 4,
     content: (product) =>
-      `${product.name} 가성비가 괜찮습니다. 기본 성능은 충분했고 설치나 세팅 과정도 무난해서 부담 없이 쓰기 좋았습니다.`,
+      `${product.name} 기본기 탄탄한 느낌입니다. 성능이 안정적이고 사용하면서 크게 거슬리는 부분이 없어서 무난하게 만족했습니다.`,
+  },
+  {
+    rating: 5,
+    content: (product) =>
+      `${product.name} 실사용 만족도가 높습니다. 화면이나 동작 속도, 전반적인 밸런스가 좋아서 메인으로 쓰기에도 충분하다고 느꼈어요.`,
+  },
+  {
+    rating: 3,
+    content: (product) =>
+      `${product.name} 전반적으로는 괜찮지만 세세한 부분에서 조금 아쉬움이 남습니다. 그래도 가격 생각하면 납득 가능한 수준입니다.`,
+  },
+  {
+    rating: 4,
+    content: (product) =>
+      `${product.name} 설치 후 바로 써봤는데 사용감이 깔끔했습니다. 성능 대비 가격이 괜찮아서 입문용이나 교체용으로도 괜찮아 보여요.`,
+  },
+  {
+    rating: 5,
+    content: (product) =>
+      `${product.name} 생각했던 용도에 잘 맞았습니다. 성능과 안정성이 모두 괜찮아서 오래 써도 크게 스트레스 없을 것 같습니다.`,
+  },
+  {
+    rating: 3,
+    content: (product) =>
+      `${product.name} 장점은 분명하지만 기대가 컸던 만큼 평범하게 느껴진 부분도 있었습니다. 그래도 기본 사용에는 큰 문제 없었습니다.`,
+  },
+  {
+    rating: 4,
+    content: (product) =>
+      `${product.name} 첫인상보다 실사용이 더 괜찮았습니다. 세팅도 어렵지 않았고 일상 작업이나 취미용으로 쓰기 충분했습니다.`,
   },
 ];
 
@@ -47,6 +107,17 @@ function buildReviewTimestamp(productIndex, reviewIndex) {
     createdAt,
     updatedAt: createdAt,
   };
+}
+
+async function findExistingSeedUsers() {
+  return User.find(
+    {
+      email: {
+        $regex: /^seed-reviewer-\d+@goreon\.local$/i,
+      },
+    },
+    { _id: 1, email: 1 },
+  );
 }
 
 async function ensureSeedUsers() {
@@ -61,12 +132,21 @@ async function ensureSeedUsers() {
         ...reviewer,
         password: hashedPassword,
       });
+    } else {
+      user.name = reviewer.name;
+      user.phone = reviewer.phone;
+      await user.save();
     }
 
     users.push(user);
   }
 
   return users;
+}
+
+function getReviewCountForProduct(productIndex) {
+  const counts = [2, 2, 3, 3, 4];
+  return counts[productIndex % counts.length];
 }
 
 async function seedReviews() {
@@ -91,21 +171,31 @@ async function seedReviews() {
     throw new Error("No products found. Seed products first.");
   }
 
+  const existingSeedUsers = await findExistingSeedUsers();
+  const existingSeedUserIds = existingSeedUsers.map((user) => user._id);
   const seedUsers = await ensureSeedUsers();
   const seedUserIds = seedUsers.map((user) => user._id);
 
-  const deleteResult = await Review.deleteMany({ user: { $in: seedUserIds } });
+  const deleteResult = await Review.deleteMany({
+    user: { $in: [...existingSeedUserIds, ...seedUserIds] },
+  });
 
-  const reviewDocs = products.flatMap((product, productIndex) =>
-    REVIEW_VARIANTS.map((variant, reviewIndex) => ({
-      user: seedUsers[reviewIndex % seedUsers.length]._id,
-      product: product._id,
-      rating: variant.rating,
-      content: variant.content(product),
-      images: [],
-      ...buildReviewTimestamp(productIndex, reviewIndex),
-    })),
-  );
+  const reviewDocs = products.flatMap((product, productIndex) => {
+    const reviewCount = getReviewCountForProduct(productIndex);
+
+    return Array.from({ length: reviewCount }, (_, reviewIndex) => {
+      const variant = REVIEW_VARIANTS[(productIndex + reviewIndex) % REVIEW_VARIANTS.length];
+
+      return {
+        user: seedUsers[reviewIndex % seedUsers.length]._id,
+        product: product._id,
+        rating: variant.rating,
+        content: variant.content(product),
+        images: [],
+        ...buildReviewTimestamp(productIndex, reviewIndex),
+      };
+    });
+  });
 
   const insertedReviews = await Review.insertMany(reviewDocs, { ordered: false });
 
