@@ -12,6 +12,7 @@
 .payment-page__layout,
 .payment-page__content,
 .payment-page__sidebar,
+.payment-page__section,
 .payment-page__card,
 .payment-page__summary-card,
 .payment-page__method-list,
@@ -22,7 +23,7 @@
 
 .payment-page__header {
   width: 100%;
-  max-width: 1280px;
+  max-width: $layout-desktop-max-width;
   margin: 0 auto;
   padding-top: 0;
 }
@@ -43,7 +44,7 @@
   display: grid;
   gap: 36px;
   width: 100%;
-  max-width: 1280px;
+  max-width: $layout-desktop-max-width;
   margin: 34px auto 0;
 }
 
@@ -51,6 +52,12 @@
 .payment-page__sidebar {
   display: grid;
   gap: 36px;
+  align-items: stretch;
+}
+
+.payment-page__section {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .payment-page__section-title {
@@ -439,7 +446,7 @@
 
   .payment-page__layout {
     grid-template-columns: minmax(0, 1.55fr) minmax(340px, 0.95fr);
-    gap: 70px;
+    gap: 72px;
     align-items: start;
     margin-top: 92px;
   }

@@ -117,6 +117,14 @@
       @include flex(center, center);
       gap: 50px;
     }
+
+    .social-icon-button {
+      @include flex-center;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+    }
   }
 }
 
@@ -278,6 +286,14 @@
       .social-icons {
         @include flex(center, center);
         gap: 50px;
+      }
+
+      .social-icon-button {
+        @include flex-center;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
       }
     }
   }

@@ -520,17 +520,26 @@
     }
 
     &__compatibility {
-      grid-template-columns: minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr) auto;
       padding: 10px 12px;
+      gap: 8px 12px;
     }
 
-    &__compatibility-count,
-    &__compatibility-status,
+    &__compatibility-count {
+      grid-column: 1;
+      font-size: $font-sm;
+    }
+
+    &__compatibility-status {
+      grid-column: 2;
+      justify-content: flex-end;
+      max-width: 50vw;
+      font-size: $font-sm;
+      text-align: right;
+    }
+
     &__compatibility-check {
       grid-column: 1 / -1;
-    }
-
-    &__compatibility-check {
       width: 100%;
       justify-self: stretch;
     }

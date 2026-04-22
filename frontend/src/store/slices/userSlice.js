@@ -1,17 +1,31 @@
-﻿/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 /* [상태관리] 유저 상태 (userSlice.js)                                        */
-/* 로그인 여부, 유저 정보, 인증 토큰 등 회원 관련 전역 상태를 관리합니다.     */
+/* 로그인 여부와 유저 정보를 관리합니다. 인증 토큰은 httpOnly 쿠키로만 보관합니다. */
 /* -------------------------------------------------------------------------- */
 
 import { createSlice } from "@reduxjs/toolkit";
 
-const persistedToken = localStorage.getItem("authToken");
 const persistedUser = localStorage.getItem("userInfo");
 
+const parsePersistedUser = () => {
+  if (!persistedUser) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(persistedUser);
+  } catch {
+    localStorage.removeItem("userInfo");
+    return null;
+  }
+};
+
+const initialUser = parsePersistedUser();
+
 const initialState = {
-  isLoggedIn: Boolean(persistedToken),
-  token: persistedToken || null,
-  userInfo: persistedUser ? JSON.parse(persistedUser) : null,
+  isLoggedIn: Boolean(initialUser),
+  token: null,
+  userInfo: initialUser,
 };
 
 const userSlice = createSlice({
@@ -21,7 +35,7 @@ const userSlice = createSlice({
     login: (state, action) => {
       state.isLoggedIn = true;
       state.userInfo = action.payload.user;
-      state.token = action.payload.token;
+      state.token = null;
     },
     logout: (state) => {
       state.isLoggedIn = false;

@@ -51,6 +51,10 @@
 
   &__add-button {
     @include button-base();
+      min-width: 44px;
+      height: 20px;
+      padding: 0px 0px;    
+      font-size: $font-xs;
   }
 
   &__section-bar {
@@ -165,7 +169,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 24px;
+    padding: 24px 12px;
   }
 
   &__desktop-quote-dim {
@@ -177,7 +181,7 @@
   &__desktop-quote-panel {
     position: relative;
     z-index: 1;
-    width: min(var(--quote-w, 1216px), calc(100vw - 48px));
+    width: min(calc(var(--quote-w, 1216px) + 40px), calc(100vw - 24px));
     height: min(840px, calc(100dvh - 48px));
     background: $color-white;
     border-radius: 20px;
@@ -239,6 +243,42 @@
 
 @include mobile {
   .pc-assembly {
+    &__product-grid {
+      align-items: stretch;
+
+      .product-card-vertical {
+        height: 100%;
+        min-width: 0;
+      }
+
+      .product-card-vertical__thumbnail {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 4 / 3;
+        object-fit: contain;
+        object-position: center;
+        flex-shrink: 0;
+      }
+
+      .product-card-vertical__bottom {
+        gap: $space-xs;
+        margin-top: auto;
+      }
+    }
+
+    &__quote-overlay {
+      &.modal-overlay--fullscreen {
+        align-items: flex-end;
+        padding-top: 12px;
+      }
+    }
+
+    &__quote-modal {
+      height: calc(100dvh - 12px);
+      border-radius: 20px 20px 0 0;
+      padding-top: 12px;
+    }
+
     &__total {
       min-height: 42px;
       font-size: clamp($font-sm, 4vw, $font-md);
@@ -313,7 +353,7 @@
 
 @include desktop-up {
   .pc-assembly {
-    padding-top: $page-content-start-desktop;
+    padding-top: 40px;
 
     &__title {
       margin: 0 auto;
