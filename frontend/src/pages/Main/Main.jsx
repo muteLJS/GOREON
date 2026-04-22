@@ -20,10 +20,11 @@ import WishlistIconButton from "components/WishlistIconButton/WishlistIconButton
 import EventModal from "components/EventModal/EventModal";
 import Modal from "components/Modal/Modal";
 import productsData from "@/data/products_list.json";
+import api from "@/utils/api";
 import { fetchAiRecommendations } from "@/utils/recommendations";
 
 const mainProducts = productsData;
-const getProductRouteId = (product) => product?._id ?? product?.productId ?? product?.id;
+const EMPTY_AI_PLACEHOLDER = "검색어를 입력해주세요!";
 
 const getMainProductById = (id) => mainProducts.find((product) => product.id === id);
 
@@ -87,15 +88,95 @@ const toPackageDetail = (product, label) => ({
   image: product.image,
 });
 
+const normalizeImageUrl = (value) => {
+  const raw = String(value ?? "").trim();
+
+  if (!raw || raw.startsWith("http:///")) {
+    return "";
+  }
+
+  if (raw.startsWith("http://")) {
+    return `https://${raw.slice("http://".length)}`;
+  }
+
+  return raw;
+};
+
+const getAiReviewProductId = (product) => product.productId ?? product._id ?? product.id;
+
+const getProductRouteId = (product) => product.id ?? product.productId ?? product._id;
+
+const formatAiReviewUserName = (name) => {
+  const trimmedName = String(name ?? "").trim();
+
+  if (!trimmedName || /^\?+$/.test(trimmedName)) {
+    return "구매 고객";
+  }
+
+  return trimmedName;
+};
+
+const normalizeLatestAiReview = ({ product, review }) => {
+  if (!review) {
+    return null;
+  }
+
+  return {
+    id: String(review._id ?? `${getAiReviewProductId(product)}-latest-review`),
+    userImage: normalizeImageUrl(review.user?.profileImage) || Review_user,
+    userName: formatAiReviewUserName(review.user?.name),
+    productName: product.name,
+    description: review.content || "구매 후 작성된 리뷰입니다.",
+    rating: Math.max(0, Math.min(5, Math.round(Number(review.rating) || 0))),
+  };
+};
+
+const fetchLatestAiReviews = async ({ products, signal }) => {
+  const reviewResults = await Promise.allSettled(
+    products.map(async (product) => {
+      const productId = getAiReviewProductId(product);
+
+      if (!productId) {
+        return null;
+      }
+
+      const response = await api.get(`/reviews/${productId}`, { signal });
+      const reviews = Array.isArray(response.data) ? response.data : [];
+
+      return normalizeLatestAiReview({ product, review: reviews[0] });
+    }),
+  );
+
+  if (signal?.aborted) {
+    throw new DOMException("Review request was aborted", "AbortError");
+  }
+
+  const latestReviews = reviewResults
+    .filter((result) => result.status === "fulfilled" && result.value)
+    .map((result) => result.value);
+
+  const failedReviewRequests = reviewResults.filter((result) => result.status === "rejected");
+
+  if (latestReviews.length === 0 && failedReviewRequests.length === reviewResults.length) {
+    throw failedReviewRequests[0].reason;
+  }
+
+  return latestReviews;
+};
+
 function Main() {
   const navigate = useNavigate();
   const [showAiResult, setShowAiResult] = useState(false);
   const [isAiSwitching, setIsAiSwitching] = useState(false);
   const [aiQuery, setAiQuery] = useState("");
+  const [isAiInputEmptyError, setIsAiInputEmptyError] = useState(false);
   const [aiStatus, setAiStatus] = useState("idle");
   const [aiMessage, setAiMessage] = useState("");
   const [aiResults, setAiResults] = useState([]);
   const [aiErrorMessage, setAiErrorMessage] = useState("");
+  const [aiReviewStatus, setAiReviewStatus] = useState("idle");
+  const [aiReviewItems, setAiReviewItems] = useState([]);
+  const [aiReviewMessage, setAiReviewMessage] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("direct");
   const [selectedSpecProduct, setSelectedSpecProduct] = useState(null);
   const [selectedUpdateIndex, setSelectedUpdateIndex] = useState(0);
@@ -109,6 +190,7 @@ function Main() {
   });
   const aiSwitchTimeoutRef = useRef(null);
   const aiRequestAbortRef = useRef(null);
+  const aiResultSectionRef = useRef(null);
   const categorySwiperRef = useRef(null);
   const categoryProgressRef = useRef(null);
   const promptItems = [
@@ -118,14 +200,6 @@ function Main() {
     "👨‍👩‍👦 부모님 쉽게 쓸 테블릿",
     "🖨 가정용 프린터 추천",
   ];
-  const reviewDescription = (
-    <>
-      고르미가 “RAM 6GB면 충분한 이유”를 어르신 눈높이에서 설명해줬어요. <br />
-      처음엔 아이패드랑 고민했는데 안드로이즈가 더 익숙하실 거라는 포인트가 정확했습니다. 부모님도
-      잘 쓰고 계세요!
-    </>
-  );
-
   const editingPackageItems = [
     toPackageDetail(getMainProduct(208), "CPU"),
     toPackageDetail(getMainProduct(324), "VGA"),
@@ -306,7 +380,14 @@ function Main() {
   };
 
   const handleAiInput = (e) => {
-    setAiQuery(e.target.value);
+    const nextQuery = e.target.value;
+
+    setAiQuery(nextQuery);
+
+    if (nextQuery.trim()) {
+      setIsAiInputEmptyError(false);
+    }
+
     handleInput(e);
   };
 
@@ -345,6 +426,7 @@ function Main() {
       .replace(/^[^\p{L}\p{N}]+/u, "")
       .trim();
     setAiQuery(promptWithoutEmoji || prompt);
+    setIsAiInputEmptyError(false);
   };
 
   const updateCategorySwiperState = (swiper = categorySwiperRef.current) => {
@@ -407,13 +489,12 @@ function Main() {
     const query = aiQuery.trim();
 
     if (!query) {
-      setAiStatus("error");
-      setAiErrorMessage("추천받고 싶은 용도나 예산을 입력해주세요.");
-      setAiMessage("추천받고 싶은 용도나 예산을 입력해주세요.");
-      setAiResults([]);
-      startAiResultTransition();
+      setAiQuery("");
+      setIsAiInputEmptyError(true);
       return;
     }
+
+    setIsAiInputEmptyError(false);
 
     if (aiRequestAbortRef.current) {
       aiRequestAbortRef.current.abort();
@@ -426,6 +507,9 @@ function Main() {
     setAiErrorMessage("");
     setAiMessage("조건에 맞는 상품을 찾는 중입니다.");
     setAiResults([]);
+    setAiReviewStatus("idle");
+    setAiReviewItems([]);
+    setAiReviewMessage("");
     startAiResultTransition();
 
     try {
@@ -446,6 +530,33 @@ function Main() {
             : "조건에 맞는 상품을 찾지 못했어요. 조건을 조금 더 넓혀볼까요?"),
       );
       setAiStatus(nextResults.length > 0 ? "success" : "empty");
+      setAiReviewStatus(nextResults.length > 0 ? "loading" : "idle");
+
+      if (nextResults.length === 0) {
+        return;
+      }
+
+      try {
+        const latestReviews = await fetchLatestAiReviews({
+          products: nextResults,
+          signal: controller.signal,
+        });
+
+        setAiReviewItems(latestReviews);
+        setAiReviewStatus(latestReviews.length > 0 ? "success" : "empty");
+        setAiReviewMessage(
+          latestReviews.length > 0
+            ? ""
+            : "추천 상품에 아직 등록된 구매 리뷰가 없습니다.",
+        );
+      } catch (reviewError) {
+        if (reviewError.name === "CanceledError" || reviewError.name === "AbortError") {
+          return;
+        }
+
+        setAiReviewStatus("error");
+        setAiReviewMessage("추천 상품의 최신 구매 리뷰를 불러오지 못했습니다.");
+      }
     } catch (error) {
       if (error.name === "CanceledError" || error.name === "AbortError") {
         return;
@@ -455,6 +566,9 @@ function Main() {
       setAiErrorMessage("추천 결과를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
       setAiMessage("추천 결과를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
       setAiResults([]);
+      setAiReviewStatus("idle");
+      setAiReviewItems([]);
+      setAiReviewMessage("");
     } finally {
       if (aiRequestAbortRef.current === controller) {
         aiRequestAbortRef.current = null;
@@ -489,6 +603,66 @@ function Main() {
   );
 
   useEffect(() => {
+    if (aiStatus !== "success" || aiResults.length === 0 || !showAiResult || !isDesktopCategory) {
+      return undefined;
+    }
+
+    const scrollTimeoutIds = [];
+    const recommendationImages = [];
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const scrollRecommendationRangeIntoView = () => {
+      const recommendationItems = aiResultSectionRef.current?.querySelector(".recommends");
+      const aiInputContainer = aiResultSectionRef.current?.querySelector(".AI_chat_container");
+
+      if (!recommendationItems || !aiInputContainer) {
+        return;
+      }
+
+      const recommendationRect = recommendationItems.getBoundingClientRect();
+      const inputRect = aiInputContainer.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const targetTop = recommendationRect.top + window.scrollY;
+      const targetBottom = inputRect.bottom + window.scrollY;
+      const targetHeight = targetBottom - targetTop;
+      const targetScrollTop =
+        targetHeight >= viewportHeight
+          ? targetTop
+          : targetTop - (viewportHeight - targetHeight) / 2;
+
+      window.scrollTo({
+        top: Math.max(0, targetScrollTop),
+        behavior: prefersReducedMotion ? "auto" : "smooth",
+      });
+    };
+
+    const scrollFrameId = window.requestAnimationFrame(() => {
+      scrollRecommendationRangeIntoView();
+
+      recommendationImages.push(
+        ...(aiResultSectionRef.current?.querySelectorAll(".recommends img") ?? []),
+      );
+      recommendationImages.forEach((image) => {
+        if (!image.complete) {
+          image.addEventListener("load", scrollRecommendationRangeIntoView, { once: true });
+        }
+      });
+
+      [450, 900, 1300].forEach((delay) => {
+        scrollTimeoutIds.push(window.setTimeout(scrollRecommendationRangeIntoView, delay));
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(scrollFrameId);
+      scrollTimeoutIds.forEach((timeoutId) => window.clearTimeout(timeoutId));
+      recommendationImages.forEach((image) => {
+        image.removeEventListener("load", scrollRecommendationRangeIntoView);
+      });
+    };
+  }, [aiResults.length, aiStatus, isDesktopCategory, showAiResult]);
+
+  useEffect(() => {
     const resetAiSection = () => {
       if (aiSwitchTimeoutRef.current) {
         window.clearTimeout(aiSwitchTimeoutRef.current);
@@ -500,7 +674,11 @@ function Main() {
       setAiStatus("idle");
       setAiMessage("");
       setAiErrorMessage("");
+      setIsAiInputEmptyError(false);
       setAiResults([]);
+      setAiReviewStatus("idle");
+      setAiReviewItems([]);
+      setAiReviewMessage("");
     };
 
     window.addEventListener("reset-main-ai-section", resetAiSection);
@@ -571,34 +749,70 @@ function Main() {
     };
   }, [isDesktopCategory, isTabletCategory, selectedCategory, categoryItems.length]);
 
+  const renderAiReviewContent = () => {
+    if (aiStatus === "loading") {
+      return (
+        <div className="AI_review_state">
+          추천 상품이 정리되면 상품별 최신 구매 리뷰를 함께 불러올게요.
+        </div>
+      );
+    }
+
+    if (aiStatus === "empty" || aiStatus === "error") {
+      return (
+        <div className="AI_review_state">
+          추천 상품이 준비되면 실제 구매 리뷰를 상품별로 보여드릴게요.
+        </div>
+      );
+    }
+
+    if (aiReviewStatus === "loading") {
+      return (
+        <div className="AI_review_state">추천 상품별 최신 구매 리뷰를 불러오는 중입니다.</div>
+      );
+    }
+
+    if (aiReviewStatus === "error" || aiReviewStatus === "empty") {
+      return (
+        <div className="AI_review_state">
+          {aiReviewMessage || "추천 상품에 아직 등록된 구매 리뷰가 없습니다."}
+        </div>
+      );
+    }
+
+    if (aiReviewItems.length === 0) {
+      return (
+        <div className="AI_review_state">
+          AI 추천 상품을 선택하면 상품별 최신 구매 리뷰가 표시됩니다.
+        </div>
+      );
+    }
+
+    return (
+      <div className="review_box">
+        {aiReviewItems.map((review) => (
+          <ReviewCard
+            key={review.id}
+            userImage={review.userImage}
+            userName={review.userName}
+            productName={review.productName}
+            description={review.description}
+            rating={review.rating}
+          />
+        ))}
+      </div>
+    );
+  };
+
   const renderAiReviewSection = () => (
     <section className="main-page__section main-page__section--ai-review">
       <div className="back back--ai-review" />
       <div className="section__AI_Review sections section__AI_Review--revealed">
         <div className="text_box">
           <h2>AI 추천 제품 실제 구매 리뷰</h2>
-          <h4>고르미의 추천을 받고 구매한 고객들의 생생한 리뷰입니다.</h4>
+          <h4>추천 상품 목록과 같은 순서로, 각 상품의 최신 구매 리뷰를 보여드립니다.</h4>
         </div>
-        <div className="review_box">
-          <ReviewCard
-            userImage={Review_user}
-            userName="User**6*"
-            productName="갤럭시 탭 S10"
-            description={reviewDescription}
-          />
-          <ReviewCard
-            userImage={Review_user}
-            userName="User**6*"
-            productName="갤럭시 탭 S10"
-            description={reviewDescription}
-          />
-          <ReviewCard
-            userImage={Review_user}
-            userName="User**6*"
-            productName="갤럭시 탭 S10"
-            description={reviewDescription}
-          />
-        </div>
+        {renderAiReviewContent()}
       </div>
     </section>
   );
@@ -632,10 +846,11 @@ function Main() {
           <form action="#" method="POST" onSubmit={handleAiSubmit}>
             <div className="AI_Chat_row_1">
               <textarea
+                className={isAiInputEmptyError ? "is-ai-input-error" : undefined}
                 name="ai_chat"
                 id="ai_chat"
                 rows={1}
-                placeholder="무엇이든 물어보세요!"
+                placeholder={isAiInputEmptyError ? EMPTY_AI_PLACEHOLDER : "무엇이든 물어보세요!"}
                 value={aiQuery}
                 onChange={handleAiInput}
               />
@@ -797,7 +1012,7 @@ function Main() {
 
   const renderResultAiSection = (isEntering = false) => (
     <div className={`ai-stage__layer ai-stage__layer--result ${isEntering ? "is-entering" : ""}`}>
-      <div className="section__AI_result sections">
+      <div className="section__AI_result sections" ref={aiResultSectionRef}>
         {aiStatus === "loading" ? (
           <div className="AI_result_state">상품 데이터 기준으로 추천을 준비하고 있어요.</div>
         ) : null}
@@ -876,10 +1091,13 @@ function Main() {
           <form action="#" method="POST" onSubmit={handleAiSubmit}>
             <div className="AI_Chat_row_1">
               <textarea
+                className={isAiInputEmptyError ? "is-ai-input-error" : undefined}
                 name="ai_chat"
                 id="ai_chat"
                 rows={1}
-                placeholder="대학생용 가벼운 노트북 추천해줘."
+                placeholder={
+                  isAiInputEmptyError ? EMPTY_AI_PLACEHOLDER : "대학생용 가벼운 노트북 추천해줘."
+                }
                 value={aiQuery}
                 onChange={handleAiInput}
               />

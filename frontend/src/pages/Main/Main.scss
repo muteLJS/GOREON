@@ -309,6 +309,9 @@
     font-size: $font-md;
     font-weight: $font-bold;
   }
+  textarea.is-ai-input-error::placeholder {
+    color: $color-error;
+  }
   textarea {
     background-color: $color-white;
     border: none;
@@ -340,6 +343,7 @@
   }
 
   .review_box {
+    width: 100%;
     @include flex();
     gap: 12px;
 
@@ -359,15 +363,36 @@
     }
 
     .item_name {
+      width: 100%;
       color: $color-sub-category-text;
       font-weight: $font-bold;
       font-size: $font-sm;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .description {
       color: $color-sub-category-text;
       font-weight: $font-medium;
       font-size: $font-xs;
+      display: -webkit-box;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
     }
+  }
+  .AI_review_state {
+    width: 100%;
+    padding: 22px 20px;
+    border: 1px solid rgba($color-sub-category-text, 0.18);
+    border-radius: $radius-lg;
+    background: rgba($color-white, 0.94);
+    color: $color-sub-category-text;
+    font-size: $font-sm;
+    font-weight: $font-medium;
+    line-height: 1.6;
   }
   .review_main {
     width: 270px;
@@ -1081,13 +1106,11 @@
     }
 
     .review_box {
-      width: 100%;
-      @include flex(flex-start, flex-start);
-      gap: 16px;
-      overflow-x: auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       padding-bottom: 4px;
       scrollbar-width: none;
-      -ms-overflow-style: none;
+      overflow-x: auto;
 
       &::-webkit-scrollbar {
         display: none;
@@ -1363,10 +1386,10 @@
     text-align: left;
     line-height: 1.35;
     cursor: pointer;
-    display: -webkit-box;
+    display: block;
     overflow: hidden;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .options {
@@ -1685,11 +1708,10 @@
       .item_name {
         font-size: $font-md;
         line-height: 1.35;
-        min-height: 44px;
-        display: -webkit-box;
+        display: block;
         overflow: hidden;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       .item_price {
         font-size: $font-md;

@@ -9,6 +9,7 @@
 !.codex/prompts/
 !.codex/prompts/**
 
+
 # dependencies
 node_modules/
 frontend/node_modules/
@@ -44,3 +45,4 @@ yarn-error.log*
 
 # chrome temp (추가)
 frontend/.chrome-widget-check*
+doc
