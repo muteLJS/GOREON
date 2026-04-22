@@ -4,13 +4,14 @@ import Rating from "@/components/Rating/Rating";
 
 function ProductCardHorizontal({ product, action }) {
   const navigate = useNavigate();
+  const productId = product?._id ?? product?.productId ?? product?.id;
 
   const handleTitleClick = () => {
     navigate(`/product/${product.id}`);
   };
 
   return (
-    <div className="product-card-horizontal">
+    <div className="product-card-horizontal" onClick={() => navigate(`/product/${productId}`)}>
       <img className="product-card-horizontal__thumbnail" src={product.image} alt={product.name} />
       <div className="product-card-horizontal__content">
         <button

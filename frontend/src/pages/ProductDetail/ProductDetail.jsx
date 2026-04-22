@@ -6,8 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { FreeMode } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
-import arrowIcon from "@/assets/icons/prev.svg"
-import downIcon from "@/assets/icons/chevron-down.svg"
+import arrowIcon from "@/assets/icons/prev.svg";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 import ReviewSection from "../../components/ReviewSection/ReviewSection";
 import { addToCart } from "../../store/slices/cartSlice";
@@ -31,6 +30,16 @@ const normalizeImageUrl = (value) => {
   }
   return raw;
 };
+
+const mapReview = (review) => ({
+  id: String(review._id),
+  author: review.user?.name || "익명",
+  date: new Date(review.createdAt).toLocaleDateString("ko-KR").replace(/ /g, ""),
+  body: review.content || "",
+  rating: Number(review.rating) || 0,
+  images: Array.isArray(review.images) ? review.images.map((image) => normalizeImageUrl(image)) : [],
+  helpfulCount: 0,
+});
 
 function getProductDetailByIdFromJson(id) {
   const product = productList.find((item) => String(item.id) === String(id));
@@ -57,22 +66,6 @@ function getProductDetailByIdFromJson(id) {
           price: parsePrice(option.price) || price,
         }))
       : [{ id: "default", label: "기본 옵션", price }];
-  const reviews = [
-    {
-      id: 1,
-      author: "User**1",
-      date: "2026.04.10",
-      body: `${product.name} 기준으로 실사용 만족도가 높고 기본 구성이 안정적입니다.`,
-      images: gallery.slice(0, 4),
-    },
-    {
-      id: 2,
-      author: "User**7",
-      date: "2026.04.12",
-      body: "옵션 선택폭이 넓고 가격대 비교가 쉬워 구매 결정에 도움이 됐습니다.",
-      images: gallery.slice(0, 4),
-    },
-  ];
 
   return {
     id: String(product.id),
@@ -82,12 +75,9 @@ function getProductDetailByIdFromJson(id) {
     shortDescription: `${product.name}의 핵심 정보와 옵션을 상세 페이지에서 확인할 수 있습니다.`,
     price,
     rating: Number(product.rating) || 0,
-    reviewCount: reviews.length,
-    photoCount: gallery.length,
     heroImage,
     gallery,
     options,
-    reviews,
   };
 }
 
@@ -110,22 +100,6 @@ function getProductDetailFromApi(product) {
         }))
       : [{ id: "default", label: "기본 옵션", price }];
   const tags = Array.isArray(product.tag) ? product.tag : [];
-  const reviews = [
-    {
-      id: 1,
-      author: "User**1",
-      date: "2026.04.10",
-      body: `${product.name} 기준으로 실사용 만족도가 높고 기본 구성이 안정적입니다.`,
-      images: gallery.slice(0, 4),
-    },
-    {
-      id: 2,
-      author: "User**7",
-      date: "2026.04.12",
-      body: "옵션 선택폭이 넓고 가격대 비교가 쉬워 구매 결정에 도움이 됐습니다.",
-      images: gallery.slice(0, 4),
-    },
-  ];
 
   return {
     id: String(product._id ?? product.id),
@@ -135,12 +109,9 @@ function getProductDetailFromApi(product) {
     shortDescription: `${product.name}의 핵심 정보와 옵션을 상세 페이지에서 확인할 수 있습니다.`,
     price,
     rating: Number(product.rating) || 0,
-    reviewCount: reviews.length,
-    photoCount: gallery.length,
     heroImage,
     gallery,
     options,
-    reviews,
   };
 }
 
@@ -158,6 +129,13 @@ function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("overview");
   const [isOverviewExpanded, setIsOverviewExpanded] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [reviewSummary, setReviewSummary] = useState({
+    rating: 0,
+    reviewCount: 0,
+    photoCount: 0,
+    gallery: [],
+  });
 
   useEffect(() => {
     const controller = new AbortController();
@@ -165,8 +143,37 @@ function ProductDetail() {
     const fetchProduct = async () => {
       try {
         setStatus("loading");
-        const response = await api.get(`/products/${id}`, { signal: controller.signal });
-        setProduct(getProductDetailFromApi(response.data.data ?? response.data));
+
+        const productResponse = await api.get(`/products/${id}`, {
+          signal: controller.signal,
+        });
+
+        const nextProduct = getProductDetailFromApi(
+          productResponse.data.data ?? productResponse.data,
+        );
+        setProduct(nextProduct);
+
+        const reviewResponse = await api.get(`/reviews/${nextProduct.id}`, {
+          signal: controller.signal,
+        });
+
+        const mappedReviews = reviewResponse.data.map(mapReview);
+        const gallery = mappedReviews.flatMap((review) => review.images || []);
+        const reviewCount = mappedReviews.length;
+        const photoCount = gallery.length;
+        const rating =
+          reviewCount > 0
+            ? mappedReviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount
+            : 0;
+
+        setReviews(mappedReviews);
+        setReviewSummary({
+          rating,
+          reviewCount,
+          photoCount,
+          gallery,
+        });
+
         setStatus("success");
       } catch (error) {
         if (error.name === "CanceledError") {
@@ -175,6 +182,13 @@ function ProductDetail() {
 
         const fallbackProduct = getProductDetailByIdFromJson(id);
         setProduct(fallbackProduct);
+        setReviews([]);
+        setReviewSummary({
+          rating: 0,
+          reviewCount: 0,
+          photoCount: 0,
+          gallery: [],
+        });
         setStatus(fallbackProduct ? "success" : "error");
       }
     };
@@ -272,7 +286,7 @@ function ProductDetail() {
   );
 
   const renderReviewPhotoSwiper = () =>
-    product.gallery?.length ? (
+    reviewSummary.gallery?.length ? (
       <div className="product-detail__review-photo-swiper" aria-label="리뷰 이미지 모음">
         <Swiper
           modules={[FreeMode]}
@@ -282,7 +296,7 @@ function ProductDetail() {
           grabCursor
           watchOverflow
         >
-          {product.gallery.map((image, index) => (
+          {reviewSummary.gallery.map((image, index) => (
             <SwiperSlide key={`${product.id}-review-photo-${index}`}>
               <img
                 src={image}
@@ -339,7 +353,6 @@ function ProductDetail() {
                 value={selectedOptionId}
                 onChange={(event) => setSelectedOptionId(event.target.value)}
               >
-               
                 <option value="" disabled>
                   옵션명
                 </option>
@@ -449,11 +462,11 @@ function ProductDetail() {
       <section className="product-detail__reviews" ref={reviewsRef}>
         {renderReviewPhotoSwiper()}
         <ReviewSection
-          rating={product.rating}
-          reviewCount={product.reviewCount}
-          photoCount={product.photoCount}
-          gallery={product.gallery}
-          reviews={product.reviews}
+          rating={reviewSummary.rating}
+          reviewCount={reviewSummary.reviewCount}
+          photoCount={reviewSummary.photoCount}
+          gallery={reviewSummary.gallery}
+          reviews={reviews}
         />
       </section>
     </main>

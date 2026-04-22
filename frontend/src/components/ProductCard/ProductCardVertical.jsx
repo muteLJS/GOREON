@@ -4,17 +4,16 @@ import Rating from "@/components/Rating/Rating";
 
 function ProductCardVertical({ product, action }) {
   const navigate = useNavigate();
+  const productId = product?._id ?? product?.productId ?? product?.id;
 
   const handleTitleClick = () => {
     navigate(`/product/${product.id}`);
   };
 
   return (
-    <div className="product-card-vertical">
-      <img className="product-card-vertical__thumbnail" src={product.image} alt={product.name} />
-      <button className="product-card-vertical__title" type="button" onClick={handleTitleClick}>
-        {product.name}
-      </button>
+    <div className="product-card-vertical" onClick={() => navigate(`/product/${productId}`)}>
+      <img className="product-card-vertical__thumbnail" src={product.image} alt="노트북" />
+      <div className="product-card-vertical__title">{product.name}</div>
       <div className="product-card-vertical__rating">
         <Rating rating={product.rating} />
       </div>

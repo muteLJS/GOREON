@@ -1,4 +1,6 @@
 const Review = require("../models/Review");
+const { uploadReviewImage } = require("../utils/r2");
+const { syncProductRating } = require("../utils/syncProductRatings");
 
 const getReviewsByProduct = async (req, res, next) => {
   try {
@@ -14,12 +16,19 @@ const getReviewsByProduct = async (req, res, next) => {
 
 const createReview = async (req, res, next) => {
   try {
+    const imageUrls = await Promise.all(
+      (req.files || []).map((file) => uploadReviewImage(file)),
+    );
+
     const review = await Review.create({
       user: req.user._id,
       product: req.body.product,
-      rating: req.body.rating,
+      rating: Number(req.body.rating),
       content: req.body.content,
+      images: imageUrls,
     });
+
+    await syncProductRating(review.product);
 
     res.status(201).json(review);
   } catch (error) {

@@ -3,74 +3,37 @@ import { Link } from "react-router-dom";
 import ReviewWrite from "@/components/ReviewWrite/ReviewWrite";
 import "./OrderHistory.scss";
 
+const REVIEW_TEST_ITEM = {
+  _id: "69e5c99709b3c5775bf31cb6",
+  category: "노트북",
+  name: "LG전자 2026 그램 프로16",
+  desc: "",
+  option: "SSD 512GB",
+  price: "2,151,850",
+  thumb:
+    "https://img.danuri.io/catalog-image/483/451/103/280fb649a9c8407c90c9aa52c2df7367.jpg?_v=20260417090326",
+};
+
 const ORDER_DATA = [
   {
     date: "2026.04.16",
     items: [
-      {
-        id: 1,
-        category: "CPU",
-        name: "인텔 코어i5-14세대 14400F",
-        desc: "(랩터레이크 리프레시) (밸류팩 정품)",
-        option: "옵션명:용량, 뭐 등등",
-        price: "₩ 20,000",
-        thumb: "/images/cpu.png",
-      },
-      {
-        id: 2,
-        category: "CPU",
-        name: "인텔 코어i5-14세대 14400F",
-        desc: "(랩터레이크 리프레시) (밸류팩 정품)",
-        option: "옵션명:용량, 뭐 등등",
-        price: "₩ 20,000",
-        thumb: "/images/cpu.png",
-      },
+      { ...REVIEW_TEST_ITEM },
+      { ...REVIEW_TEST_ITEM },
     ],
   },
   {
     date: "2026.04.12",
     items: [
-      {
-        id: 3,
-        category: "CPU",
-        name: "인텔 코어i5-14세대 14400F",
-        desc: "(랩터레이크 리프레시) (밸류팩 정품)",
-        option: "옵션명:용량, 뭐 등등",
-        price: "₩ 20,000",
-        thumb: "/images/cpu.png",
-      },
-      {
-        id: 4,
-        category: "CPU",
-        name: "인텔 코어i5-14세대 14400F",
-        desc: "(랩터레이크 리프레시) (밸류팩 정품)",
-        option: "옵션명:용량, 뭐 등등",
-        price: "₩ 20,000",
-        thumb: "/images/cpu.png",
-      },
+      { ...REVIEW_TEST_ITEM },
+      { ...REVIEW_TEST_ITEM },
     ],
   },
   {
     date: "2026.04.10",
     items: [
-      {
-        id: 5,
-        category: "CPU",
-        name: "인텔 코어i5-14세대 14400F",
-        desc: "(랩터레이크 리프레시) (밸류팩 정품)",
-        option: "옵션명:용량, 뭐 등등",
-        price: "₩ 20,000",
-        thumb: "/images/cpu.png",
-      },
-      {
-        id: 6,
-        category: "CPU",
-        name: "인텔 코어i5-14세대 14400F",
-        desc: "(랩터레이크 리프레시) (밸류팩 정품)",
-        option: "옵션명:용량, 뭐 등등",
-        price: "₩ 20,000",
-        thumb: "/images/cpu.png",
-      },
+      { ...REVIEW_TEST_ITEM },
+      { ...REVIEW_TEST_ITEM },
     ],
   },
 ];
@@ -123,7 +86,7 @@ function OrderHistory() {
 
               <div className="order-history-page__card">
                 {group.items.map((item, idx) => (
-                  <div key={item.id}>
+                  <div key={`${item._id}-${idx}`}>
                     <article className="order-history-item">
                       <div className="order-history-item__top">
                         <div className="order-history-item__thumb">
@@ -142,7 +105,7 @@ function OrderHistory() {
                           <button
                             type="button"
                             className="order-history-item__review-btn"
-                            onClick={() => setReviewTarget({ productId: item.id })}
+                            onClick={() => setReviewTarget({ productId: item._id })}
                           >
                             리뷰 작성
                           </button>
@@ -153,7 +116,7 @@ function OrderHistory() {
                         <button
                           type="button"
                           className="order-history-item__review-btn"
-                          onClick={() => setReviewTarget({ productId: item.id })}
+                          onClick={() => setReviewTarget({ productId: item._id })}
                         >
                           리뷰 작성
                         </button>

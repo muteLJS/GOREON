@@ -17,6 +17,20 @@
   background: linear-gradient(180deg, rgba($color-white, 1) 0%, rgba(#eef9f9, 1) 100%);
 }
 
+.review-section__empty {
+  padding: 20px 18px;
+  border: 1px solid rgba($color-black, 0.08);
+  border-radius: 22px;
+  background: $color-white;
+}
+
+.review-section__empty-message {
+  margin-top: 8px;
+  color: rgba($color-black, 0.56);
+  font-size: 18px;
+  font-weight: $font-semibold;
+}
+
 .review-section__eyebrow {
   color: rgba($color-black, 0.5);
   font-size: 16px;
