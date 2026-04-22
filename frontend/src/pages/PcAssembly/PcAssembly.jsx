@@ -12,7 +12,11 @@ import banner1 from "@/assets/banner/banner-1.jpg";
 import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
 import CheckIcon from "@/assets/icons/check.svg";
 import CloseIcon from "@/assets/event/close.svg";
-import { PC_ASSEMBLY_CATEGORIES, pcAssemblyProducts } from "@/utils/pcAssemblyProducts";
+import {
+  PC_ASSEMBLY_CATEGORIES,
+  getPcAssemblyPerformanceChecks,
+  pcAssemblyProducts,
+} from "@/utils/pcAssemblyProducts";
 
 function PcAssembly() {
   const dispatch = useDispatch();
@@ -72,12 +76,26 @@ function PcAssembly() {
     };
   }, [isDesktop, isQuoteOpen]);
 
-  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const getQuoteItemQuantity = (item) => Number(item.quantity) || 1;
+  const quoteItemCount = items.reduce((sum, item) => sum + getQuoteItemQuantity(item), 0);
+  const totalPrice = items.reduce(
+    (sum, item) => sum + item.price * getQuoteItemQuantity(item),
+    0,
+  );
+  const formattedTotalPrice = totalPrice.toLocaleString("ko-KR");
 
   const filteredProducts = useMemo(
     () => pcAssemblyProducts.filter((product) => product.category === selectedCategory),
     [selectedCategory],
   );
+  const compatibilityChecks = useMemo(() => getPcAssemblyPerformanceChecks(items), [items]);
+  const compatibilityStatus = useMemo(() => {
+    if (!compatibilityChecks.length) return null;
+    if (compatibilityChecks.some((row) => row.level === "error")) {
+      return { level: "error", text: "호환성 확인 필요" };
+    }
+    return null;
+  }, [compatibilityChecks]);
 
   const handleAddQuoteItem = (product) => {
     dispatch(
@@ -90,6 +108,7 @@ function PcAssembly() {
         price: product.price,
         quantity: 1,
         image: product.image,
+        rating: product.rating,
         compatibility: "ok",
         status: "ok",
       }),
@@ -111,6 +130,32 @@ function PcAssembly() {
     </div>
   );
 
+  const renderSectionBar = () => (
+    <section className="pc-assembly__section-bar" aria-label="견적 요약">
+      <strong className="pc-assembly__total">TOTAL : ₩{formattedTotalPrice}</strong>
+      <div className="pc-assembly__compatibility">
+        <div className="pc-assembly__compatibility-count">
+          <img src={CheckIcon} alt="체크" />
+          부품 {quoteItemCount}개 선택
+        </div>
+        {compatibilityStatus && (
+          <div
+            className={`pc-assembly__compatibility-status pc-assembly__compatibility-status--${compatibilityStatus.level}`}
+          >
+            {compatibilityStatus.text}
+          </div>
+        )}
+        <button
+          type="button"
+          className="pc-assembly__list-button"
+          onClick={() => setIsQuoteOpen(true)}
+        >
+          견적 리스트
+        </button>
+      </div>
+    </section>
+  );
+
   return (
     <main className="pc-assembly" ref={assemblyRef}>
       <section className="pc-assembly__banner">
@@ -125,6 +170,8 @@ function PcAssembly() {
       </section>
 
       <section className="pc-assembly__content">
+        {renderSectionBar()}
+
         <div className="pc-assembly__product-grid">
           {filteredProducts.map((product) => (
             <ProductCardVertical
@@ -141,31 +188,12 @@ function PcAssembly() {
             />
           ))}
         </div>
-
-        <section className="pc-assembly__bottom">
-          <div className="pc-assembly__summary-grid">
-            <button className="pc-assembly__total">
-              TOTAL : ₩{totalPrice.toLocaleString("ko-KR")}
-            </button>
-            <button className="pc-assembly__list-button" onClick={() => setIsQuoteOpen(true)}>
-              견적 리스트
-            </button>
-          </div>
-          <div className="pc-assembly__compatibility">
-            <div className="pc-assembly__compatibility-count">
-              <img src={CheckIcon} alt="체크" />
-              부품 {items.length}개 선택
-            </div>
-            <div className="pc-assembly__compatibility-status">호환성 모두 이상 없음</div>
-          </div>
-        </section>
       </section>
 
       <section className="pc-assembly__desktop">
+        {renderSectionBar()}
+
         <aside className="pc-assembly__sidebar">
-          <button className="pc-assembly__total">
-            TOTAL : ₩{totalPrice.toLocaleString("ko-KR")}
-          </button>
           <div className="pc-assembly__desktop-filter">
             <div className="pc-assembly__desktop-filter-title">카테고리</div>
             <div className="pc-assembly__desktop-filter-list">{filterContent}</div>
@@ -173,19 +201,6 @@ function PcAssembly() {
         </aside>
 
         <div className="pc-assembly__main">
-          <section className="pc-assembly__desktop-top">
-            <div className="pc-assembly__compatibility">
-              <div className="pc-assembly__compatibility-count">
-                <img src={CheckIcon} alt="체크" />
-                부품 {items.length}개 선택
-              </div>
-              <div className="pc-assembly__compatibility-status">호환성 모두 이상 없음</div>
-            </div>
-            <button className="pc-assembly__list-button" onClick={() => setIsQuoteOpen(true)}>
-              견적 리스트
-            </button>
-          </section>
-
           <div className="pc-assembly__desktop-list">
             {filteredProducts.map((product) => (
               <ProductCardHorizontal
@@ -216,7 +231,7 @@ function PcAssembly() {
           title="견적 리스트"
           onClose={() => setIsQuoteOpen(false)}
           className="modal--fullscreen pc-assembly__quote-modal"
-          overlayClassName="modal-overlay--fullscreen"
+          overlayClassName="modal-overlay--fullscreen pc-assembly__quote-overlay"
         >
           <PcAssemblyQuote isModal />
         </Modal>

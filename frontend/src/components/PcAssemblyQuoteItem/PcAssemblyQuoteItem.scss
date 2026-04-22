@@ -17,21 +17,16 @@
   }
 
   .indicator {
-    display: inline-block;
-    border-radius: 999px;
-    width: $font-sm;
-    height: $font-sm;
-
     &--ok {
-      background-color: green;
+      @include status-dot(10px, $color-success);
     }
 
     &--warning {
-      background-color: orange;
+      @include status-dot(10px, $color-warning);
     }
 
     &--error {
-      background-color: red;
+      @include status-dot(10px, $color-error);
     }
   }
 
@@ -88,9 +83,6 @@
   &__image {
     aspect-ratio: 1 / 1;
     padding: $space-xs;
-    border: 0;
-    background: transparent;
-    cursor: pointer;
 
     img {
       width: 100%;
@@ -152,6 +144,12 @@
       padding: 0;
       width: $font-md;
       height: $font-md;
+      cursor: pointer;
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.35;
+      }
 
       img {
         width: 100%;

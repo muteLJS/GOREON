@@ -236,6 +236,36 @@
   display: none;
 }
 
+@include tablet {
+  .header__search--mobile {
+    display: block;
+
+    .header__search-panel {
+      z-index: calc(#{$z-header} + 4);
+    }
+  }
+
+  .header__search-backdrop {
+    position: fixed;
+    inset: 0 0 var(--mobile-bottom-nav-height, 95px);
+    z-index: calc(#{$z-header} + 3);
+    background: rgba($color-black, 0.18);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity $transition-fast,
+      visibility $transition-fast;
+
+    &.is-open {
+      display: block;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+  }
+}
+
 .mobile-menu {
   position: fixed;
   top: var(--mobile-header-height);

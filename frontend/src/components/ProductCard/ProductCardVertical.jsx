@@ -5,20 +5,22 @@ import Rating from "@/components/Rating/Rating";
 function ProductCardVertical({ product, action }) {
   const navigate = useNavigate();
 
+  const handleTitleClick = () => {
+    navigate(`/product/${product.id}`);
+  };
+
   return (
-    <div className="product-card-vertical" onClick={() => navigate(`/product/${product.id}`)}>
-      <img className="product-card-vertical__thumbnail" src={product.image} alt="노트북" />
-      <div className="product-card-vertical__title">{product.name}</div>
+    <div className="product-card-vertical">
+      <img className="product-card-vertical__thumbnail" src={product.image} alt={product.name} />
+      <button className="product-card-vertical__title" type="button" onClick={handleTitleClick}>
+        {product.name}
+      </button>
       <div className="product-card-vertical__rating">
         <Rating rating={product.rating} />
       </div>
       <div className="product-card-vertical__bottom">
         <div className="product-card-vertical__price">₩{product.price.toLocaleString("ko-KR")}</div>
-        {action && (
-          <div className="product-card-vertical__action" onClick={(e) => e.stopPropagation()}>
-            {action}
-          </div>
-        )}
+        {action && <div className="product-card-vertical__action">{action}</div>}
       </div>
     </div>
   );

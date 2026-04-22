@@ -135,6 +135,25 @@ $footer-divider: rgba(255, 255, 255, 0.45);
   backdrop-filter: blur(12px);
 }
 
+.footer__mobile-search-backdrop {
+  position: fixed;
+  inset: 0 0 var(--mobile-bottom-nav-height, 95px);
+  z-index: $z-header + 1;
+  background: rgba($color-black, 0.18);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity $transition-fast,
+    visibility $transition-fast;
+
+  &.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+}
+
 .footer__mobile-search {
   position: fixed;
   right: 0;
@@ -224,6 +243,7 @@ $footer-divider: rgba(255, 255, 255, 0.45);
   font-size: 11px;
   line-height: 1.5;
   text-align: left;
+  cursor: pointer;
 }
 
 .footer__mobile-search-submit {
@@ -236,6 +256,7 @@ $footer-divider: rgba(255, 255, 255, 0.45);
   color: $color-white;
   font-size: 11px;
   font-weight: $font-bold;
+  cursor: pointer;
 }
 
 .footer__mobile-link {
@@ -244,6 +265,7 @@ $footer-divider: rgba(255, 255, 255, 0.45);
   height: 100%;
   border: 0;
   background: transparent;
+  cursor: pointer;
 
   img {
     display: block;
@@ -300,7 +322,9 @@ $footer-divider: rgba(255, 255, 255, 0.45);
 
 @include desktop-up {
   .footer__mobile,
-  .footer__mobile-nav {
+  .footer__mobile-nav,
+  .footer__mobile-search,
+  .footer__mobile-search-backdrop {
     display: none;
   }
 

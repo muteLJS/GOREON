@@ -2,6 +2,7 @@
 /* 모바일에서 모달창을 그리는 컴포넌트 입니다. */
 import { useEffect } from "react";
 import "./Modal.scss";
+import CloseIcon from "@/assets/event/close.svg";
 
 /**
  * 모바일 화면의 하단에서 열리는 모달창 컴포넌트
@@ -11,16 +12,22 @@ import "./Modal.scss";
  */
 function Modal({ title, children, onClose, className = "", overlayClassName = "" }) {
   useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
     return () => {
-      document.body.style.overflow = "auto";
+      document.body.style.overflow = prevOverflow;
     };
   }, []);
   return (
     <div className={`modal-overlay ${overlayClassName}`.trim()} onClick={onClose}>
       <div className={`modal ${className}`.trim()} onClick={(e) => e.stopPropagation()}>
         <div className="modal__title">{title}</div>
+        {onClose && (
+          <button type="button" className="modal__close" onClick={onClose} aria-label="닫기">
+            <img src={CloseIcon} alt="" />
+          </button>
+        )}
         {children}
       </div>
     </div>
