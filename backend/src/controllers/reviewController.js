@@ -14,11 +14,16 @@ const getReviewsByProduct = async (req, res, next) => {
 
 const createReview = async (req, res, next) => {
   try {
+    const imageUrls = (req.files || []).map(
+      (file) => `${req.protocol}://${req.get("host")}/uploads/${file.filename}`,
+    );
+
     const review = await Review.create({
       user: req.user._id,
       product: req.body.product,
-      rating: req.body.rating,
+      rating: Number(req.body.rating),
       content: req.body.content,
+      images: imageUrls,
     });
 
     res.status(201).json(review);
