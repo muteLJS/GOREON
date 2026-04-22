@@ -10,7 +10,9 @@ import LikeBeforeIcon from "@/assets/icons/like-before.svg";
 import ReviewIcon from "@/assets/icons/review.png";
 import products from "@/data/products_list.json";
 import { addToCart } from "@/store/slices/cartSlice";
+import { updateUserInfo } from "@/store/slices/userSlice";
 import { addToWishlist, removeFromWishlist } from "@/store/slices/wishlistSlice";
+import api from "@/utils/api";
 
 const FALLBACK_USER = {
   name: "NickName",
@@ -198,7 +200,7 @@ function ProductRailCard({ product }) {
     <article className="my-page__rail-card">
       <div className="my-page__rail-card-media-wrap">
         <Link
-          to={`/product/${product.id}`}
+          to={`/product/${productId}`}
           className="my-page__rail-card-media"
           draggable={false}
         >
@@ -218,7 +220,7 @@ function ProductRailCard({ product }) {
         </div>
       </div>
       <Link
-        to={`/product/${product.id}`}
+        to={`/product/${productId}`}
         className="my-page__rail-card-copy"
         draggable={false}
       >
@@ -260,7 +262,7 @@ function AiRecommendationCard({ product }) {
   return (
     <article className="my-page__ai-card">
       <div className="my-page__ai-card-media-wrap">
-        <Link to={`/product/${product.id}`} className="my-page__ai-card-media">
+        <Link to={`/product/${productId}`} className="my-page__ai-card-media">
           <img src={product.image} alt={product.name} />
         </Link>
         <div className="my-page__ai-card-actions">
@@ -277,13 +279,13 @@ function AiRecommendationCard({ product }) {
         </div>
       </div>
 
-      <Link to={`/product/${product.id}`} className="my-page__ai-card-copy">
+      <Link to={`/product/${productId}`} className="my-page__ai-card-copy">
         <p className="my-page__ai-card-name">{product.name}</p>
         <p className="my-page__ai-card-desc">{product.desc}</p>
         <p className="my-page__ai-card-spec">{product.spec}</p>
         <div className="my-page__ai-card-tags">
           {product.tags.map((tag) => (
-            <span key={`${product.id}-${tag}`}>{tag}</span>
+            <span key={`${productId}-${tag}`}>{tag}</span>
           ))}
         </div>
         <p className="my-page__ai-card-price">{product.price}</p>
@@ -293,6 +295,8 @@ function AiRecommendationCard({ product }) {
 }
 
 export default function MyPage() {
+  const dispatch = useDispatch();
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   const userInfo = useSelector((state) => state.user.userInfo);
   const cartCount = useSelector((state) => state.cart.items.length);
   const wishlistCount = useSelector((state) => state.wishlist.items.length);
@@ -306,6 +310,7 @@ export default function MyPage() {
   const [visibleHistoryCount, setVisibleHistoryCount] = useState(INITIAL_HISTORY_COUNT);
   const [renderedHistoryCount, setRenderedHistoryCount] = useState(INITIAL_HISTORY_COUNT);
   const [isHistoryAnimating, setIsHistoryAnimating] = useState(false);
+  const [savingField, setSavingField] = useState("");
   const historyShellRef = useRef(null);
   const historyListRef = useRef(null);
   const recentRailRef = useRef(null);
@@ -325,6 +330,38 @@ export default function MyPage() {
   useEffect(() => {
     setProfileDraft(displayUser);
   }, [displayUser.email, displayUser.name, displayUser.phone]);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      return;
+    }
+
+    let isMounted = true;
+
+    const fetchMe = async () => {
+      try {
+        const response = await api.get("/users/me");
+
+        if (!isMounted) {
+          return;
+        }
+
+        dispatch(updateUserInfo(response.data));
+      } catch (error) {
+        console.error("[mypage][me] request failed", {
+          message: error.message,
+          status: error.response?.status,
+          data: error.response?.data,
+        });
+      }
+    };
+
+    fetchMe();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [dispatch, isLoggedIn]);
 
   useEffect(() => {
     if (!historyListRef.current) {
@@ -384,8 +421,35 @@ export default function MyPage() {
     }));
   };
 
-  const handleFieldToggle = (field) => {
-    setEditingField((prev) => (prev === field ? "" : field));
+  const handleFieldToggle = async (field) => {
+    if (editingField !== field) {
+      setEditingField(field);
+      return;
+    }
+
+    try {
+      setSavingField(field);
+
+      const response = await api.patch("/users/me", {
+        name: profileDraft.name,
+        email: profileDraft.email,
+        phone: profileDraft.phone,
+      });
+
+      dispatch(updateUserInfo(response.data));
+      setProfileDraft((prev) => ({
+        ...prev,
+        ...response.data,
+      }));
+      setEditingField("");
+      showActionAlert("회원정보가 수정되었습니다.");
+    } catch (error) {
+      showActionAlert(
+        error.response?.data?.message || "회원정보 수정에 실패했습니다.",
+      );
+    } finally {
+      setSavingField("");
+    }
   };
 
   const resetRecentRailDrag = () => {
@@ -623,7 +687,7 @@ export default function MyPage() {
                   key={field.key}
                   field={field}
                   value={profileDraft[field.key] ?? ""}
-                  activeField={editingField}
+                  activeField={savingField || editingField}
                   onChange={handleFieldChange}
                   onToggle={handleFieldToggle}
                 />

@@ -2,12 +2,12 @@ import Modal from "@/components/Modal/Modal";
 import RatingInput from "@/components/RatingInput/RatingInput";
 import UploadIcon from "@/assets/icons/upload.svg";
 import { useState, useRef, useEffect } from "react";
+import api from "@/utils/api";
 import "./ReviewWrite.scss";
 
 function ReviewWrite({ productId, onClose }) {
   const MAX_CONTENT_LENGTH = 300;
   const [review, setReview] = useState({
-    productId: productId,
     rating: 0,
     content: "",
     images: [],
@@ -22,6 +22,23 @@ function ReviewWrite({ productId, onClose }) {
       });
     };
   });
+
+  const handleSubmit = async () => {
+    if (!review.rating) return;
+    if (!review.content.trim()) return;
+
+    const formData = new FormData();
+    formData.append("product", productId);
+    formData.append("rating", review.rating);
+    formData.append("content", review.content.trim());
+
+    review.images.forEach((file) => {
+      formData.append("images", file);
+    });
+
+    await api.post("/reviews", formData);
+    onClose();
+  };
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -94,7 +111,7 @@ function ReviewWrite({ productId, onClose }) {
           <button type="button" onClick={onClose}>
             작성 취소
           </button>
-          <button type="button" onClick={onClose}>
+          <button type="button" onClick={handleSubmit}>
             리뷰 등록
           </button>
         </div>
