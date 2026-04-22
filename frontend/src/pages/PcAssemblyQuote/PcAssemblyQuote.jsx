@@ -1,8 +1,7 @@
 import "./PcAssemblyQuote.scss";
 import PcAssemblyQuoteList from "@/components/PcAssemblyQuoteList/PcAssemblyQuoteList";
 import CheckIcon from "@/assets/icons/check.svg";
-import { analyzePcCompatibility } from "@/utils/pcCompatibility";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -37,8 +36,34 @@ function PcAssemblyQuote({ isModal = false }) {
   );
   const hasAnalyzedItems = analyzedItems.length > 0;
 
-  const compatibility = useMemo(() => analyzePcCompatibility(items), [items]);
-  const performanceChecks = compatibility.checks;
+  const performanceChecks = useMemo(
+    () => getPcAssemblyPerformanceChecks(analyzedItems),
+    [analyzedItems],
+  );
+  const visiblePerformanceChecks = useMemo(() => {
+    const textSet = new Set();
+
+    return performanceChecks.filter((row) => {
+      if (textSet.has(row.text)) return false;
+      textSet.add(row.text);
+      return true;
+    });
+  }, [performanceChecks]);
+  const compatibilityLevelMap = useMemo(
+    () => new Map(performanceChecks.map((row) => [row.id, row.level])),
+    [performanceChecks],
+  );
+  const compatibilityStatus = useMemo(() => {
+    if (!performanceChecks.length) return null;
+    if (performanceChecks.some((row) => row.level === "error")) {
+      return { level: "error", text: "호환성 확인 필요" };
+    }
+    if (performanceChecks.some((row) => row.level === "warning")) {
+      return { level: "warning", text: "일부 부품 확인 필요" };
+    }
+
+    return { level: "ok", text: "호환성 모두 이상 없음" };
+  }, [performanceChecks]);
 
   const recommendItems = useMemo(() => getPcAssemblyRecommendations(items), [items]);
 
@@ -155,9 +180,13 @@ function PcAssemblyQuote({ isModal = false }) {
             <img src={CheckIcon} alt="체크" />
             부품 {selectedCount}개 선택
           </div>
-          <div className={`pc-assembly-quote__compatibility-status is-${compatibility.level}`}>
-            {compatibility.message}
-          </div>
+          {compatibilityStatus && (
+            <div
+              className={`pc-assembly-quote__compatibility-status pc-assembly-quote__compatibility-status--${compatibilityStatus.level}`}
+            >
+              {compatibilityStatus.text}
+            </div>
+          )}
           <button
             className="pc-assembly-quote__compatibility-check"
             type="button"
@@ -177,17 +206,20 @@ function PcAssemblyQuote({ isModal = false }) {
             <section className="pc-assembly-quote__performance">
               <h3 className="pc-assembly-quote__section-title">성능 분석</h3>
               <div className="pc-assembly-quote__panel">
-                {performanceChecks.length > 0 ? (
-                  performanceChecks.map((row) => (
+                {hasAnalyzedItems ? (
+                  visiblePerformanceChecks.map((row) => (
                     <div className="pc-assembly-quote__panel-item" key={row.id}>
                       <span className={`indicator indicator--${row.level}`} />
                       {row.text}
                     </div>
                   ))
+                ) : hasSelectedItems ? (
+                  <div className="pc-assembly-quote__panel-empty">
+                    호환성 검사를 누르면 성능 분석이 표시됩니다.
+                  </div>
                 ) : (
-                  <div className="pc-assembly-quote__panel-item">
-                    <span className="indicator indicator--warning" />
-                    부품을 선택하면 호환성 검사를 시작합니다.
+                  <div className="pc-assembly-quote__panel-empty">
+                    부품을 체크하면 성능 분석이 표시됩니다.
                   </div>
                 )}
               </div>

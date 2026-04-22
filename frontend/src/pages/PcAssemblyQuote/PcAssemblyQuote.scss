@@ -230,15 +230,15 @@
     overflow: hidden;
     text-overflow: ellipsis;
 
-    &.is-ok {
+    &--ok {
       color: $color-text-sub;
     }
 
-    &.is-warning {
-      color: #b08900;
+    &--warning {
+      color: $color-warning;
     }
 
-    &.is-error {
+    &--error {
       color: $color-error;
     }
   }
