@@ -1,5 +1,6 @@
 import "./Footer.scss";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import FacebookIcon from "@/assets/footer/pc/facebook.svg";
 import YoutubeIcon from "@/assets/footer/pc/youtube.svg";
@@ -12,7 +13,19 @@ import SearchIcon from "@/assets/footer/mobile/search.svg";
 import CartIcon from "@/assets/footer/mobile/cart.svg";
 import HamburgerIcon from "@/assets/footer/mobile/hamburger.svg";
 
+const searchSuggestions = [
+  "유튜브용 편집용 노트북",
+  "FPS 게임에 맞는 모니터",
+  "대학생 첫 노트북 50만원 이하",
+  "부모님 쉽게 쓸 태블릿",
+];
+
 function Footer() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const desktopColumns = [
     {
       title: "서비스 정보",
@@ -45,12 +58,44 @@ function Footer() {
   ];
 
   const handleMobileMenuToggle = () => {
+    setIsSearchOpen(false);
     window.dispatchEvent(new Event("toggle-mobile-menu"));
   };
 
   const handleMobileSearchToggle = () => {
-    window.dispatchEvent(new Event("toggle-mobile-search"));
+    setIsSearchOpen((prev) => !prev);
+    window.dispatchEvent(new Event("close-mobile-menu"));
   };
+
+  const closeMobileSearch = () => {
+    setIsSearchOpen(false);
+  };
+
+  const submitSearch = (keyword = searchQuery) => {
+    const nextQuery = keyword.trim();
+
+    navigate(nextQuery ? `/search?q=${encodeURIComponent(nextQuery)}` : "/search");
+    setSearchQuery(nextQuery);
+    closeMobileSearch();
+  };
+
+  const handleSearchSubmit = (event) => {
+    event.preventDefault();
+    submitSearch();
+  };
+
+  useEffect(() => {
+    setIsSearchOpen(false);
+  }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setIsSearchOpen(false);
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   return (
     <footer className="footer">
@@ -156,6 +201,55 @@ function Footer() {
         </div>
       </div>
 
+      <div
+        className={`footer__mobile-search-backdrop ${isSearchOpen ? "is-open" : ""}`}
+        onClick={closeMobileSearch}
+      />
+      <div
+        className={`footer__mobile-search ${isSearchOpen ? "is-open" : ""}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="검색"
+        aria-hidden={!isSearchOpen}
+      >
+        <div className="footer__mobile-search-sheet">
+          <form className="footer__mobile-search-form" onSubmit={handleSearchSubmit}>
+            <div className="footer__mobile-search-input-wrap">
+              <button
+                type="submit"
+                className="footer__mobile-search-icon-button"
+                aria-label="검색 실행"
+              >
+                <img src={SearchIcon} alt="" className="footer__mobile-search-icon" />
+              </button>
+              <input
+                type="text"
+                value={searchQuery}
+                placeholder="검색어를 입력하세요"
+                onChange={(event) => setSearchQuery(event.target.value)}
+              />
+            </div>
+
+            <div className="footer__mobile-search-suggestions">
+              {searchSuggestions.map((suggestion) => (
+                <button
+                  key={suggestion}
+                  type="button"
+                  className="footer__mobile-search-suggestion"
+                  onClick={() => submitSearch(suggestion)}
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+
+            <button type="submit" className="footer__mobile-search-submit">
+              검색
+            </button>
+          </form>
+        </div>
+      </div>
+
       <div className="footer__mobile-nav">
         {mobileQuickLinks.map((item) =>
           item.name === "search" ? (
@@ -164,6 +258,7 @@ function Footer() {
               key={item.id}
               className="footer__mobile-link footer__mobile-link--search"
               aria-label={item.name}
+              aria-expanded={isSearchOpen}
               onClick={handleMobileSearchToggle}
             >
               <img src={item.src} alt={item.name} />

@@ -552,6 +552,48 @@ function Header() {
         </ul>
       </nav>
 
+      <div
+        className={`header__search-backdrop ${isSearchOpen ? "is-open" : ""}`}
+        onClick={closeSearch}
+      />
+      <div className={`header__search header__search--mobile ${isSearchOpen ? "is-open" : ""}`}>
+        <div className="header__search-panel">
+          <div className="header__search-sheet">
+            <form className="header__search-form" onSubmit={handleSearchSubmit}>
+              <div className="header__search-input-wrap">
+                <button type="submit" className="header__search-icon-button" aria-label="검색 실행">
+                  <img src={Search} alt="" className="header__search-icon" />
+                </button>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  placeholder="검색어를 입력하세요"
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  onFocus={() => setIsSearchOpen(true)}
+                />
+              </div>
+
+              <div className="header__search-suggestions">
+                {searchSuggestions.map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    type="button"
+                    className="header__search-suggestion"
+                    onClick={() => submitSearch(suggestion)}
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+
+              <button type="submit" className="header__search-submit">
+                검색
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
       <div className={`mobile-menu ${isMobileMenuOpen ? "is-open" : ""}`}>
         <div className="mobile-menu__tabs" role="tablist" aria-label="모바일 메뉴">
           {mobileTabs.map((tab) => (
