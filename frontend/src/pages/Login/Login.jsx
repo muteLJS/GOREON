@@ -5,7 +5,7 @@ import lock from "../../assets/icons/lock.svg";
 import kakao from "../../assets/icons/kakao.svg";
 import naver from "../../assets/icons/naver.svg";
 import google from "../../assets/icons/google.svg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -26,12 +26,11 @@ const defaultRegisterForm = {
 };
 
 const persistAuth = (payload) => {
-  localStorage.setItem("authToken", payload.token);
+  localStorage.removeItem("authToken");
   localStorage.setItem("userInfo", JSON.stringify(payload.user));
 };
 
 const normalizeAuthPayload = (auth) => ({
-  token: auth.token,
   user: auth.user,
 });
 
@@ -51,9 +50,9 @@ const getAuthErrorMessage = (error, fallbackMessage) => {
   const messageMap = {
     "Email already in use": "이미 가입된 이메일입니다.",
     "Password must be at least 8 characters": "비밀번호는 8자 이상이어야 합니다.",
-    "Email, password, and name are required": "이메일, 비밀번호, 닉네임을 모두 입력해주세요.",
-    "Email and password are required": "이메일과 비밀번호를 모두 입력해주세요.",
-    "Invalid email or password": "이메일 또는 비밀번호가 올바르지 않습니다.",
+    "Invalid registration request": "이메일, 비밀번호, 닉네임을 모두 입력해주세요.",
+    "Invalid login request": "이메일과 비밀번호를 모두 입력해주세요.",
+    "Authentication failed": "로그인 정보를 확인해주세요.",
   };
 
   return messageMap[serverMessage] || serverMessage;
@@ -182,7 +181,38 @@ const useAuthActions = () => {
   return { submitLogin, submitRegister };
 };
 
-const MobileLogin = ({ onShowRegister, loginForm, setLoginForm, onSubmit, error }) => {
+const socialProviders = [
+  { provider: "kakao", label: "카카오 로그인", icon: kakao },
+  { provider: "naver", label: "네이버 로그인", icon: naver },
+  { provider: "google", label: "구글 로그인", icon: google },
+];
+
+const getSocialAuthUrl = (provider) => {
+  const apiBaseUrl = (api.defaults.baseURL || "http://localhost:8081/api").replace(/\/$/, "");
+  return `${apiBaseUrl}/auth/${provider}`;
+};
+
+const startSocialLogin = (provider) => {
+  window.location.assign(getSocialAuthUrl(provider));
+};
+
+const SocialLoginButtons = ({ onSocialLogin = startSocialLogin }) => (
+  <div className="social-icons">
+    {socialProviders.map((item) => (
+      <button
+        key={item.provider}
+        type="button"
+        className="social-icon-button"
+        aria-label={item.label}
+        onClick={() => onSocialLogin(item.provider)}
+      >
+        <img src={item.icon} alt="" />
+      </button>
+    ))}
+  </div>
+);
+
+const MobileLogin = ({ onShowRegister, loginForm, setLoginForm, onSubmit, error, onSocialLogin }) => {
   return (
     <>
       <section className="mobile-login">
@@ -231,17 +261,13 @@ const MobileLogin = ({ onShowRegister, loginForm, setLoginForm, onSubmit, error 
             <p>소셜로그인</p>
             <hr />
           </div>
-          <div className="social-icons">
-            <img src={kakao} alt="google" />
-            <img src={naver} alt="facebook" />
-            <img src={google} alt="kakao" />
-          </div>
+          <SocialLoginButtons onSocialLogin={onSocialLogin} />
         </div>
       </section>
     </>
   );
 };
-const MobileRegister = ({ onShowLogin, registerForm, setRegisterForm, onSubmit, error }) => {
+const MobileRegister = ({ onShowLogin, registerForm, setRegisterForm, onSubmit, error, onSocialLogin }) => {
   return (
     <>
       <section className="mobile-register">
@@ -326,11 +352,7 @@ const MobileRegister = ({ onShowLogin, registerForm, setRegisterForm, onSubmit, 
             <p>소셜로그인</p>
             <hr />
           </div>
-          <div className="social-icons">
-            <img src={kakao} alt="google" />
-            <img src={naver} alt="facebook" />
-            <img src={google} alt="kakao" />
-          </div>
+          <SocialLoginButtons onSocialLogin={onSocialLogin} />
         </div>
       </section>
     </>
@@ -471,11 +493,7 @@ const PcLogin = ({ initialMode = "login" }) => {
                 <p>소셜로그인</p>
                 <hr />
               </div>
-              <div className="social-icons">
-                <img src={kakao} alt="google" />
-                <img src={naver} alt="facebook" />
-                <img src={google} alt="kakao" />
-              </div>
+              <SocialLoginButtons />
             </div>
           </form>
         </div>
@@ -515,6 +533,7 @@ const PcLogin = ({ initialMode = "login" }) => {
 };
 
 export default function Login({ initialMode = "login" }) {
+  const location = useLocation();
   const [isRegister, setIsRegister] = useState(initialMode === "register");
   const [loginForm, setLoginForm] = useState(defaultLoginForm);
   const [registerForm, setRegisterForm] = useState(defaultRegisterForm);
@@ -532,6 +551,12 @@ export default function Login({ initialMode = "login" }) {
     await submitRegister(registerForm, setRegisterError);
   };
 
+  useEffect(() => {
+    if (location.state?.authError) {
+      setLoginError("소셜 로그인에 실패했습니다. 다시 시도해주세요.");
+    }
+  }, [location.state]);
+
   return (
     <>
       <div className="mobile-only">
@@ -542,6 +567,7 @@ export default function Login({ initialMode = "login" }) {
             setRegisterForm={setRegisterForm}
             onSubmit={handleMobileRegisterSubmit}
             error={registerError}
+            onSocialLogin={startSocialLogin}
           />
         ) : (
           <MobileLogin
@@ -550,6 +576,7 @@ export default function Login({ initialMode = "login" }) {
             setLoginForm={setLoginForm}
             onSubmit={handleMobileLoginSubmit}
             error={loginError}
+            onSocialLogin={startSocialLogin}
           />
         )}
       </div>

@@ -14,8 +14,11 @@ function PcAssemblyQuoteItem({
   quantity,
   image,
   compatibility,
+  onDecreaseQuantity,
+  onIncreaseQuantity,
 }) {
   const navigate = useNavigate();
+  const currentQuantity = Number(quantity) || 1;
 
   const handleDetailClick = () => {
     if (productId) navigate(`/product/${productId}`);
@@ -28,19 +31,14 @@ function PcAssemblyQuoteItem({
         <span className="pc-assembly-quote-item__select-mark" />
       </label>
 
-      <button
-        className="pc-assembly-quote-item__image"
-        type="button"
-        onClick={handleDetailClick}
-        aria-label={`${name} 상세보기`}
-      >
+      <div className="pc-assembly-quote-item__image">
         <img src={image} alt={name} />
-      </button>
+      </div>
 
       <div className="pc-assembly-quote-item__info">
         <div className="pc-assembly-quote-item__info-top">
           <div className="pc-assembly-quote-item__info-category">{category}</div>
-          <span className={`indicator indicator--${compatibility}`} />
+          {compatibility && <span className={`indicator indicator--${compatibility}`} />}
         </div>
 
         <div className="pc-assembly-quote-item__info-middle">
@@ -61,11 +59,16 @@ function PcAssemblyQuoteItem({
             ₩{price.toLocaleString("ko-KR")}
           </div>
           <div className="pc-assembly-quote-item__info-action">
-            <button type="button">
+            <button
+              type="button"
+              onClick={onDecreaseQuantity}
+              disabled={currentQuantity <= 1}
+              aria-label={`${name} 수량 감소`}
+            >
               <img src={QuantityDown} alt="" />
             </button>
-            <span>{quantity}</span>
-            <button type="button">
+            <span>{currentQuantity}</span>
+            <button type="button" onClick={onIncreaseQuantity} aria-label={`${name} 수량 증가`}>
               <img src={QuantityUp} alt="" />
             </button>
           </div>

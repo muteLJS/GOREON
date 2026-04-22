@@ -292,6 +292,11 @@
       .submit {
         width: 24px;
         height: 24px;
+
+        &:disabled {
+          cursor: not-allowed;
+          opacity: 0.45;
+        }
       }
     }
 
@@ -406,6 +411,25 @@
 .section__AI_result {
   @include flex(flex-start, center, column);
   gap: 18px;
+
+  .AI_result_state {
+    width: 100%;
+    padding: 22px 20px;
+    background: rgba($color-white, 0.94);
+    border: 1px solid rgba($color-text-sub, 0.18);
+    border-radius: $radius-lg;
+    box-shadow: 0 10px 24px rgba(10, 166, 166, 0.08);
+    color: $color-category-text;
+    font-size: $font-md;
+    font-weight: $font-medium;
+    line-height: 1.5;
+    text-align: center;
+
+    &--error {
+      color: #c2410c;
+      border-color: rgba(194, 65, 12, 0.25);
+    }
+  }
 
   .recommends {
     width: 100%;
@@ -564,6 +588,11 @@
         border: 0;
         background: transparent;
         cursor: pointer;
+
+        &:disabled {
+          cursor: not-allowed;
+          opacity: 0.45;
+        }
 
         svg {
           width: 100%;
@@ -1303,7 +1332,7 @@
       box-sizing: border-box;
       border: 1px solid $color-gray-300;
       border-radius: $radius-md;
-      background-color: $color-gray-100;
+      background-color: $color-white;
       .item_img {
         position: absolute;
         width: min(72%, 170px);
@@ -2256,7 +2285,7 @@
         }
 
         &:hover {
-          box-shadow: inset 0 0 0 5px $color-text-main;
+          box-shadow: inset 0 0 0 2px $color-text-main;
         }
       }
     }
@@ -2553,6 +2582,44 @@
       }
     }
   }
+
+  .section__Set_Category {
+    .categories {
+      border-radius: $radius-lg;
+
+      form {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        border-radius: $radius-lg;
+
+        .category {
+          min-height: 36px;
+          padding: 7px 10px;
+        }
+      }
+    }
+
+    .item_box {
+      gap: 8px;
+    }
+
+    .items {
+      gap: 10px;
+
+      .item_img_box {
+        margin-bottom: 0;
+      }
+    }
+
+    .item_name {
+      min-height: 38px;
+    }
+
+    .options {
+      gap: 5px;
+      min-height: 38px;
+    }
+  }
 }
 
 @media (min-width: $breakpoint-tablet) and (max-width: 1023px) {
@@ -2567,7 +2634,6 @@
       display: block;
       width: 100%;
     }
-
   }
 }
 

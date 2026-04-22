@@ -3,75 +3,29 @@ import { Link } from "react-router-dom";
 import ReviewWrite from "@/components/ReviewWrite/ReviewWrite";
 import "./OrderHistory.scss";
 
+const REVIEW_TEST_ITEM = {
+  _id: "69e5c99709b3c5775bf31cb6",
+  category: "노트북",
+  name: "LG전자 2026 그램 프로16",
+  desc: "",
+  option: "SSD 512GB",
+  price: "2,151,850",
+  thumb:
+    "https://img.danuri.io/catalog-image/483/451/103/280fb649a9c8407c90c9aa52c2df7367.jpg?_v=20260417090326",
+};
+
 const ORDER_DATA = [
   {
     date: "2026.04.16",
-    items: [
-      {
-        id: 1,
-        category: "CPU",
-        name: "인텔 코어i5-14세대 14400F",
-        desc: "(랩터레이크 리프레시) (밸류팩 정품)",
-        option: "옵션명:용량, 뭐 등등",
-        price: "₩ 20,000",
-        thumb: "/images/cpu.png",
-      },
-      {
-        id: 2,
-        category: "CPU",
-        name: "인텔 코어i5-14세대 14400F",
-        desc: "(랩터레이크 리프레시) (밸류팩 정품)",
-        option: "옵션명:용량, 뭐 등등",
-        price: "₩ 20,000",
-        thumb: "/images/cpu.png",
-      },
-    ],
+    items: [{ ...REVIEW_TEST_ITEM }, { ...REVIEW_TEST_ITEM }],
   },
   {
     date: "2026.04.12",
-    items: [
-      {
-        id: 3,
-        category: "CPU",
-        name: "인텔 코어i5-14세대 14400F",
-        desc: "(랩터레이크 리프레시) (밸류팩 정품)",
-        option: "옵션명:용량, 뭐 등등",
-        price: "₩ 20,000",
-        thumb: "/images/cpu.png",
-      },
-      {
-        id: 4,
-        category: "CPU",
-        name: "인텔 코어i5-14세대 14400F",
-        desc: "(랩터레이크 리프레시) (밸류팩 정품)",
-        option: "옵션명:용량, 뭐 등등",
-        price: "₩ 20,000",
-        thumb: "/images/cpu.png",
-      },
-    ],
+    items: [{ ...REVIEW_TEST_ITEM }, { ...REVIEW_TEST_ITEM }],
   },
   {
     date: "2026.04.10",
-    items: [
-      {
-        id: 5,
-        category: "CPU",
-        name: "인텔 코어i5-14세대 14400F",
-        desc: "(랩터레이크 리프레시) (밸류팩 정품)",
-        option: "옵션명:용량, 뭐 등등",
-        price: "₩ 20,000",
-        thumb: "/images/cpu.png",
-      },
-      {
-        id: 6,
-        category: "CPU",
-        name: "인텔 코어i5-14세대 14400F",
-        desc: "(랩터레이크 리프레시) (밸류팩 정품)",
-        option: "옵션명:용량, 뭐 등등",
-        price: "₩ 20,000",
-        thumb: "/images/cpu.png",
-      },
-    ],
+    items: [{ ...REVIEW_TEST_ITEM }, { ...REVIEW_TEST_ITEM }],
   },
 ];
 
@@ -83,6 +37,54 @@ const PROGRESS_STEPS = [
 
 function OrderHistory() {
   const [reviewTarget, setReviewTarget] = useState(null);
+  const [confirmedItemKeys, setConfirmedItemKeys] = useState(() => new Set());
+
+  const handleConfirmPurchase = (itemKey) => {
+    setConfirmedItemKeys((prevKeys) => {
+      const nextKeys = new Set(prevKeys);
+      nextKeys.add(itemKey);
+      return nextKeys;
+    });
+  };
+
+  const handleTrackDelivery = () => {
+    window.alert("배송 조회 서비스 준비중입니다.");
+  };
+
+  const renderItemActions = (item, itemKey) => {
+    const isConfirmed = confirmedItemKeys.has(itemKey);
+
+    if (!isConfirmed) {
+      return (
+        <button
+          type="button"
+          className="order-history-item__action-button order-history-item__action-button--confirm"
+          onClick={() => handleConfirmPurchase(itemKey)}
+        >
+          구매 확정
+        </button>
+      );
+    }
+
+    return (
+      <>
+        <button
+          type="button"
+          className="order-history-item__action-button order-history-item__action-button--delivery"
+          onClick={handleTrackDelivery}
+        >
+          배송 조회
+        </button>
+        <button
+          type="button"
+          className="order-history-item__action-button order-history-item__action-button--review"
+          onClick={() => setReviewTarget({ productId: item._id })}
+        >
+          리뷰 작성
+        </button>
+      </>
+    );
+  };
 
   return (
     <section className="order-history-page">
@@ -122,49 +124,41 @@ function OrderHistory() {
               </div>
 
               <div className="order-history-page__card">
-                {group.items.map((item, idx) => (
-                  <div key={item.id}>
-                    <article className="order-history-item">
-                      <div className="order-history-item__top">
-                        <div className="order-history-item__thumb">
-                          <img src={item.thumb} alt={item.name} />
+                {group.items.map((item, idx) => {
+                  const itemKey = `${group.date}-${item._id}-${idx}`;
+
+                  return (
+                    <div key={itemKey}>
+                      <article className="order-history-item">
+                        <div className="order-history-item__top">
+                          <div className="order-history-item__thumb">
+                            <img src={item.thumb} alt={item.name} />
+                          </div>
+
+                          <div className="order-history-item__info">
+                            <p className="order-history-item__category">{item.category}</p>
+                            <p className="order-history-item__name">{item.name}</p>
+                            <p className="order-history-item__desc">{item.desc}</p>
+                            <p className="order-history-item__option">{item.option}</p>
+                            <span className="order-history-item__price">{item.price}</span>
+                          </div>
+
+                          <div className="order-history-item__action">
+                            {renderItemActions(item, itemKey)}
+                          </div>
                         </div>
 
-                        <div className="order-history-item__info">
-                          <p className="order-history-item__category">{item.category}</p>
-                          <p className="order-history-item__name">{item.name}</p>
-                          <p className="order-history-item__desc">{item.desc}</p>
-                          <p className="order-history-item__option">{item.option}</p>
-                          <span className="order-history-item__price">{item.price}</span>
+                        <div className="order-history-item__action--mobile">
+                          {renderItemActions(item, itemKey)}
                         </div>
+                      </article>
 
-                        <div className="order-history-item__action">
-                          <button
-                            type="button"
-                            className="order-history-item__review-btn"
-                            onClick={() => setReviewTarget({ productId: item.id })}
-                          >
-                            리뷰 작성
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="order-history-item__action--mobile">
-                        <button
-                          type="button"
-                          className="order-history-item__review-btn"
-                          onClick={() => setReviewTarget({ productId: item.id })}
-                        >
-                          리뷰 작성
-                        </button>
-                      </div>
-                    </article>
-
-                    {idx < group.items.length - 1 && (
-                      <div className="order-history-item__divider" />
-                    )}
-                  </div>
-                ))}
+                      {idx < group.items.length - 1 && (
+                        <div className="order-history-item__divider" />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </section>
           ))}

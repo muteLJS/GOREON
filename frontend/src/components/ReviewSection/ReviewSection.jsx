@@ -10,6 +10,7 @@ function ReviewSection({ rating, reviewCount, photoCount, gallery, reviews }) {
   const REVIEW_PREVIEW_COUNT = 5;
   const navigate = useNavigate();
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const hasReviews = reviewCount > 0;
   const [isExpanded, setIsExpanded] = useState(false);
   const [lightbox, setLightbox] = useState(null);
   const [sortType, setSortType] = useState("popular");
@@ -149,6 +150,17 @@ function ReviewSection({ rating, reviewCount, photoCount, gallery, reviews }) {
   const visibleReviews = isExpanded
     ? sortedReviews
     : sortedReviews.slice(0, REVIEW_PREVIEW_COUNT);
+
+  if (!hasReviews) {
+    return (
+      <section className="review-section">
+        <div className="review-section__empty">
+          <p className="review-section__eyebrow">상품 리뷰</p>
+          <p className="review-section__empty-message">아직 리뷰가 없습니다.</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="review-section">

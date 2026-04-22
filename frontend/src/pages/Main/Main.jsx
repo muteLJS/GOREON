@@ -20,8 +20,10 @@ import WishlistIconButton from "components/WishlistIconButton/WishlistIconButton
 import EventModal from "components/EventModal/EventModal";
 import Modal from "components/Modal/Modal";
 import productsData from "@/data/products_list.json";
+import { fetchAiRecommendations } from "@/utils/recommendations";
 
 const mainProducts = productsData;
+const getProductRouteId = (product) => product?._id ?? product?.productId ?? product?.id;
 
 const getMainProductById = (id) => mainProducts.find((product) => product.id === id);
 
@@ -89,6 +91,11 @@ function Main() {
   const navigate = useNavigate();
   const [showAiResult, setShowAiResult] = useState(false);
   const [isAiSwitching, setIsAiSwitching] = useState(false);
+  const [aiQuery, setAiQuery] = useState("");
+  const [aiStatus, setAiStatus] = useState("idle");
+  const [aiMessage, setAiMessage] = useState("");
+  const [aiResults, setAiResults] = useState([]);
+  const [aiErrorMessage, setAiErrorMessage] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("direct");
   const [selectedSpecProduct, setSelectedSpecProduct] = useState(null);
   const [selectedUpdateIndex, setSelectedUpdateIndex] = useState(0);
@@ -101,6 +108,7 @@ function Main() {
     thumbWidth: 25,
   });
   const aiSwitchTimeoutRef = useRef(null);
+  const aiRequestAbortRef = useRef(null);
   const categorySwiperRef = useRef(null);
   const categoryProgressRef = useRef(null);
   const promptItems = [
@@ -290,24 +298,53 @@ function Main() {
     ],
   };
   const categoryItems = categoryItemsMap[selectedCategory];
-  const aiResultItems = [
-    {
-      ...getMainProduct(4),
-      spec: "문서 작업 · 온라인 강의용 실속 노트북",
-    },
-    {
-      ...getMainProduct(6),
-      spec: "가벼운 과제와 웹 수업에 맞는 노트북",
-    },
-    {
-      ...getMainProduct(7),
-      spec: "첫 노트북으로 쓰기 좋은 윈도우 모델",
-    },
-  ];
+  const aiResultItems = aiResults;
   const handleInput = (e) => {
     const el = e.target;
     el.style.height = "auto";
     el.style.height = `${el.scrollHeight}px`;
+  };
+
+  const handleAiInput = (e) => {
+    setAiQuery(e.target.value);
+    handleInput(e);
+  };
+
+  const normalizeAiProduct = (item) => ({
+    id: item.id ?? item.productId ?? item._id,
+    productId: item.productId ?? item._id ?? item.id,
+    name: item.name ?? "추천 상품",
+    price: item.price ?? "0",
+    image: item.image ?? "",
+    rating: item.rating ?? 0,
+    spec: item.reason ?? item.tag?.join(" · ") ?? "상품 데이터 기준 추천",
+    reason: item.reason,
+    matchedCriteria: item.matchedCriteria ?? [],
+    caveat: item.caveat,
+  });
+
+  const startAiResultTransition = () => {
+    if (showAiResult) {
+      return;
+    }
+
+    if (aiSwitchTimeoutRef.current) {
+      window.clearTimeout(aiSwitchTimeoutRef.current);
+    }
+
+    setIsAiSwitching(true);
+    setShowAiResult(true);
+    aiSwitchTimeoutRef.current = window.setTimeout(() => {
+      setIsAiSwitching(false);
+      aiSwitchTimeoutRef.current = null;
+    }, 650);
+  };
+
+  const handlePromptSelect = (prompt) => {
+    const promptWithoutEmoji = String(prompt)
+      .replace(/^[^\p{L}\p{N}]+/u, "")
+      .trim();
+    setAiQuery(promptWithoutEmoji || prompt);
   };
 
   const updateCategorySwiperState = (swiper = categorySwiperRef.current) => {
@@ -364,22 +401,73 @@ function Main() {
     window.addEventListener("pointerup", handlePointerUp);
   };
 
-  const handleAiSubmit = (e) => {
+  const handleAiSubmit = async (e) => {
     e.preventDefault();
-    if (showAiResult) {
+
+    const query = aiQuery.trim();
+
+    if (!query) {
+      setAiStatus("error");
+      setAiErrorMessage("추천받고 싶은 용도나 예산을 입력해주세요.");
+      setAiMessage("추천받고 싶은 용도나 예산을 입력해주세요.");
+      setAiResults([]);
+      startAiResultTransition();
       return;
     }
-    setIsAiSwitching(true);
-    setShowAiResult(true);
-    aiSwitchTimeoutRef.current = window.setTimeout(() => {
-      setIsAiSwitching(false);
-      aiSwitchTimeoutRef.current = null;
-    }, 650);
+
+    if (aiRequestAbortRef.current) {
+      aiRequestAbortRef.current.abort();
+    }
+
+    const controller = new AbortController();
+    aiRequestAbortRef.current = controller;
+
+    setAiStatus("loading");
+    setAiErrorMessage("");
+    setAiMessage("조건에 맞는 상품을 찾는 중입니다.");
+    setAiResults([]);
+    startAiResultTransition();
+
+    try {
+      const result = await fetchAiRecommendations({
+        query,
+        limit: 3,
+        signal: controller.signal,
+      });
+      const nextResults = Array.isArray(result.products)
+        ? result.products.map(normalizeAiProduct)
+        : [];
+
+      setAiResults(nextResults);
+      setAiMessage(
+        result.message ||
+          (nextResults.length > 0
+            ? "현재 상품 데이터 기준으로 조건에 가까운 제품을 골랐어요."
+            : "조건에 맞는 상품을 찾지 못했어요. 조건을 조금 더 넓혀볼까요?"),
+      );
+      setAiStatus(nextResults.length > 0 ? "success" : "empty");
+    } catch (error) {
+      if (error.name === "CanceledError" || error.name === "AbortError") {
+        return;
+      }
+
+      setAiStatus("error");
+      setAiErrorMessage("추천 결과를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
+      setAiMessage("추천 결과를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
+      setAiResults([]);
+    } finally {
+      if (aiRequestAbortRef.current === controller) {
+        aiRequestAbortRef.current = null;
+      }
+    }
   };
 
-  const navigateToProduct = (id) => {
-    if (id !== undefined && id !== null) {
-      navigate(`/product/${id}`);
+  const navigateToProduct = (product) => {
+    const productId =
+      typeof product === "object" && product !== null ? getProductRouteId(product) : product;
+
+    if (productId !== undefined && productId !== null) {
+      navigate(`/product/${productId}`);
     }
   };
 
@@ -391,6 +479,10 @@ function Main() {
     () => () => {
       if (aiSwitchTimeoutRef.current) {
         window.clearTimeout(aiSwitchTimeoutRef.current);
+      }
+
+      if (aiRequestAbortRef.current) {
+        aiRequestAbortRef.current.abort();
       }
     },
     [],
@@ -405,6 +497,10 @@ function Main() {
 
       setShowAiResult(false);
       setIsAiSwitching(false);
+      setAiStatus("idle");
+      setAiMessage("");
+      setAiErrorMessage("");
+      setAiResults([]);
     };
 
     window.addEventListener("reset-main-ai-section", resetAiSection);
@@ -527,7 +623,7 @@ function Main() {
               어려운 스펙 설명 없이, 쉽고 빠르게.
             </p>
             <div className="AI_Chat_row_2">
-              <PromptButtonList items={promptItems} />
+              <PromptButtonList items={promptItems} onSelect={handlePromptSelect} />
             </div>
           </div>
           <AICharacter className="AI_logo" />
@@ -540,9 +636,10 @@ function Main() {
                 id="ai_chat"
                 rows={1}
                 placeholder="무엇이든 물어보세요!"
-                onInput={handleInput}
+                value={aiQuery}
+                onChange={handleAiInput}
               />
-              <button className="submit" type="submit">
+              <button className="submit" type="submit" disabled={aiStatus === "loading"}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                   <circle cx="12" cy="12" r="12" fill="#0AA6A6" />
                   <path
@@ -556,8 +653,12 @@ function Main() {
               </button>
             </div>
             <div className="AI_Chat_row_2">
-              <PromptButtonList items={promptItems} variant="result" />
-              <button className="submit" type="submit">
+              <PromptButtonList
+                items={promptItems}
+                variant="result"
+                onSelect={handlePromptSelect}
+              />
+              <button className="submit" type="submit" disabled={aiStatus === "loading"}>
                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
                   <circle cx="20" cy="20" r="20" fill="#0AA6A6" />
                   <path
@@ -588,7 +689,7 @@ function Main() {
             <WishlistIconButton product={product} size="sm" />
           </div>
         </div>
-        <button type="button" className="item_name" onClick={() => navigateToProduct(item.id)}>
+        <button type="button" className="item_name" onClick={() => navigateToProduct(item)}>
           {item.name}
         </button>
         <div className="options">
@@ -615,7 +716,7 @@ function Main() {
             isDesktop ? "desktop" : isTabletCategory ? "tablet" : "mobile"
           }`}
           className="item_box category_swiper"
-          spaceBetween={isDesktop ? 20 : isTabletCategory ? 24 : 16}
+          spaceBetween={isDesktop ? 20 : isTabletCategory ? 24 : 10}
           slidesPerView={isDesktop ? 3.15 : isTabletCategory ? 2.7 : 2.1}
           onSwiper={(swiper) => {
             categorySwiperRef.current = swiper;
@@ -697,63 +798,79 @@ function Main() {
   const renderResultAiSection = (isEntering = false) => (
     <div className={`ai-stage__layer ai-stage__layer--result ${isEntering ? "is-entering" : ""}`}>
       <div className="section__AI_result sections">
-        <Swiper
-          className="recommends"
-          slidesPerView={1.4}
-          spaceBetween={12}
-          breakpoints={{
-            768: {
-              slidesPerView: 3,
-              spaceBetween: 20,
-            },
-            1024: {
-              slidesPerView: 3,
-              spaceBetween: 24,
-            },
-          }}
-        >
-          {aiResultItems.map((item, index) => (
-            <SwiperSlide key={`ai-result-${index}`}>
-              <div
-                className="recommend"
-                role="button"
-                tabIndex={0}
-                onClick={() => navigateToProduct(item.id)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    navigateToProduct(item.id);
-                  }
-                }}
-              >
-                <img src={item.image} alt="" />
-                <div className="texts">
-                  <p>{item.name}</p>
-                  <p>{item.spec}</p>
-                </div>
-                <div className="go">
-                  <p className="price">{toDisplayPrice(item)}</p>
-                  <button
-                    type="button"
-                    className="chevron"
-                    aria-label={`${item.name} 상세페이지로 이동`}
-                    onClick={(event) => {
-                      event.stopPropagation();
+        {aiStatus === "loading" ? (
+          <div className="AI_result_state">상품 데이터 기준으로 추천을 준비하고 있어요.</div>
+        ) : null}
+        {aiStatus === "error" ? (
+          <div className="AI_result_state AI_result_state--error">{aiErrorMessage}</div>
+        ) : null}
+        {aiStatus === "empty" ? (
+          <div className="AI_result_state">
+            조건에 맞는 상품이 없습니다. 예산이나 용도를 넓혀보세요.
+          </div>
+        ) : null}
+        {aiResultItems.length > 0 ? (
+          <Swiper
+            className="recommends"
+            slidesPerView={1.4}
+            spaceBetween={12}
+            breakpoints={{
+              768: {
+                slidesPerView: 3,
+                spaceBetween: 20,
+              },
+              1024: {
+                slidesPerView: 3,
+                spaceBetween: 24,
+              },
+            }}
+          >
+            {aiResultItems.map((item, index) => (
+              <SwiperSlide key={`ai-result-${item.id ?? index}`}>
+                <div
+                  className="recommend"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => navigateToProduct(item.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
                       navigateToProduct(item.id);
-                    }}
-                  >
-                    <svg viewBox="0 0 24 12">
-                      <path d="M2 10L12 2L22 10" />
-                    </svg>
-                  </button>
+                    }
+                  }}
+                >
+                  <img src={item.image} alt={item.name} />
+                  <div className="texts">
+                    <p>{item.name}</p>
+                    <p>{item.spec}</p>
+                  </div>
+                  <div className="go">
+                    <p className="price">{toDisplayPrice(item)}</p>
+                    <button
+                      type="button"
+                      className="chevron"
+                      aria-label={`${item.name} 상세페이지로 이동`}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        navigateToProduct(item.id);
+                      }}
+                    >
+                      <svg viewBox="0 0 24 12">
+                        <path d="M2 10L12 2L22 10" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        ) : null}
         <div className="AI_chat_response">
           <img src={Lighting} alt="Lighting" />
-          <p>대학생에게 인기 있는 가벼운 노트북 3가지를 추천해드릴게요</p>
+          <p>
+            {aiMessage ||
+              "자연어로 원하는 용도와 예산을 입력하면 상품 데이터 기준으로 추천해드릴게요."}
+          </p>
         </div>
         <div className="AI_chat_container">
           <form action="#" method="POST" onSubmit={handleAiSubmit}>
@@ -763,9 +880,10 @@ function Main() {
                 id="ai_chat"
                 rows={1}
                 placeholder="대학생용 가벼운 노트북 추천해줘."
-                onInput={handleInput}
+                value={aiQuery}
+                onChange={handleAiInput}
               />
-              <button className="submit" type="submit">
+              <button className="submit" type="submit" disabled={aiStatus === "loading"}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                   <circle cx="12" cy="12" r="12" fill="#0AA6A6" />
                   <path
@@ -779,8 +897,8 @@ function Main() {
               </button>
             </div>
             <div className="AI_Chat_row_2">
-              <PromptButtonList items={promptItems} />
-              <button className="submit" type="submit">
+              <PromptButtonList items={promptItems} onSelect={handlePromptSelect} />
+              <button className="submit" type="submit" disabled={aiStatus === "loading"}>
                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
                   <circle cx="20" cy="20" r="20" fill="#0AA6A6" />
                   <path
@@ -954,8 +1072,8 @@ function Main() {
                   description={item.description}
                   isActive={selectedUpdateIndex === index}
                   onClick={() => setSelectedUpdateIndex(index)}
-                  onChevronClick={() => navigate(`/product/${item.id}`)}
-                />
+                onChevronClick={() => navigateToProduct(item)}
+              />
               ))}
             </div>
           </div>
@@ -969,11 +1087,11 @@ function Main() {
                       key={item.name}
                       role="button"
                       tabIndex={0}
-                      onClick={() => navigateToProduct(item.id)}
+                      onClick={() => navigateToProduct(item)}
                       onKeyDown={(event) => {
                         if (event.key === "Enter" || event.key === " ") {
                           event.preventDefault();
-                          navigateToProduct(item.id);
+                          navigateToProduct(item);
                         }
                       }}
                     >
@@ -1041,7 +1159,7 @@ function Main() {
               <button
                 type="button"
                 className="main-spec-modal__button main-spec-modal__button--primary"
-                onClick={() => navigateToProduct(selectedSpecProduct.id)}
+                onClick={() => navigateToProduct(selectedSpecProduct)}
               >
                 상세보기
               </button>

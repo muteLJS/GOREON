@@ -1,7 +1,14 @@
 import PcAssemblyQuoteItem from "@/components/PcAssemblyQuoteItem/PcAssemblyQuoteItem";
 import "./PcAssemblyQuoteList.scss";
 
-function PcAssemblyQuoteList({ productList, selectedIds, onSelectItem }) {
+function PcAssemblyQuoteList({
+  productList,
+  selectedIds,
+  compatibilityLevels,
+  onSelectItem,
+  onDecreaseQuantity,
+  onIncreaseQuantity,
+}) {
   return (
     <div
       className={`pc-assembly-quote-list ${
@@ -21,7 +28,9 @@ function PcAssemblyQuoteList({ productList, selectedIds, onSelectItem }) {
             price={item.price}
             quantity={item.quantity}
             image={item.image}
-            compatibility={item.compatibility}
+            compatibility={compatibilityLevels?.get(item.id)}
+            onDecreaseQuantity={() => onDecreaseQuantity(item)}
+            onIncreaseQuantity={() => onIncreaseQuantity(item)}
           />
         ))
       ) : (

@@ -12,6 +12,7 @@ import User from "@/assets/header/header-icons/user.svg";
 import ChevronDown from "@/assets/icons/chevron-down.svg";
 import Prev from "@/assets/icons/prev.svg";
 import { logout } from "@/store/slices/userSlice";
+import api from "@/utils/api";
 import Modal from "../Modal/Modal";
 
 const categoryMenu = [
@@ -256,7 +257,13 @@ function Header() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await api.post("/auth/logout").catch((error) => {
+      console.warn("[auth][logout] request failed", {
+        message: error.message,
+        status: error.response?.status,
+      });
+    });
     dispatch(logout());
     navigate("/");
   };
@@ -551,6 +558,48 @@ function Header() {
           </li>
         </ul>
       </nav>
+
+      <div
+        className={`header__search-backdrop ${isSearchOpen ? "is-open" : ""}`}
+        onClick={closeSearch}
+      />
+      <div className={`header__search header__search--mobile ${isSearchOpen ? "is-open" : ""}`}>
+        <div className="header__search-panel">
+          <div className="header__search-sheet">
+            <form className="header__search-form" onSubmit={handleSearchSubmit}>
+              <div className="header__search-input-wrap">
+                <button type="submit" className="header__search-icon-button" aria-label="검색 실행">
+                  <img src={Search} alt="" className="header__search-icon" />
+                </button>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  placeholder="검색어를 입력하세요"
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  onFocus={() => setIsSearchOpen(true)}
+                />
+              </div>
+
+              <div className="header__search-suggestions">
+                {searchSuggestions.map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    type="button"
+                    className="header__search-suggestion"
+                    onClick={() => submitSearch(suggestion)}
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+
+              <button type="submit" className="header__search-submit">
+                검색
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
 
       <div className={`mobile-menu ${isMobileMenuOpen ? "is-open" : ""}`}>
         <div className="mobile-menu__tabs" role="tablist" aria-label="모바일 메뉴">

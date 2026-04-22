@@ -550,12 +550,18 @@
 @include tablet-up {
   .chat-widget {
     right: 24px;
-    bottom: 136px;
+    bottom: 119px;
   }
 
   .chat-widget__window {
     height: min(560px, calc(100vh - 176px));
     max-height: calc(100vh - 176px);
+  }
+
+  .chat-widget__scroll-top {
+    width: 64px;
+    height: 64px;
+    margin-right: 0;
   }
 }
 
@@ -568,13 +574,20 @@
     height: min(644px, calc(100vh - 96px));
     max-height: calc(100vh - 96px);
   }
+
+  .chat-widget__scroll-top {
+    width: 88px;
+    height: 88px;
+    margin-right: -12px;
+  }
 }
 
 @include mobile {
   .chat-widget {
-    right: 16px;
-    left: 16px;
-    bottom: 111px;
+    right: 12px;
+    left: 12px;
+    bottom: calc(var(--mobile-bottom-nav-height, 95px) + 12px);
+    gap: 6px;
   }
 
   .chat-widget__window {
@@ -590,6 +603,33 @@
 
   .chat-widget__tooltip span {
     font-size: $font-sm;
+  }
+
+  .chat-widget__trigger-wrap {
+    min-height: 56px;
+    gap: 8px;
+  }
+
+  .chat-widget__scroll-top {
+    width: 56px;
+    height: 56px;
+    margin-right: 0;
+  }
+
+  .chat-widget__trigger {
+    width: 56px;
+    height: 56px;
+  }
+
+  .chat-widget__trigger-icon {
+    width: 26px;
+    height: 26px;
+  }
+
+  .chat-widget__tooltip {
+    width: min(142px, calc(100vw - 92px));
+    min-height: 36px;
+    padding: 0 10px;
   }
 
   .chat-widget__quick-replies {

@@ -2,7 +2,7 @@
 /* [페이지] 검색 결과 (Search)                                                */
 /* 사용자가 입력한 검색어에 일치하는 상품 및 스펙 비교 결과를 나열합니다.     */
 /* -------------------------------------------------------------------------- */
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./ListLayout.scss";
 import banner1 from "@/assets/banner/banner-1.jpg";
 import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
@@ -271,6 +271,9 @@ const TYPE_ALIAS_MAP = {
   "pc-part": "pc-parts",
 };
 
+const PRICE_MIN = 10000;
+const PRICE_MAX = 1600000 * 2;
+
 const getFilterGroupsByType = (type) => {
   const normalizedType = TYPE_ALIAS_MAP[type] ?? type;
 
@@ -285,16 +288,67 @@ const getFilterGroupsByType = (type) => {
   return DEFAULT_FILTER_GROUPS;
 };
 
-const FilterMenuList = ({ children }) => {
+const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
+
+const normalizeFilterText = (value) =>
+  String(value ?? "")
+    .toLowerCase()
+    .replace(/\s+/g, "");
+
+const getProductSearchText = (product) =>
+  [
+    product.name,
+    ...(Array.isArray(product.tag) ? product.tag : []),
+    ...(Array.isArray(product.priceOptions)
+      ? product.priceOptions.map((option) => option?.optionName).filter(Boolean)
+      : []),
+  ]
+    .join(" ")
+    .toLowerCase();
+
+const isSortGroup = (title) => title === "정렬 기준";
+
+const matchesSelectedFilters = (product, selectedFilters) => {
+  const productText = getProductSearchText(product);
+
+  return Object.entries(selectedFilters).every(([groupTitle, values]) => {
+    if (isSortGroup(groupTitle) || values.length === 0) {
+      return true;
+    }
+
+    const normalizedProductText = normalizeFilterText(productText);
+
+    return values.some((value) => normalizedProductText.includes(normalizeFilterText(value)));
+  });
+};
+
+const sortProducts = (products, selectedFilters) => {
+  const sortValue = selectedFilters["정렬 기준"]?.[0];
+  const sortedProducts = [...products];
+
+  if (sortValue === "최신상품") {
+    return sortedProducts.sort((left, right) => (Number(right.id) || 0) - (Number(left.id) || 0));
+  }
+
+  if (sortValue === "인기상품" || sortValue === "리뷰 많은 상품") {
+    return sortedProducts.sort(
+      (left, right) => (Number(right.rating) || 0) - (Number(left.rating) || 0),
+    );
+  }
+
+  return sortedProducts;
+};
+
+const FilterMenuList = ({ children, checked, onChange }) => {
   return (
     <li>
-      <input type="checkbox" />
+      <input checked={checked} type="checkbox" onChange={onChange} />
       <p>{children}</p>
     </li>
   );
 };
 
-const FilterMenuBox = ({ title, items }) => {
+const FilterMenuBox = ({ title, items, selectedValues, onToggle }) => {
   return (
     <div className="side_menu_bottom">
       <div className="side_menu_bottom_filter_container">
@@ -302,7 +356,13 @@ const FilterMenuBox = ({ title, items }) => {
       </div>
       <ul className="side_menu_bottom_filter_list">
         {items.map((item) => (
-          <FilterMenuList key={`${title}-${item}`}>{item}</FilterMenuList>
+          <FilterMenuList
+            key={`${title}-${item}`}
+            checked={selectedValues.includes(item)}
+            onChange={() => onToggle(title, item)}
+          >
+            {item}
+          </FilterMenuList>
         ))}
       </ul>
     </div>
@@ -320,10 +380,9 @@ export default function ListLayout({
 }) {
   const [searchParams] = useSearchParams();
   const type = selectedType ?? searchParams.get("type") ?? "";
-  const MIN = 10000;
-  const MAX = 1600000 * 2;
-  const [minValue, setMinValue] = useState(MIN);
-  const [maxValue, setMaxValue] = useState(MAX);
+  const [minValue, setMinValue] = useState(PRICE_MIN);
+  const [maxValue, setMaxValue] = useState(PRICE_MAX);
+  const [selectedFilters, setSelectedFilters] = useState({});
   const handleChange = (e) => {
     if (e.target.name === "min") {
       setMinValue(e.target.value);
@@ -332,9 +391,55 @@ export default function ListLayout({
     }
   };
 
-  const filteredLength = filteredProducts.length;
   const filterGroups = getFilterGroupsByType(type);
   const titleLabel = selectedTypeLabel ?? TYPE_LABEL_MAP[type] ?? "전체 상품";
+  const visibleProducts = useMemo(() => {
+    const priceFilteredProducts = filteredProducts.filter((product) => {
+      const price = parsePrice(product.price);
+
+      if (!price) {
+        return true;
+      }
+
+      return price >= Number(minValue) && price <= Number(maxValue);
+    });
+    const optionFilteredProducts = priceFilteredProducts.filter((product) =>
+      matchesSelectedFilters(product, selectedFilters),
+    );
+
+    return sortProducts(optionFilteredProducts, selectedFilters);
+  }, [filteredProducts, maxValue, minValue, selectedFilters]);
+  const filteredLength = visibleProducts.length;
+
+  const handleFilterToggle = (title, item) => {
+    setSelectedFilters((currentFilters) => {
+      const currentValues = currentFilters[title] ?? [];
+      const nextValues = currentValues.includes(item)
+        ? currentValues.filter((value) => value !== item)
+        : [...currentValues, item];
+      const nextFilters = { ...currentFilters };
+
+      if (nextValues.length > 0) {
+        nextFilters[title] = nextValues;
+      } else {
+        delete nextFilters[title];
+      }
+
+      return nextFilters;
+    });
+  };
+
+  const resetFilters = () => {
+    setSelectedFilters({});
+    setMinValue(PRICE_MIN);
+    setMaxValue(PRICE_MAX);
+  };
+
+  useEffect(() => {
+    setSelectedFilters({});
+    setMinValue(PRICE_MIN);
+    setMaxValue(PRICE_MAX);
+  }, [type]);
 
   return (
     <>
@@ -345,22 +450,28 @@ export default function ListLayout({
               <h2>필터</h2>
               <div className="side_menu_rightbox">
                 <p>초기화</p>
-                <button>
+                <button type="button" onClick={resetFilters}>
                   <img src={resetIcon} alt="reset" />
                 </button>
               </div>
             </div>
             <div className="side_menu_bottom_container">
               {filterGroups.map((group) => (
-                <FilterMenuBox key={group.title} items={group.items} title={group.title} />
+                <FilterMenuBox
+                  key={group.title}
+                  items={group.items}
+                  selectedValues={selectedFilters[group.title] ?? []}
+                  title={group.title}
+                  onToggle={handleFilterToggle}
+                />
               ))}
               <div className="side_menu_bottom_range">
                 <h3>가격</h3>
                 <input
                   type="range"
                   name="max"
-                  min={MIN}
-                  max={MAX}
+                  min={PRICE_MIN}
+                  max={PRICE_MAX}
                   step={10000}
                   value={maxValue}
                   onChange={handleChange}
@@ -399,12 +510,12 @@ export default function ListLayout({
                 <p className="list-assembly__state">상품을 불러오는 중입니다.</p>
               ) : null}
               {status === "error" ? <p className="list-assembly__state">{errorMessage}</p> : null}
-              {status === "success" && filteredProducts.length === 0 ? (
+              {status === "success" && visibleProducts.length === 0 ? (
                 <p className="list-assembly__state">조건에 맞는 상품이 없습니다.</p>
               ) : null}
-              {status === "success" && filteredProducts.length > 0 ? (
+              {status === "success" && visibleProducts.length > 0 ? (
                 <div className="list-assembly__product-grid">
-                  {filteredProducts.map((product) => (
+                  {visibleProducts.map((product) => (
                     <ProductCardVertical
                       key={product.id}
                       product={product}

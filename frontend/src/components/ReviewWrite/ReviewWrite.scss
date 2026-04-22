@@ -1,6 +1,10 @@
 @import "styles/variables";
 @import "styles/mixins";
 
+.review-write-modal {
+  box-sizing: border-box;
+}
+
 .review-write {
   display: flex;
   flex-direction: column;
@@ -77,5 +81,12 @@
     button:last-child {
       @include button-base();
     }
+  }
+}
+
+@include desktop-up {
+  .review-write-modal {
+    width: 100%;
+    max-width: $layout-desktop-max-width;
   }
 }

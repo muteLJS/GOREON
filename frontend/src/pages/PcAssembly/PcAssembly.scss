@@ -37,6 +37,10 @@
 
   &__content {
     margin-top: $space-md;
+    margin-bottom: $space-md;
+    display: flex;
+    flex-direction: column;
+    gap: $space-md;
   }
 
   &__product-grid {
@@ -45,75 +49,94 @@
     gap: $space-md;
   }
 
-  &__state {
-    grid-column: 1 / -1;
-    padding: $space-md 0;
-    color: $color-sub-category-text;
-    font-size: $font-md;
-    font-weight: $font-medium;
-  }
-
   &__add-button {
     @include button-base();
+      min-width: 44px;
+      height: 20px;
+      padding: 0px 0px;    
+      font-size: $font-xs;
   }
 
-  &__bottom {
-    margin-top: $space-md;
-    margin-bottom: $space-md;
-  }
-
-  &__summary-grid {
+  &__section-bar {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: $space-md;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    width: 100%;
+    min-width: 0;
   }
 
   &__total {
-    @include button-gray();
-    background-color: $color-gray-100;
+    @include flex(center, center);
+    min-height: 46px;
+    border-radius: 12px;
+    background: $color-gray-100;
     color: $color-text-main;
+    font-size: $font-lg;
+    font-weight: $font-bold;
+    white-space: nowrap;
+    padding: 6px 10px;
+    min-width: 0;
+    max-width: 100%;
   }
 
   &__list-button {
     @include button-base();
+    height: 38px;
+    min-width: 112px;
+    padding: 0 18px;
+    font-size: $font-md;
+    font-weight: $font-semibold;
+    white-space: nowrap;
   }
 
   &__compatibility {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: $space-md;
-    margin-top: $space-md;
+    grid-template-columns: minmax(0, 1fr) max-content;
+    gap: 8px 16px;
+    align-items: center;
     background-color: #0aa5a515;
-    border-radius: $radius-md;
+    border-radius: 12px;
+    padding: 10px 18px 8px;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
   }
 
   &__compatibility-count,
   &__compatibility-status {
     display: flex;
-    justify-content: center;
     align-items: center;
-    padding: $space-xs;
+    min-width: 0;
   }
 
   &__compatibility-count {
-    gap: $space-xs;
+    justify-content: flex-start;
+    gap: 8px;
     font-weight: $font-bold;
-    font-size: $font-sm;
+    font-size: $font-md;
+    white-space: nowrap;
+
+    img {
+      width: $font-lg;
+      height: $font-lg;
+      display: block;
+    }
   }
 
   &__compatibility-status {
-    font-size: $font-xs;
-    color: $color-text-sub;
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
-    &.is-ok {
-      color: $color-text-sub;
+    &--warning {
+      color: $color-warning;
     }
 
-    &.is-warning {
-      color: #b08900;
-    }
-
-    &.is-error {
+    &--error {
       color: $color-error;
     }
   }
@@ -146,7 +169,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 24px;
+    padding: 24px 12px;
   }
 
   &__desktop-quote-dim {
@@ -158,8 +181,7 @@
   &__desktop-quote-panel {
     position: relative;
     z-index: 1;
-    transform: translateX(clamp(-7px, -0.55vw, -2px));
-    width: min(var(--quote-w, 1216px), calc(100vw - 48px));
+    width: min(calc(var(--quote-w, 1216px) + 40px), calc(100vw - 24px));
     height: min(840px, calc(100dvh - 48px));
     background: $color-white;
     border-radius: 20px;
@@ -211,6 +233,90 @@
       flex-shrink: 0;
     }
   }
+
+  &__quote-overlay {
+    &.modal-overlay--fullscreen {
+      align-items: stretch;
+    }
+  }
+}
+
+@include mobile {
+  .pc-assembly {
+    &__product-grid {
+      align-items: stretch;
+
+      .product-card-vertical {
+        height: 100%;
+        min-width: 0;
+      }
+
+      .product-card-vertical__thumbnail {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 4 / 3;
+        object-fit: contain;
+        object-position: center;
+        flex-shrink: 0;
+      }
+
+      .product-card-vertical__bottom {
+        gap: $space-xs;
+        margin-top: auto;
+      }
+    }
+
+    &__quote-overlay {
+      &.modal-overlay--fullscreen {
+        align-items: flex-end;
+        padding-top: 12px;
+      }
+    }
+
+    &__quote-modal {
+      height: calc(100dvh - 12px);
+      border-radius: 20px 20px 0 0;
+      padding-top: 12px;
+    }
+
+    &__total {
+      min-height: 42px;
+      font-size: clamp($font-sm, 4vw, $font-md);
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &__compatibility {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      padding: 10px 12px;
+      gap: 8px;
+    }
+
+    &__compatibility-count,
+    &__compatibility-status {
+      font-size: $font-sm;
+    }
+
+    &__compatibility-count {
+      grid-column: 1;
+    }
+
+    &__compatibility-status {
+      grid-column: 2;
+      justify-content: flex-end;
+      text-align: right;
+    }
+
+    &__list-button {
+      grid-column: 1 / -1;
+      justify-self: stretch;
+      width: 100%;
+      height: 34px;
+      min-width: 0;
+      padding: 0 12px;
+      font-size: $font-sm;
+    }
+  }
 }
 
 @include tablet-up {
@@ -221,9 +327,33 @@
   }
 }
 
+@media (min-width: $breakpoint-tablet) and (max-width: 1023px) {
+  .pc-assembly {
+    &__quote-overlay {
+      &.modal-overlay--fullscreen {
+        align-items: center;
+        padding: 24px;
+      }
+    }
+
+    &__quote-modal {
+      width: min(960px, calc(100vw - 48px));
+      height: min(860px, calc(100dvh - 48px));
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.22);
+
+      .modal__close {
+        top: 20px;
+        right: 20px;
+      }
+    }
+  }
+}
+
 @include desktop-up {
   .pc-assembly {
-    padding-top: $page-content-start-desktop;
+    padding-top: 40px;
 
     &__title {
       margin: 0 auto;
@@ -238,9 +368,42 @@
     &__desktop {
       display: grid;
       grid-template-columns: repeat(12, 1fr);
-      gap: 24px;
+      gap: 16px 24px;
       margin-top: $space-lg;
       margin-bottom: $space-lg;
+    }
+
+    &__section-bar {
+      grid-column: 1 / -1;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 16px 20px;
+      margin-top: 0;
+    }
+
+    &__total {
+      grid-column: 1 / span 3;
+      min-height: 56px;
+    }
+
+    &__compatibility {
+      grid-column: 4 / -1;
+      grid-template-columns: repeat(9, minmax(0, 1fr));
+      gap: 16px;
+      min-height: 56px;
+    }
+
+    &__compatibility-count {
+      grid-column: 1 / span 3;
+    }
+
+    &__compatibility-status {
+      grid-column: 4 / span 2;
+      justify-content: flex-end;
+    }
+
+    &__list-button {
+      grid-column: 7 / -1;
+      justify-self: end;
     }
 
     &__sidebar {
@@ -279,26 +442,10 @@
       gap: $space-md;
     }
 
-    &__desktop-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: $space-md;
-    }
-
-    &__compatibility {
-      margin-top: 0;
-      flex: 1;
-    }
-
     &__desktop-list {
       display: flex;
       flex-direction: column;
       gap: $space-md;
-
-      .pc-assembly__state {
-        padding: $space-lg 0;
-      }
     }
 
     .filter-button {
