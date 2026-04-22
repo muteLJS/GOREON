@@ -1,6 +1,5 @@
 const express = require("express");
 const cors = require("cors");
-const path = require("path");
 const routes = require("./routes");
 const errorHandler = require("./middleware/errorHandler");
 const notFound = require("./middleware/notFound");
@@ -22,7 +21,6 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api", routes);
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.use(notFound);
 app.use(errorHandler);

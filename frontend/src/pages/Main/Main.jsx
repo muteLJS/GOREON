@@ -22,6 +22,7 @@ import Modal from "components/Modal/Modal";
 import productsData from "@/data/products_list.json";
 
 const mainProducts = productsData;
+const getProductRouteId = (product) => product?._id ?? product?.productId ?? product?.id;
 
 const getMainProductById = (id) => mainProducts.find((product) => product.id === id);
 
@@ -377,9 +378,12 @@ function Main() {
     }, 650);
   };
 
-  const navigateToProduct = (id) => {
-    if (id !== undefined && id !== null) {
-      navigate(`/product/${id}`);
+  const navigateToProduct = (product) => {
+    const productId =
+      typeof product === "object" && product !== null ? getProductRouteId(product) : product;
+
+    if (productId !== undefined && productId !== null) {
+      navigate(`/product/${productId}`);
     }
   };
 
@@ -588,7 +592,7 @@ function Main() {
             <WishlistIconButton product={product} size="sm" />
           </div>
         </div>
-        <button type="button" className="item_name" onClick={() => navigateToProduct(item.id)}>
+        <button type="button" className="item_name" onClick={() => navigateToProduct(item)}>
           {item.name}
         </button>
         <div className="options">
@@ -954,8 +958,8 @@ function Main() {
                   description={item.description}
                   isActive={selectedUpdateIndex === index}
                   onClick={() => setSelectedUpdateIndex(index)}
-                  onChevronClick={() => navigate(`/product/${item.id}`)}
-                />
+                onChevronClick={() => navigateToProduct(item)}
+              />
               ))}
             </div>
           </div>
@@ -969,11 +973,11 @@ function Main() {
                       key={item.name}
                       role="button"
                       tabIndex={0}
-                      onClick={() => navigateToProduct(item.id)}
+                      onClick={() => navigateToProduct(item)}
                       onKeyDown={(event) => {
                         if (event.key === "Enter" || event.key === " ") {
                           event.preventDefault();
-                          navigateToProduct(item.id);
+                          navigateToProduct(item);
                         }
                       }}
                     >
@@ -1041,7 +1045,7 @@ function Main() {
               <button
                 type="button"
                 className="main-spec-modal__button main-spec-modal__button--primary"
-                onClick={() => navigateToProduct(selectedSpecProduct.id)}
+                onClick={() => navigateToProduct(selectedSpecProduct)}
               >
                 상세보기
               </button>

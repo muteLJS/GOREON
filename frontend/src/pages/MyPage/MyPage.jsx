@@ -198,7 +198,7 @@ function ProductRailCard({ product }) {
     <article className="my-page__rail-card">
       <div className="my-page__rail-card-media-wrap">
         <Link
-          to={`/product/${product.id}`}
+          to={`/product/${productId}`}
           className="my-page__rail-card-media"
           draggable={false}
         >
@@ -218,7 +218,7 @@ function ProductRailCard({ product }) {
         </div>
       </div>
       <Link
-        to={`/product/${product.id}`}
+        to={`/product/${productId}`}
         className="my-page__rail-card-copy"
         draggable={false}
       >
@@ -260,7 +260,7 @@ function AiRecommendationCard({ product }) {
   return (
     <article className="my-page__ai-card">
       <div className="my-page__ai-card-media-wrap">
-        <Link to={`/product/${product.id}`} className="my-page__ai-card-media">
+        <Link to={`/product/${productId}`} className="my-page__ai-card-media">
           <img src={product.image} alt={product.name} />
         </Link>
         <div className="my-page__ai-card-actions">
@@ -277,13 +277,13 @@ function AiRecommendationCard({ product }) {
         </div>
       </div>
 
-      <Link to={`/product/${product.id}`} className="my-page__ai-card-copy">
+      <Link to={`/product/${productId}`} className="my-page__ai-card-copy">
         <p className="my-page__ai-card-name">{product.name}</p>
         <p className="my-page__ai-card-desc">{product.desc}</p>
         <p className="my-page__ai-card-spec">{product.spec}</p>
         <div className="my-page__ai-card-tags">
           {product.tags.map((tag) => (
-            <span key={`${product.id}-${tag}`}>{tag}</span>
+            <span key={`${productId}-${tag}`}>{tag}</span>
           ))}
         </div>
         <p className="my-page__ai-card-price">{product.price}</p>

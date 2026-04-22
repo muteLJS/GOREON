@@ -164,7 +164,7 @@ function ProductDetail() {
         const rating =
           reviewCount > 0
             ? mappedReviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount
-            : Number(nextProduct.rating) || 0;
+            : 0;
 
         setReviews(mappedReviews);
         setReviewSummary({
@@ -184,7 +184,7 @@ function ProductDetail() {
         setProduct(fallbackProduct);
         setReviews([]);
         setReviewSummary({
-          rating: Number(fallbackProduct?.rating) || 0,
+          rating: 0,
           reviewCount: 0,
           photoCount: 0,
           gallery: [],
