@@ -22,6 +22,7 @@ const TYPE_LABEL_MAP = {
   printer: "프린터",
   router: "공유기",
   webcam: "웹캠",
+  speaker: "스피커",
   "power-bank": "보조배터리",
   apple: "Apple",
   samsung: "Samsung",
@@ -61,9 +62,10 @@ const List = () => {
       fetchData();
     } else {
       setProducts([]);
-      setStatus("error");
+      setStatus("success");
     }
-    fetchData();
+
+    return () => controller.abort();
   }, [type]);
 
   return (
@@ -72,6 +74,7 @@ const List = () => {
         errorMessage={errorMessage}
         status={status}
         filteredProducts={products}
+        selectedType={type}
         selectedTypeLabel={selectedTypeLabel}
       />
     </div>

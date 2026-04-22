@@ -3,7 +3,11 @@ import "./PcAssemblyQuoteList.scss";
 
 function PcAssemblyQuoteList({ productList, selectedIds, onSelectItem }) {
   return (
-    <div className="pc-assembly-quote-list">
+    <div
+      className={`pc-assembly-quote-list ${
+        productList.length > 0 ? "pc-assembly-quote-list--has-items" : "pc-assembly-quote-list--empty"
+      }`}
+    >
       {productList.length > 0 ? (
         productList.map((item) => (
           <PcAssemblyQuoteItem

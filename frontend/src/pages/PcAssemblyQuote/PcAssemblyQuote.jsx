@@ -1,18 +1,33 @@
 import "./PcAssemblyQuote.scss";
 import PcAssemblyQuoteList from "@/components/PcAssemblyQuoteList/PcAssemblyQuoteList";
 import CheckIcon from "@/assets/icons/check.svg";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { removeQuoteItems, clearQuoteItems } from "@/store/slices/quoteSlice";
+import { getPcAssemblyRecommendations } from "@/utils/pcAssemblyProducts";
 
-function PcAssemblyQuote() {
+function PcAssemblyQuote({ isModal = false }) {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const items = useSelector((state) => state.quote.items);
   const [selectedIds, setSelectedIds] = useState([]);
   const isAllSelected = items.length > 0 && selectedIds.length === items.length;
-  const totalPrice = items.reduce((sum, item) => {
-    return sum + item.price * item.quantity;
-  }, 0);
+  const Root = isModal ? "div" : "main";
+
+  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  const performanceChecks = useMemo(
+    () => [
+      { id: 1, text: "CPU 대비 GPU 성능 부족", level: "warning" },
+      { id: 2, text: "RAM 용량 충분", level: "ok" },
+      { id: 3, text: "파워 용량 확인 필요", level: "error" },
+      { id: 4, text: "저장장치 여유 공간 부족", level: "warning" },
+    ],
+    [],
+  );
+
+  const recommendItems = useMemo(() => getPcAssemblyRecommendations(items), [items]);
 
   const handleSelectAll = () => {
     setSelectedIds(isAllSelected ? [] : items.map((item) => item.id));
@@ -29,9 +44,26 @@ function PcAssemblyQuote() {
     setSelectedIds([]);
   };
 
+  const handleClear = () => {
+    dispatch(clearQuoteItems());
+    setSelectedIds([]);
+  };
+
+  const handleCompatibilityCheck = () => {
+    console.log("호환성 검사");
+  };
+
+  const handleAddCart = () => {
+    console.log("장바구니 담기", items);
+  };
+
+  const handleRecommendClick = (productId) => {
+    navigate(`/product/${productId}`);
+  };
+
   return (
-    <main className="pc-assembly-quote">
-      <h2 className="pc-assembly-quote__title">견적 리스트</h2>
+    <Root className={`pc-assembly-quote ${isModal ? "pc-assembly-quote--modal" : ""}`}>
+      {!isModal && <h2 className="pc-assembly-quote__title">견적 리스트</h2>}
 
       <div className="pc-assembly-quote__layout">
         <section className="pc-assembly-quote__list">
@@ -60,9 +92,16 @@ function PcAssemblyQuote() {
         <section className="pc-assembly-quote__compatibility">
           <div className="pc-assembly-quote__compatibility-count">
             <img src={CheckIcon} alt="체크" />
-            부품 {items.length} 선택
+            부품 {items.length}개 선택
           </div>
           <div className="pc-assembly-quote__compatibility-status">호환성 모두 이상 없음</div>
+          <button
+            className="pc-assembly-quote__compatibility-check"
+            type="button"
+            onClick={handleCompatibilityCheck}
+          >
+            호환성 검사
+          </button>
         </section>
 
         <strong className="pc-assembly-quote__total">
@@ -70,41 +109,64 @@ function PcAssemblyQuote() {
         </strong>
 
         <div className="pc-assembly-quote__right">
-          <section className="pc-assembly-quote__performance">
-            <h3 className="pc-assembly-quote__section-title">성능 분석</h3>
-            <div className="pc-assembly-quote__panel">
-              <div className="pc-assembly-quote__panel-item">
-                <span className="indicator indicator--warning"></span>GPU 대비 파워 용량 부족
+          <div className="pc-assembly-quote__insights">
+            <section className="pc-assembly-quote__performance">
+              <h3 className="pc-assembly-quote__section-title">성능 분석</h3>
+              <div className="pc-assembly-quote__panel">
+                {performanceChecks.map((row) => (
+                  <div className="pc-assembly-quote__panel-item" key={row.id}>
+                    <span className={`indicator indicator--${row.level}`} />
+                    {row.text}
+                  </div>
+                ))}
               </div>
-              <div className="pc-assembly-quote__panel-item">
-                <span className="indicator indicator--ok"></span>RAM 용량 충분
-              </div>
-            </div>
-          </section>
+            </section>
 
-          <section className="pc-assembly-quote__recommend">
-            <h3 className="pc-assembly-quote__section-title">업그레이드 추천</h3>
-            <div className="pc-assembly-quote__panel">업그레이드 추천입니다.</div>
-          </section>
+            <section className="pc-assembly-quote__recommend">
+              <h3 className="pc-assembly-quote__section-title">업그레이드 추천</h3>
+              <div className="pc-assembly-quote__recommend-list">
+                {recommendItems.map((item) => (
+                  <button
+                    type="button"
+                    className="pc-assembly-quote__recommend-card"
+                    key={item.id}
+                    onClick={() => handleRecommendClick(item.id)}
+                  >
+                    <div className="pc-assembly-quote__recommend-thumb">
+                      <img src={item.image} alt={item.name} />
+                    </div>
+                    <div className="pc-assembly-quote__recommend-main">
+                      <div className="pc-assembly-quote__recommend-name">{item.name}</div>
+                      <p className="pc-assembly-quote__recommend-meta">{item.option}</p>
+                      <strong className="pc-assembly-quote__recommend-price">
+                        ₩{item.price.toLocaleString("ko-KR")}
+                      </strong>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </section>
+          </div>
 
           <section className="pc-assembly-quote__action">
             <button
               className="pc-assembly-quote__action-button pc-assembly-quote__action-button--secondary"
               type="button"
-              onClick={() => {
-                dispatch(clearQuoteItems());
-                setSelectedIds([]);
-              }}
+              onClick={handleClear}
             >
               초기화
             </button>
-            <button className="pc-assembly-quote__action-button" type="button">
+            <button
+              className="pc-assembly-quote__action-button"
+              type="button"
+              onClick={handleAddCart}
+            >
               장바구니 담기
             </button>
           </section>
         </div>
       </div>
-    </main>
+    </Root>
   );
 }
 

@@ -1,7 +1,7 @@
 ﻿import "./Main.scss";
 import { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, FreeMode } from "swiper/modules";
+import { useNavigate } from "react-router-dom";
 import "swiper/css";
 import AICharacter from "components/AICharacter/AICharacter";
 import Review_user from "assets/icons/review_user.svg";
@@ -18,27 +18,81 @@ import UpdateSubCard from "components/UpdateSubCard/UpdateSubCard";
 import CartIconButton from "components/CartIconButton/CartIconButton";
 import WishlistIconButton from "components/WishlistIconButton/WishlistIconButton";
 import EventModal from "components/EventModal/EventModal";
+import Modal from "components/Modal/Modal";
+import productsData from "@/data/products_list.json";
 
-const MAIN_PRODUCT_ID = 1;
-const MAIN_PRODUCT_IMAGE =
-  "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png";
-const MAIN_PACKAGE_IMAGE =
-  "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png";
+const mainProducts = productsData;
 
-const createMainProduct = ({ name, title, price, image, spec }) => ({
-  id: MAIN_PRODUCT_ID,
+const getMainProductById = (id) => mainProducts.find((product) => product.id === id);
+
+const getMainProduct = (id, overrides = {}) => {
+  const product = getMainProductById(id);
+
+  if (!product) {
+    return {
+      id,
+      name: overrides.name ?? overrides.title ?? "상품명",
+      price: overrides.price ?? "0",
+      image: overrides.image ?? "",
+      rating: overrides.rating ?? 0,
+      tag: overrides.tag ?? [],
+      ...overrides,
+    };
+  }
+
+  return {
+    ...product,
+    ...overrides,
+    id: product.id,
+    name: overrides.name ?? product.name,
+    price: overrides.price ?? product.price,
+    image: overrides.image ?? product.image,
+    rating: overrides.rating ?? product.rating ?? 0,
+  };
+};
+
+const createMainProduct = ({
+  id,
+  productId,
+  _id,
+  name,
+  title,
+  price,
+  image,
+  rating,
+  spec,
+  option,
+  tag,
+}) => ({
+  id: id ?? productId ?? _id ?? name ?? title,
+  productId: productId ?? _id ?? id,
   name: name ?? title ?? "상품명",
   price,
-  image: image ?? MAIN_PRODUCT_IMAGE,
+  image,
+  rating: rating ?? 0,
   spec,
+  option,
+  category: Array.isArray(tag) ? tag.at(-1) : tag,
+});
+
+const toDisplayPrice = (product) => `￦${product.price}`;
+
+const toPackageDetail = (product, label) => ({
+  product,
+  label: label ?? product.tag?.at(-1) ?? "상품",
+  title: product.name,
+  subtitle: product.priceOptions?.[0]?.optionName ?? product.tag?.join(" · ") ?? "",
+  image: product.image,
 });
 
 function Main() {
+  const navigate = useNavigate();
   const [showAiResult, setShowAiResult] = useState(false);
   const [isAiSwitching, setIsAiSwitching] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("direct");
   const [selectedSpecProduct, setSelectedSpecProduct] = useState(null);
   const [selectedUpdateIndex, setSelectedUpdateIndex] = useState(0);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isDesktopCategory, setIsDesktopCategory] = useState(false);
   const [isTabletCategory, setIsTabletCategory] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(true);
@@ -49,7 +103,6 @@ function Main() {
   const aiSwitchTimeoutRef = useRef(null);
   const categorySwiperRef = useRef(null);
   const categoryProgressRef = useRef(null);
-  const categoryProgressFrameRef = useRef(null);
   const promptItems = [
     "🎬 유튜브용 편집용 노트북",
     "🎮 FPS 게임에 맞는 모니터",
@@ -65,211 +118,190 @@ function Main() {
     </>
   );
 
-  const packageItems = [
+  const editingPackageItems = [
+    toPackageDetail(getMainProduct(208), "CPU"),
+    toPackageDetail(getMainProduct(324), "VGA"),
+    toPackageDetail(getMainProduct(295), "RAM"),
+    toPackageDetail(getMainProduct(353), "SSD"),
+  ];
+  const gamingPackageItems = [
+    toPackageDetail(getMainProduct(209), "CPU"),
+    toPackageDetail(getMainProduct(325), "VGA"),
+    toPackageDetail(getMainProduct(296), "RAM"),
+    toPackageDetail(getMainProduct(354), "SSD"),
+  ];
+  const officePackageItems = [
+    toPackageDetail(getMainProduct(211), "CPU"),
+    toPackageDetail(getMainProduct(266), "메인보드"),
+    toPackageDetail(getMainProduct(295), "RAM"),
+  ];
+  const packageCards = [
     {
-      label: "CPU",
-      title: "인텔 코어i5-14세대 14400F",
-      subtitle: "(랩터레이크 리프레시) (밸류팩 정품)",
-      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/cart_item_img.png",
+      product: getMainProduct(208),
+      title: "영상편집 추천 조합",
+      description: (
+        <>
+          고성능 CPU · 그래픽카드 중심 <br />
+          편집 작업에 맞춘 구성
+        </>
+      ),
+      detailItems: editingPackageItems,
     },
     {
-      label: "CPU",
-      title: "인텔 코어i5-14세대 14400F",
-      subtitle: "(랩터레이크 리프레시) (밸류팩 정품)",
-      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/cart_item_img.png",
+      product: getMainProduct(209),
+      title: "게이밍 추천 조합",
+      description: (
+        <>
+          빠른 반응과 안정적인 프레임 <br />
+          게임 플레이에 맞춘 구성
+        </>
+      ),
+      detailItems: gamingPackageItems,
     },
     {
-      label: "CPU",
-      title: "인텔 코어i5-14세대 14400F",
-      subtitle: "(랩터레이크 리프레시) (밸류팩 정품)",
-      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/cart_item_img.png",
-    },
-    {
-      label: "CPU",
-      title: "인텔 코어i5-14세대 14400F",
-      subtitle: "(랩터레이크 리프레시) (밸류팩 정품)",
-      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/cart_item_img.png",
+      product: getMainProduct(211),
+      title: "사무용 추천 조합",
+      description: (
+        <>
+          문서 작업과 온라인 강의에 적합한 <br />
+          실속형 데스크탑 구성
+        </>
+      ),
+      detailItems: officePackageItems,
     },
   ];
   const updateSubItems = [
     {
-      title: "영상편집 패키지",
+      ...getMainProduct(1),
+      title: getMainProduct(1).name,
       description: (
         <>
-          큰 화면, 직관적 UI <br />
-          영상통화 · 유튜브에 딱 맞게
+          가벼운 휴대성과 큰 화면 <br />
+          작업과 강의에 모두 어울려요
         </>
       ),
-      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png",
-      price: "￦ 2,419,000",
       specs: [
-        { label: "CPU", value: "인텔 코어 i5 14400F" },
-        { label: "RAM", value: "16 GB" },
-        { label: "VGA", value: "RTX 5060" },
-        { label: "OS", value: "Window 11 (home)" },
-        { label: "모니터", value: "FHD / 144 Hz" },
+        { label: "브랜드", value: "LG" },
+        { label: "분류", value: "노트북" },
+        { label: "옵션", value: getMainProduct(1).priceOptions?.[0]?.optionName ?? "기본 옵션" },
+        { label: "평점", value: `${getMainProduct(1).rating} / 5` },
       ],
     },
     {
-      title: "영상편집 패키지",
+      ...getMainProduct(3),
+      title: getMainProduct(3).name,
       description: (
         <>
-          큰 화면, 직관적 UI <br />
-          영상통화 · 유튜브에 딱 맞게
+          선명한 디스플레이와 안정적인 성능 <br />
+          멀티 작업에 좋은 프리미엄 노트북
         </>
       ),
-      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png",
-      price: "￦ 1,989,000",
       specs: [
-        { label: "CPU", value: "Intel Core Ultra 7" },
-        { label: "RAM", value: "16 GB LPDDR5x" },
-        { label: "VGA", value: "Intel Arc Graphics" },
-        { label: "OS", value: "Window 11 (home)" },
-        { label: "모니터", value: "WQXGA / OLED" },
+        { label: "브랜드", value: "삼성" },
+        { label: "분류", value: "노트북" },
+        { label: "옵션", value: getMainProduct(3).priceOptions?.[0]?.optionName ?? "기본 옵션" },
+        { label: "평점", value: `${getMainProduct(3).rating} / 5` },
       ],
     },
     {
-      title: "영상편집 패키지",
+      ...getMainProduct(8),
+      title: getMainProduct(8).name,
       description: (
         <>
-          큰 화면, 직관적 UI <br />
-          영상통화 · 유튜브에 딱 맞게
+          게임과 콘텐츠 작업을 함께 고려한 <br />
+          고성능 노트북
         </>
       ),
-      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png",
-      price: "￦ 2,699,000",
       specs: [
-        { label: "CPU", value: "AMD Ryzen AI 9 HX" },
-        { label: "RAM", value: "32 GB" },
-        { label: "VGA", value: "RTX 4060" },
-        { label: "OS", value: "Window 11 (home)" },
-        { label: "모니터", value: "4K / OLED" },
+        { label: "브랜드", value: "ASUS" },
+        { label: "분류", value: "노트북" },
+        { label: "옵션", value: getMainProduct(8).priceOptions?.[0]?.optionName ?? "기본 옵션" },
+        { label: "평점", value: `${getMainProduct(8).rating} / 5` },
       ],
     },
   ];
   const selectedUpdateItem = updateSubItems[selectedUpdateIndex] ?? updateSubItems[0];
   const updateMobileItems = [
     {
-      name: "MacBook Pro 14 M3",
-      price: "￦2,419,000",
-      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png",
+      ...getMainProduct(1),
       specs: [
-        { label: "CPU", value: "M3 8코어 (8-Core, 10 GPU)" },
-        { label: "RAM", value: "8GB 통합 메모리" },
-        { label: "저장장치", value: "512GB SSD" },
-        { label: "디스플레이", value: '14.2" Liquid Retina XDR' },
+        { label: "브랜드", value: "LG" },
+        { label: "분류", value: "노트북" },
+        { label: "옵션", value: getMainProduct(1).priceOptions?.[0]?.optionName ?? "기본 옵션" },
       ],
     },
     {
-      name: "LG gram Pro 16",
-      price: "￦1,989,000",
-      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png",
+      ...getMainProduct(3),
       specs: [
-        { label: "CPU", value: "Intel Core Ultra 7" },
-        { label: "RAM", value: "16GB LPDDR5x" },
-        { label: "저장장치", value: "512GB NVMe SSD" },
-        { label: "디스플레이", value: '16" WQXGA OLED' },
+        { label: "브랜드", value: "삼성" },
+        { label: "분류", value: "노트북" },
+        { label: "옵션", value: getMainProduct(3).priceOptions?.[0]?.optionName ?? "기본 옵션" },
       ],
     },
     {
-      name: "ASUS ProArt P16",
-      price: "￦2,699,000",
-      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png",
+      ...getMainProduct(8),
       specs: [
-        { label: "CPU", value: "AMD Ryzen AI 9 HX" },
-        { label: "RAM", value: "32GB LPDDR5x" },
-        { label: "저장장치", value: "1TB SSD" },
-        { label: "디스플레이", value: '16" 4K OLED' },
+        { label: "브랜드", value: "ASUS" },
+        { label: "분류", value: "노트북" },
+        { label: "옵션", value: getMainProduct(8).priceOptions?.[0]?.optionName ?? "기본 옵션" },
       ],
     },
     {
-      name: "Galaxy Book5 Pro 360",
-      price: "￦1,799,000",
-      image: "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/new_img.png",
+      ...getMainProduct(10),
       specs: [
-        { label: "CPU", value: "Intel Core Ultra 7" },
-        { label: "RAM", value: "16GB 메모리" },
-        { label: "저장장치", value: "512GB SSD" },
-        { label: "디스플레이", value: '16" AMOLED 터치' },
+        { label: "브랜드", value: "레노버" },
+        { label: "분류", value: "노트북" },
+        { label: "옵션", value: getMainProduct(10).priceOptions?.[0]?.optionName ?? "기본 옵션" },
       ],
     },
   ];
   const categoryItemsMap = {
     direct: [
-      {
-        name: "MacBook Pro 14 M3",
-        price: "￦2,419,000",
-        tags: ["#안정성", "#파이널컷", "#프리미어"],
-      },
-      {
-        name: "LG gram Pro 16",
-        price: "￦1,989,000",
-        tags: ["#대화면", "#휴대성", "#영상편집입문"],
-      },
-      { name: "ASUS ProArt P16", price: "￦2,699,000", tags: ["#OLED", "#크리에이터", "#색감"] },
-      {
-        name: "Galaxy Book5 Pro 360",
-        price: "￦1,799,000",
-        tags: ["#터치", "#펜입력", "#멀티작업"],
-      },
-      { name: "iPad Air 13", price: "￦1,249,000", tags: ["#썸네일", "#가벼움", "#M시리즈"] },
-      { name: "Surface Laptop 7", price: "￦1,699,000", tags: ["#업무겸용", "#배터리", "#슬림"] },
+      getMainProduct(29, { tags: ["#크리에이터", "#영상편집", "#고성능"] }),
+      getMainProduct(1, { tags: ["#대화면", "#휴대성", "#작업용"] }),
+      getMainProduct(3, { tags: ["#프리미엄", "#멀티작업", "#노트북"] }),
+      getMainProduct(8, { tags: ["#그래픽", "#게이밍겸용", "#콘텐츠"] }),
+      getMainProduct(601, { tags: ["#태블릿", "#드로잉", "#가벼움"] }),
+      getMainProduct(592, { tags: ["#휴대성", "#필기", "#M시리즈"] }),
     ],
     game: [
-      { name: "ROG Zephyrus G14", price: "￦2,299,000", tags: ["#게이밍", "#RTX", "#고주사율"] },
-      { name: "Lenovo Legion 5i", price: "￦1,949,000", tags: ["#FPS", "#발열관리", "#가성비"] },
-      { name: "OMEN 16", price: "￦1,899,000", tags: ["#144Hz", "#고성능", "#몰입감"] },
-      { name: "Alienware m16", price: "￦2,899,000", tags: ["#프리미엄", "#QHD", "#RGB"] },
-      { name: "MSI Katana 17", price: "￦1,659,000", tags: ["#17인치", "#RTX4060", "#입문게이밍"] },
-      { name: "AORUS 15", price: "￦2,099,000", tags: ["#e스포츠", "#반응속도", "#성능"] },
+      getMainProduct(8, { tags: ["#게이밍", "#ASUS", "#고성능"] }),
+      getMainProduct(10, { tags: ["#LOQ", "#FPS", "#가성비"] }),
+      getMainProduct(11, { tags: ["#OMEN", "#몰입감", "#고사양"] }),
+      getMainProduct(12, { tags: ["#HP", "#게이밍", "#노트북"] }),
+      getMainProduct(5, { tags: ["#MSI", "#QHD", "#게임"] }),
+      getMainProduct(325, { tags: ["#RTX5070", "#그래픽카드", "#업그레이드"] }),
     ],
     student: [
-      { name: "LG gram 15", price: "￦1,589,000", tags: ["#가벼움", "#문서작업", "#배터리"] },
-      { name: "Galaxy Book4", price: "￦1,129,000", tags: ["#대학생", "#휴대성", "#필기연동"] },
-      {
-        name: "MacBook Air 13 M3",
-        price: "￦1,590,000",
-        tags: ["#조용함", "#과제", "#오래가는배터리"],
-      },
-      {
-        name: "ASUS Vivobook 15",
-        price: "￦899,000",
-        tags: ["#가성비", "#온라인강의", "#첫노트북"],
-      },
-      { name: "Surface Go 4", price: "￦879,000", tags: ["#태블릿겸용", "#필기", "#이동수업"] },
-      { name: "Acer Swift Go 14", price: "￦1,099,000", tags: ["#휴대성", "#리포트", "#실속형"] },
+      getMainProduct(4, { tags: ["#가성비", "#문서작업", "#노트북"] }),
+      getMainProduct(6, { tags: ["#실속형", "#온라인강의", "#휴대"] }),
+      getMainProduct(7, { tags: ["#첫노트북", "#과제", "#윈도우"] }),
+      getMainProduct(2, { tags: ["#ASUS", "#강의", "#입문"] }),
+      getMainProduct(9, { tags: ["#삼성", "#대학생", "#휴대성"] }),
+      getMainProduct(590, { tags: ["#태블릿", "#필기", "#가벼움"] }),
     ],
     together: [
-      { name: "Galaxy Tab S10", price: "￦632,000", tags: ["#큰글씨", "#영상통화", "#쉬운사용"] },
-      { name: "iPad 11세대", price: "￦529,000", tags: ["#직관적", "#가족공유", "#안정성"] },
-      { name: "LG 스탠바이미 Go", price: "￦1,179,000", tags: ["#큰화면", "#OTT", "#간편이동"] },
-      { name: "갤럭시 A35", price: "￦449,000", tags: ["#쉬운UI", "#카메라", "#가성비"] },
-      { name: "아이뮤즈 뮤패드", price: "￦289,000", tags: ["#입문형", "#유튜브", "#실속형"] },
-      { name: "레노버 Tab Plus", price: "￦399,000", tags: ["#스피커", "#OTT", "#간편사용"] },
+      getMainProduct(589, { tags: ["#큰화면", "#영상통화", "#태블릿"] }),
+      getMainProduct(590, { tags: ["#입문형", "#쉬운사용", "#iPad"] }),
+      getMainProduct(601, { tags: ["#대화면", "#OTT", "#가족공유"] }),
+      getMainProduct(481, { tags: ["#스마트폰", "#카메라", "#자급제"] }),
+      getMainProduct(502, { tags: ["#건강관리", "#워치", "#알림"] }),
+      getMainProduct(606, { tags: ["#가벼움", "#유튜브", "#태블릿"] }),
     ],
   };
   const categoryItems = categoryItemsMap[selectedCategory];
   const aiResultItems = [
     {
-      name: "갤럭시 탭 S10",
-      spec: "128/256GB, WiFi,그레이",
-      price: "632,000원",
-      image:
-        "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/product_detail_main_img.png",
+      ...getMainProduct(4),
+      spec: "문서 작업 · 온라인 강의용 실속 노트북",
     },
     {
-      name: "갤럭시 탭 S10",
-      spec: "128/256GB, WiFi,그레이",
-      price: "632,000원",
-      image:
-        "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/product_detail_main_img.png",
+      ...getMainProduct(6),
+      spec: "가벼운 과제와 웹 수업에 맞는 노트북",
     },
     {
-      name: "갤럭시 탭 S10",
-      spec: "128/256GB, WiFi,그레이",
-      price: "632,000원",
-      image:
-        "https://raw.githubusercontent.com/muteLJS/goreon-assets/main/product_detail_main_img.png",
+      ...getMainProduct(7),
+      spec: "첫 노트북으로 쓰기 좋은 윈도우 모델",
     },
   ];
   const handleInput = (e) => {
@@ -278,62 +310,19 @@ function Main() {
     el.style.height = `${el.scrollHeight}px`;
   };
 
-  const handleCategorySwiperChange = (swiper, progressValue) => {
-    if (!swiper || swiper.destroyed || !swiper.params) {
+  const updateCategorySwiperState = (swiper = categorySwiperRef.current) => {
+    if (!swiper || swiper.destroyed) {
       return;
     }
 
-    const visibleSlides =
-      typeof swiper.params.slidesPerView === "number" ? swiper.params.slidesPerView : 1;
-    const clampedVisibleSlides = Math.min(visibleSlides, categoryItems.length);
-    const maxIndex = Math.max(categoryItems.length - clampedVisibleSlides, 0);
-    const activeIndex = swiper.params.loop ? swiper.realIndex : swiper.activeIndex;
-    const rawProgress =
-      typeof progressValue === "number"
-        ? progressValue
-        : typeof swiper.progress === "number"
-          ? swiper.progress
-          : maxIndex === 0
-            ? 0
-            : Math.min(activeIndex, maxIndex) / maxIndex;
-    const nextProgress = Math.max(0, Math.min(rawProgress, 1));
-    const nextThumbWidth = (clampedVisibleSlides / categoryItems.length) * 100 * 0.78;
+    const totalWidth = Math.max(swiper.virtualSize ?? 0, swiper.width ?? 0, 1);
+    const visibleWidth = Math.max(swiper.width ?? 0, 1);
+    const nextThumbWidth = (visibleWidth / totalWidth) * 100;
 
     setCategorySwiperState({
-      progress: nextProgress,
-      thumbWidth: nextThumbWidth,
+      progress: Math.max(0, Math.min(swiper.progress ?? 0, 1)),
+      thumbWidth: Math.max(12, Math.min(nextThumbWidth, 100)),
     });
-  };
-
-  const getCategorySwiperProgress = (swiper) => {
-    if (!swiper || swiper.destroyed || !Array.isArray(swiper.slidesGrid)) {
-      return typeof swiper?.progress === "number" ? swiper.progress : 0;
-    }
-
-    const translate = -swiper.getTranslate();
-    const slidesGrid = swiper.slidesGrid;
-    let slideIndex = swiper.activeIndex ?? 0;
-
-    for (let index = 0; index < slidesGrid.length - 1; index += 1) {
-      if (translate >= slidesGrid[index] && translate < slidesGrid[index + 1]) {
-        slideIndex = index;
-        break;
-      }
-    }
-
-    const currentStart = slidesGrid[slideIndex] ?? 0;
-    const nextStart = slidesGrid[slideIndex + 1] ?? currentStart + 1;
-    const distance = Math.max(nextStart - currentStart, 1);
-    const intraSlideProgress = Math.max(0, Math.min((translate - currentStart) / distance, 1));
-    const slideEl = swiper.slides?.[slideIndex];
-    const realIndexFromSlide = Number(slideEl?.getAttribute("data-swiper-slide-index"));
-    const realIndex = Number.isFinite(realIndexFromSlide)
-      ? realIndexFromSlide
-      : swiper.params.loop
-        ? swiper.realIndex
-        : slideIndex;
-
-    return ((realIndex + intraSlideProgress) % categoryItems.length) / categoryItems.length;
   };
 
   const moveCategorySwiperByProgress = (progress) => {
@@ -343,18 +332,8 @@ function Main() {
       return;
     }
 
-    const clampedProgress = Math.max(0, Math.min(progress, 1));
-    const targetIndex = Math.round(clampedProgress * Math.max(categoryItems.length - 1, 0));
-
-    if (swiper.params.loop && typeof swiper.slideToLoop === "function") {
-      swiper.slideToLoop(targetIndex, 300);
-    } else {
-      swiper.slideTo(targetIndex, 300);
-    }
-
-    if (swiper.autoplay) {
-      swiper.autoplay.start();
-    }
+    swiper.setProgress(Math.max(0, Math.min(progress, 1)), 0);
+    updateCategorySwiperState(swiper);
   };
 
   const handleCategoryProgressPointerDown = (event) => {
@@ -398,18 +377,42 @@ function Main() {
     }, 650);
   };
 
+  const navigateToProduct = (id) => {
+    if (id !== undefined && id !== null) {
+      navigate(`/product/${id}`);
+    }
+  };
+
+  const stopCardAction = (event) => {
+    event.stopPropagation();
+  };
+
   useEffect(
     () => () => {
       if (aiSwitchTimeoutRef.current) {
         window.clearTimeout(aiSwitchTimeoutRef.current);
       }
-
-      if (categoryProgressFrameRef.current) {
-        window.cancelAnimationFrame(categoryProgressFrameRef.current);
-      }
     },
     [],
   );
+
+  useEffect(() => {
+    const resetAiSection = () => {
+      if (aiSwitchTimeoutRef.current) {
+        window.clearTimeout(aiSwitchTimeoutRef.current);
+        aiSwitchTimeoutRef.current = null;
+      }
+
+      setShowAiResult(false);
+      setIsAiSwitching(false);
+    };
+
+    window.addEventListener("reset-main-ai-section", resetAiSection);
+
+    return () => {
+      window.removeEventListener("reset-main-ai-section", resetAiSection);
+    };
+  }, []);
 
   useEffect(() => {
     const desktopQuery = window.matchMedia("(min-width: 1024px)");
@@ -449,53 +452,28 @@ function Main() {
 
   useEffect(() => {
     const swiper = categorySwiperRef.current;
-    if (!swiper || swiper.destroyed || !swiper.params) {
-      return;
-    }
 
-    if (!isDesktopCategory && swiper.autoplay) {
-      swiper.autoplay.stop();
-    }
-
-    if (swiper.params.loop && typeof swiper.slideToLoop === "function") {
-      swiper.slideToLoop(0, 0, false);
-    } else {
+    if (swiper && !swiper.destroyed) {
       swiper.slideTo(0, 0, false);
+      swiper.update();
+      updateCategorySwiperState(swiper);
     }
 
-    swiper.update();
-    handleCategorySwiperChange(swiper);
-  }, [isDesktopCategory, selectedCategory, categoryItems.length]);
+    const handleResize = () => {
+      const currentSwiper = categorySwiperRef.current;
 
-  useEffect(() => {
-    if (categoryProgressFrameRef.current) {
-      window.cancelAnimationFrame(categoryProgressFrameRef.current);
-      categoryProgressFrameRef.current = null;
-    }
-
-    if (!isDesktopCategory) {
-      return undefined;
-    }
-
-    const tick = () => {
-      const swiper = categorySwiperRef.current;
-
-      if (swiper && !swiper.destroyed) {
-        handleCategorySwiperChange(swiper, getCategorySwiperProgress(swiper));
+      if (currentSwiper && !currentSwiper.destroyed) {
+        currentSwiper.update();
+        updateCategorySwiperState(currentSwiper);
       }
-
-      categoryProgressFrameRef.current = window.requestAnimationFrame(tick);
     };
 
-    categoryProgressFrameRef.current = window.requestAnimationFrame(tick);
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      if (categoryProgressFrameRef.current) {
-        window.cancelAnimationFrame(categoryProgressFrameRef.current);
-        categoryProgressFrameRef.current = null;
-      }
+      window.removeEventListener("resize", handleResize);
     };
-  }, [isDesktopCategory, selectedCategory, categoryItems.length]);
+  }, [isDesktopCategory, isTabletCategory, selectedCategory, categoryItems.length]);
 
   const renderAiReviewSection = () => (
     <section className="main-page__section main-page__section--ai-review">
@@ -599,24 +577,26 @@ function Main() {
   );
 
   const renderCategoryCard = (item) => {
-    const product = createMainProduct({ ...item, image: MAIN_PRODUCT_IMAGE });
+    const product = createMainProduct(item);
 
     return (
-      <div className="items pointer" key={item.name}>
+      <div className="items" key={item.id}>
         <div className="item_img_box">
-          <img src={MAIN_PRODUCT_IMAGE} alt="items" className="item_img" />
-          <div className="icons">
-            <CartIconButton product={product} />
-            <WishlistIconButton product={product} />
+          <img src={item.image} alt={item.name} className="item_img" />
+          <div className="icons" onClick={stopCardAction}>
+            <CartIconButton product={product} size="sm" />
+            <WishlistIconButton product={product} size="sm" />
           </div>
         </div>
-        <p className="item_name">{item.name}</p>
+        <button type="button" className="item_name" onClick={() => navigateToProduct(item.id)}>
+          {item.name}
+        </button>
         <div className="options">
           {item.tags.map((tag) => (
             <p key={tag}>{tag}</p>
           ))}
         </div>
-        <p className="item_price">{item.price}</p>
+        <p className="item_price">{toDisplayPrice(item)}</p>
         <div className="item_colors">
           <div className="color1 colors"></div>
           <div className="color2 colors"></div>
@@ -635,32 +615,17 @@ function Main() {
             isDesktop ? "desktop" : isTabletCategory ? "tablet" : "mobile"
           }`}
           className="item_box category_swiper"
-          modules={isDesktop ? [Autoplay, FreeMode] : undefined}
           spaceBetween={isDesktop ? 20 : isTabletCategory ? 24 : 16}
-          slidesPerView={isDesktop ? 3.1 : isTabletCategory ? 3.1 : 2.1}
-          allowTouchMove={true}
-          grabCursor={isDesktop}
-          loop={isDesktop}
-          speed={isDesktop ? 6500 : 300}
-          freeMode={isDesktop ? { enabled: true, momentum: false } : false}
-          autoplay={
-            isDesktop
-              ? {
-                  delay: 0,
-                  disableOnInteraction: false,
-                  pauseOnMouseEnter: false,
-                }
-              : false
-          }
+          slidesPerView={isDesktop ? 3.15 : isTabletCategory ? 2.7 : 2.1}
           onSwiper={(swiper) => {
             categorySwiperRef.current = swiper;
-            handleCategorySwiperChange(swiper);
+            updateCategorySwiperState(swiper);
           }}
-          onSlideChange={handleCategorySwiperChange}
-          onProgress={handleCategorySwiperChange}
+          onProgress={updateCategorySwiperState}
+          onSlideChange={updateCategorySwiperState}
         >
           {categoryItems.map((item) => (
-            <SwiperSlide key={item.name}>{renderCategoryCard(item)}</SwiperSlide>
+            <SwiperSlide key={item.id}>{renderCategoryCard(item)}</SwiperSlide>
           ))}
         </Swiper>
         <div
@@ -688,42 +653,17 @@ function Main() {
 
   const renderPackageCards = () => (
     <>
-      <PackageCard
-        title="영상편집 패키지"
-        description={
-          <>
-            큰 화면, 직관적 UI <br />
-            영상통화 · 유튜브에 딱 맞게
-          </>
-        }
-        price="￦ 2,419,000"
-        mainImage="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
-        detailItems={packageItems}
-      />
-      <PackageCard
-        title="영상편집 패키지"
-        description={
-          <>
-            큰 화면, 직관적 UI <br />
-            영상통화 · 유튜브에 딱 맞게
-          </>
-        }
-        price="￦ 2,419,000"
-        mainImage="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
-        detailItems={packageItems.slice(0, 1)}
-      />
-      <PackageCard
-        title="영상편집 패키지"
-        description={
-          <>
-            큰 화면, 직관적 UI <br />
-            영상통화 · 유튜브에 딱 맞게
-          </>
-        }
-        price="￦ 2,419,000"
-        mainImage="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
-        detailItems={packageItems.slice(0, 2)}
-      />
+      {packageCards.map((card) => (
+        <PackageCard
+          key={card.product.id}
+          product={card.product}
+          title={card.title}
+          description={card.description}
+          price={toDisplayPrice(card.product)}
+          mainImage={card.product.image}
+          detailItems={card.detailItems}
+        />
+      ))}
     </>
   );
 
@@ -738,24 +678,18 @@ function Main() {
         slidesPerView="auto"
         spaceBetween={isTabletCategory ? 28 : 24}
       >
-        {[packageItems, packageItems.slice(0, 1), packageItems.slice(0, 2)].map(
-          (detailItems, index) => (
-            <SwiperSlide key={`package-${index}`}>
-              <PackageCard
-                title="영상편집 패키지"
-                description={
-                  <>
-                    큰 화면, 직관적 UI <br />
-                    영상통화 · 유튜브에 딱 맞게
-                  </>
-                }
-                price="￦ 2,419,000"
-                mainImage="https://raw.githubusercontent.com/muteLJS/goreon-assets/main/recommend_img.png"
-                detailItems={detailItems}
-              />
-            </SwiperSlide>
-          ),
-        )}
+        {packageCards.map((card) => (
+          <SwiperSlide key={`package-${card.product.id}`}>
+            <PackageCard
+              product={card.product}
+              title={card.title}
+              description={card.description}
+              price={toDisplayPrice(card.product)}
+              mainImage={card.product.image}
+              detailItems={card.detailItems}
+            />
+          </SwiperSlide>
+        ))}
       </Swiper>
     );
   };
@@ -780,19 +714,38 @@ function Main() {
         >
           {aiResultItems.map((item, index) => (
             <SwiperSlide key={`ai-result-${index}`}>
-              <div className="recommend">
+              <div
+                className="recommend"
+                role="button"
+                tabIndex={0}
+                onClick={() => navigateToProduct(item.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    navigateToProduct(item.id);
+                  }
+                }}
+              >
                 <img src={item.image} alt="" />
                 <div className="texts">
                   <p>{item.name}</p>
                   <p>{item.spec}</p>
                 </div>
                 <div className="go">
-                  <p className="price">{item.price}</p>
-                  <div className="chevron" aria-hidden="true">
+                  <p className="price">{toDisplayPrice(item)}</p>
+                  <button
+                    type="button"
+                    className="chevron"
+                    aria-label={`${item.name} 상세페이지로 이동`}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      navigateToProduct(item.id);
+                    }}
+                  >
                     <svg viewBox="0 0 24 12">
                       <path d="M2 10L12 2L22 10" />
                     </svg>
-                  </div>
+                  </button>
                 </div>
               </div>
             </SwiperSlide>
@@ -812,6 +765,18 @@ function Main() {
                 placeholder="대학생용 가벼운 노트북 추천해줘."
                 onInput={handleInput}
               />
+              <button className="submit" type="submit">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="12" fill="#0AA6A6" />
+                  <path
+                    d="M8 13L12 9L16 13"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
             </div>
             <div className="AI_Chat_row_2">
               <PromptButtonList items={promptItems} />
@@ -915,57 +880,7 @@ function Main() {
               </label>
             </form>
           </div>
-          <Swiper
-            className="item_box category_swiper"
-            spaceBetween={6}
-            slidesPerView={2.1}
-            onSwiper={handleCategorySwiperChange}
-            onSlideChange={handleCategorySwiperChange}
-            breakpoints={{
-              1024: {
-                slidesPerView: 3.1,
-                spaceBetween: 20,
-              },
-            }}
-          >
-            {categoryItems.map((item) => {
-              const product = createMainProduct({ ...item, image: MAIN_PRODUCT_IMAGE });
-
-              return (
-                <SwiperSlide key={item.name}>
-                  <div className="items pointer">
-                    <div className="item_img_box">
-                      <img src={MAIN_PRODUCT_IMAGE} alt="items" className="item_img" />
-                      <div className="icons">
-                        <CartIconButton product={product} />
-                        <WishlistIconButton product={product} />
-                      </div>
-                    </div>
-                    <p className="item_name">{item.name}</p>
-                    <div className="options">
-                      {item.tags.map((tag) => (
-                        <p key={tag}>{tag}</p>
-                      ))}
-                    </div>
-                    <p className="item_price">{item.price}</p>
-                    <div className="item_colors">
-                      <div className="color1 colors"></div>
-                      <div className="color2 colors"></div>
-                    </div>
-                  </div>
-                </SwiperSlide>
-              );
-            })}
-          </Swiper>
-          <div className="unfilled">
-            <div
-              className="filled"
-              style={{
-                width: `${categorySwiperState.thumbWidth}%`,
-                left: `calc((100% - ${categorySwiperState.thumbWidth}%) * ${categorySwiperState.progress})`,
-              }}
-            ></div>
-          </div>
+          {renderCategoryItems()}
         </div>
       </section>
       <section className="main-page__section">
@@ -990,7 +905,20 @@ function Main() {
             <More />
           </div>
           <div className="desktop">
-            <div className="main_item">
+            <div
+              className={`main_item ${isUpdateModalOpen ? "is-modal-open" : ""}`}
+              role="button"
+              tabIndex={0}
+              onMouseEnter={() => setIsUpdateModalOpen(true)}
+              onMouseLeave={() => setIsUpdateModalOpen(false)}
+              onClick={() => navigateToProduct(selectedUpdateItem.id)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  navigateToProduct(selectedUpdateItem.id);
+                }
+              }}
+            >
               <div className="back_img">
                 <img
                   src={selectedUpdateItem.image}
@@ -998,7 +926,7 @@ function Main() {
                   className="pakage_img"
                 />
               </div>
-              <div className="modal_info">
+              <div className="modal_info" onClick={stopCardAction}>
                 <div className="options">
                   {selectedUpdateItem.specs.map((spec) => (
                     <div className="option" key={spec.label}>
@@ -1008,24 +936,12 @@ function Main() {
                   ))}
                   <div className="option">
                     <p>가격</p>
-                    <p className="item_info">{selectedUpdateItem.price}</p>
+                    <p className="item_info">{toDisplayPrice(selectedUpdateItem)}</p>
                   </div>
                 </div>
                 <div className="icons">
-                  <CartIconButton
-                    product={createMainProduct({
-                      title: "영상편집 패키지",
-                      price: "￦ 2,419,000",
-                      image: MAIN_PACKAGE_IMAGE,
-                    })}
-                  />
-                  <WishlistIconButton
-                    product={createMainProduct({
-                      title: "영상편집 패키지",
-                      price: "￦ 2,419,000",
-                      image: MAIN_PACKAGE_IMAGE,
-                    })}
-                  />
+                  <CartIconButton product={createMainProduct(selectedUpdateItem)} size="sm" />
+                  <WishlistIconButton product={createMainProduct(selectedUpdateItem)} size="sm" />
                 </div>
               </div>
             </div>
@@ -1038,6 +954,7 @@ function Main() {
                   description={item.description}
                   isActive={selectedUpdateIndex === index}
                   onClick={() => setSelectedUpdateIndex(index)}
+                  onChevronClick={() => navigate(`/product/${item.id}`)}
                 />
               ))}
             </div>
@@ -1047,26 +964,37 @@ function Main() {
               {[0, 2].map((startIndex) => (
                 <div className="item_row" key={`update-mobile-row-${startIndex}`}>
                   {updateMobileItems.slice(startIndex, startIndex + 2).map((item) => (
-                    <div className="item_box" key={item.name}>
+                    <div
+                      className="item_box"
+                      key={item.name}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => navigateToProduct(item.id)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          navigateToProduct(item.id);
+                        }
+                      }}
+                    >
                       <div className="items">
                         <div className="item_img_box">
                           <img src={item.image} alt={item.name} className="item_img" />
                           <div className="icons">
-                            <CartIconButton
-                              product={createMainProduct({ ...item, image: item.image })}
-                            />
-                            <WishlistIconButton
-                              product={createMainProduct({ ...item, image: item.image })}
-                            />
+                            <CartIconButton product={createMainProduct(item)} size="sm" />
+                            <WishlistIconButton product={createMainProduct(item)} size="sm" />
                           </div>
                         </div>
                         <div className="item_texts">
                           <p className="item_name">{item.name}</p>
-                          <p className="item_price">{item.price}</p>
+                          <p className="item_price">{toDisplayPrice(item)}</p>
                           <button
                             type="button"
                             className="item_spec"
-                            onClick={() => setSelectedSpecProduct(item)}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setSelectedSpecProduct(item);
+                            }}
                           >
                             주요스펙
                           </button>
@@ -1082,6 +1010,45 @@ function Main() {
       </section>
 
       <EventModal isOpen={isEventModalOpen} onClose={() => setIsEventModalOpen(false)} />
+      {selectedSpecProduct && (
+        <Modal title="주요스펙" onClose={() => setSelectedSpecProduct(null)}>
+          <div className="main-spec-modal">
+            <div className="main-spec-modal__summary">
+              <div className="main-spec-modal__image">
+                <img src={selectedSpecProduct.image} alt={selectedSpecProduct.name} />
+              </div>
+              <div className="main-spec-modal__product">
+                <p className="main-spec-modal__name">{selectedSpecProduct.name}</p>
+                <p className="main-spec-modal__price">{toDisplayPrice(selectedSpecProduct)}</p>
+              </div>
+            </div>
+            <dl className="main-spec-modal__list">
+              {selectedSpecProduct.specs?.map((spec) => (
+                <div className="main-spec-modal__row" key={spec.label}>
+                  <dt>{spec.label}</dt>
+                  <dd>{spec.value}</dd>
+                </div>
+              ))}
+            </dl>
+            <div className="main-spec-modal__actions">
+              <button
+                type="button"
+                className="main-spec-modal__button main-spec-modal__button--ghost"
+                onClick={() => setSelectedSpecProduct(null)}
+              >
+                닫기
+              </button>
+              <button
+                type="button"
+                className="main-spec-modal__button main-spec-modal__button--primary"
+                onClick={() => navigateToProduct(selectedSpecProduct.id)}
+              >
+                상세보기
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </main>
   );
 }

@@ -261,6 +261,10 @@ function Header() {
     navigate("/");
   };
 
+  const handleHomeClick = () => {
+    window.dispatchEvent(new Event("reset-main-ai-section"));
+  };
+
   const goToPath = (path) => {
     navigate(path);
   };
@@ -343,7 +347,7 @@ function Header() {
       <div className="header__top">
         {isHomePage ? (
           <h1 className="header__logo header__logo--mobile">
-            <Link to="/" aria-label="GOREON 홈">
+            <Link to="/" aria-label="GOREON 홈" onClick={handleHomeClick}>
               <img src={LogoIcon} alt="GOREON 아이콘" className="header__logo-icon" />
               <img src={LogoFull} alt="GOREON 로고" className="header__logo-full" />
             </Link>
@@ -359,7 +363,7 @@ function Header() {
           </button>
         )}
         <h1 className="header__logo header__logo--desktop">
-          <Link to="/" aria-label="GOREON 홈">
+          <Link to="/" aria-label="GOREON 홈" onClick={handleHomeClick}>
             <img src={LogoIcon} alt="GOREON 아이콘" className="header__logo-icon" />
             <img src={LogoFull} alt="GOREON 로고" className="header__logo-full" />
           </Link>

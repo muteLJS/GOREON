@@ -4,16 +4,987 @@
 .my-page {
   width: 100%;
   padding-top: $page-content-start-mobile;
+  padding-bottom: 84px;
+  color: $color-text-main;
+}
+
+.my-page__mobile-frame {
+  width: 100%;
+  max-width: 402px;
+  margin: 0 auto;
+}
+
+.my-page__header {
+  padding-top: 0;
+
+  h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: $font-black;
+    line-height: 1.2;
+  }
+}
+
+.my-page__profile-card,
+.my-page__info-panel,
+.my-page__recent-panel,
+.my-page__history-panel {
+  background: $color-white;
+  border: 1px solid rgba($color-text-main, 0.1);
+  border-radius: 22px;
+}
+
+.my-page__profile-card {
+  margin-top: 40px;
+  overflow: hidden;
+}
+
+.my-page__profile-main {
+  padding: 18px 16px 12px;
+}
+
+.my-page__nickname {
+  margin: 0;
+  font-size: 28px;
+  font-weight: $font-black;
+  line-height: 1.15;
+}
+
+.my-page__email {
+  margin: 8px 0 0;
+  font-size: 16px;
+  font-weight: $font-semibold;
+  line-height: 1.4;
+  color: rgba($color-text-main, 0.78);
+}
+
+.my-page__metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-height: 90px;
+  border-top: 1px solid rgba($color-text-main, 0.08);
+}
+
+.my-page__metric {
+  @include flex(center, center, column);
+  position: relative;
+  gap: 10px;
+  padding: 16px 10px;
+  color: $color-text-main;
+  text-decoration: none;
+
+  strong {
+    display: none;
+  }
+}
+
+.my-page__metric-label {
+  font-size: 15px;
+  font-weight: $font-semibold;
+  line-height: 1.2;
+  text-align: center;
+  word-break: keep-all;
+}
+
+.my-page__metric-icon {
+  @include flex-center;
+  width: 42px;
+  height: 42px;
+
+  svg,
+  img {
+    width: 42px;
+    height: 42px;
+  }
+
+  svg {
+    stroke: $color-text-main;
+    stroke-width: 1;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  img {
+    object-fit: contain;
+  }
+}
+
+.my-page__metric-icon--review {
+  img {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+.my-page__metric-divider {
+  position: absolute;
+  top: 8px;
+  right: 0;
+  width: 1px;
+  height: calc(100% - 16px);
+  background: rgba($color-text-main, 0.12);
+}
+
+.my-page__section {
+  margin-top: 44px;
+}
+
+.my-page__overview-grid {
+  display: contents;
+}
+
+.my-page__section-title {
+  margin: 0 0 14px;
+  font-size: 18px;
+  font-weight: $font-black;
+  line-height: 1.25;
+}
+
+.my-page__info-panel {
+  padding: 30px 18px 34px;
+}
+
+.my-page__info-item + .my-page__info-item {
+  margin-top: 22px;
+}
+
+.my-page__info-label {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: $font-bold;
+  line-height: 1.2;
+}
+
+.my-page__info-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.my-page__info-value {
+  min-height: 50px;
+  padding: 0 20px;
+  border: 1px solid rgba($color-text-main, 0.22);
+  border-radius: 14px;
+  background: rgba($color-bg, 0.9);
+  display: flex;
+  align-items: center;
+
+  span {
+    @include ellipsis;
+    display: block;
+    width: 100%;
+    font-size: 15px;
+    font-weight: $font-semibold;
+  }
+
+  input {
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: $color-text-main;
+    font-size: 15px;
+    font-weight: $font-semibold;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+.my-page__edit-button {
+  min-width: 86px;
+  height: 50px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: $font-bold;
+  cursor: pointer;
+}
+
+.my-page__edit-button--edit {
+  border: 0;
+  background: #12b8c0;
+  color: $color-white;
+}
+
+.my-page__edit-button--done {
+  border: 2px solid #12b8c0;
+  background: $color-white;
+  color: #12b8c0;
+}
+
+.my-page__recent-panel {
+  padding: 20px 0 24px 18px;
+  overflow: hidden;
+}
+
+.my-page__rail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 124px;
+  gap: 14px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 10px;
+  cursor: grab;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &.is-dragging {
+    cursor: grabbing;
+    user-select: none;
+  }
+}
+
+.my-page__rail-card {
+  min-width: 0;
+  position: relative;
+  display: grid;
+  align-content: start;
+}
+
+.my-page__rail-card-media-wrap {
+  position: static;
+  padding-bottom: 0;
+  overflow: visible;
+}
+
+.my-page__ai-card-media-wrap {
+  position: static;
+}
+
+.my-page__rail-card-media {
+  display: block;
+  width: 124px;
+  height: 142px;
+  border: 1px solid rgba($color-text-main, 0.1);
+  border-radius: 12px;
+  background: $color-white;
+  overflow: hidden;
+
+  > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 18px 14px;
+    box-sizing: border-box;
+    object-fit: contain;
+  }
+}
+
+.my-page__rail-card-actions,
+.my-page__ai-card-actions {
+  display: flex;
+  gap: 2px;
+  z-index: 1;
+
+  button {
+    @include flex-center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 1px solid rgba($color-text-main, 0.12);
+    border-radius: 50%;
+    background: $color-white;
+    cursor: pointer;
+  }
+
+  img {
+    width: 12px;
+    height: 12px;
+    padding: 0;
+    object-fit: contain;
+  }
+}
+
+.my-page__rail-card-actions {
+  position: absolute;
+  right: 8px;
+  bottom: 0;
+  gap: 4px;
+
+  button {
+    width: 18px;
+    height: 18px;
+    box-shadow: 0 2px 6px rgba($color-text-main, 0.08);
+  }
+
+  img {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+.my-page__ai-card-actions {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+.my-page__rail-card-copy {
+  display: block;
+  padding-top: 10px;
+  padding-right: 76px;
+  color: $color-text-main;
+  text-decoration: none;
+}
+
+.my-page__rail-card-name {
+  @include ellipsis-multi(2);
+  margin: 0;
+  font-size: 12px;
+  font-weight: $font-semibold;
+  line-height: 1.35;
+}
+
+.my-page__rail-card-price {
+  margin: 8px 0 0;
+  font-size: 15px;
+  font-weight: $font-black;
+  line-height: 1.2;
+}
+
+.my-page__history-list {
+  display: grid;
+  gap: 18px;
+}
+
+.my-page__history-list-shell {
+  overflow: hidden;
+  transition: height 2s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: height;
+}
+
+.my-page__history-group {
+  display: grid;
+  gap: 10px;
+}
+
+.my-page__history-date-row {
+  @include flex(center, flex-start);
+  gap: 8px;
+}
+
+.my-page__history-date {
+  margin: 0;
+  flex-shrink: 0;
+  color: rgba($color-text-main, 0.48);
+  font-size: 12px;
+  font-weight: $font-semibold;
+  line-height: 1.2;
+}
+
+.my-page__history-line {
+  width: 100%;
+  height: 1px;
+  background: rgba($color-text-main, 0.12);
+}
+
+.my-page__history-panel {
+  padding: 16px 12px 14px;
+  overflow: hidden;
+}
+
+.my-page__history-head {
+  @include flex(flex-start, flex-start);
+  gap: 8px;
+
+  > div {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+}
+
+.my-page__history-badge {
+  display: block;
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  max-width: none;
+  object-fit: contain;
+  margin-top: 3px;
+}
+
+.my-page__history-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: $font-black;
+  line-height: 1.25;
+}
+
+.my-page__history-subtitle {
+  margin: 4px 0 0;
+  font-size: 12px;
+  font-weight: $font-semibold;
+  line-height: 1.35;
+}
+
+.my-page__ai-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.my-page__ai-grid--slider {
+  grid-auto-flow: column;
+  grid-auto-columns: 154px;
+  grid-template-columns: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.my-page__ai-card {
+  min-width: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.my-page__ai-card-media {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 150px;
+  border: 1px solid rgba($color-text-main, 0.08);
+  border-radius: 10px;
+  background: #eefbfb;
+  overflow: hidden;
+
+  > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 20px 14px 18px;
+    box-sizing: border-box;
+    object-fit: contain;
+  }
+}
+
+.my-page__ai-card-copy {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding-top: 10px;
+  padding-right: 26px;
+  color: $color-text-main;
+  text-decoration: none;
+}
+
+.my-page__ai-card-name {
+  @include ellipsis-multi(2);
+  margin: 0;
+  min-height: 32px;
+  font-size: 12px;
+  font-weight: $font-black;
+  line-height: 1.35;
+}
+
+.my-page__ai-card-desc,
+.my-page__ai-card-spec {
+  @include ellipsis;
+  margin: 0;
+  min-height: 13px;
+  color: rgba($color-text-main, 0.78);
+  font-size: 9px;
+  font-weight: $font-semibold;
+  line-height: 1.45;
+}
+
+.my-page__ai-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 24px;
+  margin-top: 6px;
+
+  span {
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: #dff5f5;
+    color: $color-text-main;
+    font-size: 8px;
+    font-weight: $font-bold;
+    line-height: 1;
+  }
+}
+
+.my-page__ai-card-price {
+  margin: 8px 0 0;
+  padding-right: 2px;
+  font-size: 16px;
+  font-weight: $font-black;
+  line-height: 1.1;
+}
+
+.my-page__more-wrap {
+  @include flex-center;
+  margin-top: 28px;
+}
+
+.my-page__more-button {
+  min-width: 168px;
+  height: 42px;
+  padding: 0 18px;
+  border: 1px solid rgba($color-text-main, 0.18);
+  border-radius: 999px;
+  background: $color-white;
+  color: $color-text-main;
+  font-size: 14px;
+  font-weight: $font-bold;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: default;
+  }
 }
 
 @include tablet-up {
   .my-page {
     padding-top: $page-content-start-tablet;
+    padding-bottom: 104px;
+  }
+
+  .my-page__mobile-frame {
+    max-width: 700px;
+  }
+
+  .my-page__section {
+    margin-top: 52px;
+  }
+
+  .my-page__section-title {
+    margin-bottom: 16px;
+    font-size: 20px;
+  }
+
+  .my-page__info-panel {
+    padding: 34px 22px 38px;
+  }
+
+  .my-page__info-item + .my-page__info-item {
+    margin-top: 24px;
+  }
+
+  .my-page__recent-panel {
+    padding: 24px 0 30px 22px;
+  }
+
+  .my-page__rail {
+    grid-auto-columns: 148px;
+    gap: 16px;
+    padding-bottom: 14px;
+  }
+
+  .my-page__rail-card-media {
+    width: 148px;
+    height: 166px;
+  }
+
+  .my-page__rail-card-name {
+    font-size: 13px;
+  }
+
+  .my-page__rail-card-price {
+    font-size: 16px;
+  }
+
+  .my-page__ai-card-media {
+    height: 180px;
+  }
+
+  .my-page__ai-grid--slider {
+    grid-auto-columns: 180px;
   }
 }
 
 @include desktop-up {
   .my-page {
-    padding-top: $page-content-start-desktop;
+    padding-top: $page-content-start-tablet;
+    padding-bottom: 172px;
+  }
+
+  .my-page__mobile-frame {
+    width: 100%;
+    max-width: $layout-desktop-max-width;
+  }
+
+  .my-page__header {
+    padding-top: 0;
+
+    h1 {
+      font-size: 42px;
+      line-height: 1.1;
+      text-align: center;
+    }
+  }
+
+  .my-page__profile-card {
+    margin-top: 56px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 12px;
+    overflow: visible;
+    background: transparent;
+    border: 0;
+  }
+
+  .my-page__profile-main,
+  .my-page__metrics {
+    min-height: 78px;
+    background: $color-white;
+    border: 1px solid rgba($color-text-main, 0.08);
+    border-radius: 16px;
+  }
+
+  .my-page__profile-main {
+    padding: 18px 28px;
+  }
+
+  .my-page__nickname {
+    font-size: 24px;
+  }
+
+  .my-page__email {
+    margin-top: 6px;
+    font-size: 12px;
+    color: $color-text-main;
+  }
+
+  .my-page__metrics {
+    min-height: 0;
+    border-top: 0;
+  }
+
+  .my-page__metric {
+    gap: 8px;
+    padding: 14px 10px;
+  }
+
+  .my-page__metric-label {
+    font-size: 15px;
+    font-weight: $font-bold;
+    line-height: 1.2;
+  }
+
+  .my-page__metric-icon {
+    width: 44px;
+    height: 44px;
+
+    svg,
+    img {
+      width: 44px;
+      height: 44px;
+    }
+  }
+
+  .my-page__metric-icon--review {
+    box-sizing: border-box;
+    padding-bottom: 4px;
+
+    img {
+      width: 34px;
+      height: 34px;
+    }
+  }
+
+  .my-page__overview-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: 28px;
+    align-items: stretch;
+  }
+
+  .my-page__overview-grid .my-page__section {
+    margin-top: 68px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .my-page__section {
+    margin-top: 68px;
+  }
+
+  .my-page__section-title {
+    margin-bottom: 16px;
+    font-size: 20px;
+  }
+
+  .my-page__info-panel {
+    flex: 1;
+    min-height: 352px;
+    padding: 42px 34px 0;
+    border-radius: 16px;
+  }
+
+  .my-page__info-item + .my-page__info-item {
+    margin-top: 24px;
+  }
+
+  .my-page__info-label {
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  .my-page__info-row {
+    gap: 14px;
+  }
+
+  .my-page__info-value {
+    min-height: 40px;
+    padding: 0 16px;
+    border-radius: 12px;
+
+    span,
+    input {
+      font-size: 14px;
+    }
+  }
+
+  .my-page__edit-button {
+    min-width: 58px;
+    height: 40px;
+    border-radius: 12px;
+    font-size: 12px;
+  }
+
+  .my-page__edit-button--done {
+    border-width: 1px;
+  }
+
+  .my-page__recent-panel {
+    flex: 1;
+    min-height: 352px;
+    padding: 36px 28px 2px;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .my-page__rail {
+    grid-auto-flow: column;
+    grid-auto-columns: 188px;
+    gap: 18px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 12px;
+    margin-bottom: 0;
+  }
+
+  .my-page__rail-card-media {
+    width: 188px;
+    height: 184px;
+    border-radius: 12px;
+
+    > img {
+      padding: 18px 16px;
+    }
+  }
+
+  .my-page__rail-card-media-wrap {
+    padding-bottom: 0;
+  }
+
+  .my-page__rail-card-actions {
+    right: 8px;
+    bottom: 0;
+    gap: 6px;
+
+    button {
+      width: 24px;
+      height: 24px;
+    }
+
+    img {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  .my-page__rail-card-copy {
+    padding-top: 12px;
+    padding-right: 82px;
+  }
+
+  .my-page__rail-card-name {
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .my-page__rail-card-price {
+    margin-top: 8px;
+    font-size: 18px;
+  }
+
+  .my-page__history-list {
+    gap: 18px;
+  }
+
+  .my-page__history-date-row {
+    gap: 10px;
+  }
+
+  .my-page__history-date {
+    font-size: 14px;
+  }
+
+  .my-page__history-panel {
+    padding: 22px 28px 24px;
+    border-radius: 16px;
+  }
+
+  .my-page__history-head {
+    gap: 10px;
+  }
+
+  .my-page__history-badge {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    max-width: none;
+    margin-top: 2px;
+  }
+
+  .my-page__history-title {
+    font-size: 16px;
+  }
+
+  .my-page__history-subtitle {
+    margin-top: 6px;
+    font-size: 13px;
+  }
+
+  .my-page__ai-grid,
+  .my-page__ai-grid--slider {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 18px;
+    overflow: visible;
+  }
+
+  .my-page__ai-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: 108px minmax(0, 1fr);
+    gap: 22px;
+    align-items: start;
+  }
+
+  .my-page__ai-card-media-wrap {
+    position: static;
+  }
+
+  .my-page__ai-card:nth-child(n + 4) {
+    display: none;
+  }
+
+  .my-page__ai-card + .my-page__ai-card {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid rgba($color-text-main, 0.08);
+  }
+
+  .my-page__ai-card-media {
+    width: 108px;
+    height: 108px;
+    border-radius: 8px;
+
+    > img {
+      padding: 14px 10px 12px;
+    }
+  }
+
+  .my-page__ai-card-actions {
+    right: 18px;
+    top: auto;
+    bottom: 0;
+    gap: 6px;
+
+    button {
+      width: 30px;
+      height: 30px;
+    }
+
+    img {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  .my-page__ai-card-copy {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "name price"
+      "desc price"
+      "spec price"
+      "tags price";
+    column-gap: 18px;
+    row-gap: 6px;
+    align-items: start;
+    padding-top: 4px;
+    min-height: 108px;
+    padding-right: 24px;
+  }
+
+  .my-page__ai-card-name {
+    grid-area: name;
+    min-height: 0;
+    font-size: 18px;
+    line-height: 1.2;
+  }
+
+  .my-page__ai-card-desc {
+    grid-area: desc;
+    min-height: 0;
+    font-size: 15px;
+    line-height: 1.35;
+  }
+
+  .my-page__ai-card-spec {
+    grid-area: spec;
+    min-height: 0;
+    font-size: 15px;
+    line-height: 1.35;
+  }
+
+  .my-page__ai-card-tags {
+    grid-area: tags;
+    min-height: 0;
+    margin-top: 0;
+
+    span {
+      font-size: 10px;
+    }
+  }
+
+  .my-page__ai-card-price {
+    grid-area: price;
+    align-self: end;
+    justify-self: end;
+    margin: 0 0 38px;
+    font-size: 18px;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .my-page__more-wrap {
+    margin-top: 40px;
   }
 }

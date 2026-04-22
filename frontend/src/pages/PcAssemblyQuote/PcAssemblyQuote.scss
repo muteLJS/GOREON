@@ -2,13 +2,29 @@
 @import "styles/mixins";
 
 .pc-assembly-quote {
-  padding-top: $page-content-start-mobile;
-  margin-bottom: $space-lg;
+  width: 100%;
+  padding-top: 0;
+  margin-bottom: 0;
+  color: $color-text-main;
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  &__title {
+    text-align: left;
+    font-size: $font-xl;
+    font-weight: $font-bold;
+    margin: 0 0 12px;
+  }
 
   &__layout {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: $space-lg 16px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    min-width: 0;
   }
 
   &__list,
@@ -16,38 +32,14 @@
   &__total,
   &__right {
     grid-column: 1 / -1;
+    min-width: 0;
   }
 
   &__right {
     display: flex;
     flex-direction: column;
-    gap: $space-lg;
-  }
-
-  .indicator {
-    display: inline-block;
-    border-radius: 999px;
-    width: $font-sm;
-    height: $font-sm;
-
-    &--ok {
-      background-color: green;
-    }
-
-    &--warning {
-      background-color: orange;
-    }
-
-    &--error {
-      background-color: red;
-    }
-  }
-
-  &__title {
-    text-align: center;
-    font-size: $font-xl;
-    font-weight: $font-bold;
-    margin: 0 0 $space-lg;
+    gap: 16px;
+    min-width: 0;
   }
 
   &__control {
@@ -60,7 +52,6 @@
   &__select-all {
     @include flex(center, flex-start);
     gap: 8px;
-    color: $color-text-main;
     font-size: $font-lg;
     font-weight: $font-bold;
     cursor: pointer;
@@ -74,15 +65,12 @@
 
   &__checkbox-mark {
     @include flex-center;
-    position: relative;
     width: 22px;
     height: 22px;
     border: 1px solid $color-text-main;
     border-radius: 8px;
     background: $color-white;
-    transition:
-      background-color $transition-fast,
-      border-color $transition-fast;
+    flex-shrink: 0;
 
     &::after {
       content: "";
@@ -91,15 +79,11 @@
       border-left: 2px solid transparent;
       border-bottom: 2px solid transparent;
       transform: translateY(-1px) rotate(-45deg);
-      transition:
-        border-color $transition-fast,
-        opacity $transition-fast;
       opacity: 0;
     }
   }
 
   &__select-all input:checked + &__checkbox-mark {
-    border-color: $color-text-main;
     background: $color-text-main;
 
     &::after {
@@ -109,132 +93,385 @@
   }
 
   &__delete-button {
-    padding: 0;
     border: 0;
     background: transparent;
-    color: $color-text-main;
+    padding: 0;
     font-size: $font-lg;
     font-weight: $font-bold;
     cursor: pointer;
   }
 
-  &__summary {
+  &__panel {
+    @include panel-card();
     display: flex;
     flex-direction: column;
-    gap: $space-md;
-  }
-
-  &__compatibility {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: $space-md;
-    background-color: #0aa5a515;
-    border-radius: $radius-md;
-  }
-
-  &__compatibility-count,
-  &__compatibility-status {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: $space-xs;
-  }
-
-  &__compatibility-count {
-    display: flex;
-    gap: $space-xs;
-    font-weight: $font-bold;
-    font-size: $font-sm;
-  }
-
-  &__compatibility-status {
-    font-size: $font-xs;
-    color: $color-text-sub;
-  }
-
-  &__total {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: $color-gray-100;
-    border-radius: $radius-md;
-    padding: $space-xs;
-    margin-top: -$space-md;
+    gap: 10px;
+    min-width: 0;
   }
 
   &__section-title {
+    margin: 0 0 12px;
     font-size: $font-lg;
     font-weight: $font-bold;
-    margin-bottom: $space-xs;
   }
 
-  &__panel {
+  &__insights {
     display: flex;
     flex-direction: column;
-    gap: $space-xs;
-    border-radius: 16px;
-    border: 1px solid rgba(60, 60, 60, 0.24);
-    padding: $space-md;
+    gap: 32px;
+    min-height: 0;
+  }
+
+  &__performance {
+    margin-bottom: 0;
+
+    .pc-assembly-quote__panel {
+      max-height: 148px;
+      overflow-y: auto;
+      padding-right: 10px;
+      scrollbar-color: $color-btn transparent;
+      scrollbar-width: auto;
+
+      &::-webkit-scrollbar {
+        width: 16px;
+      }
+
+      &::-webkit-scrollbar-button {
+        display: none;
+        width: 0;
+        height: 0;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: $color-btn;
+        border-radius: $radius-full;
+      }
+
+      &::-webkit-scrollbar-thumb:hover {
+        background: $color-primary-dark;
+      }
+    }
   }
 
   &__panel-item {
     display: flex;
     align-items: center;
-    gap: $space-sm;
+    gap: 8px;
+    min-width: 0;
+    color: $color-text-main;
+    font-weight: $font-semibold;
+  }
+
+  .indicator {
+    &--ok {
+      @include status-dot(10px, $color-success);
+    }
+    &--warning {
+      @include status-dot(10px, $color-warning);
+    }
+    &--error {
+      @include status-dot(10px, $color-error);
+    }
+  }
+
+  &__compatibility {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr) max-content;
+    gap: 16px;
+    align-items: center;
+    background-color: #0aa5a515;
+    border-radius: 12px;
+    padding: 10px 18px 8px;
+    min-width: 0;
+  }
+
+  &__compatibility-count {
+    @include flex(center, flex-start);
+    gap: 8px;
+    min-width: 0;
+    font-size: $font-md;
+    font-weight: $font-bold;
+    white-space: nowrap;
+
+    img {
+      width: $font-lg;
+      height: $font-lg;
+      display: block;
+    }
+  }
+
+  &__compatibility-status {
+    @include flex(center, flex-end);
+    min-width: 0;
+    font-size: $font-sm;
+    color: $color-text-sub;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__compatibility-check {
+    @include button-base();
+    height: 32px;
+    min-width: 96px;
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    white-space: nowrap;
+  }
+
+  &__total {
+    @include flex(center, center);
+    min-height: 46px;
+    border-radius: 12px;
+    background: $color-gray-100;
+    font-size: $font-lg;
+    font-weight: $font-bold;
+    white-space: nowrap;
+    padding: 6px 10px;
+  }
+
+  &__recommend-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 240px;
+    overflow: auto;
+    padding-right: 2px;
+  }
+
+  &__recommend-card {
+    width: 100%;
+    border: 1px solid rgba($color-text-main, 0.14);
+    border-radius: 16px;
+    background: $color-white;
+    padding: 12px;
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 14px;
+    align-items: center;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  &__recommend-thumb {
+    width: 96px;
+    height: 96px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #60606024;
+    background: #f8f8f6;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+  }
+
+  &__recommend-main {
+    min-width: 0;
+  }
+
+  &__recommend-name {
+    margin: 0;
+    color: $color-text-main;
+    font-size: $font-lg;
+    font-weight: $font-black;
+    line-height: 1.35;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__recommend-meta {
+    margin: 4px 0 0;
+    color: rgba($color-text-main, 0.78);
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+  }
+
+  &__recommend-price {
+    display: block;
+    margin: 10px 0 0;
+    color: $color-text-main;
+    font-size: 40px;
+    font-weight: $font-black;
+    line-height: 1;
+    letter-spacing: -0.02em;
   }
 
   &__action {
     display: flex;
     flex-direction: column;
-    gap: $space-md;
+    gap: 12px;
   }
 
   &__action-button {
     @include button-base();
+    height: 42px;
   }
 
   &__action-button--secondary {
     @include button-gray();
+    height: 42px;
   }
 
-  @include tablet-up {
-    padding-top: $page-content-start-tablet;
+  &--modal {
+    padding-right: 2px;
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+
+    .pc-assembly-quote__layout {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+    }
   }
 
   @include desktop-up {
-    padding-top: $page-content-start-desktop;
+    &--modal {
+      .pc-assembly-quote__layout {
+        overflow: hidden;
+        grid-template-rows: auto minmax(0, 1fr);
+        align-items: stretch;
+      }
+
+      .pc-assembly-quote__list,
+      .pc-assembly-quote__right {
+        min-height: 0;
+      }
+
+      .pc-assembly-quote__list {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .pc-assembly-quote__list .pc-assembly-quote-list {
+        flex: 0 0 auto;
+      }
+
+      .pc-assembly-quote__list .pc-assembly-quote-list--has-items {
+        flex: 1;
+      }
+
+      .pc-assembly-quote__right {
+        height: 100%;
+        gap: 16px;
+      }
+
+      .pc-assembly-quote__insights {
+        flex: 1;
+        justify-content: flex-start;
+        gap: 32px;
+      }
+
+      .pc-assembly-quote__panel {
+        gap: 8px;
+      }
+
+      .pc-assembly-quote__section-title {
+        font-size: $font-lg;
+        margin-bottom: 12px;
+      }
+
+      .pc-assembly-quote__recommend-list {
+        max-height: none;
+        overflow: visible;
+        gap: 8px;
+        padding: 0;
+      }
+
+      .pc-assembly-quote__recommend-card {
+        grid-template-columns: 72px minmax(0, 1fr);
+        gap: 10px;
+        padding: 10px;
+        border-radius: 14px;
+      }
+
+      .pc-assembly-quote__recommend-thumb {
+        width: 72px;
+        height: 72px;
+        border-radius: 12px;
+      }
+
+      .pc-assembly-quote__recommend-name {
+        font-size: $font-md;
+        line-height: 1.35;
+        white-space: normal;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+
+      .pc-assembly-quote__recommend-meta {
+        font-size: $font-xs;
+        margin-top: 3px;
+      }
+
+      .pc-assembly-quote__recommend-price {
+        font-size: $font-md;
+        margin-top: 6px;
+        letter-spacing: 0;
+      }
+    }
 
     &__layout {
-      grid-template-columns: repeat(12, 1fr);
-      gap: 24px;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 16px 20px;
+      align-items: start;
     }
 
     &__total {
       grid-column: 1 / span 3;
       grid-row: 1;
-      margin-top: 0;
+      min-height: 56px;
     }
 
     &__compatibility {
       grid-column: 4 / -1;
       grid-row: 1;
+      grid-template-columns: repeat(9, minmax(0, 1fr));
+      min-height: 56px;
+    }
+
+    &__compatibility-count {
+      grid-column: 1 / span 3;
+    }
+
+    &__compatibility-status {
+      grid-column: 4 / span 2;
+      justify-content: flex-end;
+    }
+
+    &__compatibility-check {
+      grid-column: 7 / -1;
+      justify-self: end;
     }
 
     &__list {
-      grid-column: 1 / 9;
+      grid-column: 1 / span 8;
       grid-row: 2;
     }
 
     &__right {
       grid-column: 9 / -1;
       grid-row: 2;
-      gap: $space-xxl;
+      gap: 16px;
     }
 
     &__action {
       flex-direction: row;
 
-      button {
+      .pc-assembly-quote__action-button,
+      .pc-assembly-quote__action-button--secondary {
         flex: 1;
       }
     }

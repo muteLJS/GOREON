@@ -5,8 +5,35 @@
 
 import { createSlice } from "@reduxjs/toolkit";
 
+const WISHLIST_STORAGE_KEY = "wishlistItems";
+
+const loadWishlistItems = () => {
+  if (typeof window === "undefined") {
+    return [];
+  }
+
+  try {
+    const storedItems = window.localStorage.getItem(WISHLIST_STORAGE_KEY);
+    return storedItems ? JSON.parse(storedItems) : [];
+  } catch {
+    return [];
+  }
+};
+
+const persistWishlistItems = (items) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(items));
+  } catch {
+    // Ignore localStorage write failures and keep in-memory state working.
+  }
+};
+
 const initialState = {
-  items: [],
+  items: loadWishlistItems(),
 };
 
 const wishlistSlice = createSlice({
@@ -17,10 +44,12 @@ const wishlistSlice = createSlice({
       const existing = state.items.find((item) => item.id === action.payload.id);
       if (!existing) {
         state.items.push(action.payload);
+        persistWishlistItems(state.items);
       }
     },
     removeFromWishlist: (state, action) => {
       state.items = state.items.filter((item) => item.id !== action.payload);
+      persistWishlistItems(state.items);
     },
   },
 });
