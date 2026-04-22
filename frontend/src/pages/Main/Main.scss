@@ -292,6 +292,11 @@
       .submit {
         width: 24px;
         height: 24px;
+
+        &:disabled {
+          cursor: not-allowed;
+          opacity: 0.45;
+        }
       }
     }
 
@@ -406,6 +411,25 @@
 .section__AI_result {
   @include flex(flex-start, center, column);
   gap: 18px;
+
+  .AI_result_state {
+    width: 100%;
+    padding: 22px 20px;
+    background: rgba($color-white, 0.94);
+    border: 1px solid rgba($color-text-sub, 0.18);
+    border-radius: $radius-lg;
+    box-shadow: 0 10px 24px rgba(10, 166, 166, 0.08);
+    color: $color-category-text;
+    font-size: $font-md;
+    font-weight: $font-medium;
+    line-height: 1.5;
+    text-align: center;
+
+    &--error {
+      color: #c2410c;
+      border-color: rgba(194, 65, 12, 0.25);
+    }
+  }
 
   .recommends {
     width: 100%;
@@ -564,6 +588,11 @@
         border: 0;
         background: transparent;
         cursor: pointer;
+
+        &:disabled {
+          cursor: not-allowed;
+          opacity: 0.45;
+        }
 
         svg {
           width: 100%;
@@ -2567,7 +2596,6 @@
       display: block;
       width: 100%;
     }
-
   }
 }
 

@@ -63,11 +63,11 @@ const chunkItemsByWidth = (items, widths, maxWidth, gap) => {
   return pages;
 };
 
-function PromptButtonList({ items, variant = "default" }) {
+function PromptButtonList({ items, variant = "default", onSelect }) {
   const containerRef = useRef(null);
   const measureRefs = useRef([]);
   const [isDesktop, setIsDesktop] = useState(() =>
-    typeof window === "undefined" ? false : window.innerWidth >= DESKTOP_BREAKPOINT
+    typeof window === "undefined" ? false : window.innerWidth >= DESKTOP_BREAKPOINT,
   );
   const [desktopPages, setDesktopPages] = useState([items]);
   const shouldUseMeasuredPages = variant === "result" || isDesktop;
@@ -102,7 +102,9 @@ function PromptButtonList({ items, variant = "default" }) {
 
     const updatePages = () => {
       if (variant === "result" && !isDesktop && typeof window !== "undefined") {
-        setDesktopPages(chunkItemsByCount(items, getResultMobilePageSize(window.innerWidth) ?? items.length));
+        setDesktopPages(
+          chunkItemsByCount(items, getResultMobilePageSize(window.innerWidth) ?? items.length),
+        );
         return;
       }
 
@@ -113,7 +115,8 @@ function PromptButtonList({ items, variant = "default" }) {
       }
 
       const availableWidth = container.clientWidth;
-      const gap = variant === "result" ? DEFAULT_GAP : availableWidth >= 1200 ? LARGE_GAP : DEFAULT_GAP;
+      const gap =
+        variant === "result" ? DEFAULT_GAP : availableWidth >= 1200 ? LARGE_GAP : DEFAULT_GAP;
       const widths = items.map((_, index) => measureRefs.current[index]?.offsetWidth ?? 0);
 
       if (!availableWidth || widths.some((width) => width === 0)) {
@@ -144,15 +147,12 @@ function PromptButtonList({ items, variant = "default" }) {
   if (variant === "swiper") {
     return (
       <div className="buttons buttons--swiper">
-        <Swiper
-          className="buttons__swiper"
-          slidesPerView="auto"
-          spaceBetween={10}
-          watchOverflow
-        >
+        <Swiper className="buttons__swiper" slidesPerView="auto" spaceBetween={10} watchOverflow>
           {items.map((item) => (
             <SwiperSlide key={item} className="buttons__slide">
-              <button type="button">{item}</button>
+              <button type="button" onClick={() => onSelect?.(item)}>
+                {item}
+              </button>
             </SwiperSlide>
           ))}
         </Swiper>
@@ -164,7 +164,7 @@ function PromptButtonList({ items, variant = "default" }) {
     return (
       <div className="buttons">
         {items.map((item) => (
-          <button key={item} type="button">
+          <button key={item} type="button" onClick={() => onSelect?.(item)}>
             {item}
           </button>
         ))}
@@ -191,18 +191,23 @@ function PromptButtonList({ items, variant = "default" }) {
         {desktopPages.length === 1 ? (
           <div className="buttons__page">
             {items.map((item) => (
-              <button key={item} type="button">
+              <button key={item} type="button" onClick={() => onSelect?.(item)}>
                 {item}
               </button>
             ))}
           </div>
         ) : (
-          <Swiper className="buttons__pages-swiper" slidesPerView={1} spaceBetween={0} watchOverflow>
+          <Swiper
+            className="buttons__pages-swiper"
+            slidesPerView={1}
+            spaceBetween={0}
+            watchOverflow
+          >
             {desktopPages.map((pageItems, pageIndex) => (
               <SwiperSlide key={`page-${pageIndex}`}>
                 <div className="buttons__page">
                   {pageItems.map((item) => (
-                    <button key={item} type="button">
+                    <button key={item} type="button" onClick={() => onSelect?.(item)}>
                       {item}
                     </button>
                   ))}
