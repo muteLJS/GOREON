@@ -23,6 +23,7 @@ import productsData from "@/data/products_list.json";
 import { fetchAiRecommendations } from "@/utils/recommendations";
 
 const mainProducts = productsData;
+const EMPTY_AI_PLACEHOLDER = "검색어를 입력해주세요!";
 
 const getMainProductById = (id) => mainProducts.find((product) => product.id === id);
 
@@ -91,6 +92,7 @@ function Main() {
   const [showAiResult, setShowAiResult] = useState(false);
   const [isAiSwitching, setIsAiSwitching] = useState(false);
   const [aiQuery, setAiQuery] = useState("");
+  const [isAiInputEmptyError, setIsAiInputEmptyError] = useState(false);
   const [aiStatus, setAiStatus] = useState("idle");
   const [aiMessage, setAiMessage] = useState("");
   const [aiResults, setAiResults] = useState([]);
@@ -108,6 +110,7 @@ function Main() {
   });
   const aiSwitchTimeoutRef = useRef(null);
   const aiRequestAbortRef = useRef(null);
+  const aiResultSectionRef = useRef(null);
   const categorySwiperRef = useRef(null);
   const categoryProgressRef = useRef(null);
   const promptItems = [
@@ -305,7 +308,14 @@ function Main() {
   };
 
   const handleAiInput = (e) => {
-    setAiQuery(e.target.value);
+    const nextQuery = e.target.value;
+
+    setAiQuery(nextQuery);
+
+    if (nextQuery.trim()) {
+      setIsAiInputEmptyError(false);
+    }
+
     handleInput(e);
   };
 
@@ -344,6 +354,7 @@ function Main() {
       .replace(/^[^\p{L}\p{N}]+/u, "")
       .trim();
     setAiQuery(promptWithoutEmoji || prompt);
+    setIsAiInputEmptyError(false);
   };
 
   const updateCategorySwiperState = (swiper = categorySwiperRef.current) => {
@@ -406,13 +417,12 @@ function Main() {
     const query = aiQuery.trim();
 
     if (!query) {
-      setAiStatus("error");
-      setAiErrorMessage("추천받고 싶은 용도나 예산을 입력해주세요.");
-      setAiMessage("추천받고 싶은 용도나 예산을 입력해주세요.");
-      setAiResults([]);
-      startAiResultTransition();
+      setAiQuery("");
+      setIsAiInputEmptyError(true);
       return;
     }
+
+    setIsAiInputEmptyError(false);
 
     if (aiRequestAbortRef.current) {
       aiRequestAbortRef.current.abort();
@@ -485,6 +495,66 @@ function Main() {
   );
 
   useEffect(() => {
+    if (aiStatus !== "success" || aiResults.length === 0 || !showAiResult || !isDesktopCategory) {
+      return undefined;
+    }
+
+    const scrollTimeoutIds = [];
+    const recommendationImages = [];
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const scrollRecommendationRangeIntoView = () => {
+      const recommendationItems = aiResultSectionRef.current?.querySelector(".recommends");
+      const aiInputContainer = aiResultSectionRef.current?.querySelector(".AI_chat_container");
+
+      if (!recommendationItems || !aiInputContainer) {
+        return;
+      }
+
+      const recommendationRect = recommendationItems.getBoundingClientRect();
+      const inputRect = aiInputContainer.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const targetTop = recommendationRect.top + window.scrollY;
+      const targetBottom = inputRect.bottom + window.scrollY;
+      const targetHeight = targetBottom - targetTop;
+      const targetScrollTop =
+        targetHeight >= viewportHeight
+          ? targetTop
+          : targetTop - (viewportHeight - targetHeight) / 2;
+
+      window.scrollTo({
+        top: Math.max(0, targetScrollTop),
+        behavior: prefersReducedMotion ? "auto" : "smooth",
+      });
+    };
+
+    const scrollFrameId = window.requestAnimationFrame(() => {
+      scrollRecommendationRangeIntoView();
+
+      recommendationImages.push(
+        ...(aiResultSectionRef.current?.querySelectorAll(".recommends img") ?? []),
+      );
+      recommendationImages.forEach((image) => {
+        if (!image.complete) {
+          image.addEventListener("load", scrollRecommendationRangeIntoView, { once: true });
+        }
+      });
+
+      [450, 900, 1300].forEach((delay) => {
+        scrollTimeoutIds.push(window.setTimeout(scrollRecommendationRangeIntoView, delay));
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(scrollFrameId);
+      scrollTimeoutIds.forEach((timeoutId) => window.clearTimeout(timeoutId));
+      recommendationImages.forEach((image) => {
+        image.removeEventListener("load", scrollRecommendationRangeIntoView);
+      });
+    };
+  }, [aiResults.length, aiStatus, isDesktopCategory, showAiResult]);
+
+  useEffect(() => {
     const resetAiSection = () => {
       if (aiSwitchTimeoutRef.current) {
         window.clearTimeout(aiSwitchTimeoutRef.current);
@@ -496,6 +566,7 @@ function Main() {
       setAiStatus("idle");
       setAiMessage("");
       setAiErrorMessage("");
+      setIsAiInputEmptyError(false);
       setAiResults([]);
     };
 
@@ -628,10 +699,11 @@ function Main() {
           <form action="#" method="POST" onSubmit={handleAiSubmit}>
             <div className="AI_Chat_row_1">
               <textarea
+                className={isAiInputEmptyError ? "is-ai-input-error" : undefined}
                 name="ai_chat"
                 id="ai_chat"
                 rows={1}
-                placeholder="무엇이든 물어보세요!"
+                placeholder={isAiInputEmptyError ? EMPTY_AI_PLACEHOLDER : "무엇이든 물어보세요!"}
                 value={aiQuery}
                 onChange={handleAiInput}
               />
@@ -793,7 +865,7 @@ function Main() {
 
   const renderResultAiSection = (isEntering = false) => (
     <div className={`ai-stage__layer ai-stage__layer--result ${isEntering ? "is-entering" : ""}`}>
-      <div className="section__AI_result sections">
+      <div className="section__AI_result sections" ref={aiResultSectionRef}>
         {aiStatus === "loading" ? (
           <div className="AI_result_state">상품 데이터 기준으로 추천을 준비하고 있어요.</div>
         ) : null}
@@ -872,10 +944,13 @@ function Main() {
           <form action="#" method="POST" onSubmit={handleAiSubmit}>
             <div className="AI_Chat_row_1">
               <textarea
+                className={isAiInputEmptyError ? "is-ai-input-error" : undefined}
                 name="ai_chat"
                 id="ai_chat"
                 rows={1}
-                placeholder="대학생용 가벼운 노트북 추천해줘."
+                placeholder={
+                  isAiInputEmptyError ? EMPTY_AI_PLACEHOLDER : "대학생용 가벼운 노트북 추천해줘."
+                }
                 value={aiQuery}
                 onChange={handleAiInput}
               />

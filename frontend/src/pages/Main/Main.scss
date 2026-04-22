@@ -309,6 +309,9 @@
     font-size: $font-md;
     font-weight: $font-bold;
   }
+  textarea.is-ai-input-error::placeholder {
+    color: $color-error;
+  }
   textarea {
     background-color: $color-white;
     border: none;
