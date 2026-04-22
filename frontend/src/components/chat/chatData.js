@@ -1,4 +1,4 @@
-import ProductExampleImage from "../../assets/products/product-example.jpg";
+import ProductExampleImage from "@/assets/products/product-example.jpg";
 
 export const CHAT_MODE = {
   IDLE: "idle",
