@@ -1332,7 +1332,7 @@
       box-sizing: border-box;
       border: 1px solid $color-gray-300;
       border-radius: $radius-md;
-      background-color: $color-gray-100;
+      background-color: $color-white;
       .item_img {
         position: absolute;
         width: min(72%, 170px);
@@ -2285,7 +2285,7 @@
         }
 
         &:hover {
-          box-shadow: inset 0 0 0 5px $color-text-main;
+          box-shadow: inset 0 0 0 2px $color-text-main;
         }
       }
     }
@@ -2580,6 +2580,44 @@
         max-width: 128px;
         margin-top: 6px;
       }
+    }
+  }
+
+  .section__Set_Category {
+    .categories {
+      border-radius: $radius-lg;
+
+      form {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        border-radius: $radius-lg;
+
+        .category {
+          min-height: 36px;
+          padding: 7px 10px;
+        }
+      }
+    }
+
+    .item_box {
+      gap: 8px;
+    }
+
+    .items {
+      gap: 10px;
+
+      .item_img_box {
+        margin-bottom: 0;
+      }
+    }
+
+    .item_name {
+      min-height: 38px;
+    }
+
+    .options {
+      gap: 5px;
+      min-height: 38px;
     }
   }
 }

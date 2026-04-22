@@ -1,13 +1,14 @@
 import "./MyPage.scss";
-import { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 import AiBadgeIcon from "@/assets/icons/mypage_ai.png";
-import CartStraightIcon from "@/assets/icons/cart-straight.svg";
-import LikeAfterIcon from "@/assets/icons/like-after.svg";
-import LikeBeforeIcon from "@/assets/icons/like-before.svg";
+import MypageCartIcon from "@/assets/icons/Mypage_cart.svg";
+import MypageLikeIcon from "@/assets/icons/Mypage_like.svg";
 import ReviewIcon from "@/assets/icons/review.png";
+import CartIconButton from "@/components/CartIconButton/CartIconButton";
+import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 import products from "@/data/products_list.json";
 import { addToCart } from "@/store/slices/cartSlice";
 import { updateUserInfo } from "@/store/slices/userSlice";
@@ -33,41 +34,6 @@ const getProductId = (product) => product?._id ?? product?.productId ?? product?
 
 const formatPrice = (value) =>
   `₩${new Intl.NumberFormat("ko-KR").format(parsePrice(value))}`;
-
-const buildCartPayload = (product) => {
-  const productId = getProductId(product);
-
-  return {
-    id: product.id ?? productId,
-    productId,
-    category: product?.category ?? "상품",
-    name: product?.name ?? product?.title ?? "상품명",
-    option: product?.option ?? product?.spec ?? "기본 옵션",
-    price: parsePrice(product?.price),
-    image: product?.image ?? product?.heroImage ?? "",
-    quantity: 1,
-  };
-};
-
-const buildWishlistPayload = (product) => {
-  const productId = getProductId(product);
-
-  return {
-    id: productId,
-    name: product?.name ?? product?.title ?? "상품명",
-    price: parsePrice(product?.price),
-    image: product?.image ?? product?.heroImage ?? "",
-    rating: Number(product?.rating) || 0,
-  };
-};
-
-const showActionAlert = (message) => {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  window.alert(message);
-};
 
 const mappedProducts = products.slice(0, 24).map((product, index) => ({
   id: product.id ?? index + 1,
@@ -116,21 +82,11 @@ const aiHistory = [
 
 function MetricIcon({ type }) {
   if (type === "cart") {
-    return (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M3.5 5.5h2.6l1.8 8h9.2l1.9-5.8H7.6" />
-        <circle cx="10" cy="18.5" r="1.5" />
-        <circle cx="17" cy="18.5" r="1.5" />
-      </svg>
-    );
+    return <img src={MypageCartIcon} alt="" />;
   }
 
   if (type === "wish") {
-    return (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 19.3 5.4 13a4.2 4.2 0 0 1 5.9-6l.7.7.7-.7a4.2 4.2 0 1 1 5.9 6Z" />
-      </svg>
-    );
+    return <img src={MypageLikeIcon} alt="" />;
   }
 
   return <img src={ReviewIcon} alt="" />;
@@ -169,32 +125,7 @@ function EditableField({ field, value, activeField, onChange, onToggle }) {
 }
 
 function ProductRailCard({ product }) {
-  const dispatch = useDispatch();
-  const wishlistItems = useSelector((state) => state.wishlist.items);
   const productId = getProductId(product);
-  const isWishlisted = wishlistItems.some((item) => item.id === productId);
-
-  const handleAddToCart = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    dispatch(addToCart(buildCartPayload(product)));
-    showActionAlert("장바구니에 추가되었습니다.");
-  };
-
-  const handleToggleWishlist = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    if (isWishlisted) {
-      dispatch(removeFromWishlist(productId));
-      showActionAlert("찜한 상품에서 제거되었습니다.");
-      return;
-    }
-
-    dispatch(addToWishlist(buildWishlistPayload(product)));
-    showActionAlert("찜한 상품에 추가 되었습니다.");
-  };
 
   return (
     <article className="my-page__rail-card">
@@ -207,16 +138,8 @@ function ProductRailCard({ product }) {
           <img src={product.image} alt={product.name} draggable={false} />
         </Link>
         <div className="my-page__rail-card-actions">
-          <button type="button" aria-label="장바구니 담기" onClick={handleAddToCart}>
-            <img src={CartStraightIcon} alt="" />
-          </button>
-          <button
-            type="button"
-            aria-label={isWishlisted ? "찜 해제" : "찜하기"}
-            onClick={handleToggleWishlist}
-          >
-            <img src={isWishlisted ? LikeAfterIcon : LikeBeforeIcon} alt="" />
-          </button>
+          <CartIconButton product={product} size="sm" />
+          <WishlistIconButton product={product} size="sm" />
         </div>
       </div>
       <Link
@@ -232,32 +155,7 @@ function ProductRailCard({ product }) {
 }
 
 function AiRecommendationCard({ product }) {
-  const dispatch = useDispatch();
-  const wishlistItems = useSelector((state) => state.wishlist.items);
   const productId = getProductId(product);
-  const isWishlisted = wishlistItems.some((item) => item.id === productId);
-
-  const handleAddToCart = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    dispatch(addToCart(buildCartPayload(product)));
-    showActionAlert("장바구니에 추가되었습니다.");
-  };
-
-  const handleToggleWishlist = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    if (isWishlisted) {
-      dispatch(removeFromWishlist(productId));
-      showActionAlert("찜한 상품에서 제거되었습니다.");
-      return;
-    }
-
-    dispatch(addToWishlist(buildWishlistPayload(product)));
-    showActionAlert("찜한 상품에 추가 되었습니다.");
-  };
 
   return (
     <article className="my-page__ai-card">
@@ -266,16 +164,8 @@ function AiRecommendationCard({ product }) {
           <img src={product.image} alt={product.name} />
         </Link>
         <div className="my-page__ai-card-actions">
-          <button type="button" aria-label="장바구니 담기" onClick={handleAddToCart}>
-            <img src={CartStraightIcon} alt="" />
-          </button>
-          <button
-            type="button"
-            aria-label={isWishlisted ? "찜 해제" : "찜하기"}
-            onClick={handleToggleWishlist}
-          >
-            <img src={isWishlisted ? LikeAfterIcon : LikeBeforeIcon} alt="" />
-          </button>
+          <CartIconButton product={product} size="sm" />
+          <WishlistIconButton product={product} size="sm" />
         </div>
       </div>
 
@@ -300,10 +190,10 @@ export default function MyPage() {
   const userInfo = useSelector((state) => state.user.userInfo);
   const cartCount = useSelector((state) => state.cart.items.length);
   const wishlistCount = useSelector((state) => state.wishlist.items.length);
-  const displayUser = {
+  const displayUser = useMemo(() => ({
     ...FALLBACK_USER,
     ...userInfo,
-  };
+  }), [userInfo]);
 
   const [profileDraft, setProfileDraft] = useState(displayUser);
   const [editingField, setEditingField] = useState("");
@@ -329,7 +219,7 @@ export default function MyPage() {
 
   useEffect(() => {
     setProfileDraft(displayUser);
-  }, [displayUser.email, displayUser.name, displayUser.phone]);
+  }, [displayUser]);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -664,9 +554,7 @@ export default function MyPage() {
             {metrics.map((metric, index) => (
               <Link key={metric.key} to={metric.href} className="my-page__metric">
                 <span
-                  className={`my-page__metric-icon ${
-                    metric.key === "review" ? "my-page__metric-icon--review" : ""
-                  }`}
+                  className={`my-page__metric-icon my-page__metric-icon--${metric.key}`}
                 >
                   <MetricIcon type={metric.key} />
                 </span>

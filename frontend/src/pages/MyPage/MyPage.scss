@@ -40,10 +40,19 @@
 }
 
 .my-page__profile-main {
-  padding: 18px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 0;
+  padding: 18px 16px;
+  text-align: left;
 }
 
 .my-page__nickname {
+  @include ellipsis;
+  width: 100%;
   margin: 0;
   font-size: 28px;
   font-weight: $font-black;
@@ -51,7 +60,9 @@
 }
 
 .my-page__email {
-  margin: 8px 0 0;
+  @include ellipsis;
+  width: 100%;
+  margin: 0;
   font-size: 16px;
   font-weight: $font-semibold;
   line-height: 1.4;
@@ -107,6 +118,14 @@
 
   img {
     object-fit: contain;
+  }
+}
+
+.my-page__metric-icon--cart,
+.my-page__metric-icon--wish {
+  img {
+    width: 30px;
+    height: 30px;
   }
 }
 
@@ -199,7 +218,7 @@
   min-width: 86px;
   height: 50px;
   border-radius: 14px;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: $font-bold;
   cursor: pointer;
 }
@@ -284,26 +303,9 @@
 .my-page__rail-card-actions,
 .my-page__ai-card-actions {
   display: flex;
-  gap: 2px;
+  align-items: center;
+  gap: 4px;
   z-index: 1;
-
-  button {
-    @include flex-center;
-    width: 20px;
-    height: 20px;
-    padding: 0;
-    border: 1px solid rgba($color-text-main, 0.12);
-    border-radius: 50%;
-    background: $color-white;
-    cursor: pointer;
-  }
-
-  img {
-    width: 12px;
-    height: 12px;
-    padding: 0;
-    object-fit: contain;
-  }
 }
 
 .my-page__rail-card-actions {
@@ -311,17 +313,6 @@
   right: 8px;
   bottom: 0;
   gap: 4px;
-
-  button {
-    width: 18px;
-    height: 18px;
-    box-shadow: 0 2px 6px rgba($color-text-main, 0.08);
-  }
-
-  img {
-    width: 10px;
-    height: 10px;
-  }
 }
 
 .my-page__ai-card-actions {
@@ -652,6 +643,7 @@
   }
 
   .my-page__profile-main {
+    gap: 6px;
     padding: 18px 28px;
   }
 
@@ -696,6 +688,14 @@
     box-sizing: border-box;
     padding-bottom: 4px;
 
+    img {
+      width: 34px;
+      height: 34px;
+    }
+  }
+
+  .my-page__metric-icon--cart,
+  .my-page__metric-icon--wish {
     img {
       width: 34px;
       height: 34px;
@@ -759,7 +759,7 @@
     min-width: 58px;
     height: 40px;
     border-radius: 12px;
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .my-page__edit-button--done {
@@ -804,16 +804,6 @@
     right: 8px;
     bottom: 0;
     gap: 6px;
-
-    button {
-      width: 24px;
-      height: 24px;
-    }
-
-    img {
-      width: 12px;
-      height: 12px;
-    }
   }
 
   .my-page__rail-card-copy {
@@ -915,16 +905,6 @@
     top: auto;
     bottom: 0;
     gap: 6px;
-
-    button {
-      width: 30px;
-      height: 30px;
-    }
-
-    img {
-      width: 14px;
-      height: 14px;
-    }
   }
 
   .my-page__ai-card-copy {

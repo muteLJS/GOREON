@@ -26,6 +26,7 @@ const errorHandler = (err, req, res, next) => {
       message: err.message,
       stack: err.stack,
     });
+    message = "Internal server error";
   }
 
   res.status(statusCode).json({

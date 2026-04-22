@@ -12,6 +12,7 @@ import User from "@/assets/header/header-icons/user.svg";
 import ChevronDown from "@/assets/icons/chevron-down.svg";
 import Prev from "@/assets/icons/prev.svg";
 import { logout } from "@/store/slices/userSlice";
+import api from "@/utils/api";
 import Modal from "../Modal/Modal";
 
 const categoryMenu = [
@@ -256,7 +257,13 @@ function Header() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await api.post("/auth/logout").catch((error) => {
+      console.warn("[auth][logout] request failed", {
+        message: error.message,
+        status: error.response?.status,
+      });
+    });
     dispatch(logout());
     navigate("/");
   };

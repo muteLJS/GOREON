@@ -26,21 +26,33 @@ function PcAssembly() {
   const [isQuoteOpen, setIsQuoteOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("CPU");
   const [isDesktop, setIsDesktop] = useState(window.matchMedia("(min-width: 1024px)").matches);
+  const [isMobile, setIsMobile] = useState(window.matchMedia("(max-width: 767px)").matches);
   const assemblyRef = useRef(null);
+  const desktopSectionRef = useRef(null);
   const [quotePanelWidth, setQuotePanelWidth] = useState(1216);
 
   useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-    const onChange = (e) => setIsDesktop(e.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
+    const desktopMq = window.matchMedia("(min-width: 1024px)");
+    const mobileMq = window.matchMedia("(max-width: 767px)");
+    const handleDesktopChange = (event) => setIsDesktop(event.matches);
+    const handleMobileChange = (event) => setIsMobile(event.matches);
+
+    desktopMq.addEventListener("change", handleDesktopChange);
+    mobileMq.addEventListener("change", handleMobileChange);
+
+    return () => {
+      desktopMq.removeEventListener("change", handleDesktopChange);
+      mobileMq.removeEventListener("change", handleMobileChange);
+    };
   }, []);
 
   useEffect(() => {
     if (!(isDesktop && isQuoteOpen)) return undefined;
 
     const updateWidth = () => {
-      const width = assemblyRef.current?.getBoundingClientRect().width;
+      const width =
+        desktopSectionRef.current?.getBoundingClientRect().width ??
+        assemblyRef.current?.getBoundingClientRect().width;
       if (width) setQuotePanelWidth(Math.round(width));
     };
 
@@ -52,7 +64,11 @@ function PcAssembly() {
     }
 
     const observer = new ResizeObserver(updateWidth);
-    if (assemblyRef.current) observer.observe(assemblyRef.current);
+    if (desktopSectionRef.current) {
+      observer.observe(desktopSectionRef.current);
+    } else if (assemblyRef.current) {
+      observer.observe(assemblyRef.current);
+    }
     window.addEventListener("resize", updateWidth);
 
     return () => {
@@ -190,7 +206,7 @@ function PcAssembly() {
         </div>
       </section>
 
-      <section className="pc-assembly__desktop">
+      <section className="pc-assembly__desktop" ref={desktopSectionRef}>
         {renderSectionBar()}
 
         <aside className="pc-assembly__sidebar">
@@ -232,6 +248,8 @@ function PcAssembly() {
           onClose={() => setIsQuoteOpen(false)}
           className="modal--fullscreen pc-assembly__quote-modal"
           overlayClassName="modal-overlay--fullscreen pc-assembly__quote-overlay"
+          showCloseButton={!isMobile}
+          dragToClose={isMobile}
         >
           <PcAssemblyQuote isModal />
         </Modal>

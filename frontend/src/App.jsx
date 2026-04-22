@@ -1,4 +1,5 @@
-﻿import React from "react";
+﻿import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 
 import MainLayout from "./layouts/MainLayout/MainLayout";
@@ -16,10 +17,23 @@ import PcAssemblyQuote from "./pages/PcAssemblyQuote/PcAssemblyQuote";
 import Register from "./pages/Register/Register";
 import List from "./pages/List/List";
 import OrderHistory from "./pages/OrderHistory/OrderHistory";
+import SocialLoginCallback from "./pages/SocialLoginCallback/SocialLoginCallback";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import { logout } from "./store/slices/userSlice";
 
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const handleAuthLogout = () => {
+      dispatch(logout());
+    };
+
+    window.addEventListener("auth:logout", handleAuthLogout);
+    return () => window.removeEventListener("auth:logout", handleAuthLogout);
+  }, [dispatch]);
+
   return (
     <>
       <ScrollToTop />
@@ -31,6 +45,7 @@ function App() {
           <Route path="/pc-assembly" element={<PcAssembly />} />
           <Route path="/pc-assembly-quote" element={<PcAssemblyQuote />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/auth/social/callback" element={<SocialLoginCallback />} />
           <Route path="/register" element={<Register />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/wishlist" element={<Wishlist />} />

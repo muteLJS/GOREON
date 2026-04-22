@@ -50,7 +50,7 @@ function cx(...classNames) {
 
 function Section({ title, titleClassName, children }) {
   return (
-    <section>
+    <section className="payment-page__section">
       {title ? (
         <h3 className={cx("payment-page__section-title", titleClassName)}>{title}</h3>
       ) : null}

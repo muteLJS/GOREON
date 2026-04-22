@@ -21,7 +21,7 @@
 
 .order-history-page__header {
   width: 100%;
-  max-width: 1280px;
+  max-width: $layout-desktop-max-width;
   margin: 0 auto;
   padding-top: 0;
 }
@@ -42,7 +42,7 @@
   display: grid;
   gap: 36px;
   width: 100%;
-  max-width: 1280px;
+  max-width: $layout-desktop-max-width;
   margin: 34px auto 0;
 }
 
@@ -162,11 +162,12 @@
 }
 
 .order-history-item__action--mobile {
-  display: block;
+  display: grid;
+  gap: 8px;
   margin-top: 12px;
 }
 
-.order-history-item__review-btn {
+.order-history-item__action-button {
   width: 100%;
   height: 44px;
   border: 2px solid $color-text-main;
@@ -176,15 +177,17 @@
   font-size: 14px;
   font-weight: $font-bold;
   cursor: pointer;
-  transition:
-    background-color $transition-fast,
-    color $transition-fast,
-    border-color $transition-fast;
+}
 
-  &:hover {
-    background: $color-text-main;
-    color: $color-white;
-  }
+.order-history-item__action-button--confirm,
+.order-history-item__action-button--delivery {
+  background: $color-text-main;
+  color: $color-white;
+}
+
+.order-history-item__action-button--review {
+  background: $color-white;
+  color: $color-text-main;
 }
 
 .order-history-item__divider {
@@ -285,7 +288,7 @@
   }
 
   .order-history-page__layout {
-    max-width: 760px;
+    max-width: $layout-desktop-max-width;
     margin: 92px auto 0;
     gap: 28px;
   }
@@ -344,14 +347,15 @@
   }
 
   .order-history-item__action {
-    @include flex(center, flex-end);
+    @include flex(stretch, center, column);
+    gap: 8px;
   }
 
   .order-history-item__action--mobile {
     display: none;
   }
 
-  .order-history-item__review-btn {
+  .order-history-item__action-button {
     width: auto;
     min-width: 84px;
     height: 42px;

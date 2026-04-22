@@ -21,6 +21,32 @@
   border-radius: 16px 16px 0 0;
   padding: $layout-mobile-padding;
   max-width: $breakpoint-desktop;
+  transition: transform 0.2s ease;
+
+  &--draggable {
+    touch-action: pan-y;
+  }
+
+  &__drag-zone {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 18px;
+    margin: -6px 0 6px;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  &__drag-zone:active {
+    cursor: grabbing;
+  }
+
+  &__drag-handle {
+    width: 44px;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba($color-text-main, 0.18);
+  }
 
   &__title {
     font-size: $font-md;

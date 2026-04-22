@@ -58,7 +58,7 @@ function ReviewWrite({ productId, onClose }) {
   };
 
   return (
-    <Modal title="리뷰 작성하기">
+    <Modal title="리뷰 작성하기" className="review-write-modal">
       <div className="review-write">
         <section className="review-write__rating">
           <p className="review-write__title">

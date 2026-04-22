@@ -716,7 +716,7 @@ function Main() {
             isDesktop ? "desktop" : isTabletCategory ? "tablet" : "mobile"
           }`}
           className="item_box category_swiper"
-          spaceBetween={isDesktop ? 20 : isTabletCategory ? 24 : 16}
+          spaceBetween={isDesktop ? 20 : isTabletCategory ? 24 : 10}
           slidesPerView={isDesktop ? 3.15 : isTabletCategory ? 2.7 : 2.1}
           onSwiper={(swiper) => {
             categorySwiperRef.current = swiper;
