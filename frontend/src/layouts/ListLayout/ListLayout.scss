@@ -1,6 +1,9 @@
 @import "styles/variables";
 @import "styles/mixins";
 
+$range-thumb-size: 18px;
+$range-thumb-half: 9px;
+
 .list-wrap {
   width: 100%;
   padding: 40px 0;
@@ -42,11 +45,13 @@
       .filter-button {
         display: flex;
         align-items: center;
+        justify-content: center;
         border: 1px solid #60606024;
         border-radius: 999px;
         font-size: $font-xs;
         gap: $space-xs;
         padding: $space-xxs $space-xs;
+        background-color: #ffffff;
 
         img {
           width: $font-xs;
@@ -213,22 +218,6 @@
 
           .side_menu_bottom_range {
             padding: 0 23px;
-            h3 {
-              font-size: 20px;
-              font-weight: 700;
-            }
-            input {
-              width: 100%;
-            }
-            .value {
-              display: flex;
-              justify-content: space-between;
-              p {
-                font-size: $font-xs;
-                color: $color-sub-category-text;
-                font-weight: $font-medium;
-              }
-            }
           }
         }
         &_bottom {
@@ -255,15 +244,6 @@
             overflow: hidden;
             transition: max-height 0.4s ease-out;
 
-            li {
-              display: flex;
-              gap: 8px;
-              p {
-                font-size: $font-md;
-                font-weight: $font-medium;
-                color: $color-sub-category-text;
-              }
-            }
           }
         }
       }
@@ -284,5 +264,245 @@
         }
       }
     }
+  }
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  p {
+    font-size: $font-sm;
+    font-weight: $font-medium;
+    color: $color-sub-category-text;
+  }
+}
+
+.price-filter {
+  h3 {
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .range-slider {
+    position: relative;
+    height: 28px;
+    margin-top: 18px;
+  }
+
+  .range-slider__rail {
+    position: absolute;
+    inset: 0;
+    --range-left: 0;
+    --range-right: 0;
+  }
+
+  .range-slider__track,
+  .range-slider__active {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 6px;
+    border-radius: 999px;
+  }
+
+  .range-slider__track {
+    left: $range-thumb-half;
+    right: $range-thumb-half;
+    background-color: #d7dbe0;
+  }
+
+  .range-slider__active {
+    left: calc(#{$range-thumb-half} + ((100% - #{$range-thumb-size}) * var(--range-left) / 100));
+    right: calc(
+      #{$range-thumb-half} + ((100% - #{$range-thumb-size}) * var(--range-right) / 100)
+    );
+    background-color: $color-text-sub;
+  }
+
+  .range-input {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 28px;
+    transform: translateY(-50%);
+    appearance: none;
+    background: transparent;
+    margin: 0;
+    padding: 0;
+    pointer-events: none;
+  }
+
+  .range-input::-webkit-slider-runnable-track {
+    height: 6px;
+    background: transparent;
+  }
+
+  .range-input::-moz-range-track {
+    height: 6px;
+    background: transparent;
+  }
+
+  .range-input::-webkit-slider-thumb {
+    width: $range-thumb-size;
+    height: $range-thumb-size;
+    border: 2px solid $color-text-sub;
+    border-radius: 50%;
+    background-color: #ffffff;
+    appearance: none;
+    cursor: pointer;
+    margin-top: -6px;
+    pointer-events: auto;
+  }
+
+  .range-input::-moz-range-thumb {
+    width: $range-thumb-size;
+    height: $range-thumb-size;
+    border: 2px solid $color-text-sub;
+    border-radius: 50%;
+    background-color: #ffffff;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
+  .range-input:disabled::-webkit-slider-thumb,
+  .range-input:disabled::-moz-range-thumb {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .value {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 12px;
+
+    p {
+      font-size: $font-xs;
+      color: $color-sub-category-text;
+      font-weight: $font-semibold;
+    }
+  }
+}
+
+.list-mobile-filter-modal,
+.list-mobile-sort-modal {
+  .modal__title {
+    margin-bottom: 12px;
+  }
+}
+
+.list-mobile-filter {
+  padding: 0 0 8px;
+
+  &__tabs {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+
+  &__tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  &__tab {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: $color-sub-category-text;
+    font-size: $font-sm;
+    font-weight: $font-medium;
+  }
+
+  &__tab.is-active {
+    color: $color-text-main;
+    font-weight: $font-bold;
+  }
+
+  &__content {
+    min-height: 96px;
+    padding-top: 4px;
+  }
+
+  &__options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 18px;
+  }
+
+  &__options .filter-option {
+    min-height: 24px;
+  }
+
+  &__price {
+    .range-slider {
+      margin-top: 12px;
+    }
+
+    h3 {
+      display: none;
+    }
+  }
+
+  &__actions {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr);
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  &__reset {
+    @include button-reverse($bg: #ffffff, $color: $color-text-main, $radius: 12px);
+    @include flex(center, center);
+    min-width: 0;
+    height: 40px;
+    padding: 0;
+    border-color: rgba(96, 96, 96, 0.2);
+    gap: 6px;
+
+    img {
+      width: 14px;
+      height: 14px;
+      display: block;
+    }
+  }
+
+  &__apply {
+    @include button-base($bg: $color-text-sub, $color: $color-white, $radius: 12px);
+    min-width: 0;
+    height: 40px;
+    padding: 0 16px;
+  }
+}
+
+.list-mobile-sort {
+  padding: 4px 0 8px;
+
+  &__options {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__option {
+    width: 100%;
+    min-height: 40px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    color: $color-sub-category-text;
+    font-size: $font-sm;
+    font-weight: $font-medium;
+  }
+
+  &__option.is-active {
+    color: $color-text-main;
+    font-weight: $font-bold;
   }
 }

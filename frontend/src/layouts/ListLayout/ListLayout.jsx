@@ -7,6 +7,7 @@ import "./ListLayout.scss";
 import banner1 from "@/assets/banner/banner-1.jpg";
 import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
 import CartIconButton from "@/components/CartIconButton/CartIconButton";
+import Modal from "@/components/Modal/Modal";
 import ProductCardVertical from "@/components/ProductCard/ProductCardVertical";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 
@@ -46,6 +47,9 @@ const TYPE_LABEL_MAP = {
   acer: "Acer",
 };
 
+const SORT_OPTIONS = ["인기상품", "최신상품", "리뷰 많은 상품"];
+const DEFAULT_SORT_OPTION = SORT_OPTIONS[0];
+
 const DEFAULT_FILTER_GROUPS = [
   {
     title: "제품군",
@@ -54,10 +58,6 @@ const DEFAULT_FILTER_GROUPS = [
   {
     title: "제조사",
     items: ["APPLE", "SAMSUNG", "LG", "HP", "LENOVO", "DELL", "ASUS", "MSI"],
-  },
-  {
-    title: "정렬 기준",
-    items: ["인기상품", "최신상품", "리뷰 많은 상품"],
   },
 ];
 
@@ -251,7 +251,6 @@ const BRAND_FILTER_GROUPS = [
     title: "용도",
     items: ["사무/학습", "영상편집", "게이밍", "휴대성 우선", "프리미엄", "가성비"],
   },
-  { title: "정렬 기준", items: ["인기상품", "최신상품", "리뷰 많은 상품"] },
 ];
 
 const BRAND_TYPES = new Set([
@@ -271,9 +270,6 @@ const TYPE_ALIAS_MAP = {
   "pc-part": "pc-parts",
 };
 
-const PRICE_MIN = 10000;
-const PRICE_MAX = 1600000 * 2;
-
 const getFilterGroupsByType = (type) => {
   const normalizedType = TYPE_ALIAS_MAP[type] ?? type;
 
@@ -289,6 +285,21 @@ const getFilterGroupsByType = (type) => {
 };
 
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
+
+const getPriceBounds = (products) => {
+  const prices = products
+    .map((product) => parsePrice(product.price))
+    .filter((price) => Number.isFinite(price) && price > 0);
+
+  if (prices.length === 0) {
+    return { min: 0, max: 0 };
+  }
+
+  return {
+    min: Math.min(...prices),
+    max: Math.max(...prices),
+  };
+};
 
 const normalizeFilterText = (value) =>
   String(value ?? "")
@@ -306,13 +317,11 @@ const getProductSearchText = (product) =>
     .join(" ")
     .toLowerCase();
 
-const isSortGroup = (title) => title === "정렬 기준";
-
 const matchesSelectedFilters = (product, selectedFilters) => {
   const productText = getProductSearchText(product);
 
-  return Object.entries(selectedFilters).every(([groupTitle, values]) => {
-    if (isSortGroup(groupTitle) || values.length === 0) {
+  return Object.entries(selectedFilters).every(([_groupTitle, values]) => {
+    if (values.length === 0) {
       return true;
     }
 
@@ -322,8 +331,7 @@ const matchesSelectedFilters = (product, selectedFilters) => {
   });
 };
 
-const sortProducts = (products, selectedFilters) => {
-  const sortValue = selectedFilters["정렬 기준"]?.[0];
+const sortProducts = (products, sortValue) => {
   const sortedProducts = [...products];
 
   if (sortValue === "최신상품") {
@@ -341,7 +349,7 @@ const sortProducts = (products, selectedFilters) => {
 
 const FilterMenuList = ({ children, checked, onChange }) => {
   return (
-    <li>
+    <li className="filter-option">
       <input checked={checked} type="checkbox" onChange={onChange} />
       <p>{children}</p>
     </li>
@@ -369,6 +377,65 @@ const FilterMenuBox = ({ title, items, selectedValues, onToggle }) => {
   );
 };
 
+const PriceFilterBox = ({
+  className = "",
+  minValue,
+  maxValue,
+  minPrice,
+  maxPrice,
+  priceRangePercent,
+  onMinChange,
+  onMaxChange,
+}) => {
+  const isDisabled = minPrice === maxPrice;
+
+  return (
+    <div className={`price-filter ${className}`.trim()}>
+      <h3>가격</h3>
+      <div className="range-slider">
+        <div
+          className="range-slider__rail"
+          style={{
+            "--range-left": String(priceRangePercent.left),
+            "--range-right": String(priceRangePercent.right),
+          }}
+        >
+          <div className="range-slider__track" />
+          <div className="range-slider__active" />
+        </div>
+        <input
+          type="range"
+          name="min"
+          min={minPrice}
+          max={maxPrice}
+          step={1}
+          value={minValue}
+          onChange={onMinChange}
+          className="range-input range-input--min"
+          disabled={isDisabled}
+          aria-label="최소 가격"
+        />
+        <input
+          type="range"
+          name="max"
+          min={minPrice}
+          max={maxPrice}
+          step={1}
+          value={maxValue}
+          onChange={onMaxChange}
+          className="range-input range-input--max"
+          disabled={isDisabled}
+          aria-label="최대 가격"
+        />
+      </div>
+      <div className="value">
+        <p>₩ {Number(minValue).toLocaleString("ko-KR")}</p>
+        <p>₩ {Number(maxValue).toLocaleString("ko-KR")}</p>
+      </div>
+    </div>
+  );
+};
+
 export default function ListLayout({
   filteredProducts,
   status,
@@ -380,19 +447,33 @@ export default function ListLayout({
 }) {
   const [searchParams] = useSearchParams();
   const type = selectedType ?? searchParams.get("type") ?? "";
-  const [minValue, setMinValue] = useState(PRICE_MIN);
-  const [maxValue, setMaxValue] = useState(PRICE_MAX);
+  const priceBounds = useMemo(() => getPriceBounds(filteredProducts), [filteredProducts]);
+  const [minValue, setMinValue] = useState(priceBounds.min);
+  const [maxValue, setMaxValue] = useState(priceBounds.max);
   const [selectedFilters, setSelectedFilters] = useState({});
-  const handleChange = (e) => {
-    if (e.target.name === "min") {
-      setMinValue(e.target.value);
-    } else {
-      setMaxValue(e.target.value);
-    }
-  };
+  const [selectedSort, setSelectedSort] = useState(DEFAULT_SORT_OPTION);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [isSortModalOpen, setIsSortModalOpen] = useState(false);
+  const [activeMobileFilterTab, setActiveMobileFilterTab] = useState("");
 
   const filterGroups = getFilterGroupsByType(type);
+  const mobileFilterGroups = useMemo(() => filterGroups, [filterGroups]);
   const titleLabel = selectedTypeLabel ?? TYPE_LABEL_MAP[type] ?? "전체 상품";
+  const priceRangePercent = useMemo(() => {
+    const range = priceBounds.max - priceBounds.min;
+
+    if (range <= 0) {
+      return {
+        left: 0,
+        right: 0,
+      };
+    }
+
+    return {
+      left: ((minValue - priceBounds.min) / range) * 100,
+      right: 100 - ((maxValue - priceBounds.min) / range) * 100,
+    };
+  }, [maxValue, minValue, priceBounds.max, priceBounds.min]);
   const visibleProducts = useMemo(() => {
     const priceFilteredProducts = filteredProducts.filter((product) => {
       const price = parsePrice(product.price);
@@ -407,9 +488,25 @@ export default function ListLayout({
       matchesSelectedFilters(product, selectedFilters),
     );
 
-    return sortProducts(optionFilteredProducts, selectedFilters);
-  }, [filteredProducts, maxValue, minValue, selectedFilters]);
+    return sortProducts(optionFilteredProducts, selectedSort);
+  }, [filteredProducts, maxValue, minValue, selectedFilters, selectedSort]);
   const filteredLength = visibleProducts.length;
+  const activeMobileFilterGroup =
+    mobileFilterGroups.find((group) => group.title === activeMobileFilterTab) ??
+    mobileFilterGroups[0] ??
+    null;
+
+  const handleMinChange = (event) => {
+    const nextValue = Number(event.target.value);
+
+    setMinValue(Math.min(nextValue, maxValue));
+  };
+
+  const handleMaxChange = (event) => {
+    const nextValue = Number(event.target.value);
+
+    setMaxValue(Math.max(nextValue, minValue));
+  };
 
   const handleFilterToggle = (title, item) => {
     setSelectedFilters((currentFilters) => {
@@ -431,15 +528,25 @@ export default function ListLayout({
 
   const resetFilters = () => {
     setSelectedFilters({});
-    setMinValue(PRICE_MIN);
-    setMaxValue(PRICE_MAX);
+    setMinValue(priceBounds.min);
+    setMaxValue(priceBounds.max);
+  };
+
+  const resetMobileFilterConditions = () => {
+    setSelectedFilters({});
+    setMinValue(priceBounds.min);
+    setMaxValue(priceBounds.max);
   };
 
   useEffect(() => {
     setSelectedFilters({});
-    setMinValue(PRICE_MIN);
-    setMaxValue(PRICE_MAX);
-  }, [type]);
+    setMinValue(priceBounds.min);
+    setMaxValue(priceBounds.max);
+  }, [priceBounds.max, priceBounds.min, searchLabel, type]);
+
+  useEffect(() => {
+    setActiveMobileFilterTab(mobileFilterGroups[0]?.title ?? "가격");
+  }, [mobileFilterGroups]);
 
   return (
     <>
@@ -465,23 +572,16 @@ export default function ListLayout({
                   onToggle={handleFilterToggle}
                 />
               ))}
-              <div className="side_menu_bottom_range">
-                <h3>가격</h3>
-                <input
-                  type="range"
-                  name="max"
-                  min={PRICE_MIN}
-                  max={PRICE_MAX}
-                  step={10000}
-                  value={maxValue}
-                  onChange={handleChange}
-                  className="range-input range-input--max"
-                />
-                <div className="value">
-                  <p>₩{Number(minValue).toLocaleString("ko-KR")}</p>
-                  <p>₩{Number(maxValue).toLocaleString("ko-KR")}</p>
-                </div>
-              </div>
+              <PriceFilterBox
+                className="side_menu_bottom_range"
+                minValue={minValue}
+                maxValue={maxValue}
+                minPrice={priceBounds.min}
+                maxPrice={priceBounds.max}
+                priceRangePercent={priceRangePercent}
+                onMinChange={handleMinChange}
+                onMaxChange={handleMaxChange}
+              />
             </div>
           </section>
           <section className="list-assembly">
@@ -497,11 +597,19 @@ export default function ListLayout({
                 <span>({filteredLength}) </span>
               </h2>
               <div className="filter-container">
-                <button className="filter-button">
+                <button
+                  type="button"
+                  className="filter-button"
+                  onClick={() => setIsFilterModalOpen(true)}
+                >
                   필터 <img src={ChevronDownIcon} alt="down" />
                 </button>
-                <button className="filter-button">
-                  인기상품순 <img src={ChevronDownIcon} alt="down" />
+                <button
+                  type="button"
+                  className="filter-button"
+                  onClick={() => setIsSortModalOpen(true)}
+                >
+                  {selectedSort}순 <img src={ChevronDownIcon} alt="down" />
                 </button>
               </div>
             </section>
@@ -533,6 +641,110 @@ export default function ListLayout({
           </section>
         </section>
       </main>
+      {isFilterModalOpen ? (
+        <Modal
+          title="필터"
+          onClose={() => setIsFilterModalOpen(false)}
+          className="list-mobile-filter-modal"
+        >
+          <div className="list-mobile-filter">
+            <div className="list-mobile-filter__tabs">
+              {mobileFilterGroups.map((group) => (
+                <button
+                  key={group.title}
+                  type="button"
+                  className={`list-mobile-filter__tab ${
+                    activeMobileFilterTab === group.title ? "is-active" : ""
+                  }`}
+                  onClick={() => setActiveMobileFilterTab(group.title)}
+                >
+                  {group.title}
+                </button>
+              ))}
+              <button
+                type="button"
+                className={`list-mobile-filter__tab ${
+                  activeMobileFilterTab === "가격" ? "is-active" : ""
+                }`}
+                onClick={() => setActiveMobileFilterTab("가격")}
+              >
+                가격
+              </button>
+            </div>
+
+            <div className="list-mobile-filter__content">
+              {activeMobileFilterTab === "가격" ? (
+                <PriceFilterBox
+                  className="list-mobile-filter__price"
+                  minValue={minValue}
+                  maxValue={maxValue}
+                  minPrice={priceBounds.min}
+                  maxPrice={priceBounds.max}
+                  priceRangePercent={priceRangePercent}
+                  onMinChange={handleMinChange}
+                  onMaxChange={handleMaxChange}
+                />
+              ) : (
+                <ul className="list-mobile-filter__options">
+                  {activeMobileFilterGroup?.items.map((item) => (
+                    <FilterMenuList
+                      key={`${activeMobileFilterGroup.title}-${item}`}
+                      checked={(selectedFilters[activeMobileFilterGroup.title] ?? []).includes(item)}
+                      onChange={() => handleFilterToggle(activeMobileFilterGroup.title, item)}
+                    >
+                      {item}
+                    </FilterMenuList>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <div className="list-mobile-filter__actions">
+              <button
+                type="button"
+                className="list-mobile-filter__reset"
+                onClick={resetMobileFilterConditions}
+              >
+                초기화 <img src={resetIcon} alt="" />
+              </button>
+              <button
+                type="button"
+                className="list-mobile-filter__apply"
+                onClick={() => setIsFilterModalOpen(false)}
+              >
+                선택한 조건으로 상품 보기
+              </button>
+            </div>
+          </div>
+        </Modal>
+      ) : null}
+      {isSortModalOpen ? (
+        <Modal
+          title="정렬"
+          onClose={() => setIsSortModalOpen(false)}
+          className="list-mobile-sort-modal"
+        >
+          <div className="list-mobile-sort">
+            <div className="list-mobile-sort__options">
+              {SORT_OPTIONS.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  className={`list-mobile-sort__option ${
+                    selectedSort === option ? "is-active" : ""
+                  }`}
+                  onClick={() => {
+                    setSelectedSort(option);
+                    setIsSortModalOpen(false);
+                  }}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+          </div>
+        </Modal>
+      ) : null}
     </>
   );
 }
