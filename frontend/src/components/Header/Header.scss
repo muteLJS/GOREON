@@ -1,9 +1,12 @@
-﻿@import "styles/variables";
+@import "styles/variables";
 @import "styles/mixins";
 
 .header {
   --mobile-header-height: 76px;
   --mobile-bottom-nav-height: 95px;
+  --nav-label-font-size: clamp(18px, 5.2vw, 20px);
+  --menu-title-font-size: clamp(22px, 6vw, 24px);
+  --menu-item-font-size: clamp(18px, 5.2vw, 20px);
   width: 100%;
   background: $color-white;
   position: sticky;
@@ -292,38 +295,58 @@
 }
 
 .mobile-menu__tabs {
-  @include flex(center, center);
-  gap: 4px;
-  margin: 14px 16px 0;
-  padding: 4px;
-  border: 1px solid rgba($color-black, 0.1);
-  border-radius: 999px;
-  background: $color-white;
+  display: flex;
+  gap: 28px;
+  padding: 0 20px;
+  border-bottom: 1px solid rgba($color-black, 0.08);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .mobile-menu__tab {
-  flex: 1;
-  min-width: 0;
-  height: 40px;
+  position: relative;
+  flex: 0 0 auto;
+  min-width: max-content;
+  height: 56px;
+  padding: 0;
   border: 0;
-  border-radius: 999px;
   background: transparent;
-  color: rgba($color-black, 0.62);
-  font-size: 14px;
+  color: rgba($color-black, 0.52);
+  font-size: var(--nav-label-font-size);
   font-weight: $font-bold;
+  line-height: 1;
   cursor: pointer;
-  transition:
-    background-color $transition-fast,
-    color $transition-fast;
+  transition: color $transition-fast;
+
+  &::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: -1px;
+    left: 0;
+    height: 2px;
+    background: $color-text-sub;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform $transition-fast;
+  }
 }
 
 .mobile-menu__tab.is-active {
-  background: rgba($color-black, 0.06);
-  color: $color-text-main;
+  color: $color-text-sub;
+
+  &::after {
+    transform: scaleX(1);
+  }
 }
 
 .mobile-menu__content {
-  padding: 26px 20px 40px;
+  padding: 24px 20px 40px;
 }
 
 .mobile-menu__section + .mobile-menu__section {
@@ -337,7 +360,7 @@
   border: 0;
   background: transparent;
   color: $color-text-main;
-  font-size: 24px;
+  font-size: var(--menu-title-font-size);
   font-weight: $font-bold;
   line-height: 1.2;
   text-align: left;
@@ -365,13 +388,13 @@
 
 .mobile-menu__list-item a {
   color: rgba($color-black, 0.7);
-  font-size: 16px;
+  font-size: var(--menu-item-font-size);
   font-weight: $font-medium;
   line-height: 1.45;
   text-decoration: none;
 }
 
-.mobile-menu__list--brand-text .mobile-menu__list-item a {
+.mobile-menu__list--brand .mobile-menu__list-item a {
   color: $color-text-main;
   font-weight: $font-semibold;
 }
@@ -382,7 +405,7 @@
 
 .mobile-menu__cta-title {
   color: $color-text-main;
-  font-size: 24px;
+  font-size: var(--menu-title-font-size);
   font-weight: $font-bold;
   line-height: 1.2;
 }
@@ -425,12 +448,7 @@ body.mobile-menu-open {
     height: 32px;
   }
 
-  .mobile-menu__tabs {
-    max-width: 680px;
-    margin-right: 24px;
-    margin-left: 24px;
-  }
-
+  .mobile-menu__tabs,
   .mobile-menu__content {
     padding-right: 24px;
     padding-left: 24px;
@@ -471,7 +489,7 @@ body.mobile-menu-open {
 
   .header__right {
     @include flex(center, flex-end);
-    gap: 22px;
+    gap: 8px;
     display: flex;
   }
 
@@ -482,7 +500,7 @@ body.mobile-menu-open {
 
   .header__icons {
     @include flex(center, flex-start);
-    gap: 24px;
+    gap: 0;
   }
 
   .header__search--mobile {
@@ -491,6 +509,8 @@ body.mobile-menu-open {
 
   .header__icon-btn {
     @include flex-center;
+    position: relative;
+    flex: 0 0 auto;
     width: 26px;
     height: 26px;
     padding: 0;
@@ -499,10 +519,33 @@ body.mobile-menu-open {
     cursor: pointer;
 
     img {
-      width: 100%;
-      height: 100%;
+      width: var(--icon-width, 100%);
+      height: var(--icon-height, 100%);
       object-fit: contain;
     }
+  }
+
+  .header__icon-btn--action,
+  .header__icon-btn--search {
+    width: 70px;
+    height: 70px;
+  }
+
+  .header__icon-btn--search::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -8px;
+    width: 0;
+    height: 3px;
+    background: $color-text-sub;
+    transform: translateX(-50%);
+    transition: width $transition-fast;
+  }
+
+  .header__search:hover .header__icon-btn--search::after,
+  .header__search.is-open .header__icon-btn--search::after {
+    width: 70px;
   }
 
   .header__search-panel {
@@ -517,53 +560,63 @@ body.mobile-menu-open {
   }
 
   .header__search-sheet {
+    @include flex-center;
     max-width: $layout-desktop-max-width;
     margin: 0 auto;
     padding: 34px 18px 40px;
     border-radius: 0;
     box-shadow: none;
-    @include flex(center, center);
   }
 
   .header__search-form {
-    gap: 10px;
+    gap: 18px;
     width: 652px;
   }
 
   .header__search-input-wrap {
-    height: 64px;
-    gap: 10px;
-    padding: 0 4px;
+    height: 74px;
+    gap: 18px;
+    padding: 0 2px 12px;
+    border-bottom-width: 3px;
 
     input {
-      font-size: 18px;
+      font-size: 24px;
+      font-weight: $font-semibold;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+
+      &::placeholder {
+        color: rgba($color-black, 0.2);
+        font-weight: $font-semibold;
+        letter-spacing: -0.03em;
+      }
     }
   }
 
   .header__search-icon-button {
-    width: 24px;
-    height: 24px;
+    width: 33px;
+    height: 33px;
   }
 
   .header__search-icon {
-    width: 24px;
-    height: 24px;
+    width: 33px;
+    height: 33px;
   }
 
   .header__search-suggestions {
-    gap: 8px;
-    padding-left: 34px;
+    gap: 10px;
+    padding-left: 0;
   }
 
   .header__search-suggestion {
-    font-size: 15px;
-    color: rgba($color-black, 0.5);
+    font-size: 21px;
+    font-weight: $font-medium;
+    line-height: 1.35;
+    letter-spacing: -0.03em;
+    color: rgba($color-black, 0.18);
   }
 
-  .header__search-submit {
-    display: none;
-  }
-
+  .header__search-submit,
   .header__search-backdrop {
     display: none;
   }
@@ -574,7 +627,17 @@ body.mobile-menu-open {
     flex: 0 0 auto;
 
     button {
-      @include button-base();
+      min-width: 0;
+      height: 36px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 10px;
+      background: $color-text-sub;
+      color: $color-white;
+      font-size: 15px;
+      font-weight: $font-bold;
+      line-height: 1;
+      cursor: pointer;
       white-space: nowrap;
     }
   }
@@ -587,7 +650,7 @@ body.mobile-menu-open {
 
   .gnb {
     @include flex(center, center);
-    gap: 220px;
+    gap: clamp(80px, 14vw, 220px);
     max-width: $layout-desktop-max-width;
     height: 54px;
     margin: 0 auto;
@@ -608,7 +671,7 @@ body.mobile-menu-open {
     border: 0;
     background: transparent;
     color: $color-text-sub;
-    font-size: 15px;
+    font-size: var(--nav-label-font-size);
     font-weight: $font-bold;
     line-height: 1;
     white-space: nowrap;
@@ -691,7 +754,7 @@ body.mobile-menu-open {
     border: 2px solid rgba($color-black, 0.12);
     border-radius: 14px;
     color: $color-text-main;
-    font-size: 22px;
+    font-size: var(--menu-title-font-size);
     font-weight: $font-bold;
     background: $color-white;
   }
@@ -706,7 +769,7 @@ body.mobile-menu-open {
 
   .dropdown__list-item a {
     color: $color-text-main;
-    font-size: 20px;
+    font-size: var(--menu-item-font-size);
     font-weight: $font-semibold;
     line-height: 1.25;
     text-decoration: none;
@@ -720,26 +783,4 @@ body.mobile-menu-open {
   .dropdown__brand-item a {
     display: inline-flex;
   }
-}
-
-.header__search-form--modal {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.header__search-input-wrap--modal {
-  min-height: 48px;
-  padding: 0 0 10px;
-}
-
-.header__search-suggestions--modal {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 14px;
-}
-
-.header__search-submit--modal {
-  width: 100%;
 }

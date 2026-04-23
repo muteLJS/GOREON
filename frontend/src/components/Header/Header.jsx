@@ -11,110 +11,74 @@ import Search from "@/assets/header/header-icons/search.svg";
 import User from "@/assets/header/header-icons/user.svg";
 import ChevronDown from "@/assets/icons/chevron-down.svg";
 import Prev from "@/assets/icons/prev.svg";
+import {
+  BRAND_MENU,
+  CATEGORY_MENU,
+  DESKTOP_NAV_ITEMS,
+  MOBILE_NAV_TABS,
+  SEARCH_SUGGESTIONS,
+} from "@/data/navigation";
 import { logout } from "@/store/slices/userSlice";
 import api from "@/utils/api";
-import Modal from "../Modal/Modal";
 
-const categoryMenu = [
-  {
-    id: 1,
-    key: "computer",
-    title: "컴퓨터",
-    items: [
-      { label: "노트북", type: "notebook" },
-      { label: "데스크탑", type: "desktop" },
-      { label: "모니터", type: "monitor" },
-      { label: "키보드", type: "keyboard" },
-      { label: "마우스", type: "mouse" },
-      { label: "PC 주변기기", type: "pc-accessory" },
-      { label: "PC 부품", type: "pc-parts" },
-    ],
-  },
-  {
-    id: 2,
-    key: "mobile",
-    title: "모바일",
-    items: [
-      { label: "스마트폰", type: "smartphone" },
-      { label: "스마트워치", type: "smartwatch" },
-      { label: "이어폰", type: "earphone" },
-    ],
-  },
-  {
-    id: 3,
-    key: "tablet",
-    title: "태블릿",
-    items: [
-      { label: "태블릿", type: "tablet" },
-      { label: "태블릿 액세서리", type: "tablet-accessory" },
-      { label: "펜슬", type: "pencil" },
-      { label: "키보드 케이스", type: "keyboard-case" },
-    ],
-  },
-  {
-    id: 4,
-    key: "home",
-    title: "생활가전",
-    items: [
-      { label: "프린터", type: "printer" },
-      { label: "공유기", type: "router" },
-      { label: "스피커", type: "speaker" },
-      { label: "보조배터리", type: "power-bank" },
-    ],
-  },
-];
+const DESKTOP_BREAKPOINT = 1024;
 
-const brandMenu = [
-  {
-    id: 1,
-    key: "premium",
-    title: "프리미엄",
-    items: [
-      { label: "Apple", type: "apple" },
-      { label: "Samsung", type: "samsung" },
-      { label: "LG", type: "lg" },
-    ],
-  },
-  {
-    id: 2,
-    key: "value",
-    title: "가성비",
-    items: [
-      { label: "HP", type: "hp" },
-      { label: "Lenovo", type: "lenovo" },
-      { label: "Dell", type: "dell" },
-    ],
-  },
-  {
-    id: 3,
-    key: "gaming",
-    title: "게이밍",
-    items: [
-      { label: "MSI", type: "msi" },
-      { label: "ASUS", type: "asus" },
-      { label: "Acer", type: "acer" },
-    ],
-  },
-];
+const MOBILE_MENU_SECTIONS = {
+  category: CATEGORY_MENU,
+  brand: BRAND_MENU,
+};
 
-const mobileTabs = [
-  { key: "category", label: "카테고리" },
-  { key: "brand", label: "브랜드" },
-  { key: "pc-build", label: "PC 조립" },
-];
+const DESKTOP_SEARCH_ICON_STYLE = {
+  "--icon-width": "24px",
+  "--icon-height": "24px",
+};
 
-const searchSuggestions = [
-  "유튜브용 편집용 노트북",
-  "FPS 게임에 맞는 모니터",
-  "대학생 첫 노트북 50만원 이하",
-  "부모님 쉽게 쓸 태블릿",
-];
-
-const createExpandedState = (items) =>
-  items.reduce((acc, item) => {
-    acc[item.key] = true;
+const createExpandedState = (sections) =>
+  sections.reduce((acc, section) => {
+    acc[section.key] = true;
     return acc;
   }, {});
+
+const createInitialExpandedMenus = () => ({
+  category: createExpandedState(CATEGORY_MENU),
+  brand: createExpandedState(BRAND_MENU),
+});
+
+function HeaderSearchForm({ searchQuery, onQueryChange, onSubmit, onSuggestionClick, onFocus }) {
+  return (
+    <form className="header__search-form" onSubmit={onSubmit}>
+      <div className="header__search-input-wrap">
+        <button type="submit" className="header__search-icon-button" aria-label="검색 실행">
+          <img src={Search} alt="" className="header__search-icon" />
+        </button>
+        <input
+          type="text"
+          value={searchQuery}
+          placeholder="검색어를 입력하세요"
+          onChange={(event) => onQueryChange(event.target.value)}
+          onFocus={onFocus}
+        />
+      </div>
+
+      <div className="header__search-suggestions">
+        {SEARCH_SUGGESTIONS.map((suggestion) => (
+          <button
+            key={suggestion}
+            type="button"
+            className="header__search-suggestion"
+            onClick={() => onSuggestionClick(suggestion)}
+          >
+            {suggestion}
+          </button>
+        ))}
+      </div>
+
+      <button type="submit" className="header__search-submit">
+        검색
+      </button>
+    </form>
+  );
+}
 
 function Header() {
   const dispatch = useDispatch();
@@ -123,12 +87,10 @@ function Header() {
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   const desktopSearchRef = useRef(null);
   const searchCloseTimerRef = useRef(null);
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMobileTab, setActiveMobileTab] = useState("category");
-  const [expandedCategories, setExpandedCategories] = useState(() =>
-    createExpandedState(categoryMenu),
-  );
-  const [expandedBrands, setExpandedBrands] = useState(() => createExpandedState(brandMenu));
+  const [expandedMobileMenus, setExpandedMobileMenus] = useState(createInitialExpandedMenus);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSearchPinned, setIsSearchPinned] = useState(false);
@@ -136,13 +98,42 @@ function Header() {
   const [hoveredDesktopMenu, setHoveredDesktopMenu] = useState(null);
 
   const headerIcons = [
-    { id: 2, name: "cart", src: Cart, alt: "장바구니", to: "/cart" },
-    { id: 3, name: "like", src: Like, alt: "찜 목록", to: "/wishlist" },
-    { id: 4, name: "user", src: User, alt: "마이페이지", to: isLoggedIn ? "/mypage" : "/login" },
+    { key: "cart", src: Cart, alt: "장바구니", to: "/cart", width: 26, height: 23 },
+    { key: "like", src: Like, alt: "찜 목록", to: "/wishlist", width: 26, height: 22 },
+    {
+      key: "user",
+      src: User,
+      alt: "마이페이지",
+      to: isLoggedIn ? "/mypage" : "/login",
+      width: 26,
+      height: 26,
+    },
   ];
 
+  const clearSearchCloseTimer = () => {
+    if (searchCloseTimerRef.current) {
+      window.clearTimeout(searchCloseTimerRef.current);
+      searchCloseTimerRef.current = null;
+    }
+  };
+
+  const closeSearch = () => {
+    clearSearchCloseTimer();
+    setIsSearchOpen(false);
+    setIsSearchPinned(false);
+  };
+
+  const isDesktopViewport = () => window.innerWidth >= DESKTOP_BREAKPOINT;
+
   useEffect(() => {
+    const resetSearchState = () => {
+      clearSearchCloseTimer();
+      setIsSearchOpen(false);
+      setIsSearchPinned(false);
+    };
+
     const handleToggleMenu = () => {
+      resetSearchState();
       setIsMobileMenuOpen((prev) => !prev);
     };
 
@@ -151,18 +142,20 @@ function Header() {
     };
 
     const handleToggleSearch = () => {
-      if (window.innerWidth < 1024) {
-        setIsSearchOpen((prev) => !prev);
-        setIsSearchPinned((prev) => !prev);
+      if (!isDesktopViewport()) {
         setIsMobileMenuOpen(false);
+        setIsSearchPinned((prevPinned) => {
+          const nextPinned = !prevPinned;
+          setIsSearchOpen(nextPinned);
+          return nextPinned;
+        });
       }
     };
 
     const handleResize = () => {
-      if (window.innerWidth >= 1024) {
+      if (isDesktopViewport()) {
         setIsMobileMenuOpen(false);
-        setIsSearchOpen(false);
-        setIsSearchPinned(false);
+        resetSearchState();
       }
     };
 
@@ -188,6 +181,8 @@ function Header() {
   }, [isMobileMenuOpen]);
 
   useEffect(() => {
+    clearSearchCloseTimer();
+    setIsMobileMenuOpen(false);
     setIsSearchOpen(false);
     setIsSearchPinned(false);
     setActiveDesktopMenu(null);
@@ -195,32 +190,28 @@ function Header() {
   }, [location.pathname, location.search]);
 
   useEffect(() => {
-    const clearSearchCloseTimer = () => {
-      if (searchCloseTimerRef.current) {
-        window.clearTimeout(searchCloseTimerRef.current);
-        searchCloseTimerRef.current = null;
-      }
+    const resetSearchState = () => {
+      clearSearchCloseTimer();
+      setIsSearchOpen(false);
+      setIsSearchPinned(false);
     };
 
     const handlePointerDown = (event) => {
-      const isInsideDesktop = desktopSearchRef.current?.contains(event.target);
+      const isInsideDesktopSearch = desktopSearchRef.current?.contains(event.target);
 
-      if (!isInsideDesktop && window.innerWidth >= 1024) {
-        setIsSearchOpen(false);
-        setIsSearchPinned(false);
+      if (!isInsideDesktopSearch && isDesktopViewport()) {
+        resetSearchState();
       }
     };
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
-        setIsSearchOpen(false);
-        setIsSearchPinned(false);
+        resetSearchState();
       }
     };
 
     const handleScroll = () => {
-      setIsSearchOpen(false);
-      setIsSearchPinned(false);
+      resetSearchState();
     };
 
     document.addEventListener("mousedown", handlePointerDown);
@@ -235,26 +226,23 @@ function Header() {
     };
   }, []);
 
-  const toggleCategorySection = (sectionKey) => {
-    setExpandedCategories((prev) => ({
+  const toggleMobileSection = (tabKey, sectionKey) => {
+    setExpandedMobileMenus((prev) => ({
       ...prev,
-      [sectionKey]: !prev[sectionKey],
-    }));
-  };
-
-  const toggleBrandSection = (sectionKey) => {
-    setExpandedBrands((prev) => ({
-      ...prev,
-      [sectionKey]: !prev[sectionKey],
+      [tabKey]: {
+        ...prev[tabKey],
+        [sectionKey]: !prev[tabKey][sectionKey],
+      },
     }));
   };
 
   const handleBack = () => {
     if (window.history.length > 1) {
       navigate(-1);
-    } else {
-      navigate("/");
+      return;
     }
+
+    navigate("/");
   };
 
   const handleLogout = async () => {
@@ -264,6 +252,7 @@ function Header() {
         status: error.response?.status,
       });
     });
+
     dispatch(logout());
     navigate("/");
   };
@@ -272,26 +261,15 @@ function Header() {
     window.dispatchEvent(new Event("reset-main-ai-section"));
   };
 
-  const goToPath = (path) => {
-    navigate(path);
-  };
-
-  const clearSearchCloseTimer = () => {
-    if (searchCloseTimerRef.current) {
-      window.clearTimeout(searchCloseTimerRef.current);
-      searchCloseTimerRef.current = null;
-    }
-  };
-
   const openSearchLayer = () => {
-    if (window.innerWidth >= 1024) {
+    if (isDesktopViewport()) {
       clearSearchCloseTimer();
       setIsSearchOpen(true);
     }
   };
 
   const closeSearchLayer = () => {
-    if (window.innerWidth >= 1024 && !isSearchPinned) {
+    if (isDesktopViewport() && !isSearchPinned) {
       clearSearchCloseTimer();
       searchCloseTimerRef.current = window.setTimeout(() => {
         setIsSearchOpen(false);
@@ -303,23 +281,18 @@ function Header() {
   const toggleSearchLayer = () => {
     const nextPinned = !isSearchPinned;
     setIsSearchPinned(nextPinned);
-    setIsSearchOpen(nextPinned || window.innerWidth >= 1024);
-  };
-
-  const closeSearch = () => {
-    setIsSearchOpen(false);
-    setIsSearchPinned(false);
+    setIsSearchOpen(nextPinned || isDesktopViewport());
   };
 
   const openDesktopMenu = (menuKey) => {
-    if (window.innerWidth >= 1024) {
+    if (isDesktopViewport()) {
       setHoveredDesktopMenu(menuKey);
       closeSearch();
     }
   };
 
-  const pinDesktopMenu = (menuKey) => {
-    if (window.innerWidth >= 1024) {
+  const toggleDesktopMenu = (menuKey) => {
+    if (isDesktopViewport()) {
       setActiveDesktopMenu((prev) => (prev === menuKey ? null : menuKey));
       setHoveredDesktopMenu(null);
       closeSearch();
@@ -327,12 +300,10 @@ function Header() {
   };
 
   const clearDesktopHover = () => {
-    if (window.innerWidth >= 1024) {
+    if (isDesktopViewport()) {
       setHoveredDesktopMenu(null);
     }
   };
-
-  const visibleDesktopMenu = hoveredDesktopMenu ?? activeDesktopMenu;
 
   const submitSearch = (keyword = searchQuery) => {
     const nextQuery = keyword.trim();
@@ -347,7 +318,14 @@ function Header() {
     submitSearch();
   };
 
+  const handleMobileMenuLinkClick = () => {
+    setIsMobileMenuOpen(false);
+  };
+
+  const activeMobileSections = MOBILE_MENU_SECTIONS[activeMobileTab];
+  const isBrandTab = activeMobileTab === "brand";
   const isHomePage = location.pathname === "/";
+  const visibleDesktopMenu = hoveredDesktopMenu ?? activeDesktopMenu;
 
   return (
     <header className="header">
@@ -363,12 +341,13 @@ function Header() {
           <button
             type="button"
             className="header__mobile-back"
-            aria-label="뒤로가기"
+            aria-label="뒤로 가기"
             onClick={handleBack}
           >
             <img src={Prev} alt="" />
           </button>
         )}
+
         <h1 className="header__logo header__logo--desktop">
           <Link to="/" aria-label="GOREON 홈" onClick={handleHomeClick}>
             <img src={LogoIcon} alt="GOREON 아이콘" className="header__logo-icon" />
@@ -387,6 +366,7 @@ function Header() {
               <button
                 type="button"
                 className="header__icon-btn header__icon-btn--search"
+                style={DESKTOP_SEARCH_ICON_STYLE}
                 aria-label="검색"
                 aria-expanded={isSearchOpen}
                 onClick={toggleSearchLayer}
@@ -400,41 +380,13 @@ function Header() {
                 onMouseLeave={closeSearchLayer}
               >
                 <div className="header__search-sheet">
-                  <form className="header__search-form" onSubmit={handleSearchSubmit}>
-                    <div className="header__search-input-wrap">
-                      <button
-                        type="submit"
-                        className="header__search-icon-button"
-                        aria-label="검색 실행"
-                      >
-                        <img src={Search} alt="" className="header__search-icon" />
-                      </button>
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        placeholder="검색어를 입력하세요"
-                        onChange={(event) => setSearchQuery(event.target.value)}
-                        onFocus={() => setIsSearchOpen(true)}
-                      />
-                    </div>
-
-                    <div className="header__search-suggestions">
-                      {searchSuggestions.map((suggestion) => (
-                        <button
-                          key={suggestion}
-                          type="button"
-                          className="header__search-suggestion"
-                          onClick={() => submitSearch(suggestion)}
-                        >
-                          {suggestion}
-                        </button>
-                      ))}
-                    </div>
-
-                    <button type="submit" className="header__search-submit">
-                      검색
-                    </button>
-                  </form>
+                  <HeaderSearchForm
+                    searchQuery={searchQuery}
+                    onQueryChange={setSearchQuery}
+                    onSubmit={handleSearchSubmit}
+                    onSuggestionClick={submitSearch}
+                    onFocus={() => setIsSearchOpen(true)}
+                  />
                 </div>
               </div>
             </div>
@@ -442,10 +394,14 @@ function Header() {
             {headerIcons.map((icon) => (
               <button
                 type="button"
-                className={`header__icon-btn header__icon-btn--${icon.name}`}
-                key={icon.id}
+                className="header__icon-btn header__icon-btn--action"
+                key={icon.key}
+                style={{
+                  "--icon-width": `${icon.width}px`,
+                  "--icon-height": `${icon.height}px`,
+                }}
                 aria-label={icon.alt}
-                onClick={() => goToPath(icon.to)}
+                onClick={() => navigate(icon.to)}
               >
                 <img src={icon.src} alt="" />
               </button>
@@ -459,21 +415,22 @@ function Header() {
               </button>
             ) : (
               <>
-                <button type="button" onClick={() => goToPath("/login")}>
+                <button type="button" onClick={() => navigate("/login")}>
                   로그인
                 </button>
-                <button type="button" onClick={() => goToPath("/register")}>
+                <button type="button" onClick={() => navigate("/register")}>
                   회원가입
                 </button>
               </>
             )}
           </div>
         </div>
+
         <button
           type="button"
           className="header__mobile-user"
           aria-label="마이페이지"
-          onClick={() => goToPath(isLoggedIn ? "/mypage" : "/login")}
+          onClick={() => navigate(isLoggedIn ? "/mypage" : "/login")}
         >
           <img src={User} alt="" />
         </button>
@@ -481,81 +438,67 @@ function Header() {
 
       <nav className="header__nav" aria-label="메인 메뉴">
         <ul className="gnb" onMouseLeave={clearDesktopHover}>
-          <li
-            className={`gnb__item gnb__item--with-dropdown ${
-              visibleDesktopMenu === "category" ? "is-open" : ""
-            }`}
-            onMouseEnter={() => openDesktopMenu("category")}
-          >
-            <button
-              type="button"
-              className="gnb__button"
-              onClick={() => pinDesktopMenu("category")}
-            >
-              카테고리
-            </button>
-            <div className="dropdown dropdown--category">
-              <div className="dropdown__panel">
-                <div className="dropdown__inner dropdown__inner--category">
-                  {categoryMenu.map((category) => (
-                    <div className="dropdown__column" key={category.id}>
-                      <div className="dropdown__title">{category.title}</div>
-                      <ul className="dropdown__list">
-                        {category.items.map((item) => (
-                          <li className="dropdown__list-item" key={item.type}>
-                            <Link to={`/list?type=${item.type}`}>{item.label}</Link>
-                          </li>
-                        ))}
-                      </ul>
+          {DESKTOP_NAV_ITEMS.map((item) => {
+            const isOpen = visibleDesktopMenu === item.key;
+
+            if (!item.sections) {
+              return (
+                <li
+                  className={`gnb__item ${isOpen ? "is-open" : ""}`}
+                  key={item.key}
+                  onMouseEnter={() => openDesktopMenu(item.key)}
+                >
+                  <Link to={item.to} className="gnb__link">
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            }
+
+            const listItemClassName =
+              item.variant === "brand"
+                ? "dropdown__list-item dropdown__brand-item"
+                : "dropdown__list-item";
+            const innerClassName =
+              item.variant === "brand"
+                ? "dropdown__inner dropdown__inner--brand"
+                : "dropdown__inner dropdown__inner--category";
+
+            return (
+              <li
+                className={`gnb__item ${isOpen ? "is-open" : ""}`}
+                key={item.key}
+                onMouseEnter={() => openDesktopMenu(item.key)}
+              >
+                <button
+                  type="button"
+                  className="gnb__button"
+                  onClick={() => toggleDesktopMenu(item.key)}
+                >
+                  {item.label}
+                </button>
+
+                <div className="dropdown">
+                  <div className="dropdown__panel">
+                    <div className={innerClassName}>
+                      {item.sections.map((section) => (
+                        <div className="dropdown__column" key={section.key}>
+                          <div className="dropdown__title">{section.title}</div>
+                          <ul className="dropdown__list">
+                            {section.items.map((menuItem) => (
+                              <li className={listItemClassName} key={menuItem.type}>
+                                <Link to={`/list?type=${menuItem.type}`}>{menuItem.label}</Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
                 </div>
-              </div>
-            </div>
-          </li>
-
-          <li
-            className={`gnb__item gnb__item--with-dropdown ${
-              visibleDesktopMenu === "brand" ? "is-open" : ""
-            }`}
-            onMouseEnter={() => openDesktopMenu("brand")}
-          >
-            <button type="button" className="gnb__button" onClick={() => pinDesktopMenu("brand")}>
-              브랜드관
-            </button>
-
-            <div className="dropdown dropdown--brand">
-              <div className="dropdown__panel">
-                <div className="dropdown__inner dropdown__inner--brand">
-                  {brandMenu.map((group) => (
-                    <div className="dropdown__column" key={group.id}>
-                      <div className="dropdown__title">{group.title}</div>
-                      <ul className="dropdown__list dropdown__list--brand">
-                        {group.items.map((brand) => (
-                          <li className="dropdown__list-item dropdown__brand-item" key={brand.type}>
-                            <Link to={`/list?type=${brand.type}`}>{brand.label}</Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </li>
-
-          <li
-            className={`gnb__item ${visibleDesktopMenu === "pc-build" ? "is-open" : ""}`}
-            onMouseEnter={() => openDesktopMenu("pc-build")}
-          >
-            <Link
-              to="/pc-assembly"
-              className="gnb__link"
-              onClick={() => pinDesktopMenu("pc-build")}
-            >
-              PC 조립
-            </Link>
-          </li>
+              </li>
+            );
+          })}
         </ul>
       </nav>
 
@@ -563,47 +506,24 @@ function Header() {
         className={`header__search-backdrop ${isSearchOpen ? "is-open" : ""}`}
         onClick={closeSearch}
       />
+
       <div className={`header__search header__search--mobile ${isSearchOpen ? "is-open" : ""}`}>
         <div className="header__search-panel">
           <div className="header__search-sheet">
-            <form className="header__search-form" onSubmit={handleSearchSubmit}>
-              <div className="header__search-input-wrap">
-                <button type="submit" className="header__search-icon-button" aria-label="검색 실행">
-                  <img src={Search} alt="" className="header__search-icon" />
-                </button>
-                <input
-                  type="text"
-                  value={searchQuery}
-                  placeholder="검색어를 입력하세요"
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  onFocus={() => setIsSearchOpen(true)}
-                />
-              </div>
-
-              <div className="header__search-suggestions">
-                {searchSuggestions.map((suggestion) => (
-                  <button
-                    key={suggestion}
-                    type="button"
-                    className="header__search-suggestion"
-                    onClick={() => submitSearch(suggestion)}
-                  >
-                    {suggestion}
-                  </button>
-                ))}
-              </div>
-
-              <button type="submit" className="header__search-submit">
-                검색
-              </button>
-            </form>
+            <HeaderSearchForm
+              searchQuery={searchQuery}
+              onQueryChange={setSearchQuery}
+              onSubmit={handleSearchSubmit}
+              onSuggestionClick={submitSearch}
+              onFocus={() => setIsSearchOpen(true)}
+            />
           </div>
         </div>
       </div>
 
       <div className={`mobile-menu ${isMobileMenuOpen ? "is-open" : ""}`}>
         <div className="mobile-menu__tabs" role="tablist" aria-label="모바일 메뉴">
-          {mobileTabs.map((tab) => (
+          {MOBILE_NAV_TABS.map((tab) => (
             <button
               key={tab.key}
               type="button"
@@ -618,84 +538,41 @@ function Header() {
         </div>
 
         <div className="mobile-menu__content">
-          {activeMobileTab === "category" && (
-            <div className="mobile-menu__section-group">
-              {categoryMenu.map((section) => (
-                <section className="mobile-menu__section" key={section.key}>
-                  <button
-                    type="button"
-                    className="mobile-menu__section-button"
-                    onClick={() => toggleCategorySection(section.key)}
-                    aria-expanded={expandedCategories[section.key]}
+          {activeMobileSections ? (
+            activeMobileSections.map((section) => (
+              <section className="mobile-menu__section" key={section.key}>
+                <button
+                  type="button"
+                  className="mobile-menu__section-button"
+                  onClick={() => toggleMobileSection(activeMobileTab, section.key)}
+                  aria-expanded={expandedMobileMenus[activeMobileTab][section.key]}
+                >
+                  <span>{section.title}</span>
+                  <img
+                    src={ChevronDown}
+                    alt=""
+                    className={`mobile-menu__chevron ${
+                      expandedMobileMenus[activeMobileTab][section.key] ? "is-open" : ""
+                    }`}
+                  />
+                </button>
+
+                {expandedMobileMenus[activeMobileTab][section.key] && (
+                  <ul
+                    className={`mobile-menu__list ${isBrandTab ? "mobile-menu__list--brand" : ""}`}
                   >
-                    <span>{section.title}</span>
-                    <img
-                      src={ChevronDown}
-                      alt=""
-                      className={`mobile-menu__chevron ${
-                        expandedCategories[section.key] ? "is-open" : ""
-                      }`}
-                    />
-                  </button>
-
-                  {expandedCategories[section.key] && (
-                    <ul className="mobile-menu__list">
-                      {section.items.map((item) => (
-                        <li key={item.type} className="mobile-menu__list-item">
-                          <Link
-                            to={`/list?type=${item.type}`}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                          >
-                            {item.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </section>
-              ))}
-            </div>
-          )}
-
-          {activeMobileTab === "brand" && (
-            <div className="mobile-menu__section-group">
-              {brandMenu.map((section) => (
-                <section className="mobile-menu__section" key={section.key}>
-                  <button
-                    type="button"
-                    className="mobile-menu__section-button"
-                    onClick={() => toggleBrandSection(section.key)}
-                    aria-expanded={expandedBrands[section.key]}
-                  >
-                    <span>{section.title}</span>
-                    <img
-                      src={ChevronDown}
-                      alt=""
-                      className={`mobile-menu__chevron ${
-                        expandedBrands[section.key] ? "is-open" : ""
-                      }`}
-                    />
-                  </button>
-                  {expandedBrands[section.key] && (
-                    <ul className="mobile-menu__list mobile-menu__list--brand-text">
-                      {section.items.map((item) => (
-                        <li key={item.type} className="mobile-menu__list-item">
-                          <Link
-                            to={`/list?type=${item.type}`}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                          >
-                            {item.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </section>
-              ))}
-            </div>
-          )}
-
-          {activeMobileTab === "pc-build" && (
+                    {section.items.map((item) => (
+                      <li key={item.type} className="mobile-menu__list-item">
+                        <Link to={`/list?type=${item.type}`} onClick={handleMobileMenuLinkClick}>
+                          {item.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            ))
+          ) : (
             <div className="mobile-menu__cta">
               <p className="mobile-menu__cta-title">PC 조립</p>
               <p className="mobile-menu__cta-text">
@@ -704,7 +581,7 @@ function Header() {
               <Link
                 to="/pc-assembly"
                 className="mobile-menu__cta-link"
-                onClick={() => setIsMobileMenuOpen(false)}
+                onClick={handleMobileMenuLinkClick}
               >
                 PC 조립 페이지로 이동
               </Link>
