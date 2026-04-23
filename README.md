@@ -3,15 +3,15 @@
 <div align="center">
   <img width="200" height="200" alt="gormi" src="https://github.com/user-attachments/assets/9e5d6643-25b5-4d38-9162-ad0dcc568913" />
   <br/>
-  <p><strong>나에게 맞는 전자기기를 더 빠르고 직관적으로 찾아주는 AI 쇼핑몰</strong></p>
+  <p><strong>나에게 맞는 전자기기를 더 빠르고 쉽게 찾아주는 AI 쇼핑몰</strong></p>
   <p>
     프로젝트 기간 : 2026.03.30 ~ 2026.04.30
   </p>
   <p>
-    <a href="https://goreon.onrender.com/" target="_blank">
+    <a href="https://goreon-0x90.onrender.com/" target="_blank">
       <img
         alt="서비스 바로가기"
-          src="https://img.shields.io/badge/서비스%20바로가기-0AA6A6?style=for-the-badge&logo=render&logoColor=white"
+          src="https://img.shields.io/badge/GOREON%20서비스%20바로가기-0AA6A6?style=for-the-badge&logo=render&logoColor=white"
       />
     </a>
   </p>
@@ -21,10 +21,29 @@
 
 ## 주요 기능 & 화면
 
-- 조건 기반 상품 검색 및 필터링
-- 상품 비교 및 추천
-- 직관적인 UI/UX
-- 추후 AI 추천 기능 확장 예정
+- **반응형 UI (데스크톱 / 태블릿 / 모바일 지원)**  
+  다양한 기기 환경에 맞춰 최적화된 레이아웃을 제공합니다.
+
+- **AI 기반 상품 추천**  
+  사용자의 선택을 바탕으로 맞춤형 상품을 추천합니다.
+
+- **추천 상품 기록 조회**  
+  AI가 추천해준 상품들을 다시 확인할 수 있습니다.
+
+- **상품 검색 및 카테고리 탐색**  
+  검색어 또는 카테고리를 통해 원하는 상품을 쉽게 찾을 수 있습니다.
+
+- **장바구니 / 찜**  
+  관심 있는 상품을 저장하고, 한 곳에서 관리할 수 있습니다.
+
+- **주문 내역 조회**  
+  이전에 주문한 상품들을 확인할 수 있습니다.
+
+- **상품 상세 페이지**  
+  상품의 상세 정보와 이미지를 확인할 수 있습니다.
+
+- **리뷰**  
+  상품에 대한 후기를 작성하고 다른 사용자의 리뷰도 확인할 수 있습니다.
 
 <br/>
 
@@ -35,27 +54,22 @@
     <td align="center" width="20%">
       <img src="https://github.com/muteLJS.png" width="100" style="border-radius:50%" /><br/>
       <strong><a href="https://github.com/muteLJS">muteLJS</a></strong><br/>
-      <sub>Frontend</sub>
     </td>
     <td align="center" width="20%">
       <img src="https://github.com/urusekai.png" width="100" style="border-radius:50%" /><br/>
       <strong><a href="https://github.com/urusekai">urusekai</a></strong><br/>
-      <sub>Frontend</sub>
     </td>
     <td align="center" width="20%">
       <img src="https://github.com/leechan9715.png" width="100" style="border-radius:50%" /><br/>
       <strong><a href="https://github.com/leechan9715">leechan9715</a></strong><br/>
-      <sub>Frontend</sub>
     </td>
     <td align="center" width="20%">
       <img src="https://github.com/kAzee0700.png" width="100" style="border-radius:50%" /><br/>
       <strong><a href="https://github.com/kAzee0700">kAzee0700</a></strong><br/>
-      <sub>Frontend</sub>
     </td>
     <td align="center" width="20%">
       <img src="https://github.com/gwonsumin.png" width="100" style="border-radius:50%" /><br/>
       <strong><a href="https://github.com/gwonsumin">gwonsumin</a></strong><br/>
-      <sub>Frontend</sub>
     </td>
   </tr>
 </table>
