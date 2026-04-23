@@ -107,6 +107,7 @@ function getProductDetailFromApi(product) {
 
   return {
     id: String(product._id ?? product.id),
+    _id: product._id ? String(product._id) : "",
     brand: tags[0] || String(product.name ?? "").split(" ")[0] || "브랜드 정보 준비중",
     title: product.name,
     subtitle: `${tags[1] || tags[0] || "상품"} 카테고리 추천 상품`,
@@ -244,7 +245,8 @@ function ProductDetail() {
         ? Number.parseFloat(window.getComputedStyle(tabsElement).top) || 0
         : 0;
       const activationOffset = stickyTop + (tabsElement?.offsetHeight ?? 0) + 24;
-      const reviewsTop = reviewsRef.current?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY;
+      const reviewsTop =
+        reviewsRef.current?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY;
 
       setActiveTab((prev) => {
         const nextTab = reviewsTop <= activationOffset ? "reviews" : "overview";
@@ -297,7 +299,7 @@ function ProductDetail() {
     dispatch(
       addToCart({
         id: cartItemId,
-        productId: product.id,
+        productId: product._id ?? product.id,
         name: product.title,
         option: displayOption.label,
         price: displayOption.price,
