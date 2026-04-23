@@ -249,27 +249,17 @@
 }
 
 .my-page__rail {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 124px;
-  gap: 14px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
   padding-bottom: 10px;
-  cursor: grab;
-  touch-action: pan-y;
-  -webkit-overflow-scrolling: touch;
+  overflow: visible;
 
-  &::-webkit-scrollbar {
-    display: none;
+  .swiper-wrapper {
+    align-items: stretch;
   }
+}
 
-  &.is-dragging {
-    cursor: grabbing;
-    user-select: none;
-  }
+.my-page__rail-slide {
+  width: 124px;
+  height: auto;
 }
 
 .my-page__rail-card {
@@ -604,9 +594,11 @@
   }
 
   .my-page__rail {
-    grid-auto-columns: 148px;
-    gap: 16px;
     padding-bottom: 14px;
+  }
+
+  .my-page__rail-slide {
+    width: 148px;
   }
 
   .my-page__rail-card-media {
@@ -807,15 +799,12 @@
   }
 
   .my-page__rail {
-    grid-auto-flow: column;
-    grid-auto-columns: 188px;
-    gap: 18px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
     padding-bottom: 12px;
     margin-bottom: 0;
+  }
+
+  .my-page__rail-slide {
+    width: 188px;
   }
 
   .my-page__rail-card-media {

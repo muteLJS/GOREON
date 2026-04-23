@@ -2,6 +2,8 @@ import "./MyPage.scss";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
 
 import AiBadgeIcon from "@/assets/icons/mypage_ai.png";
 import MypageCartIcon from "@/assets/icons/Mypage_cart.svg";
@@ -218,15 +220,6 @@ export default function MyPage() {
   const [savingField, setSavingField] = useState("");
   const historyShellRef = useRef(null);
   const historyListRef = useRef(null);
-  const recentRailRef = useRef(null);
-  const recentRailDragRef = useRef({
-    pointerId: null,
-    startX: 0,
-    startY: 0,
-    startScrollLeft: 0,
-    isDragging: false,
-  });
-  const recentRailDidDragRef = useRef(false);
   const historyAnimationFrameRef = useRef(null);
   const pendingHistoryCountRef = useRef(null);
   const pendingHistoryHeightRef = useRef(null);
@@ -373,103 +366,6 @@ export default function MyPage() {
     } finally {
       setSavingField("");
     }
-  };
-
-  const resetRecentRailDrag = () => {
-    const rail = recentRailRef.current;
-
-    if (rail) {
-      rail.classList.remove("is-dragging");
-    }
-
-    recentRailDragRef.current = {
-      pointerId: null,
-      startX: 0,
-      startY: 0,
-      startScrollLeft: 0,
-      isDragging: false,
-    };
-  };
-
-  const handleRecentRailPointerDown = (event) => {
-    const rail = recentRailRef.current;
-
-    if (!rail) {
-      return;
-    }
-
-    if (event.pointerType === "mouse" && event.button !== 0) {
-      return;
-    }
-
-    if (event.target.closest("button")) {
-      return;
-    }
-
-    recentRailDidDragRef.current = false;
-    recentRailDragRef.current = {
-      pointerId: event.pointerId,
-      startX: event.clientX,
-      startY: event.clientY,
-      startScrollLeft: rail.scrollLeft,
-      isDragging: false,
-    };
-  };
-
-  const handleRecentRailPointerMove = (event) => {
-    const rail = recentRailRef.current;
-    const dragState = recentRailDragRef.current;
-
-    if (!rail || dragState.pointerId !== event.pointerId) {
-      return;
-    }
-
-    const deltaX = event.clientX - dragState.startX;
-    const deltaY = event.clientY - dragState.startY;
-
-    if (!dragState.isDragging) {
-      if (Math.abs(deltaX) < 6 && Math.abs(deltaY) < 6) {
-        return;
-      }
-
-      if (Math.abs(deltaX) <= Math.abs(deltaY)) {
-        resetRecentRailDrag();
-        return;
-      }
-
-      dragState.isDragging = true;
-      recentRailDidDragRef.current = true;
-      rail.setPointerCapture?.(event.pointerId);
-      rail.classList.add("is-dragging");
-    }
-
-    event.preventDefault();
-    rail.scrollLeft = dragState.startScrollLeft - deltaX;
-  };
-
-  const handleRecentRailPointerEnd = (event) => {
-    const rail = recentRailRef.current;
-    const dragState = recentRailDragRef.current;
-
-    if (!rail || dragState.pointerId !== event.pointerId) {
-      return;
-    }
-
-    if (dragState.isDragging) {
-      rail.releasePointerCapture?.(event.pointerId);
-    }
-
-    resetRecentRailDrag();
-  };
-
-  const handleRecentRailClickCapture = (event) => {
-    if (!recentRailDidDragRef.current) {
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-    recentRailDidDragRef.current = false;
   };
 
   const getCurrentHistoryHeight = () => {
@@ -622,19 +518,29 @@ export default function MyPage() {
               }`}
             >
               {recentProducts.length > 0 ? (
-                <div
-                  ref={recentRailRef}
+                <Swiper
                   className="my-page__rail"
-                  onPointerDown={handleRecentRailPointerDown}
-                  onPointerMove={handleRecentRailPointerMove}
-                  onPointerUp={handleRecentRailPointerEnd}
-                  onPointerCancel={handleRecentRailPointerEnd}
-                  onClickCapture={handleRecentRailClickCapture}
+                  slidesPerView="auto"
+                  spaceBetween={14}
+                  breakpoints={{
+                    768: {
+                      spaceBetween: 16,
+                    },
+                    1024: {
+                      spaceBetween: 18,
+                    },
+                  }}
+                  watchOverflow
                 >
-                  {recentProducts.map((product) => (
-                    <ProductRailCard key={product.id} product={product} />
+                  {recentProducts.map((product, index) => (
+                    <SwiperSlide
+                      key={`${getProductId(product)}-${index}`}
+                      className="my-page__rail-slide"
+                    >
+                      <ProductRailCard product={product} />
+                    </SwiperSlide>
                   ))}
-                </div>
+                </Swiper>
               ) : (
                 <p className="my-page__empty-message">최근 본 상품이 없습니다.</p>
               )}
