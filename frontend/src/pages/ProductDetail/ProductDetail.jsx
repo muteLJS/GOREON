@@ -219,7 +219,8 @@ function ProductDetail() {
 
     dispatch(
       addRecentViewed({
-        id: Number(id),
+        id: product.id,
+        productId: product.id,
         name: product.title,
         price: formatPrice(product.price),
         image: product.heroImage,
