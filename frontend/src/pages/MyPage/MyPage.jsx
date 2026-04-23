@@ -197,13 +197,10 @@ export default function MyPage() {
               spec:
                 product.matchedCriteria?.length > 0
                   ? product.matchedCriteria.join(" / ")
-                  : product.spec ?? "상품 데이터 기준 추천",
+                  : (product.spec ?? "상품 데이터 기준 추천"),
               tags:
                 product.matchedCriteria?.length > 0
-                  ? product.matchedCriteria
-                      .slice(0, 3)
-                      .map(formatHistoryTag)
-                      .filter(Boolean)
+                  ? product.matchedCriteria.slice(0, 3).map(formatHistoryTag).filter(Boolean)
                   : ["#AI추천"],
               rating: Number(product.rating) || 0,
             }))
@@ -360,9 +357,9 @@ export default function MyPage() {
         ...response.data,
       }));
       setEditingField("");
-      showActionAlert("회원정보가 수정되었습니다.");
-    } catch (error) {
-      showActionAlert(error.response?.data?.message || "회원정보 수정에 실패했습니다.");
+      alert("회원정보가 수정되었습니다.");
+    } catch {
+      alert("회원정보 수정에 실패했습니다.");
     } finally {
       setSavingField("");
     }
@@ -575,7 +572,8 @@ export default function MyPage() {
                     }
 
                     setHistoryListHeight(
-                      nextHeight ?? Math.ceil(historyListRef.current.getBoundingClientRect().height),
+                      nextHeight ??
+                        Math.ceil(historyListRef.current.getBoundingClientRect().height),
                     );
                     setIsHistoryAnimating(false);
                   });
