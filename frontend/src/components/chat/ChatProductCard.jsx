@@ -3,6 +3,9 @@ import CartIconButton from "../CartIconButton/CartIconButton";
 import WishlistIconButton from "../WishlistIconButton/WishlistIconButton";
 
 function ChatProductCard({ product }) {
+  const tags = Array.isArray(product.tags) ? product.tags : [];
+  const detailPath = product.detailPath ?? `/product/${product.productId ?? product.id ?? 1}`;
+
   return (
     <article className="chat-widget__product-card">
       <div className="chat-widget__product-media">
@@ -21,7 +24,7 @@ function ChatProductCard({ product }) {
         <p className="chat-widget__product-spec">{product.spec}</p>
 
         <div className="chat-widget__product-tags">
-          {product.tags.map((tag) => (
+          {tags.map((tag) => (
             <span key={tag} className="chat-widget__product-tag">
               {tag}
             </span>
@@ -30,7 +33,7 @@ function ChatProductCard({ product }) {
 
         <p className="chat-widget__product-price">{product.price}</p>
 
-        <Link to={product.detailPath} className="chat-widget__product-link">
+        <Link to={detailPath} className="chat-widget__product-link">
           {product.ctaLabel}
         </Link>
       </div>

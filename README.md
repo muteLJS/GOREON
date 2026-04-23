@@ -43,8 +43,8 @@
       <sub>Frontend</sub>
     </td>
     <td align="center" width="20%">
-      <img src="https://github.com/LeeSeungChans.png" width="100" style="border-radius:50%" /><br/>
-      <strong><a href="https://github.com/LeeSeungChans">LeeSeungChans</a></strong><br/>
+      <img src="https://github.com/leechan9715.png" width="100" style="border-radius:50%" /><br/>
+      <strong><a href="https://github.com/leechan9715">leechan9715</a></strong><br/>
       <sub>Frontend</sub>
     </td>
     <td align="center" width="20%">
