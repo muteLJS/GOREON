@@ -9,7 +9,6 @@ import MypageLikeIcon from "@/assets/icons/Mypage_like.svg";
 import ReviewIcon from "@/assets/icons/review.png";
 import CartIconButton from "@/components/CartIconButton/CartIconButton";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
-import products from "@/data/products_list.json";
 import { updateUserInfo } from "@/store/slices/userSlice";
 import api from "@/utils/api";
 
@@ -31,49 +30,39 @@ const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")
 const getProductId = (product) => product?._id ?? product?.productId ?? product?.id ?? 1;
 
 const formatPrice = (value) => `₩${new Intl.NumberFormat("ko-KR").format(parsePrice(value))}`;
+const formatHistoryDate = (value) => {
+  const date = new Date(value);
 
-const mappedProducts = products.slice(0, 24).map((product, index) => ({
-  id: product.id ?? index + 1,
-  name: product.name ?? `추천 상품 ${index + 1}`,
-  price: formatPrice(product.price),
-  image: product.image ?? "",
-  spec: product.priceOptions?.[0]?.optionName ?? "M3칩 / GPU / 발열 안정",
-  desc: "영상 편집에 적합한 고성능 노트북",
-  tags: ["#영상편집", "#영상편집"],
-}));
+  if (Number.isNaN(date.getTime())) {
+    return "날짜 정보 없음";
+  }
 
-const aiHistory = [
-  {
-    date: "2026.04.07",
-    title: "영상 편집용 추천이에요.",
-    subtitle: "250만원 이하 / 휴대성 고려",
-    items: mappedProducts.slice(0, 4),
-  },
-  {
-    date: "2026.04.05",
-    title: "가성비 노트북 추천이에요.",
-    subtitle: "100만원 이하 / 가성비 / 기본 작업용",
-    items: mappedProducts.slice(4, 8),
-  },
-  {
-    date: "2026.04.03",
-    title: "대학생용 노트북 추천이에요.",
-    subtitle: "가벼운 무게 / 문서 작업 중점",
-    items: mappedProducts.slice(8, 12),
-  },
-  {
-    date: "2026.04.01",
-    title: "출장용 노트북 추천이에요.",
-    subtitle: "배터리 우선 / 휴대성 중점",
-    items: mappedProducts.slice(12, 16),
-  },
-  {
-    date: "2026.03.29",
-    title: "게임 겸용 노트북 추천이에요.",
-    subtitle: "그래픽 성능 / 쿨링 고려",
-    items: mappedProducts.slice(16, 20),
-  },
-];
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(
+    date.getDate(),
+  ).padStart(2, "0")}`;
+};
+
+const formatHistoryTag = (value) => {
+  const normalized = String(value ?? "").trim();
+
+  if (!normalized) {
+    return "";
+  }
+
+  return normalized.startsWith("#") ? normalized : `#${normalized}`;
+};
+
+const createHistoryTitle = (query) => {
+  const normalized = String(query ?? "")
+    .trim()
+    .replace(/[.!?~]+$/g, "");
+
+  if (!normalized) {
+    return "AI 추천 결과";
+  }
+
+  return `"${normalized}"에 대한 추천 결과예요.`;
+};
 
 function MetricIcon({ type }) {
   if (type === "cart") {
@@ -160,11 +149,13 @@ function AiRecommendationCard({ product }) {
         <p className="my-page__ai-card-name">{product.name}</p>
         <p className="my-page__ai-card-desc">{product.desc}</p>
         <p className="my-page__ai-card-spec">{product.spec}</p>
-        <div className="my-page__ai-card-tags">
-          {product.tags.map((tag) => (
-            <span key={`${productId}-${tag}`}>{tag}</span>
-          ))}
-        </div>
+        {product.tags.length > 0 ? (
+          <div className="my-page__ai-card-tags">
+            {product.tags.map((tag) => (
+              <span key={`${productId}-${tag}`}>{tag}</span>
+            ))}
+          </div>
+        ) : null}
         <p className="my-page__ai-card-price">{product.price}</p>
       </Link>
     </article>
@@ -178,12 +169,45 @@ export default function MyPage() {
   const cartCount = useSelector((state) => state.cart.items.length);
   const wishlistCount = useSelector((state) => state.wishlist.items.length);
   const recentProducts = useSelector((state) => state.recentViewed.items);
+  const aiRecommendationHistoryItems = useSelector((state) => state.aiRecommendationHistory.items);
   const displayUser = useMemo(
     () => ({
       ...FALLBACK_USER,
       ...userInfo,
     }),
     [userInfo],
+  );
+  const aiHistory = useMemo(
+    () =>
+      aiRecommendationHistoryItems.map((history) => ({
+        id: history.id,
+        date: formatHistoryDate(history.createdAt),
+        title: createHistoryTitle(history.query),
+        subtitle: history.message || "상품 데이터 기준으로 추천한 결과입니다.",
+        items: Array.isArray(history.products)
+          ? history.products.map((product) => ({
+              id: product.id ?? product.productId,
+              productId: product.productId ?? product.id,
+              name: product.name ?? "추천 상품",
+              price: formatPrice(product.price),
+              image: product.image ?? "",
+              desc: product.reason ?? product.spec ?? "상품 데이터 기준 추천",
+              spec:
+                product.matchedCriteria?.length > 0
+                  ? product.matchedCriteria.join(" / ")
+                  : product.spec ?? "상품 데이터 기준 추천",
+              tags:
+                product.matchedCriteria?.length > 0
+                  ? product.matchedCriteria
+                      .slice(0, 3)
+                      .map(formatHistoryTag)
+                      .filter(Boolean)
+                  : ["#AI추천"],
+              rating: Number(product.rating) || 0,
+            }))
+          : [],
+      })),
+    [aiRecommendationHistoryItems],
   );
 
   const [profileDraft, setProfileDraft] = useState(displayUser);
@@ -211,6 +235,26 @@ export default function MyPage() {
   useEffect(() => {
     setProfileDraft(displayUser);
   }, [displayUser]);
+
+  useEffect(() => {
+    const defaultVisibleCount = Math.min(INITIAL_HISTORY_COUNT, aiHistory.length);
+
+    setVisibleHistoryCount((prev) => {
+      if (aiHistory.length === 0) {
+        return 0;
+      }
+
+      return Math.min(Math.max(prev, defaultVisibleCount), aiHistory.length);
+    });
+
+    setRenderedHistoryCount((prev) => {
+      if (aiHistory.length === 0) {
+        return 0;
+      }
+
+      return Math.min(Math.max(prev, defaultVisibleCount), aiHistory.length);
+    });
+  }, [aiHistory.length]);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -600,81 +644,87 @@ export default function MyPage() {
 
         <section className="my-page__section">
           <h2 className="my-page__section-title">AI 추천 기록</h2>
-          <div
-            ref={historyShellRef}
-            className="my-page__history-list-shell"
-            style={{ height: `${historyListHeight}px` }}
-            onTransitionEnd={(event) => {
-              if (event.target !== event.currentTarget || event.propertyName !== "height") {
-                return;
-              }
+          {aiHistory.length > 0 ? (
+            <div
+              ref={historyShellRef}
+              className="my-page__history-list-shell"
+              style={{ height: `${historyListHeight}px` }}
+              onTransitionEnd={(event) => {
+                if (event.target !== event.currentTarget || event.propertyName !== "height") {
+                  return;
+                }
 
-              if (pendingHistoryCountRef.current !== null) {
-                const nextCount = pendingHistoryCountRef.current;
-                const nextHeight = pendingHistoryHeightRef.current;
-                pendingHistoryCountRef.current = null;
-                pendingHistoryHeightRef.current = null;
-                setVisibleHistoryCount(nextCount);
-                setRenderedHistoryCount(nextCount);
+                if (pendingHistoryCountRef.current !== null) {
+                  const nextCount = pendingHistoryCountRef.current;
+                  const nextHeight = pendingHistoryHeightRef.current;
+                  pendingHistoryCountRef.current = null;
+                  pendingHistoryHeightRef.current = null;
+                  setVisibleHistoryCount(nextCount);
+                  setRenderedHistoryCount(nextCount);
 
-                historyAnimationFrameRef.current = window.requestAnimationFrame(() => {
-                  if (!historyListRef.current) {
+                  historyAnimationFrameRef.current = window.requestAnimationFrame(() => {
+                    if (!historyListRef.current) {
+                      setIsHistoryAnimating(false);
+                      return;
+                    }
+
+                    setHistoryListHeight(
+                      nextHeight ?? Math.ceil(historyListRef.current.getBoundingClientRect().height),
+                    );
                     setIsHistoryAnimating(false);
-                    return;
-                  }
+                  });
 
-                  setHistoryListHeight(
-                    nextHeight ?? Math.ceil(historyListRef.current.getBoundingClientRect().height),
-                  );
+                  return;
+                }
+
+                if (!historyListRef.current) {
                   setIsHistoryAnimating(false);
-                });
+                  return;
+                }
 
-                return;
-              }
-
-              if (!historyListRef.current) {
+                setHistoryListHeight(historyListRef.current.scrollHeight);
                 setIsHistoryAnimating(false);
-                return;
-              }
+              }}
+            >
+              <div ref={historyListRef} className="my-page__history-list">
+                {visibleHistory.map((history) => (
+                  <article key={history.id} className="my-page__history-group">
+                    <div className="my-page__history-date-row">
+                      <p className="my-page__history-date">{history.date}</p>
+                      <div className="my-page__history-line" />
+                    </div>
 
-              setHistoryListHeight(historyListRef.current.scrollHeight);
-              setIsHistoryAnimating(false);
-            }}
-          >
-            <div ref={historyListRef} className="my-page__history-list">
-              {visibleHistory.map((history) => (
-                <article key={history.date} className="my-page__history-group">
-                  <div className="my-page__history-date-row">
-                    <p className="my-page__history-date">{history.date}</p>
-                    <div className="my-page__history-line" />
-                  </div>
+                    <div className="my-page__history-panel">
+                      <div className="my-page__history-head">
+                        <img src={AiBadgeIcon} alt="" className="my-page__history-badge" />
+                        <div>
+                          <p className="my-page__history-title">{history.title}</p>
+                          <p className="my-page__history-subtitle">{history.subtitle}</p>
+                        </div>
+                      </div>
 
-                  <div className="my-page__history-panel">
-                    <div className="my-page__history-head">
-                      <img src={AiBadgeIcon} alt="" className="my-page__history-badge" />
-                      <div>
-                        <p className="my-page__history-title">{history.title}</p>
-                        <p className="my-page__history-subtitle">{history.subtitle}</p>
+                      <div
+                        className={`my-page__ai-grid ${
+                          history.items.length >= 3 ? "my-page__ai-grid--slider" : ""
+                        }`}
+                      >
+                        {history.items.map((product) => (
+                          <AiRecommendationCard
+                            key={`${history.id}-${product.id}`}
+                            product={product}
+                          />
+                        ))}
                       </div>
                     </div>
-
-                    <div
-                      className={`my-page__ai-grid ${
-                        history.items.length >= 3 ? "my-page__ai-grid--slider" : ""
-                      }`}
-                    >
-                      {history.items.map((product) => (
-                        <AiRecommendationCard
-                          key={`${history.date}-${product.id}`}
-                          product={product}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </article>
-              ))}
+                  </article>
+                ))}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="my-page__history-panel my-page__history-panel--empty">
+              <p className="my-page__empty-message">AI 추천 기록이 없습니다.</p>
+            </div>
+          )}
         </section>
 
         {canToggleHistory ? (

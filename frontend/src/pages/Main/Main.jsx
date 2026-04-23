@@ -1,5 +1,6 @@
 ﻿import "./Main.scss";
 import { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useNavigate } from "react-router-dom";
 import "swiper/css";
@@ -20,6 +21,7 @@ import WishlistIconButton from "components/WishlistIconButton/WishlistIconButton
 import EventModal from "components/EventModal/EventModal";
 import Modal from "components/Modal/Modal";
 import productsData from "@/data/products_list.json";
+import { addAiRecommendationHistory } from "@/store/slices/aiRecommendationHistory";
 import api from "@/utils/api";
 import { fetchAiRecommendations } from "@/utils/recommendations";
 
@@ -165,6 +167,7 @@ const fetchLatestAiReviews = async ({ products, signal }) => {
 };
 
 function Main() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showAiResult, setShowAiResult] = useState(false);
   const [isAiSwitching, setIsAiSwitching] = useState(false);
@@ -404,6 +407,14 @@ function Main() {
     caveat: item.caveat,
   });
 
+  const createAiHistoryEntry = ({ query, message, products }) => ({
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
+    query,
+    message,
+    createdAt: new Date().toISOString(),
+    products,
+  });
+
   const startAiResultTransition = () => {
     if (showAiResult) {
       return;
@@ -521,20 +532,30 @@ function Main() {
       const nextResults = Array.isArray(result.products)
         ? result.products.map(normalizeAiProduct)
         : [];
+      const nextMessage =
+        result.message ||
+        (nextResults.length > 0
+          ? "현재 상품 데이터 기준으로 조건에 가까운 제품을 골랐어요."
+          : "조건에 맞는 상품을 찾지 못했어요. 조건을 조금 더 넓혀볼까요?");
 
       setAiResults(nextResults);
-      setAiMessage(
-        result.message ||
-          (nextResults.length > 0
-            ? "현재 상품 데이터 기준으로 조건에 가까운 제품을 골랐어요."
-            : "조건에 맞는 상품을 찾지 못했어요. 조건을 조금 더 넓혀볼까요?"),
-      );
+      setAiMessage(nextMessage);
       setAiStatus(nextResults.length > 0 ? "success" : "empty");
       setAiReviewStatus(nextResults.length > 0 ? "loading" : "idle");
 
       if (nextResults.length === 0) {
         return;
       }
+
+      dispatch(
+        addAiRecommendationHistory(
+          createAiHistoryEntry({
+            query,
+            message: nextMessage,
+            products: nextResults,
+          }),
+        ),
+      );
 
       try {
         const latestReviews = await fetchLatestAiReviews({

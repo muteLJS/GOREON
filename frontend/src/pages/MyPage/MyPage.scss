@@ -403,6 +403,11 @@
   overflow: hidden;
 }
 
+.my-page__history-panel--empty {
+  display: flex;
+  justify-content: center;
+}
+
 .my-page__history-head {
   @include flex(flex-start, flex-start);
   gap: 8px;
