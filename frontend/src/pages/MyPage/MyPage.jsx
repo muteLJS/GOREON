@@ -121,15 +121,17 @@ function ProductRailCard({ product }) {
         <Link to={`/product/${productId}`} className="my-page__rail-card-media" draggable={false}>
           <img src={product.image} alt={product.name} draggable={false} />
         </Link>
+      </div>
+      <Link to={`/product/${productId}`} className="my-page__rail-card-copy" draggable={false}>
+        <p className="my-page__rail-card-name">{product.name}</p>
+      </Link>
+      <div className="my-page__rail-card-footer">
+        <p className="my-page__rail-card-price">{product.price}</p>
         <div className="my-page__rail-card-actions">
           <CartIconButton product={product} size="sm" />
           <WishlistIconButton product={product} size="sm" />
         </div>
       </div>
-      <Link to={`/product/${productId}`} className="my-page__rail-card-copy" draggable={false}>
-        <p className="my-page__rail-card-name">{product.name}</p>
-        <p className="my-page__rail-card-price">{product.price}</p>
-      </Link>
     </article>
   );
 }
@@ -143,25 +145,26 @@ function AiRecommendationCard({ product }) {
         <Link to={`/product/${productId}`} className="my-page__ai-card-media">
           <img src={product.image} alt={product.name} />
         </Link>
+      </div>
+
+      <div className="my-page__ai-card-content">
+        <Link to={`/product/${productId}`} className="my-page__ai-card-copy">
+          <p className="my-page__ai-card-name">{product.name}</p>
+          <p className="my-page__ai-card-desc">{product.desc}</p>
+          {product.tags.length > 0 ? (
+            <div className="my-page__ai-card-tags">
+              {product.tags.map((tag) => (
+                <span key={`${productId}-${tag}`}>{tag}</span>
+              ))}
+            </div>
+          ) : null}
+        </Link>
+        <p className="my-page__ai-card-price">{product.price}</p>
         <div className="my-page__ai-card-actions">
           <CartIconButton product={product} size="sm" />
           <WishlistIconButton product={product} size="sm" />
         </div>
       </div>
-
-      <Link to={`/product/${productId}`} className="my-page__ai-card-copy">
-        <p className="my-page__ai-card-name">{product.name}</p>
-        <p className="my-page__ai-card-desc">{product.desc}</p>
-        <p className="my-page__ai-card-spec">{product.spec}</p>
-        {product.tags.length > 0 ? (
-          <div className="my-page__ai-card-tags">
-            {product.tags.map((tag) => (
-              <span key={`${productId}-${tag}`}>{tag}</span>
-            ))}
-          </div>
-        ) : null}
-        <p className="my-page__ai-card-price">{product.price}</p>
-      </Link>
     </article>
   );
 }
@@ -198,10 +201,6 @@ export default function MyPage() {
               price: formatPrice(product.price),
               image: product.image ?? "",
               desc: product.reason ?? product.spec ?? "상품 데이터 기준 추천",
-              spec:
-                product.matchedCriteria?.length > 0
-                  ? product.matchedCriteria.join(" / ")
-                  : (product.spec ?? "상품 데이터 기준 추천"),
               tags:
                 product.matchedCriteria?.length > 0
                   ? product.matchedCriteria.slice(0, 3).map(formatHistoryTag).filter(Boolean)

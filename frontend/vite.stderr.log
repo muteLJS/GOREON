@@ -1,0 +1,670 @@
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+7 │ @import "./styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^^^
+  ╵
+    src\index.scss 7:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+8 │ @import "./styles/mixins";
+  │         ^^^^^^^^^^^^^^^^^
+  ╵
+    src\index.scss 8:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+   ╷
+11 │ @import "./styles/reset";
+   │         ^^^^^^^^^^^^^^^^
+   ╵
+    src\index.scss 11:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+   ╷
+14 │ @import "./styles/global";
+   │         ^^^^^^^^^^^^^^^^^
+   ╵
+    src\index.scss 14:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\components\Toast\Toast.scss 1:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ ﻿@import "styles/mixins";
+  │          ^^^^^^^^^^^^^^^
+  ╵
+    src\pages\Login\Login.scss 1:10  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/variables"; // input 박스 컴포넌트 스타일
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\pages\Login\Login.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ ﻿@import "styles/variables";
+  │          ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\layouts\MainLayout\MainLayout.scss 1:10  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\layouts\MainLayout\MainLayout.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\pages\Category\Category.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+3 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\pages\Category\Category.scss 3:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ ﻿@import "styles/variables";
+  │          ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\pages\Wishlist\Wishlist.scss 1:10  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\pages\Wishlist\Wishlist.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ ﻿@import "styles/variables";
+  │          ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\pages\PcAssembly\PcAssembly.scss 1:10  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\pages\PcAssembly\PcAssembly.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ ﻿@import "styles/variables";
+  │          ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\pages\Cart\Cart.scss 1:10  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\pages\Cart\Cart.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\pages\PcAssemblyQuote\PcAssemblyQuote.scss 1:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\pages\PcAssemblyQuote\PcAssemblyQuote.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ ﻿@import "styles/variables";
+  │          ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\pages\Payment\Payment.scss 1:10  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\pages\Payment\Payment.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\pages\OrderHistory\OrderHistory.scss 1:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\pages\OrderHistory\OrderHistory.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\pages\ProductDetail\ProductDetail.scss 1:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\pages\ProductDetail\ProductDetail.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\pages\MyPage\MyPage.scss 1:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\pages\MyPage\MyPage.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ ﻿@import "styles/variables";
+  │          ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\pages\Main\Main.scss 1:10  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\pages\Main\Main.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ ﻿@import "styles/variables";
+  │          ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\components\Footer\Footer.scss 1:10  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\components\Footer\Footer.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\components\AddressModal\AddressModal.scss 1:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\components\AddressModal\AddressModal.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\components\ProductCard\ProductCardHorizontal.scss 1:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\components\ProductCard\ProductCardHorizontal.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ ﻿@import "styles/variables";
+  │          ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\components\ProductCard\ProductCardVertical.scss 1:10  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\components\ProductCard\ProductCardVertical.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\components\more\More.scss 1:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\components\more\More.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\components\CartIconButton\CartIconButton.scss 1:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\components\CartIconButton\CartIconButton.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\components\Modal\Modal.scss 1:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\components\EventModal\EventModal.scss 1:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\components\EventModal\EventModal.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\components\WishlistIconButton\WishlistIconButton.scss 1:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\components\WishlistIconButton\WishlistIconButton.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\components\PcAssemblyQuoteList\PcAssemblyQuoteList.scss 1:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\components\PcAssemblyQuoteList\PcAssemblyQuoteList.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\components\ReviewWrite\ReviewWrite.scss 1:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\components\ReviewWrite\ReviewWrite.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\components\chat\FloatingChatWidget.scss 1:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\components\chat\FloatingChatWidget.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\components\ReviewSection\ReviewSection.scss 1:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\components\ReviewSection\ReviewSection.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\components\Header\Header.scss 1:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\components\Header\Header.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\layouts\ListLayout\ListLayout.scss 1:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\layouts\ListLayout\ListLayout.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ ﻿@import "styles/variables";
+  │          ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\components\ProductList-row\ProductList-row.scss 1:10  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\components\ProductList-row\ProductList-row.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\components\ScrollTopButton\ScrollTopButton.scss 1:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\components\RatingInput\RatingInput.scss 1:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ ﻿@import "styles/variables";
+  │          ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\components\Rating\Rating.scss 1:10  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ @import "styles/variables";
+  │         ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\components\PcAssemblyQuoteItem\PcAssemblyQuoteItem.scss 1:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\components\PcAssemblyQuoteItem\PcAssemblyQuoteItem.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+1 │ ﻿@import "styles/variables";
+  │          ^^^^^^^^^^^^^^^^^^
+  ╵
+    src\components\ProductList-name,price\ProductList-name,price.scss 1:10  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "styles/mixins";
+  │         ^^^^^^^^^^^^^^^
+  ╵
+    src\components\ProductList-name,price\ProductList-name,price.scss 2:9  root stylesheet
+

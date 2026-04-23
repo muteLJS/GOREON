@@ -237,7 +237,7 @@ function PcAssembly() {
       </section>
 
       {isFilterOpen && (
-        <Modal title="필터" onClose={() => setIsFilterOpen(false)}>
+        <Modal title="필터" onClose={() => setIsFilterOpen(false)} showCloseButton={false}>
           {filterContent}
         </Modal>
       )}
@@ -248,7 +248,7 @@ function PcAssembly() {
           onClose={() => setIsQuoteOpen(false)}
           className="modal--fullscreen pc-assembly__quote-modal"
           overlayClassName="modal-overlay--fullscreen pc-assembly__quote-overlay"
-          showCloseButton={!isMobile}
+          showCloseButton={false}
           dragToClose={isMobile}
         >
           <PcAssemblyQuote isModal />
