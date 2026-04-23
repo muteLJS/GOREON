@@ -10,6 +10,7 @@ import arrowIcon from "@/assets/icons/prev.svg";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 import ReviewSection from "../../components/ReviewSection/ReviewSection";
 import { addToCart } from "../../store/slices/cartSlice";
+import { addRecentViewed } from "@/store/slices/recentViewed";
 import ChevronDown from "../../assets/icons/chevron-down.svg";
 import api from "../../utils/api";
 
@@ -37,7 +38,9 @@ const mapReview = (review) => ({
   date: new Date(review.createdAt).toLocaleDateString("ko-KR").replace(/ /g, ""),
   body: review.content || "",
   rating: Number(review.rating) || 0,
-  images: Array.isArray(review.images) ? review.images.map((image) => normalizeImageUrl(image)) : [],
+  images: Array.isArray(review.images)
+    ? review.images.map((image) => normalizeImageUrl(image))
+    : [],
   helpfulCount: 0,
 });
 
@@ -208,6 +211,22 @@ function ProductDetail() {
     setActiveTab("overview");
     setIsOverviewExpanded(false);
   }, [product]);
+
+  useEffect(() => {
+    if (!product) {
+      return;
+    }
+
+    dispatch(
+      addRecentViewed({
+        id: Number(id),
+        name: product.title,
+        price: formatPrice(product.price),
+        image: product.heroImage,
+        rating: product.rating,
+      }),
+    );
+  }, [dispatch, id, product]);
 
   if (status === "loading") {
     return (
