@@ -10,6 +10,7 @@ import MypageCartIcon from "@/assets/icons/Mypage_cart.svg";
 import MypageLikeIcon from "@/assets/icons/Mypage_like.svg";
 import ReviewIcon from "@/assets/icons/review.png";
 import CartIconButton from "@/components/CartIconButton/CartIconButton";
+import { useToast } from "@/components/Toast/toastContext";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 import { logout, updateUserInfo } from "@/store/slices/userSlice";
 import api from "@/utils/api";
@@ -167,6 +168,7 @@ function AiRecommendationCard({ product }) {
 export default function MyPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   const userInfo = useSelector((state) => state.user.userInfo);
   const cartCount = useSelector((state) => state.cart.items.length);
@@ -370,9 +372,9 @@ export default function MyPage() {
         ...response.data,
       }));
       setEditingField("");
-      alert("회원정보가 수정되었습니다.");
+      showToast("회원정보가 수정되었습니다.");
     } catch {
-      alert("회원정보 수정에 실패했습니다.");
+      showToast("회원정보 수정에 실패했습니다.");
     } finally {
       setSavingField("");
     }

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import LikeAfterIcon from "@/assets/icons/like-after.svg";
 import LikeBeforeIcon from "@/assets/icons/like-before.svg";
+import { useToast } from "@/components/Toast/toastContext";
 import { addToWishlist } from "@/store/slices/wishlistSlice";
 import CartIconButton from "components/CartIconButton/CartIconButton";
 
@@ -30,6 +31,7 @@ function PackageCard({
 }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const wishlistItems = useSelector((state) => state.wishlist.items);
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const packageProduct = product ?? {
@@ -49,14 +51,21 @@ function PackageCard({
 
   const handlePackageWishlistClick = (event) => {
     event.stopPropagation();
+    let addedCount = 0;
 
     packageProducts.forEach((item) => {
       const wishlistItem = toWishlistItem(item);
+      const isAlreadyWishlisted = wishlistItems.some(
+        (existingItem) => existingItem.id === wishlistItem.id,
+      );
 
-      if (wishlistItem.id !== undefined) {
+      if (wishlistItem.id !== undefined && !isAlreadyWishlisted) {
         dispatch(addToWishlist(wishlistItem));
+        addedCount += 1;
       }
     });
+
+    showToast(addedCount > 0 ? "찜 목록에 추가했습니다." : "이미 찜 목록에 담겨 있습니다.");
   };
 
   const handleDetailItemClick = (item) => {

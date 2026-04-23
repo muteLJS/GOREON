@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
+import { useToast } from "@/components/Toast/toastContext";
 import AddressModal from "../../components/AddressModal/AddressModal";
 import CreditCardIcon from "../../assets/icons/creditcard.svg";
 import KakaoPayIcon from "../../assets/icons/kakaopay.svg";
@@ -100,6 +101,7 @@ function TextField({ icon, iconAlt = "", className, ...inputProps }) {
 export default function Payment() {
   const { state } = useLocation();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const storedCartItems = useSelector((store) => store.cart.items);
   const initialShippingForm = useMemo(
     () => ({
@@ -151,7 +153,7 @@ export default function Payment() {
 
   const handleMethodClick = (option) => {
     if (!option.available) {
-      window.alert("서비스 준비중입니다.");
+      showToast("서비스 준비중입니다.");
       return;
     }
 

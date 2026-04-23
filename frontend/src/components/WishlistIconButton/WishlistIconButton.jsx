@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import LikeAfterIcon from "@/assets/icons/like-after.svg";
 import LikeBeforeIcon from "@/assets/icons/like-before.svg";
+import { useToast } from "@/components/Toast/toastContext";
 import { addToWishlist, removeFromWishlist } from "@/store/slices/wishlistSlice";
 import "./WishlistIconButton.scss";
 
@@ -9,6 +10,7 @@ const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")
 
 function WishlistIconButton({ product, className = "", iconClassName = "", size = "md" }) {
   const dispatch = useDispatch();
+  const { showToast } = useToast();
   const wishlistItems = useSelector((state) => state.wishlist.items);
   const productId = product?._id ?? product?.productId ?? product?.id ?? 1;
   const isWishlisted = wishlistItems.some((item) => item.id === productId);
@@ -18,6 +20,7 @@ function WishlistIconButton({ product, className = "", iconClassName = "", size 
 
     if (isWishlisted) {
       dispatch(removeFromWishlist(productId));
+      showToast("찜 목록에서 제거했습니다.");
       return;
     }
 
@@ -30,6 +33,8 @@ function WishlistIconButton({ product, className = "", iconClassName = "", size 
         rating: Number(product?.rating) || 0,
       }),
     );
+
+    showToast("찜 목록에 추가했습니다.");
   };
 
   return (
