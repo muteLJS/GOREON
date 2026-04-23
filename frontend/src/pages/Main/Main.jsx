@@ -22,6 +22,9 @@ import Modal from "components/Modal/Modal";
 import productsData from "@/data/products_list.json";
 import api from "@/utils/api";
 import { fetchAiRecommendations } from "@/utils/recommendations";
+import newProduct1 from "assets/products/newProduct1.png";
+import newProduct2 from "assets/products/newProduct2.png";
+import newProduct3 from "assets/products/newProduct3.png";
 
 const mainProducts = productsData;
 const EMPTY_AI_PLACEHOLDER = "검색어를 입력해주세요!";
@@ -77,6 +80,60 @@ const createMainProduct = ({
   option,
   category: Array.isArray(tag) ? tag.at(-1) : tag,
 });
+
+const getPrimaryPriceOption = (product) => product.priceOptions?.[0]?.optionName ?? "기본 옵션";
+
+const createUpdateSpecs = (product, brand) => [
+  { label: "브랜드", value: brand },
+  { label: "분류", value: "노트북" },
+  { label: "옵션", value: getPrimaryPriceOption(product) },
+  { label: "평점", value: `${product.rating} / 5` },
+];
+
+const createUpdateShowcaseItem = ({ productId, brand, description, featuredImage }) => {
+  const product = getMainProduct(productId);
+
+  return {
+    ...product,
+    title: product.name,
+    description,
+    featuredImage: featuredImage ?? product.image,
+    thumbnailImage: product.image,
+    specs: createUpdateSpecs(product, brand),
+  };
+};
+
+const UPDATE_IMAGE_TRANSITION_DURATION = 220;
+
+const updateShowcaseItems = [
+  createUpdateShowcaseItem({
+    productId: 1,
+    brand: "LG",
+    description: "가벼운 휴대성과 큰 화면으로 작업과 강의에 모두 어울려요",
+    featuredImage: newProduct1,
+  }),
+  createUpdateShowcaseItem({
+    productId: 3,
+    brand: "삼성",
+    description: "선명한 디스플레이와 안정적인 성능으로 멀티 작업에 좋아요",
+    featuredImage: newProduct2,
+  }),
+  createUpdateShowcaseItem({
+    productId: 8,
+    brand: "ASUS",
+    description: "게임과 콘텐츠 작업을 함께 고려한 고성능 노트북이에요",
+    featuredImage: newProduct3,
+  }),
+];
+
+const updateMobileItems = [
+  ...updateShowcaseItems,
+  createUpdateShowcaseItem({
+    productId: 10,
+    brand: "레노버",
+    description: "게이밍 입문부터 실사용까지 두루 어울리는 밸런스형 노트북이에요",
+  }),
+];
 
 const toDisplayPrice = (product) => `￦${product.price}`;
 
@@ -180,7 +237,10 @@ function Main() {
   const [selectedCategory, setSelectedCategory] = useState("direct");
   const [selectedSpecProduct, setSelectedSpecProduct] = useState(null);
   const [selectedUpdateIndex, setSelectedUpdateIndex] = useState(0);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [hoveredUpdateIndex, setHoveredUpdateIndex] = useState(null);
+  const [visibleUpdateIndex, setVisibleUpdateIndex] = useState(0);
+  const [incomingUpdateIndex, setIncomingUpdateIndex] = useState(null);
+  const [isUpdateImageTransitioning, setIsUpdateImageTransitioning] = useState(false);
   const [isDesktopCategory, setIsDesktopCategory] = useState(false);
   const [isTabletCategory, setIsTabletCategory] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(true);
@@ -190,6 +250,9 @@ function Main() {
   });
   const aiSwitchTimeoutRef = useRef(null);
   const aiRequestAbortRef = useRef(null);
+  const updateImageTransitionTimeoutRef = useRef(null);
+  const updateImageTransitionRafRef = useRef(null);
+  const updateImageCacheRef = useRef(new Set());
   const aiResultSectionRef = useRef(null);
   const categorySwiperRef = useRef(null);
   const categoryProgressRef = useRef(null);
@@ -252,91 +315,17 @@ function Main() {
       detailItems: officePackageItems,
     },
   ];
-  const updateSubItems = [
-    {
-      ...getMainProduct(1),
-      title: getMainProduct(1).name,
-      description: (
-        <>
-          가벼운 휴대성과 큰 화면 <br />
-          작업과 강의에 모두 어울려요
-        </>
-      ),
-      specs: [
-        { label: "브랜드", value: "LG" },
-        { label: "분류", value: "노트북" },
-        { label: "옵션", value: getMainProduct(1).priceOptions?.[0]?.optionName ?? "기본 옵션" },
-        { label: "평점", value: `${getMainProduct(1).rating} / 5` },
-      ],
-    },
-    {
-      ...getMainProduct(3),
-      title: getMainProduct(3).name,
-      description: (
-        <>
-          선명한 디스플레이와 안정적인 성능 <br />
-          멀티 작업에 좋은 프리미엄 노트북
-        </>
-      ),
-      specs: [
-        { label: "브랜드", value: "삼성" },
-        { label: "분류", value: "노트북" },
-        { label: "옵션", value: getMainProduct(3).priceOptions?.[0]?.optionName ?? "기본 옵션" },
-        { label: "평점", value: `${getMainProduct(3).rating} / 5` },
-      ],
-    },
-    {
-      ...getMainProduct(8),
-      title: getMainProduct(8).name,
-      description: (
-        <>
-          게임과 콘텐츠 작업을 함께 고려한 <br />
-          고성능 노트북
-        </>
-      ),
-      specs: [
-        { label: "브랜드", value: "ASUS" },
-        { label: "분류", value: "노트북" },
-        { label: "옵션", value: getMainProduct(8).priceOptions?.[0]?.optionName ?? "기본 옵션" },
-        { label: "평점", value: `${getMainProduct(8).rating} / 5` },
-      ],
-    },
-  ];
-  const selectedUpdateItem = updateSubItems[selectedUpdateIndex] ?? updateSubItems[0];
-  const updateMobileItems = [
-    {
-      ...getMainProduct(1),
-      specs: [
-        { label: "브랜드", value: "LG" },
-        { label: "분류", value: "노트북" },
-        { label: "옵션", value: getMainProduct(1).priceOptions?.[0]?.optionName ?? "기본 옵션" },
-      ],
-    },
-    {
-      ...getMainProduct(3),
-      specs: [
-        { label: "브랜드", value: "삼성" },
-        { label: "분류", value: "노트북" },
-        { label: "옵션", value: getMainProduct(3).priceOptions?.[0]?.optionName ?? "기본 옵션" },
-      ],
-    },
-    {
-      ...getMainProduct(8),
-      specs: [
-        { label: "브랜드", value: "ASUS" },
-        { label: "분류", value: "노트북" },
-        { label: "옵션", value: getMainProduct(8).priceOptions?.[0]?.optionName ?? "기본 옵션" },
-      ],
-    },
-    {
-      ...getMainProduct(10),
-      specs: [
-        { label: "브랜드", value: "레노버" },
-        { label: "분류", value: "노트북" },
-        { label: "옵션", value: getMainProduct(10).priceOptions?.[0]?.optionName ?? "기본 옵션" },
-      ],
-    },
-  ];
+  const targetUpdateIndex = hoveredUpdateIndex ?? selectedUpdateIndex;
+  const targetUpdateItem = updateShowcaseItems[targetUpdateIndex] ?? updateShowcaseItems[0];
+  const visibleUpdateItem = updateShowcaseItems[visibleUpdateIndex] ?? updateShowcaseItems[0];
+  const incomingUpdateItem =
+    incomingUpdateIndex === null ? null : updateShowcaseItems[incomingUpdateIndex] ?? null;
+  const isUpdatePreviewing =
+    hoveredUpdateIndex !== null && hoveredUpdateIndex !== selectedUpdateIndex;
+  const updateMobileRowStartIndices = Array.from(
+    { length: Math.ceil(updateMobileItems.length / 2) },
+    (_, rowIndex) => rowIndex * 2,
+  );
   const categoryItemsMap = {
     direct: [
       getMainProduct(29, { tags: ["#크리에이터", "#영상편집", "#고성능"] }),
@@ -589,6 +578,100 @@ function Main() {
     event.stopPropagation();
   };
 
+  useEffect(() => {
+    updateShowcaseItems.forEach((item) => {
+      const imageSrc = item.featuredImage;
+
+      if (!imageSrc || updateImageCacheRef.current.has(imageSrc)) {
+        return;
+      }
+
+      const preloadImage = new window.Image();
+
+      preloadImage.onload = () => {
+        updateImageCacheRef.current.add(imageSrc);
+      };
+      preloadImage.onerror = () => {
+        updateImageCacheRef.current.add(imageSrc);
+      };
+      preloadImage.src = imageSrc;
+    });
+  }, []);
+
+  useEffect(() => {
+    const targetItem = updateShowcaseItems[targetUpdateIndex] ?? updateShowcaseItems[0];
+
+    if (!targetItem) {
+      return undefined;
+    }
+
+    if (updateImageTransitionTimeoutRef.current) {
+      window.clearTimeout(updateImageTransitionTimeoutRef.current);
+      updateImageTransitionTimeoutRef.current = null;
+    }
+
+    if (updateImageTransitionRafRef.current) {
+      window.cancelAnimationFrame(updateImageTransitionRafRef.current);
+      updateImageTransitionRafRef.current = null;
+    }
+
+    if (visibleUpdateIndex === targetUpdateIndex) {
+      setIncomingUpdateIndex(null);
+      setIsUpdateImageTransitioning(false);
+      return undefined;
+    }
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const finalizeTransition = () => {
+      setVisibleUpdateIndex(targetUpdateIndex);
+      setIncomingUpdateIndex(null);
+      setIsUpdateImageTransitioning(false);
+      updateImageTransitionTimeoutRef.current = null;
+    };
+    const runTransition = () => {
+      if (prefersReducedMotion) {
+        finalizeTransition();
+        return;
+      }
+
+      setIncomingUpdateIndex(targetUpdateIndex);
+      setIsUpdateImageTransitioning(false);
+
+      updateImageTransitionRafRef.current = window.requestAnimationFrame(() => {
+        updateImageTransitionRafRef.current = window.requestAnimationFrame(() => {
+          setIsUpdateImageTransitioning(true);
+        });
+      });
+
+      updateImageTransitionTimeoutRef.current = window.setTimeout(
+        finalizeTransition,
+        UPDATE_IMAGE_TRANSITION_DURATION,
+      );
+    };
+
+    const nextImageSrc = targetItem.featuredImage;
+
+    if (!nextImageSrc || updateImageCacheRef.current.has(nextImageSrc)) {
+      runTransition();
+      return undefined;
+    }
+
+    const nextImage = new window.Image();
+    const handleReady = () => {
+      updateImageCacheRef.current.add(nextImageSrc);
+      runTransition();
+    };
+
+    nextImage.onload = handleReady;
+    nextImage.onerror = handleReady;
+    nextImage.src = nextImageSrc;
+
+    return () => {
+      nextImage.onload = null;
+      nextImage.onerror = null;
+    };
+  }, [targetUpdateIndex, visibleUpdateIndex]);
+
   useEffect(
     () => () => {
       if (aiSwitchTimeoutRef.current) {
@@ -597,6 +680,14 @@ function Main() {
 
       if (aiRequestAbortRef.current) {
         aiRequestAbortRef.current.abort();
+      }
+
+      if (updateImageTransitionTimeoutRef.current) {
+        window.clearTimeout(updateImageTransitionTimeoutRef.current);
+      }
+
+      if (updateImageTransitionRafRef.current) {
+        window.cancelAnimationFrame(updateImageTransitionRafRef.current);
       }
     },
     [],
@@ -1242,29 +1333,42 @@ function Main() {
           </div>
           <div className="desktop">
             <div
-              className={`main_item ${isUpdateModalOpen ? "is-modal-open" : ""}`}
+              className="main_item"
               role="button"
               tabIndex={0}
-              onMouseEnter={() => setIsUpdateModalOpen(true)}
-              onMouseLeave={() => setIsUpdateModalOpen(false)}
-              onClick={() => navigateToProduct(selectedUpdateItem.id)}
+              onClick={() => navigateToProduct(targetUpdateItem)}
               onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " ") {
                   event.preventDefault();
-                  navigateToProduct(selectedUpdateItem.id);
+                  navigateToProduct(targetUpdateItem);
                 }
               }}
             >
-              <div className="back_img">
+              <div
+                className={`main_item__image ${incomingUpdateItem ? "is-transitioning" : ""}`}
+              >
                 <img
-                  src={selectedUpdateItem.image}
-                  alt={selectedUpdateItem.title}
-                  className="pakage_img"
+                  key={`featured-current-${visibleUpdateItem.id}`}
+                  src={visibleUpdateItem.featuredImage}
+                  alt={visibleUpdateItem.title}
+                  className={`featured_img featured_img--current ${
+                    incomingUpdateItem && isUpdateImageTransitioning ? "is-subdued" : ""
+                  }`}
                 />
+                {incomingUpdateItem && (
+                  <img
+                    key={`featured-next-${incomingUpdateItem.id}`}
+                    src={incomingUpdateItem.featuredImage}
+                    alt={incomingUpdateItem.title}
+                    className={`featured_img featured_img--incoming ${
+                      isUpdateImageTransitioning ? "is-visible" : ""
+                    }`}
+                  />
+                )}
               </div>
               <div className="modal_info" onClick={stopCardAction}>
                 <div className="options">
-                  {selectedUpdateItem.specs.map((spec) => (
+                  {targetUpdateItem.specs.map((spec) => (
                     <div className="option" key={spec.label}>
                       <p>{spec.label}</p>
                       <p className="item_info">{spec.value}</p>
@@ -1272,32 +1376,40 @@ function Main() {
                   ))}
                   <div className="option">
                     <p>가격</p>
-                    <p className="item_info">{toDisplayPrice(selectedUpdateItem)}</p>
+                    <p className="item_info">{toDisplayPrice(targetUpdateItem)}</p>
                   </div>
                 </div>
                 <div className="icons">
-                  <CartIconButton product={createMainProduct(selectedUpdateItem)} size="sm" />
-                  <WishlistIconButton product={createMainProduct(selectedUpdateItem)} size="sm" />
+                  <CartIconButton product={createMainProduct(targetUpdateItem)} size="sm" />
+                  <WishlistIconButton
+                    product={createMainProduct(targetUpdateItem)}
+                    size="sm"
+                  />
                 </div>
               </div>
             </div>
             <div className="sub_item">
-              {updateSubItems.map((item, index) => (
+              {updateShowcaseItems.map((item, index) => (
                 <UpdateSubCard
-                  key={`update-sub-${index}`}
-                  image={item.image}
+                  key={item.id}
+                  thumbnailImage={item.thumbnailImage}
                   title={item.title}
                   description={item.description}
                   isActive={selectedUpdateIndex === index}
+                  isPreview={hoveredUpdateIndex === index && isUpdatePreviewing}
                   onClick={() => setSelectedUpdateIndex(index)}
-                onChevronClick={() => navigateToProduct(item)}
-              />
+                  onMouseEnter={() => setHoveredUpdateIndex(index)}
+                  onMouseLeave={() => setHoveredUpdateIndex(null)}
+                  onFocus={() => setHoveredUpdateIndex(index)}
+                  onBlur={() => setHoveredUpdateIndex(null)}
+                  onChevronClick={() => navigateToProduct(item)}
+                />
               ))}
             </div>
           </div>
           <div className="mobile">
             <div className="item_boxs">
-              {[0, 2].map((startIndex) => (
+              {updateMobileRowStartIndices.map((startIndex) => (
                 <div className="item_row" key={`update-mobile-row-${startIndex}`}>
                   {updateMobileItems.slice(startIndex, startIndex + 2).map((item) => (
                     <div
@@ -1315,7 +1427,11 @@ function Main() {
                     >
                       <div className="items">
                         <div className="item_img_box">
-                          <img src={item.image} alt={item.name} className="item_img" />
+                          <img
+                            src={item.thumbnailImage}
+                            alt={item.name}
+                            className="item_img"
+                          />
                           <div className="icons">
                             <CartIconButton product={createMainProduct(item)} size="sm" />
                             <WishlistIconButton product={createMainProduct(item)} size="sm" />

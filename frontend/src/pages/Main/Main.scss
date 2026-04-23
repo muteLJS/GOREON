@@ -1683,7 +1683,7 @@
       box-sizing: border-box;
       border: 1px solid $color-gray-300;
       border-radius: $radius-md;
-      background-color: $color-gray-100;
+      background-color: $color-white;
       .item_img {
         position: absolute;
         width: 58%;
@@ -2449,142 +2449,333 @@
       display: none;
     }
     .desktop {
-      display: block;
+      display: grid;
       width: 100%;
-      @include flex(stretch, space-between);
-      gap: 30px;
+      grid-template-columns: minmax(0, 1.36fr) minmax(0, 1fr);
+      align-items: stretch;
+      gap: 28px;
+      min-height: 515px;
+
       .main_item {
-        flex: 0 0 60%;
-        width: 60%;
+        width: 100%;
         min-width: 0;
+        height: 100%;
+        padding: 0;
+        border: 0;
         position: relative;
+        background: transparent;
         cursor: pointer;
-        .back_img {
-          @include flex-center;
-          aspect-ratio: 3 / 2;
-          overflow: hidden;
-          padding: 0;
-          border-radius: $radius-md;
-          background-color: $color-white;
-          img {
-            margin: 0 auto;
-            width: 80%;
-            height: 80%;
-            object-fit: contain;
-            display: block;
-            border-radius: $radius-md;
-          }
-        }
-        .modal_info {
-          position: absolute;
-          top: 0;
-          left: 0;
+
+        .main_item__image {
+          position: relative;
+          isolation: isolate;
           width: 100%;
           height: 100%;
-          padding: 48px 48px 36px;
-          @include flex(flex-start, space-between, column);
-          border-radius: $radius-md;
-          background: rgba($color: #000000, $alpha: 0.6);
-          opacity: 0;
-          transition: opacity 0.3s ease;
-          pointer-events: none;
-          .options {
-            @include flex(flex-start, center, column);
+          overflow: hidden;
+          border-radius: 20px;
+          border: 1px solid rgba($color-text-main, 0.08);
+          background-color: $color-white;
+          will-change: opacity, transform;
+
+          .featured_img {
+            position: absolute;
+            inset: 0;
             width: 100%;
-            gap: 20px;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            object-position: center;
+            transform-origin: center;
+            backface-visibility: hidden;
+            transition:
+              opacity 0.22s ease,
+              transform 0.22s ease,
+              filter 0.22s ease;
+          }
+
+          .featured_img--current {
+            z-index: 1;
+            opacity: 1;
+            transform: scale(1);
+          }
+
+          .featured_img--current.is-subdued {
+            opacity: 0.18;
+            transform: scale(1.012);
+            filter: saturate(0.94);
+          }
+
+          .featured_img--incoming {
+            z-index: 2;
+            opacity: 0;
+            transform: scale(1.02);
+          }
+
+          .featured_img--incoming.is-visible {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        .modal_info {
+          position: absolute;
+          inset: 0;
+          padding: 50px 40px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          gap: 20px;
+          border-radius: 20px;
+          background: rgba(10, 20, 24, 0.72);
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.22s ease;
+
+          .options {
+            display: grid;
+            gap: 12px;
+
             .option {
-              width: 100%;
-              @include flex(center, space-between);
-              font-size: $font-lg-2;
-              color: $color-white;
-              font-weight: $font-bold;
+              display: grid;
+              grid-template-columns: 94px minmax(0, 1fr);
+              align-items: center;
+              gap: 18px;
+
+              p {
+                margin: 0;
+                color: $color-white;
+                font-size: 24px;
+                font-weight: $font-bold;
+                line-height: 1.35;
+              }
+
               .item_info {
+                text-align: right;
                 font-weight: $font-medium;
               }
             }
           }
+
           .icons {
-            @include flex(center, center);
-            gap: 10px;
-            margin-left: auto;
+            width: max-content;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            align-items: center;
+            align-self: flex-end;
+            gap: 18px;
+            flex-wrap: nowrap;
+            pointer-events: auto;
 
             .cart-icon-button,
             .wishlist-icon-button {
               display: grid;
               place-items: center;
+              width: 50px;
+              height: 50px;
+              flex: 0 0 50px;
+              border: 1.5px solid rgba($color-text-main, 0.18);
+              box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
 
               img {
-                display: block;
-                margin: 0;
-                width: 15px;
-                height: 15px;
-                object-fit: contain;
+                width: 24px;
+                height: 24px;
               }
             }
           }
         }
-        &.is-modal-open .modal_info {
+
+        &:hover .modal_info,
+        &:focus-within .modal_info {
           opacity: 1;
           pointer-events: auto;
         }
+
+        &:focus-visible {
+          outline: 2px solid $color-text-main;
+          outline-offset: 6px;
+        }
       }
+
       .sub_item {
-        flex: 1 1 0;
         min-width: 0;
-        @include flex(center, flex-start, column);
-        width: 35%;
         height: 100%;
-        gap: 40px;
+        display: grid;
+        grid-template-rows: repeat(3, minmax(0, 1fr));
+        gap: 28px;
+
         .sub_info {
-          flex: 1;
+          position: relative;
           width: 100%;
-          height: 100%;
-          @include flex(center, space-between);
-          cursor: pointer;
+          min-height: 0;
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          align-items: stretch;
           background-color: $color-white;
-          border: 2px solid $color-gray-100;
-          border-radius: $radius-md;
-          padding: 12px;
-          color: inherit;
-          font: inherit;
-          text-align: left;
-          transition: $transition-fast;
+          border: 0;
+          border-radius: 10px;
+          overflow: hidden;
+          transition:
+            box-shadow 0.2s ease,
+            background-color 0.2s ease,
+            transform 0.2s ease;
+
+          &::before {
+            content: "";
+            position: absolute;
+            top: 22px;
+            bottom: 22px;
+            left: 0;
+            width: 4px;
+            border-radius: 999px;
+            background: $color-text-main;
+            opacity: 0;
+            transform: scaleY(0.45);
+            transform-origin: center;
+            transition:
+              opacity 0.2s ease,
+              transform 0.2s ease,
+              background-color 0.2s ease;
+          }
+
           &:hover {
-            border: 2px solid $color-text-main;
+            box-shadow: 0 14px 30px rgba($color-text-main, 0.08);
+            transform: translateY(-1px);
+          }
+
+          &.is-preview {
+            background-color: rgba($color-button, 0.14);
+            box-shadow: 0 12px 26px rgba($color-text-main, 0.08);
+
+            &::before {
+              opacity: 0.44;
+              transform: scaleY(0.82);
+            }
           }
 
           &.is-active {
-            border-color: $color-text-main;
+            box-shadow:
+              0 16px 34px rgba($color-text-main, 0.12),
+              inset 0 0 0 1px rgba($color-text-main, 0.06);
+            background-color: rgba($color-button, 0.34);
+
+            &::before {
+              opacity: 1;
+              transform: scaleY(1);
+            }
+          }
+
+          &:focus-within {
+            box-shadow: 0 14px 32px rgba($color-text-main, 0.12);
+          }
+
+          .sub_info__content {
+            width: 100%;
+            min-width: 0;
+            height: 100%;
+            border: 0;
+            background: transparent;
+            padding: 12px 18px;
+            color: inherit;
+            font: inherit;
+            text-align: left;
+            cursor: pointer;
+            position: relative;
+            z-index: 1;
           }
 
           .sub_title {
             width: 100%;
-            @include flex(center, flex-start);
-            gap: 24px;
-            img {
-              width: 20%;
-            }
-            .pakage_texts {
-              @include flex(flex-start, center, column);
-              gap: 5px;
-              color: $color-text-main;
-              font-weight: $font-bold;
-              font-size: $font-lg-3;
-              .gray_text {
-                color: $color-gray-600;
-                font-weight: $font-medium;
-                font-size: $font-md;
-                line-height: 1.45;
-              }
+            height: 100%;
+            min-width: 0;
+            display: grid;
+            grid-template-columns: 129px minmax(0, 1fr);
+            align-items: center;
+            gap: 20px;
+          }
+
+          .pakage_img_box {
+            width: 129px;
+            height: 129px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .pakage_img {
+              width: 100%;
+              height: 100%;
+              display: block;
+              object-fit: contain;
             }
           }
+
+          .pakage_texts {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 10px;
+            color: $color-text-main;
+
+            .title {
+              margin: 0;
+              font-size: 26px;
+              font-weight: $font-bold;
+              line-height: 1.28;
+              display: -webkit-box;
+              -webkit-box-orient: vertical;
+              -webkit-line-clamp: 2;
+              overflow: hidden;
+            }
+
+            .gray_text {
+              margin: 0;
+              color: $color-gray-600;
+              font-size: 16px;
+              font-weight: $font-medium;
+              line-height: 1.5;
+              display: -webkit-box;
+              -webkit-box-orient: vertical;
+              -webkit-line-clamp: 2;
+              overflow: hidden;
+            }
+          }
+
           .chevron {
-            width: 20px;
-            stroke: $color-text-main;
-            fill: none;
-            stroke-width: 2px;
-            padding: 15px 0;
-            transform: rotate(90deg);
+            width: 72px;
+            height: 100%;
+            padding: 0 20px 0 12px;
+            border: 0;
+            background: transparent;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            color: $color-text-main;
+            position: relative;
+            z-index: 1;
+            transition:
+              color 0.2s ease,
+              transform 0.2s ease;
+
+            svg {
+              width: 24px;
+              height: 24px;
+              stroke: currentColor;
+              fill: none;
+              stroke-width: 2.25;
+              stroke-linecap: round;
+              stroke-linejoin: round;
+            }
+          }
+
+          &.is-preview .chevron,
+          &.is-active .chevron {
+            transform: translateX(2px);
+          }
+
+          .sub_info__content:focus-visible,
+          .chevron:focus-visible {
+            outline: none;
           }
         }
       }
