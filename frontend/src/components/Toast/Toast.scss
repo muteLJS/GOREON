@@ -1,0 +1,67 @@
+@import "styles/variables";
+@import "styles/mixins";
+
+.toast-viewport {
+  position: fixed;
+  top: calc(var(--mobile-header-height, 76px) + 32px);
+  left: 50%;
+  width: min(calc(100vw - 24px), 420px);
+  z-index: $z-toast;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.toast {
+  width: 100%;
+  min-height: 40px;
+  padding: 10px 16px;
+  border: 1px solid rgba($color-text-main, 0.08);
+  border-radius: 14px;
+  background: $color-white;
+  box-shadow: 0 10px 24px rgba($color-black, 0.12);
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(-12px);
+  transition:
+    opacity 0.16s ease-out,
+    transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+  backdrop-filter: blur(14px);
+}
+
+.toast.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.is-exiting {
+  opacity: 0;
+  transform: translateY(0);
+  transition: opacity 0.12s ease-out;
+}
+
+.toast__message {
+  margin: 0 auto;
+  text-align: center;
+  color: $color-text-main;
+  font-size: $font-sm;
+  font-weight: $font-semibold;
+  word-break: keep-all;
+}
+
+@include tablet-up {
+  .toast-viewport {
+    top: calc(var(--mobile-header-height, 84px) + 34px);
+    width: min(calc(100vw - 48px), 440px);
+  }
+}
+
+@include desktop-up {
+  .toast-viewport {
+    top: 56px;
+    width: min(calc(100vw - 64px), 420px);
+  }
+}

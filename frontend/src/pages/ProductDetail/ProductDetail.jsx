@@ -1,12 +1,13 @@
 ﻿import "./ProductDetail.scss";
 import productList from "@/data/products_list.json";
 import { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { FreeMode } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import arrowIcon from "@/assets/icons/prev.svg";
+import { useToast } from "@/components/Toast/toastContext";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 import ReviewSection from "../../components/ReviewSection/ReviewSection";
 import { addToCart } from "../../store/slices/cartSlice";
@@ -122,6 +123,8 @@ function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { showToast } = useToast();
+  const cartItems = useSelector((state) => state.cart.items);
 
   const tabsRef = useRef(null);
   const overviewRef = useRef(null);
@@ -287,10 +290,13 @@ function ProductDetail() {
   const totalPrice = displayOption.price * quantity;
   const categoryLabel = product.subtitle.split(" 카테고리")[0] || "상품";
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (shouldShowToast = true) => {
+    const cartItemId = `${product.id}-${displayOption.id}`;
+    const isAlreadyInCart = cartItems.some((item) => item.id === cartItemId);
+
     dispatch(
       addToCart({
-        id: `${product.id}-${displayOption.id}`,
+        id: cartItemId,
         productId: product.id,
         name: product.title,
         option: displayOption.label,
@@ -299,10 +305,14 @@ function ProductDetail() {
         quantity,
       }),
     );
+
+    if (shouldShowToast) {
+      showToast(isAlreadyInCart ? "장바구니 수량이 추가되었습니다." : "장바구니에 담았습니다.");
+    }
   };
 
   const handleBuyNow = () => {
-    handleAddToCart();
+    handleAddToCart(false);
     navigate("/payment");
   };
 

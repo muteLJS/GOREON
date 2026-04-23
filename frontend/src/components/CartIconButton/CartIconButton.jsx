@@ -1,6 +1,7 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import CartIcon from "@/assets/icons/cart-straight.svg";
+import { useToast } from "@/components/Toast/toastContext";
 import { addToCart } from "@/store/slices/cartSlice";
 import "./CartIconButton.scss";
 
@@ -8,12 +9,15 @@ const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")
 
 function CartIconButton({ product, className = "", size = "md" }) {
   const dispatch = useDispatch();
+  const { showToast } = useToast();
+  const cartItems = useSelector((state) => state.cart.items);
 
   const handleClick = (event) => {
     event.stopPropagation();
 
     const productId = product?._id ?? product?.productId ?? product?.id ?? 1;
     const cartItemId = product?.id ?? productId;
+    const isAlreadyInCart = cartItems.some((item) => item.id === cartItemId);
 
     dispatch(
       addToCart({
@@ -27,6 +31,8 @@ function CartIconButton({ product, className = "", size = "md" }) {
         quantity: 1,
       }),
     );
+
+    showToast(isAlreadyInCart ? "장바구니 수량이 추가되었습니다." : "장바구니에 담았습니다.");
   };
 
   return (

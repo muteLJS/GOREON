@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useToast } from "@/components/Toast/toastContext";
 import ReviewWrite from "@/components/ReviewWrite/ReviewWrite";
 import "./OrderHistory.scss";
 
@@ -38,6 +39,7 @@ const PROGRESS_STEPS = [
 function OrderHistory() {
   const [reviewTarget, setReviewTarget] = useState(null);
   const [confirmedItemKeys, setConfirmedItemKeys] = useState(() => new Set());
+  const { showToast } = useToast();
 
   const handleConfirmPurchase = (itemKey) => {
     setConfirmedItemKeys((prevKeys) => {
@@ -45,10 +47,12 @@ function OrderHistory() {
       nextKeys.add(itemKey);
       return nextKeys;
     });
+
+    showToast("구매가 확정되었습니다.");
   };
 
   const handleTrackDelivery = () => {
-    window.alert("배송 조회 서비스 준비중입니다.");
+    showToast("배송 조회 서비스 준비중입니다.");
   };
 
   const renderItemActions = (item, itemKey) => {
