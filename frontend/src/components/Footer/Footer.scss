@@ -69,6 +69,7 @@ $footer-divider: rgba(255, 255, 255, 0.45);
   font-size: 17px;
   font-weight: 700;
   line-height: 1;
+  letter-spacing: 0.1em;
 }
 
 .footer__support-link {
@@ -105,6 +106,19 @@ $footer-divider: rgba(255, 255, 255, 0.45);
 
 .footer__social--mobile {
   margin-top: 28px;
+}
+
+.footer__social--mobile .footer__social-link {
+  background: transparent;
+  border-radius: 0;
+  height: auto;
+  width: auto;
+
+  img {
+    height: 40px;
+    width: 40px;
+    opacity: 0.7;
+  }
 }
 
 .footer__social-link {
@@ -381,7 +395,7 @@ $footer-divider: rgba(255, 255, 255, 0.45);
 
   .footer__support--desktop .footer__support-number {
     font-size: 56px;
-    letter-spacing: -0.04em;
+    letter-spacing: 0.05em;
   }
 
   .footer__support--desktop .footer__support-link {
@@ -420,13 +434,11 @@ $footer-divider: rgba(255, 255, 255, 0.45);
     background: rgba(255, 255, 255, 0.96);
     border-radius: 16px;
     flex-shrink: 0;
-    height: 62px;
-    width: 62px;
 
     img {
       display: block;
-      height: 36px;
-      width: 36px;
+      height: 60px;
+      width: 60px;
     }
   }
 
@@ -448,7 +460,12 @@ $footer-divider: rgba(255, 255, 255, 0.45);
   }
 
   .footer__social-link {
-    height: 54px;
-    width: 54px;
+    height: auto;
+    width: auto;
+
+    img {
+      height: 52px;
+      width: 52px;
+    }
   }
 }
