@@ -41,13 +41,27 @@
 
 .my-page__profile-main {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: stretch;
-  gap: 8px;
+  align-items: center;
   min-width: 0;
   padding: 18px 16px;
   text-align: left;
+}
+
+.my-page__profile-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+}
+
+.my-page__profile-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .my-page__nickname {
@@ -67,6 +81,22 @@
   font-weight: $font-semibold;
   line-height: 1.4;
   color: rgba($color-text-main, 0.78);
+}
+
+.my-page__logout-button {
+  flex: 0 0 auto;
+  min-width: 0;
+  height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px;
+  background: $color-text-sub;
+  color: $color-white;
+  font-size: 15px;
+  font-weight: $font-bold;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
 .my-page__metrics {
@@ -663,8 +693,15 @@
   }
 
   .my-page__profile-main {
-    gap: 6px;
     padding: 18px 28px;
+  }
+
+  .my-page__profile-top {
+    gap: 16px;
+  }
+
+  .my-page__profile-copy {
+    gap: 6px;
   }
 
   .my-page__nickname {
@@ -675,6 +712,10 @@
     margin-top: 6px;
     font-size: 12px;
     color: $color-text-main;
+  }
+
+  .my-page__logout-button {
+    display: none;
   }
 
   .my-page__metrics {
