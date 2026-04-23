@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Order = require("../models/Order");
 
 const createOrder = async (req, res, next) => {
@@ -12,6 +13,12 @@ const createOrder = async (req, res, next) => {
       return res
         .status(400)
         .json({ message: "총 주문 금액이 올바르지 않습니다." });
+    }
+
+    const invalidItem = items.find((item) => !mongoose.isValidObjectId(item.product));
+
+    if (invalidItem) {
+      return res.status(400).json({ message: "상품 정보가 올바르지 않습니다." });
     }
 
     const normalizedItems = items.map((item) => ({
