@@ -1,7 +1,7 @@
 import "./MyPage.scss";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 
@@ -11,7 +11,7 @@ import MypageLikeIcon from "@/assets/icons/Mypage_like.svg";
 import ReviewIcon from "@/assets/icons/review.png";
 import CartIconButton from "@/components/CartIconButton/CartIconButton";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
-import { updateUserInfo } from "@/store/slices/userSlice";
+import { logout, updateUserInfo } from "@/store/slices/userSlice";
 import api from "@/utils/api";
 
 const FALLBACK_USER = {
@@ -166,6 +166,7 @@ function AiRecommendationCard({ product }) {
 
 export default function MyPage() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   const userInfo = useSelector((state) => state.user.userInfo);
   const cartCount = useSelector((state) => state.cart.items.length);
@@ -336,6 +337,18 @@ export default function MyPage() {
     }));
   };
 
+  const handleLogout = async () => {
+    await api.post("/auth/logout").catch((error) => {
+      console.warn("[auth][logout] request failed", {
+        message: error.message,
+        status: error.response?.status,
+      });
+    });
+
+    dispatch(logout());
+    navigate("/");
+  };
+
   const handleFieldToggle = async (field) => {
     if (editingField !== field) {
       setEditingField(field);
@@ -472,8 +485,17 @@ export default function MyPage() {
 
         <section className="my-page__profile-card">
           <div className="my-page__profile-main">
-            <p className="my-page__nickname">{profileDraft.name}</p>
-            <p className="my-page__email">{profileDraft.email}</p>
+            <div className="my-page__profile-top">
+              <div className="my-page__profile-copy">
+                <p className="my-page__nickname">{profileDraft.name}</p>
+                <p className="my-page__email">{profileDraft.email}</p>
+              </div>
+              {isLoggedIn ? (
+                <button type="button" className="my-page__logout-button" onClick={handleLogout}>
+                  로그아웃
+                </button>
+              ) : null}
+            </div>
           </div>
 
           <div className="my-page__metrics">
