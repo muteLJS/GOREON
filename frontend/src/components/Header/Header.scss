@@ -770,14 +770,15 @@ body.mobile-menu-open {
   .dropdown__list-item a {
     color: $color-text-main;
     font-size: var(--menu-item-font-size);
-    font-weight: $font-semibold;
+    font-weight: $font-regular;
     line-height: 1.25;
     text-decoration: none;
-    transition: color $transition-fast;
+    transition: all $transition-fast;
   }
 
   .dropdown__list-item a:hover {
     color: $color-text-sub;
+    font-weight: $font-semibold;
   }
 
   .dropdown__brand-item a {
