@@ -56,7 +56,33 @@ const getMyOrders = async (req, res, next) => {
   }
 };
 
+const confirmOrder = async (req, res, next) => {
+  try {
+    const { orderId } = req.params;
+
+    if (!mongoose.isValidObjectId(orderId)) {
+      return res.status(400).json({ message: "주문 정보가 올바르지 않습니다." });
+    }
+
+    const order = await Order.findOne({ _id: orderId, user: req.user._id });
+
+    if (!order) {
+      return res.status(404).json({ message: "주문을 찾을 수 없습니다." });
+    }
+
+    if (order.status !== "confirmed") {
+      order.status = "confirmed";
+      await order.save();
+    }
+
+    res.json(order);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createOrder,
   getMyOrders,
+  confirmOrder,
 };

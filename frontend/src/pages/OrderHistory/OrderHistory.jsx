@@ -40,6 +40,8 @@ const groupOrdersByDate = (orders) => {
     groups.get(dateKey).push(
       ...items.map((item, index) => ({
         ...item,
+        orderId: order._id,
+        orderStatus: order.status,
         itemKey: `${order._id}-${item.product}-${index}`,
       })),
     );
@@ -57,7 +59,7 @@ function OrderHistory() {
   const [orders, setOrders] = useState([]);
   const [fetchStatus, setFetchStatus] = useState("loading");
   const [reviewTarget, setReviewTarget] = useState(null);
-  const [confirmedItemKeys, setConfirmedItemKeys] = useState(() => new Set());
+  const [confirmingOrderIds, setConfirmingOrderIds] = useState([]);
 
   useEffect(() => {
     let isMounted = true;
@@ -99,31 +101,44 @@ function OrderHistory() {
 
   const groupedOrders = useMemo(() => groupOrdersByDate(orders), [orders]);
 
-  const handleConfirmPurchase = (itemKey) => {
-    setConfirmedItemKeys((prevKeys) => {
-      const nextKeys = new Set(prevKeys);
-      nextKeys.add(itemKey);
-      return nextKeys;
-    });
+  const handleConfirmPurchase = async (orderId) => {
+    try {
+      setConfirmingOrderIds((prev) => [...prev, orderId]);
 
-    showToast("구매가 확정되었습니다.");
+      const response = await api.patch(`/orders/${orderId}/confirm`);
+      const confirmedOrder = response.data;
+
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order._id === confirmedOrder._id ? confirmedOrder : order,
+        ),
+      );
+
+      showToast("구매가 확정되었습니다.");
+    } catch (error) {
+      showToast(error.response?.data?.message || "구매 확정에 실패했습니다.");
+    } finally {
+      setConfirmingOrderIds((prev) => prev.filter((id) => id !== orderId));
+    }
   };
 
   const handleTrackDelivery = () => {
     showToast("배송 조회 서비스 준비중입니다.");
   };
 
-  const renderItemActions = (item, itemKey) => {
-    const isConfirmed = confirmedItemKeys.has(itemKey);
+  const renderItemActions = (item) => {
+    const isConfirmed = item.orderStatus === "confirmed";
+    const isConfirming = confirmingOrderIds.includes(item.orderId);
 
     if (!isConfirmed) {
       return (
         <button
           type="button"
           className="order-history-item__action-button order-history-item__action-button--confirm"
-          onClick={() => handleConfirmPurchase(itemKey)}
+          onClick={() => handleConfirmPurchase(item.orderId)}
+          disabled={isConfirming}
         >
-          구매 확정
+          {isConfirming ? "처리중..." : "구매 확정"}
         </button>
       );
     }
@@ -227,12 +242,12 @@ function OrderHistory() {
                             </div>
 
                             <div className="order-history-item__action">
-                              {renderItemActions(item, itemKey)}
+                              {renderItemActions(item)}
                             </div>
                           </div>
 
                           <div className="order-history-item__action--mobile">
-                            {renderItemActions(item, itemKey)}
+                            {renderItemActions(item)}
                           </div>
                         </article>
 
