@@ -347,11 +347,13 @@ const sortProducts = (products, sortValue) => {
   return sortedProducts;
 };
 
-const FilterMenuList = ({ children, checked, onChange }) => {
+const FilterMenuList = ({ children, checked, onChange, inputId }) => {
   return (
     <li className="filter-option">
-      <input checked={checked} type="checkbox" onChange={onChange} />
-      <p>{children}</p>
+      <label htmlFor={inputId} className="filter-option__label">
+        <input id={inputId} checked={checked} type="checkbox" onChange={onChange} />
+        <p>{children}</p>
+      </label>
     </li>
   );
 };
@@ -366,6 +368,7 @@ const FilterMenuBox = ({ title, items, selectedValues, onToggle }) => {
         {items.map((item) => (
           <FilterMenuList
             key={`${title}-${item}`}
+            inputId={`${title}-${item}`}
             checked={selectedValues.includes(item)}
             onChange={() => onToggle(title, item)}
           >
@@ -646,6 +649,7 @@ export default function ListLayout({
           title="필터"
           onClose={() => setIsFilterModalOpen(false)}
           className="list-mobile-filter-modal"
+          showCloseButton={false}
         >
           <div className="list-mobile-filter">
             <div className="list-mobile-filter__tabs">
@@ -689,6 +693,7 @@ export default function ListLayout({
                   {activeMobileFilterGroup?.items.map((item) => (
                     <FilterMenuList
                       key={`${activeMobileFilterGroup.title}-${item}`}
+                      inputId={`mobile-${activeMobileFilterGroup.title}-${item}`}
                       checked={(selectedFilters[activeMobileFilterGroup.title] ?? []).includes(item)}
                       onChange={() => handleFilterToggle(activeMobileFilterGroup.title, item)}
                     >
@@ -707,13 +712,6 @@ export default function ListLayout({
               >
                 초기화 <img src={resetIcon} alt="" />
               </button>
-              <button
-                type="button"
-                className="list-mobile-filter__apply"
-                onClick={() => setIsFilterModalOpen(false)}
-              >
-                선택한 조건으로 상품 보기
-              </button>
             </div>
           </div>
         </Modal>
@@ -723,6 +721,7 @@ export default function ListLayout({
           title="정렬"
           onClose={() => setIsSortModalOpen(false)}
           className="list-mobile-sort-modal"
+          showCloseButton={false}
         >
           <div className="list-mobile-sort">
             <div className="list-mobile-sort__options">

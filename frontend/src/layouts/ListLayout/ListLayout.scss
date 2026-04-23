@@ -268,9 +268,12 @@ $range-thumb-half: 9px;
 }
 
 .filter-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  .filter-option__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
 
   p {
     font-size: $font-sm;
@@ -450,15 +453,14 @@ $range-thumb-half: 9px;
   }
 
   &__actions {
-    display: grid;
-    grid-template-columns: 92px minmax(0, 1fr);
-    gap: 10px;
+    display: flex;
     margin-top: 18px;
   }
 
   &__reset {
     @include button-reverse($bg: #ffffff, $color: $color-text-main, $radius: 12px);
     @include flex(center, center);
+    width: 100%;
     min-width: 0;
     height: 40px;
     padding: 0;
@@ -471,27 +473,21 @@ $range-thumb-half: 9px;
       display: block;
     }
   }
-
-  &__apply {
-    @include button-base($bg: $color-text-sub, $color: $color-white, $radius: 12px);
-    min-width: 0;
-    height: 40px;
-    padding: 0 16px;
-  }
 }
 
 .list-mobile-sort {
-  padding: 4px 0 8px;
+  padding: 0;
 
   &__options {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: $space-xs;
+    align-items: flex-start;
   }
 
   &__option {
-    width: 100%;
-    min-height: 40px;
+    width: auto;
+    min-height: 0;
     padding: 0;
     border: 0;
     background: transparent;
