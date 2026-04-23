@@ -240,6 +240,14 @@
   overflow: hidden;
 }
 
+.my-page__recent-panel--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  padding: 24px 18px;
+}
+
 .my-page__rail {
   display: grid;
   grid-auto-flow: column;
@@ -342,6 +350,16 @@
   font-size: 15px;
   font-weight: $font-black;
   line-height: 1.2;
+}
+
+.my-page__empty-message {
+  margin: 0;
+  max-width: 220px;
+  text-align: center;
+  color: rgba($color-text-main, 0.48);
+  font-size: 14px;
+  font-weight: $font-medium;
+  line-height: 1.6;
 }
 
 .my-page__history-list {
@@ -575,6 +593,11 @@
     padding: 24px 0 30px 22px;
   }
 
+  .my-page__recent-panel--empty {
+    min-height: 252px;
+    padding: 24px 22px 30px;
+  }
+
   .my-page__rail {
     grid-auto-columns: 148px;
     gap: 16px;
@@ -772,6 +795,10 @@
     padding: 36px 28px 2px;
     border-radius: 16px;
     overflow: hidden;
+  }
+
+  .my-page__recent-panel--empty {
+    padding: 36px 28px;
   }
 
   .my-page__rail {

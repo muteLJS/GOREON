@@ -1,6 +1,6 @@
 import "./MyPage.scss";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 
 import AiBadgeIcon from "@/assets/icons/mypage_ai.png";
@@ -10,9 +10,7 @@ import ReviewIcon from "@/assets/icons/review.png";
 import CartIconButton from "@/components/CartIconButton/CartIconButton";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 import products from "@/data/products_list.json";
-import { addToCart } from "@/store/slices/cartSlice";
 import { updateUserInfo } from "@/store/slices/userSlice";
-import { addToWishlist, removeFromWishlist } from "@/store/slices/wishlistSlice";
 import api from "@/utils/api";
 
 const FALLBACK_USER = {
@@ -32,8 +30,7 @@ const INITIAL_HISTORY_COUNT = 2;
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
 const getProductId = (product) => product?._id ?? product?.productId ?? product?.id ?? 1;
 
-const formatPrice = (value) =>
-  `₩${new Intl.NumberFormat("ko-KR").format(parsePrice(value))}`;
+const formatPrice = (value) => `₩${new Intl.NumberFormat("ko-KR").format(parsePrice(value))}`;
 
 const mappedProducts = products.slice(0, 24).map((product, index) => ({
   id: product.id ?? index + 1,
@@ -44,8 +41,6 @@ const mappedProducts = products.slice(0, 24).map((product, index) => ({
   desc: "영상 편집에 적합한 고성능 노트북",
   tags: ["#영상편집", "#영상편집"],
 }));
-
-const recentProducts = mappedProducts.slice(0, 6);
 
 const aiHistory = [
   {
@@ -130,11 +125,7 @@ function ProductRailCard({ product }) {
   return (
     <article className="my-page__rail-card">
       <div className="my-page__rail-card-media-wrap">
-        <Link
-          to={`/product/${productId}`}
-          className="my-page__rail-card-media"
-          draggable={false}
-        >
+        <Link to={`/product/${productId}`} className="my-page__rail-card-media" draggable={false}>
           <img src={product.image} alt={product.name} draggable={false} />
         </Link>
         <div className="my-page__rail-card-actions">
@@ -142,11 +133,7 @@ function ProductRailCard({ product }) {
           <WishlistIconButton product={product} size="sm" />
         </div>
       </div>
-      <Link
-        to={`/product/${productId}`}
-        className="my-page__rail-card-copy"
-        draggable={false}
-      >
+      <Link to={`/product/${productId}`} className="my-page__rail-card-copy" draggable={false}>
         <p className="my-page__rail-card-name">{product.name}</p>
         <p className="my-page__rail-card-price">{product.price}</p>
       </Link>
@@ -190,10 +177,14 @@ export default function MyPage() {
   const userInfo = useSelector((state) => state.user.userInfo);
   const cartCount = useSelector((state) => state.cart.items.length);
   const wishlistCount = useSelector((state) => state.wishlist.items.length);
-  const displayUser = useMemo(() => ({
-    ...FALLBACK_USER,
-    ...userInfo,
-  }), [userInfo]);
+  const recentProducts = useSelector((state) => state.recentViewed.items);
+  const displayUser = useMemo(
+    () => ({
+      ...FALLBACK_USER,
+      ...userInfo,
+    }),
+    [userInfo],
+  );
 
   const [profileDraft, setProfileDraft] = useState(displayUser);
   const [editingField, setEditingField] = useState("");
@@ -334,9 +325,7 @@ export default function MyPage() {
       setEditingField("");
       showActionAlert("회원정보가 수정되었습니다.");
     } catch (error) {
-      showActionAlert(
-        error.response?.data?.message || "회원정보 수정에 실패했습니다.",
-      );
+      showActionAlert(error.response?.data?.message || "회원정보 수정에 실패했습니다.");
     } finally {
       setSavingField("");
     }
@@ -553,9 +542,7 @@ export default function MyPage() {
           <div className="my-page__metrics">
             {metrics.map((metric, index) => (
               <Link key={metric.key} to={metric.href} className="my-page__metric">
-                <span
-                  className={`my-page__metric-icon my-page__metric-icon--${metric.key}`}
-                >
+                <span className={`my-page__metric-icon my-page__metric-icon--${metric.key}`}>
                   <MetricIcon type={metric.key} />
                 </span>
                 <strong>{metric.value}</strong>
@@ -585,20 +572,28 @@ export default function MyPage() {
 
           <section className="my-page__section">
             <h2 className="my-page__section-title">최근 본 상품</h2>
-            <div className="my-page__recent-panel">
-              <div
-                ref={recentRailRef}
-                className="my-page__rail"
-                onPointerDown={handleRecentRailPointerDown}
-                onPointerMove={handleRecentRailPointerMove}
-                onPointerUp={handleRecentRailPointerEnd}
-                onPointerCancel={handleRecentRailPointerEnd}
-                onClickCapture={handleRecentRailClickCapture}
-              >
-                {recentProducts.map((product) => (
-                  <ProductRailCard key={product.id} product={product} />
-                ))}
-              </div>
+            <div
+              className={`my-page__recent-panel${
+                recentProducts.length === 0 ? " my-page__recent-panel--empty" : ""
+              }`}
+            >
+              {recentProducts.length > 0 ? (
+                <div
+                  ref={recentRailRef}
+                  className="my-page__rail"
+                  onPointerDown={handleRecentRailPointerDown}
+                  onPointerMove={handleRecentRailPointerMove}
+                  onPointerUp={handleRecentRailPointerEnd}
+                  onPointerCancel={handleRecentRailPointerEnd}
+                  onClickCapture={handleRecentRailClickCapture}
+                >
+                  {recentProducts.map((product) => (
+                    <ProductRailCard key={product.id} product={product} />
+                  ))}
+                </div>
+              ) : (
+                <p className="my-page__empty-message">최근 본 상품이 없습니다.</p>
+              )}
             </div>
           </section>
         </div>
@@ -610,10 +605,7 @@ export default function MyPage() {
             className="my-page__history-list-shell"
             style={{ height: `${historyListHeight}px` }}
             onTransitionEnd={(event) => {
-              if (
-                event.target !== event.currentTarget ||
-                event.propertyName !== "height"
-              ) {
+              if (event.target !== event.currentTarget || event.propertyName !== "height") {
                 return;
               }
 
@@ -693,9 +685,7 @@ export default function MyPage() {
               disabled={isHistoryAnimating}
               onClick={() => {
                 if (hasMoreHistory) {
-                  animateHistoryCountChange(
-                    Math.min(visibleHistoryCount + 2, aiHistory.length),
-                  );
+                  animateHistoryCountChange(Math.min(visibleHistoryCount + 2, aiHistory.length));
                   return;
                 }
 
