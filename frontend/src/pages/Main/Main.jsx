@@ -1,4 +1,4 @@
-﻿import "./Main.scss";
+import "./Main.scss";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -24,6 +24,10 @@ import productsData from "@/data/products_list.json";
 import { addAiRecommendationHistory } from "@/store/slices/aiRecommendationHistory";
 import api from "@/utils/api";
 import { fetchAiRecommendations } from "@/utils/recommendations";
+import {
+  createAiRecommendationHistoryEntry,
+  normalizeAiRecommendationProduct,
+} from "@/utils/aiRecommendationMappers";
 import newProduct1 from "assets/products/newProduct1.png";
 import newProduct2 from "assets/products/newProduct2.png";
 import newProduct3 from "assets/products/newProduct3.png";
@@ -383,27 +387,6 @@ function Main() {
     handleInput(e);
   };
 
-  const normalizeAiProduct = (item) => ({
-    id: item.id ?? item.productId ?? item._id,
-    productId: item.productId ?? item._id ?? item.id,
-    name: item.name ?? "추천 상품",
-    price: item.price ?? "0",
-    image: item.image ?? "",
-    rating: item.rating ?? 0,
-    spec: item.reason ?? item.tag?.join(" · ") ?? "상품 데이터 기준 추천",
-    reason: item.reason,
-    matchedCriteria: item.matchedCriteria ?? [],
-    caveat: item.caveat,
-  });
-
-  const createAiHistoryEntry = ({ query, message, products }) => ({
-    id: `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
-    query,
-    message,
-    createdAt: new Date().toISOString(),
-    products,
-  });
-
   const startAiResultTransition = () => {
     if (showAiResult) {
       return;
@@ -519,7 +502,7 @@ function Main() {
         signal: controller.signal,
       });
       const nextResults = Array.isArray(result.products)
-        ? result.products.map(normalizeAiProduct)
+        ? result.products.map(normalizeAiRecommendationProduct)
         : [];
       const nextMessage =
         result.message ||
@@ -538,7 +521,7 @@ function Main() {
 
       dispatch(
         addAiRecommendationHistory(
-          createAiHistoryEntry({
+          createAiRecommendationHistoryEntry({
             query,
             message: nextMessage,
             products: nextResults,

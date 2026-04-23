@@ -32,6 +32,7 @@ const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")
 const getProductId = (product) => product?._id ?? product?.productId ?? product?.id ?? 1;
 
 const formatPrice = (value) => `₩${new Intl.NumberFormat("ko-KR").format(parsePrice(value))}`;
+const showActionAlert = (message) => window.alert(message);
 const formatHistoryDate = (value) => {
   const date = new Date(value);
 
