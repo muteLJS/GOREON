@@ -2,6 +2,8 @@
 @import "styles/mixins";
 
 .product-detail {
+  --product-detail-tab-top: calc(var(--mobile-header-height, 76px) + 12px);
+  --product-detail-section-offset: calc(var(--mobile-header-height, 76px) + 84px);
   width: 100%;
   padding: 0 0 132px;
   color: $color-text-main;
@@ -239,8 +241,8 @@
 .product-detail__tabs {
   @include flex(center, center);
   gap: 0;
-  position: relative;
-  top: auto;
+  position: sticky;
+  top: var(--product-detail-tab-top);
   z-index: 5;
   width: min(184px, 100%);
   margin: 20px auto;
@@ -268,14 +270,9 @@
   }
 }
 
-.product-detail__story + .product-detail__tabs {
-  margin-top: 20px;
-  margin-bottom: 12px;
-}
-
 .product-detail__story,
 .product-detail__reviews {
-  scroll-margin-top: 132px;
+  scroll-margin-top: var(--product-detail-section-offset);
 }
 
 .product-detail__story {
@@ -660,6 +657,8 @@
 
 @include tablet-up {
   .product-detail {
+    --product-detail-tab-top: calc(var(--mobile-header-height, 84px) + 16px);
+    --product-detail-section-offset: calc(var(--mobile-header-height, 84px) + 104px);
     width: min(720px, calc(100vw - #{$layout-tablet-padding * 2}));
     max-width: calc(100vw - #{$layout-tablet-padding * 2});
     margin: 0 auto;
@@ -788,11 +787,6 @@
       height: 28px;
       font-size: 14px;
     }
-  }
-
-  .product-detail__story + .product-detail__tabs {
-    margin-top: 56px;
-    margin-bottom: 24px;
   }
 
   .product-detail__overview-preview.is-collapsed {
@@ -930,6 +924,8 @@
 
 @include desktop-up {
   .product-detail {
+    --product-detail-tab-top: 28px;
+    --product-detail-section-offset: 120px;
     width: min(1320px, calc(100vw - 48px));
     margin: 0;
     margin-left: 50%;
@@ -964,8 +960,12 @@
 
   .product-detail__tabs {
     width: min(376px, 100%);
-    top: auto;
     margin: 120px auto 119px;
+
+    button {
+      height: 28px;
+      font-size: 14px;
+    }
   }
 
   .product-detail__overview-preview.is-collapsed {
@@ -976,12 +976,6 @@
     width: 871px;
     margin: 0 auto;
   }
-
-  .product-detail__story + .product-detail__tabs {
-    margin-top: 120px;
-    margin-bottom: 38px;
-  }
-
   .product-detail__visual-frame {
     width: 100%;
     height: auto;

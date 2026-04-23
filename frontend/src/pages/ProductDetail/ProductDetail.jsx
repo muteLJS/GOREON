@@ -123,6 +123,7 @@ function ProductDetail() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const tabsRef = useRef(null);
   const overviewRef = useRef(null);
   const reviewsRef = useRef(null);
 
@@ -229,6 +230,35 @@ function ProductDetail() {
     );
   }, [dispatch, id, product]);
 
+  useEffect(() => {
+    if (!product) {
+      return;
+    }
+
+    const updateActiveTabFromScroll = () => {
+      const tabsElement = tabsRef.current;
+      const stickyTop = tabsElement
+        ? Number.parseFloat(window.getComputedStyle(tabsElement).top) || 0
+        : 0;
+      const activationOffset = stickyTop + (tabsElement?.offsetHeight ?? 0) + 24;
+      const reviewsTop = reviewsRef.current?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY;
+
+      setActiveTab((prev) => {
+        const nextTab = reviewsTop <= activationOffset ? "reviews" : "overview";
+        return prev === nextTab ? prev : nextTab;
+      });
+    };
+
+    updateActiveTabFromScroll();
+    window.addEventListener("scroll", updateActiveTabFromScroll, { passive: true });
+    window.addEventListener("resize", updateActiveTabFromScroll);
+
+    return () => {
+      window.removeEventListener("scroll", updateActiveTabFromScroll);
+      window.removeEventListener("resize", updateActiveTabFromScroll);
+    };
+  }, [product]);
+
   if (status === "loading") {
     return (
       <main className="product-detail">
@@ -283,21 +313,35 @@ function ProductDetail() {
   const handleTabClick = (tab) => {
     setActiveTab(tab);
     const targetRef = tab === "overview" ? overviewRef : reviewsRef;
-    targetRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!targetRef.current) {
+      return;
+    }
+
+    const tabsElement = tabsRef.current;
+    const stickyTop = tabsElement
+      ? Number.parseFloat(window.getComputedStyle(tabsElement).top) || 0
+      : 0;
+    const scrollOffset = stickyTop + (tabsElement?.offsetHeight ?? 0) + 16;
+    const targetTop = targetRef.current.getBoundingClientRect().top + window.scrollY - scrollOffset;
+
+    window.scrollTo({
+      top: Math.max(0, targetTop),
+      behavior: "smooth",
+    });
   };
 
-  const renderTabs = (visualActiveTab = activeTab) => (
-    <div className="product-detail__tabs">
+  const renderTabs = () => (
+    <div className="product-detail__tabs" ref={tabsRef}>
       <button
         type="button"
-        className={visualActiveTab === "overview" ? "is-active" : ""}
+        className={activeTab === "overview" ? "is-active" : ""}
         onClick={() => handleTabClick("overview")}
       >
-        상품 설명
+        상세정보
       </button>
       <button
         type="button"
-        className={visualActiveTab === "reviews" ? "is-active" : ""}
+        className={activeTab === "reviews" ? "is-active" : ""}
         onClick={() => handleTabClick("reviews")}
       >
         리뷰
@@ -476,8 +520,6 @@ function ProductDetail() {
           />
         </button>
       </section>
-
-      {renderTabs("reviews")}
 
       <section className="product-detail__reviews" ref={reviewsRef}>
         {renderReviewPhotoSwiper()}
