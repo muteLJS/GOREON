@@ -137,6 +137,61 @@ const updateMobileItems = [
   }),
 ];
 
+const categorySections = [
+  {
+    id: "direct",
+    label: "영상 편집",
+    icon: Direct,
+    items: [
+      getMainProduct(29, { tags: ["#크리에이터", "#영상편집", "#고성능"] }),
+      getMainProduct(1, { tags: ["#대화면", "#휴대성", "#작업용"] }),
+      getMainProduct(3, { tags: ["#프리미엄", "#멀티작업", "#노트북"] }),
+      getMainProduct(8, { tags: ["#그래픽", "#게이밍겸용", "#콘텐츠"] }),
+      getMainProduct(601, { tags: ["#태블릿", "#드로잉", "#가벼움"] }),
+      getMainProduct(592, { tags: ["#휴대성", "#필기", "#M시리즈"] }),
+    ],
+  },
+  {
+    id: "game",
+    label: "게이밍",
+    icon: Game,
+    items: [
+      getMainProduct(8, { tags: ["#게이밍", "#ASUS", "#고성능"] }),
+      getMainProduct(10, { tags: ["#LOQ", "#FPS", "#가성비"] }),
+      getMainProduct(11, { tags: ["#OMEN", "#몰입감", "#고사양"] }),
+      getMainProduct(12, { tags: ["#HP", "#게이밍", "#노트북"] }),
+      getMainProduct(5, { tags: ["#MSI", "#QHD", "#게임"] }),
+      getMainProduct(325, { tags: ["#RTX5070", "#그래픽카드", "#업그레이드"] }),
+    ],
+  },
+  {
+    id: "student",
+    label: "학생",
+    icon: Book,
+    items: [
+      getMainProduct(4, { tags: ["#가성비", "#문서작업", "#노트북"] }),
+      getMainProduct(6, { tags: ["#실속형", "#온라인강의", "#휴대"] }),
+      getMainProduct(7, { tags: ["#첫노트북", "#과제", "#윈도우"] }),
+      getMainProduct(2, { tags: ["#ASUS", "#강의", "#입문"] }),
+      getMainProduct(9, { tags: ["#삼성", "#대학생", "#휴대성"] }),
+      getMainProduct(590, { tags: ["#태블릿", "#필기", "#가벼움"] }),
+    ],
+  },
+  {
+    id: "together",
+    label: "부모님",
+    icon: Together,
+    items: [
+      getMainProduct(589, { tags: ["#큰화면", "#영상통화", "#태블릿"] }),
+      getMainProduct(590, { tags: ["#입문형", "#쉬운사용", "#iPad"] }),
+      getMainProduct(601, { tags: ["#대화면", "#OTT", "#가족공유"] }),
+      getMainProduct(481, { tags: ["#스마트폰", "#카메라", "#자급제"] }),
+      getMainProduct(502, { tags: ["#건강관리", "#워치", "#알림"] }),
+      getMainProduct(606, { tags: ["#가벼움", "#유튜브", "#태블릿"] }),
+    ],
+  },
+];
+
 const toDisplayPrice = (product) => `￦${product.price}`;
 
 const toPackageDetail = (product, label) => ({
@@ -329,41 +384,9 @@ function Main() {
     { length: Math.ceil(updateMobileItems.length / 2) },
     (_, rowIndex) => rowIndex * 2,
   );
-  const categoryItemsMap = {
-    direct: [
-      getMainProduct(29, { tags: ["#크리에이터", "#영상편집", "#고성능"] }),
-      getMainProduct(1, { tags: ["#대화면", "#휴대성", "#작업용"] }),
-      getMainProduct(3, { tags: ["#프리미엄", "#멀티작업", "#노트북"] }),
-      getMainProduct(8, { tags: ["#그래픽", "#게이밍겸용", "#콘텐츠"] }),
-      getMainProduct(601, { tags: ["#태블릿", "#드로잉", "#가벼움"] }),
-      getMainProduct(592, { tags: ["#휴대성", "#필기", "#M시리즈"] }),
-    ],
-    game: [
-      getMainProduct(8, { tags: ["#게이밍", "#ASUS", "#고성능"] }),
-      getMainProduct(10, { tags: ["#LOQ", "#FPS", "#가성비"] }),
-      getMainProduct(11, { tags: ["#OMEN", "#몰입감", "#고사양"] }),
-      getMainProduct(12, { tags: ["#HP", "#게이밍", "#노트북"] }),
-      getMainProduct(5, { tags: ["#MSI", "#QHD", "#게임"] }),
-      getMainProduct(325, { tags: ["#RTX5070", "#그래픽카드", "#업그레이드"] }),
-    ],
-    student: [
-      getMainProduct(4, { tags: ["#가성비", "#문서작업", "#노트북"] }),
-      getMainProduct(6, { tags: ["#실속형", "#온라인강의", "#휴대"] }),
-      getMainProduct(7, { tags: ["#첫노트북", "#과제", "#윈도우"] }),
-      getMainProduct(2, { tags: ["#ASUS", "#강의", "#입문"] }),
-      getMainProduct(9, { tags: ["#삼성", "#대학생", "#휴대성"] }),
-      getMainProduct(590, { tags: ["#태블릿", "#필기", "#가벼움"] }),
-    ],
-    together: [
-      getMainProduct(589, { tags: ["#큰화면", "#영상통화", "#태블릿"] }),
-      getMainProduct(590, { tags: ["#입문형", "#쉬운사용", "#iPad"] }),
-      getMainProduct(601, { tags: ["#대화면", "#OTT", "#가족공유"] }),
-      getMainProduct(481, { tags: ["#스마트폰", "#카메라", "#자급제"] }),
-      getMainProduct(502, { tags: ["#건강관리", "#워치", "#알림"] }),
-      getMainProduct(606, { tags: ["#가벼움", "#유튜브", "#태블릿"] }),
-    ],
-  };
-  const categoryItems = categoryItemsMap[selectedCategory];
+  const selectedCategorySection =
+    categorySections.find((section) => section.id === selectedCategory) ?? categorySections[0];
+  const categoryItems = selectedCategorySection.items;
   const aiResultItems = aiResults;
   const handleInput = (e) => {
     const el = e.target;
@@ -1276,57 +1299,23 @@ function Main() {
             </div>
             <More />
           </div>
-          <div className="categories">
-            <form action="#">
-              <input
-                type="radio"
-                id="direct"
-                name="category"
-                className="hidden"
-                checked={selectedCategory === "direct"}
-                onChange={() => setSelectedCategory("direct")}
-              />
-              <label htmlFor="direct" className="category category_1 pointer">
-                <img src={Direct} alt="direct" />
-                <p>영상 편집</p>
-              </label>
-              <input
-                type="radio"
-                id="game"
-                name="category"
-                className="hidden"
-                checked={selectedCategory === "game"}
-                onChange={() => setSelectedCategory("game")}
-              />
-              <label htmlFor="game" className="category category_2 pointer">
-                <img src={Game} alt="game" />
-                <p>게이밍</p>
-              </label>
-              <input
-                type="radio"
-                id="student"
-                name="category"
-                className="hidden"
-                checked={selectedCategory === "student"}
-                onChange={() => setSelectedCategory("student")}
-              />
-              <label htmlFor="student" className="category category_3 pointer">
-                <img src={Book} alt="student" />
-                <p>학생</p>
-              </label>
-              <input
-                type="radio"
-                id="together"
-                name="category"
-                className="hidden"
-                checked={selectedCategory === "together"}
-                onChange={() => setSelectedCategory("together")}
-              />
-              <label htmlFor="together" className="category category_4 pointer">
-                <img src={Together} alt="together" />
-                <p>부모님</p>
-              </label>
-            </form>
+          <div className="categories" aria-label="목적별 추천 카테고리">
+            {categorySections.map((section) => {
+              const isActive = section.id === selectedCategory;
+
+              return (
+                <button
+                  key={section.id}
+                  type="button"
+                  className={`category ${isActive ? "is-active" : ""}`.trim()}
+                  onClick={() => setSelectedCategory(section.id)}
+                  aria-pressed={isActive}
+                >
+                  <img src={section.icon} alt="" aria-hidden="true" />
+                  <span>{section.label}</span>
+                </button>
+              );
+            })}
           </div>
           {renderCategoryItems()}
         </div>
