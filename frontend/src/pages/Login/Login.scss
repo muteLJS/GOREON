@@ -1,5 +1,5 @@
-﻿@import "styles/mixins";
-@import "styles/variables"; // input 박스 컴포넌트 스타일
+@use "styles/mixins" as *;
+@use "styles/variables" as *; // input 박스 컴포넌트 스타일
 
 // Mobile (로그인/회원가입 공통)
 .mobile-login,

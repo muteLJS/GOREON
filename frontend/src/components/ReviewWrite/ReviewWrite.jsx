@@ -1,12 +1,14 @@
 import Modal from "@/components/Modal/Modal";
 import RatingInput from "@/components/RatingInput/RatingInput";
 import UploadIcon from "@/assets/icons/upload.svg";
+import { useToast } from "@/components/Toast/toastContext";
 import { useState, useRef, useEffect } from "react";
 import api from "@/utils/api";
 import "./ReviewWrite.scss";
 
 function ReviewWrite({ productId, onClose }) {
   const MAX_CONTENT_LENGTH = 300;
+  const { showToast } = useToast();
   const [review, setReview] = useState({
     rating: 0,
     content: "",
@@ -36,8 +38,13 @@ function ReviewWrite({ productId, onClose }) {
       formData.append("images", file);
     });
 
-    await api.post("/reviews", formData);
-    onClose();
+    try {
+      await api.post("/reviews", formData);
+      showToast("리뷰가 등록되었습니다.");
+      onClose();
+    } catch {
+      showToast("리뷰 등록에 실패했습니다.");
+    }
   };
 
   const handleImageChange = (e) => {

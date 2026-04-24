@@ -8,6 +8,8 @@ import userReducer from "./slices/userSlice";
 import cartReducer from "./slices/cartSlice";
 import wishlistReducer from "./slices/wishlistSlice";
 import quoteReducer from "./slices/quoteSlice";
+import recentViewedReducer from "./slices/recentViewed";
+import aiRecommendationHistoryReducer from "./slices/aiRecommendationHistory";
 
 const store = configureStore({
   reducer: {
@@ -15,6 +17,8 @@ const store = configureStore({
     cart: cartReducer,
     wishlist: wishlistReducer,
     quote: quoteReducer,
+    recentViewed: recentViewedReducer,
+    aiRecommendationHistory: aiRecommendationHistoryReducer,
   },
 });
 

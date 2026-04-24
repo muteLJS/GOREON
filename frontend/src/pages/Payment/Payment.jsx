@@ -1,9 +1,10 @@
 ﻿import "./Payment.scss";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
+import { useToast } from "@/components/Toast/toastContext";
 import AddressModal from "../../components/AddressModal/AddressModal";
 import CreditCardIcon from "../../assets/icons/creditcard.svg";
 import KakaoPayIcon from "../../assets/icons/kakaopay.svg";
@@ -17,6 +18,8 @@ import {
   getCartItems,
   summarizeOrder,
 } from "../../utils/cart";
+import { removeCartItems } from "../../store/slices/cartSlice";
+import api from "../../utils/api";
 
 const PAYMENT_OPTIONS = [
   { id: "card", label: "신용 카드", icon: CreditCardIcon, iconAlt: "신용 카드", available: true },
@@ -100,6 +103,8 @@ function TextField({ icon, iconAlt = "", className, ...inputProps }) {
 export default function Payment() {
   const { state } = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { showToast } = useToast();
   const storedCartItems = useSelector((store) => store.cart.items);
   const initialShippingForm = useMemo(
     () => ({
@@ -113,6 +118,7 @@ export default function Payment() {
   const [cardForm, setCardForm] = useState(EMPTY_CARD_FORM);
   const [shippingForm, setShippingForm] = useState(initialShippingForm);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const orderItems = useMemo(() => {
     if (Array.isArray(state?.orderItems)) {
@@ -151,7 +157,7 @@ export default function Payment() {
 
   const handleMethodClick = (option) => {
     if (!option.available) {
-      window.alert("서비스 준비중입니다.");
+      showToast("서비스 준비중입니다.");
       return;
     }
 
@@ -181,8 +187,51 @@ export default function Payment() {
     [closeAddressModal],
   );
 
-  const handlePayment = () => {
-    navigate("/order-history");
+  const handlePayment = async () => {
+    if (orderItems.length === 0) {
+      showToast("주문할 상품이 없습니다.");
+      return;
+    }
+
+    const invalidItem = orderItems.find((item) => !item.productId);
+
+    if (invalidItem) {
+      showToast("상품 정보가 올바르지 않습니다.");
+      return;
+    }
+
+    const payload = {
+      items: orderItems.map((item) => ({
+        product: item.productId,
+        name: item.name,
+        category: item.category || "",
+        option: item.option || "",
+        thumb: item.image || "",
+        price: Number(item.price) || 0,
+        quantity: Number(item.quantity) || 1,
+      })),
+      totalAmount: orderTotal,
+    };
+
+    try {
+      setIsSubmitting(true);
+
+      await api.post("/orders", payload);
+      dispatch(removeCartItems(orderItems.map((item) => item.id)));
+
+      showToast("주문이 완료되었습니다.");
+      navigate("/order-history");
+    } catch (error) {
+      if (error.response?.status === 401) {
+        showToast("로그인이 필요합니다.");
+        navigate("/login", { state: { from: "/payment" } });
+        return;
+      }
+
+      showToast(error.response?.data?.message || "주문 처리에 실패했습니다.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -381,8 +430,13 @@ export default function Payment() {
             </div>
           </Section>
 
-          <button type="button" className="payment-page__submit" onClick={handlePayment}>
-            결제하기
+          <button
+            type="button"
+            className="payment-page__submit"
+            onClick={handlePayment}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "처리중..." : "결제하기"}
           </button>
         </div>
       </div>

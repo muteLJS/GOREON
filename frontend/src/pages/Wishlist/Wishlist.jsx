@@ -10,6 +10,7 @@ import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
 import CartIconButton from "@/components/CartIconButton/CartIconButton";
 import ProductCardVertical from "@/components/ProductCard/ProductCardVertical";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
+import { getProductListKey } from "@/utils/productIdentity";
 
 const FilterMenuBox = ({ title }) => {
   return (
@@ -61,7 +62,7 @@ export default function Wishlist() {
               <div className="list-assembly__product-grid">
                 {wishlistItems.map((product) => (
                   <ProductCardVertical
-                    key={product.id}
+                    key={getProductListKey(product)}
                     product={product}
                     action={
                       <div className="list-assembly__button-container">

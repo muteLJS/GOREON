@@ -1,18 +1,19 @@
 import "./MyPage.scss";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
 
 import AiBadgeIcon from "@/assets/icons/mypage_ai.png";
 import MypageCartIcon from "@/assets/icons/Mypage_cart.svg";
 import MypageLikeIcon from "@/assets/icons/Mypage_like.svg";
 import ReviewIcon from "@/assets/icons/review.png";
 import CartIconButton from "@/components/CartIconButton/CartIconButton";
+import { useToast } from "@/components/Toast/toastContext";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
-import products from "@/data/products_list.json";
-import { addToCart } from "@/store/slices/cartSlice";
-import { updateUserInfo } from "@/store/slices/userSlice";
-import { addToWishlist, removeFromWishlist } from "@/store/slices/wishlistSlice";
+import { logout, updateUserInfo } from "@/store/slices/userSlice";
+import { getProductListKey, getProductObjectId } from "@/utils/productIdentity";
 import api from "@/utils/api";
 
 const FALLBACK_USER = {
@@ -30,55 +31,43 @@ const INFO_FIELDS = [
 const INITIAL_HISTORY_COUNT = 2;
 
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
-const getProductId = (product) => product?._id ?? product?.productId ?? product?.id ?? 1;
+const getProductId = (product) => getProductObjectId(product) ?? "1";
 
-const formatPrice = (value) =>
-  `₩${new Intl.NumberFormat("ko-KR").format(parsePrice(value))}`;
+const formatPrice = (value) => `₩${new Intl.NumberFormat("ko-KR").format(parsePrice(value))}`;
+const showActionAlert = (message) => window.alert(message);
+const formatHistoryDate = (value) => {
+  const date = new Date(value);
 
-const mappedProducts = products.slice(0, 24).map((product, index) => ({
-  id: product.id ?? index + 1,
-  name: product.name ?? `추천 상품 ${index + 1}`,
-  price: formatPrice(product.price),
-  image: product.image ?? "",
-  spec: product.priceOptions?.[0]?.optionName ?? "M3칩 / GPU / 발열 안정",
-  desc: "영상 편집에 적합한 고성능 노트북",
-  tags: ["#영상편집", "#영상편집"],
-}));
+  if (Number.isNaN(date.getTime())) {
+    return "날짜 정보 없음";
+  }
 
-const recentProducts = mappedProducts.slice(0, 6);
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(
+    date.getDate(),
+  ).padStart(2, "0")}`;
+};
 
-const aiHistory = [
-  {
-    date: "2026.04.07",
-    title: "영상 편집용 추천이에요.",
-    subtitle: "250만원 이하 / 휴대성 고려",
-    items: mappedProducts.slice(0, 4),
-  },
-  {
-    date: "2026.04.05",
-    title: "가성비 노트북 추천이에요.",
-    subtitle: "100만원 이하 / 가성비 / 기본 작업용",
-    items: mappedProducts.slice(4, 8),
-  },
-  {
-    date: "2026.04.03",
-    title: "대학생용 노트북 추천이에요.",
-    subtitle: "가벼운 무게 / 문서 작업 중점",
-    items: mappedProducts.slice(8, 12),
-  },
-  {
-    date: "2026.04.01",
-    title: "출장용 노트북 추천이에요.",
-    subtitle: "배터리 우선 / 휴대성 중점",
-    items: mappedProducts.slice(12, 16),
-  },
-  {
-    date: "2026.03.29",
-    title: "게임 겸용 노트북 추천이에요.",
-    subtitle: "그래픽 성능 / 쿨링 고려",
-    items: mappedProducts.slice(16, 20),
-  },
-];
+const formatHistoryTag = (value) => {
+  const normalized = String(value ?? "").trim();
+
+  if (!normalized) {
+    return "";
+  }
+
+  return normalized.startsWith("#") ? normalized : `#${normalized}`;
+};
+
+const createHistoryTitle = (query) => {
+  const normalized = String(query ?? "")
+    .trim()
+    .replace(/[.!?~]+$/g, "");
+
+  if (!normalized) {
+    return "AI 추천 결과";
+  }
+
+  return `"${normalized}"에 대한 추천 결과예요.`;
+};
 
 function MetricIcon({ type }) {
   if (type === "cart") {
@@ -130,26 +119,20 @@ function ProductRailCard({ product }) {
   return (
     <article className="my-page__rail-card">
       <div className="my-page__rail-card-media-wrap">
-        <Link
-          to={`/product/${productId}`}
-          className="my-page__rail-card-media"
-          draggable={false}
-        >
+        <Link to={`/product/${productId}`} className="my-page__rail-card-media" draggable={false}>
           <img src={product.image} alt={product.name} draggable={false} />
         </Link>
+      </div>
+      <Link to={`/product/${productId}`} className="my-page__rail-card-copy" draggable={false}>
+        <p className="my-page__rail-card-name">{product.name}</p>
+      </Link>
+      <div className="my-page__rail-card-footer">
+        <p className="my-page__rail-card-price">{product.price}</p>
         <div className="my-page__rail-card-actions">
           <CartIconButton product={product} size="sm" />
           <WishlistIconButton product={product} size="sm" />
         </div>
       </div>
-      <Link
-        to={`/product/${productId}`}
-        className="my-page__rail-card-copy"
-        draggable={false}
-      >
-        <p className="my-page__rail-card-name">{product.name}</p>
-        <p className="my-page__rail-card-price">{product.price}</p>
-      </Link>
     </article>
   );
 }
@@ -163,37 +146,73 @@ function AiRecommendationCard({ product }) {
         <Link to={`/product/${productId}`} className="my-page__ai-card-media">
           <img src={product.image} alt={product.name} />
         </Link>
+      </div>
+
+      <div className="my-page__ai-card-content">
+        <Link to={`/product/${productId}`} className="my-page__ai-card-copy">
+          <p className="my-page__ai-card-name">{product.name}</p>
+          <p className="my-page__ai-card-desc">{product.desc}</p>
+          {product.tags.length > 0 ? (
+            <div className="my-page__ai-card-tags">
+              {product.tags.map((tag) => (
+                <span key={`${productId}-${tag}`}>{tag}</span>
+              ))}
+            </div>
+          ) : null}
+        </Link>
+        <p className="my-page__ai-card-price">{product.price}</p>
         <div className="my-page__ai-card-actions">
           <CartIconButton product={product} size="sm" />
           <WishlistIconButton product={product} size="sm" />
         </div>
       </div>
-
-      <Link to={`/product/${productId}`} className="my-page__ai-card-copy">
-        <p className="my-page__ai-card-name">{product.name}</p>
-        <p className="my-page__ai-card-desc">{product.desc}</p>
-        <p className="my-page__ai-card-spec">{product.spec}</p>
-        <div className="my-page__ai-card-tags">
-          {product.tags.map((tag) => (
-            <span key={`${productId}-${tag}`}>{tag}</span>
-          ))}
-        </div>
-        <p className="my-page__ai-card-price">{product.price}</p>
-      </Link>
     </article>
   );
 }
 
 export default function MyPage() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { showToast } = useToast();
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   const userInfo = useSelector((state) => state.user.userInfo);
   const cartCount = useSelector((state) => state.cart.items.length);
   const wishlistCount = useSelector((state) => state.wishlist.items.length);
-  const displayUser = useMemo(() => ({
-    ...FALLBACK_USER,
-    ...userInfo,
-  }), [userInfo]);
+  const recentProducts = useSelector((state) => state.recentViewed.items);
+  const aiRecommendationHistoryItems = useSelector((state) => state.aiRecommendationHistory.items);
+  const displayUser = useMemo(
+    () => ({
+      ...FALLBACK_USER,
+      ...userInfo,
+    }),
+    [userInfo],
+  );
+  const aiHistory = useMemo(
+    () =>
+      aiRecommendationHistoryItems.map((history) => ({
+        id: history.id,
+        date: formatHistoryDate(history.createdAt),
+        title: createHistoryTitle(history.query),
+        subtitle: history.message || "상품 데이터 기준으로 추천한 결과입니다.",
+        items: Array.isArray(history.products)
+          ? history.products.map((product) => ({
+              id: getProductObjectId(product),
+              _id: getProductObjectId(product),
+              productId: getProductObjectId(product),
+              name: product.name ?? "추천 상품",
+              price: formatPrice(product.price),
+              image: product.image ?? "",
+              desc: product.reason ?? product.spec ?? "상품 데이터 기준 추천",
+              tags:
+                product.matchedCriteria?.length > 0
+                  ? product.matchedCriteria.slice(0, 3).map(formatHistoryTag).filter(Boolean)
+                  : ["#AI추천"],
+              rating: Number(product.rating) || 0,
+            }))
+          : [],
+      })),
+    [aiRecommendationHistoryItems],
+  );
 
   const [profileDraft, setProfileDraft] = useState(displayUser);
   const [editingField, setEditingField] = useState("");
@@ -203,15 +222,6 @@ export default function MyPage() {
   const [savingField, setSavingField] = useState("");
   const historyShellRef = useRef(null);
   const historyListRef = useRef(null);
-  const recentRailRef = useRef(null);
-  const recentRailDragRef = useRef({
-    pointerId: null,
-    startX: 0,
-    startY: 0,
-    startScrollLeft: 0,
-    isDragging: false,
-  });
-  const recentRailDidDragRef = useRef(false);
   const historyAnimationFrameRef = useRef(null);
   const pendingHistoryCountRef = useRef(null);
   const pendingHistoryHeightRef = useRef(null);
@@ -220,6 +230,26 @@ export default function MyPage() {
   useEffect(() => {
     setProfileDraft(displayUser);
   }, [displayUser]);
+
+  useEffect(() => {
+    const defaultVisibleCount = Math.min(INITIAL_HISTORY_COUNT, aiHistory.length);
+
+    setVisibleHistoryCount((prev) => {
+      if (aiHistory.length === 0) {
+        return 0;
+      }
+
+      return Math.min(Math.max(prev, defaultVisibleCount), aiHistory.length);
+    });
+
+    setRenderedHistoryCount((prev) => {
+      if (aiHistory.length === 0) {
+        return 0;
+      }
+
+      return Math.min(Math.max(prev, defaultVisibleCount), aiHistory.length);
+    });
+  }, [aiHistory.length]);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -311,6 +341,18 @@ export default function MyPage() {
     }));
   };
 
+  const handleLogout = async () => {
+    await api.post("/auth/logout").catch((error) => {
+      console.warn("[auth][logout] request failed", {
+        message: error.message,
+        status: error.response?.status,
+      });
+    });
+
+    dispatch(logout());
+    navigate("/");
+  };
+
   const handleFieldToggle = async (field) => {
     if (editingField !== field) {
       setEditingField(field);
@@ -332,111 +374,12 @@ export default function MyPage() {
         ...response.data,
       }));
       setEditingField("");
-      showActionAlert("회원정보가 수정되었습니다.");
-    } catch (error) {
-      showActionAlert(
-        error.response?.data?.message || "회원정보 수정에 실패했습니다.",
-      );
+      showToast("회원정보가 수정되었습니다.");
+    } catch {
+      showToast("회원정보 수정에 실패했습니다.");
     } finally {
       setSavingField("");
     }
-  };
-
-  const resetRecentRailDrag = () => {
-    const rail = recentRailRef.current;
-
-    if (rail) {
-      rail.classList.remove("is-dragging");
-    }
-
-    recentRailDragRef.current = {
-      pointerId: null,
-      startX: 0,
-      startY: 0,
-      startScrollLeft: 0,
-      isDragging: false,
-    };
-  };
-
-  const handleRecentRailPointerDown = (event) => {
-    const rail = recentRailRef.current;
-
-    if (!rail) {
-      return;
-    }
-
-    if (event.pointerType === "mouse" && event.button !== 0) {
-      return;
-    }
-
-    if (event.target.closest("button")) {
-      return;
-    }
-
-    recentRailDidDragRef.current = false;
-    recentRailDragRef.current = {
-      pointerId: event.pointerId,
-      startX: event.clientX,
-      startY: event.clientY,
-      startScrollLeft: rail.scrollLeft,
-      isDragging: false,
-    };
-  };
-
-  const handleRecentRailPointerMove = (event) => {
-    const rail = recentRailRef.current;
-    const dragState = recentRailDragRef.current;
-
-    if (!rail || dragState.pointerId !== event.pointerId) {
-      return;
-    }
-
-    const deltaX = event.clientX - dragState.startX;
-    const deltaY = event.clientY - dragState.startY;
-
-    if (!dragState.isDragging) {
-      if (Math.abs(deltaX) < 6 && Math.abs(deltaY) < 6) {
-        return;
-      }
-
-      if (Math.abs(deltaX) <= Math.abs(deltaY)) {
-        resetRecentRailDrag();
-        return;
-      }
-
-      dragState.isDragging = true;
-      recentRailDidDragRef.current = true;
-      rail.setPointerCapture?.(event.pointerId);
-      rail.classList.add("is-dragging");
-    }
-
-    event.preventDefault();
-    rail.scrollLeft = dragState.startScrollLeft - deltaX;
-  };
-
-  const handleRecentRailPointerEnd = (event) => {
-    const rail = recentRailRef.current;
-    const dragState = recentRailDragRef.current;
-
-    if (!rail || dragState.pointerId !== event.pointerId) {
-      return;
-    }
-
-    if (dragState.isDragging) {
-      rail.releasePointerCapture?.(event.pointerId);
-    }
-
-    resetRecentRailDrag();
-  };
-
-  const handleRecentRailClickCapture = (event) => {
-    if (!recentRailDidDragRef.current) {
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-    recentRailDidDragRef.current = false;
   };
 
   const getCurrentHistoryHeight = () => {
@@ -546,16 +489,23 @@ export default function MyPage() {
 
         <section className="my-page__profile-card">
           <div className="my-page__profile-main">
-            <p className="my-page__nickname">{profileDraft.name}</p>
-            <p className="my-page__email">{profileDraft.email}</p>
+            <div className="my-page__profile-top">
+              <div className="my-page__profile-copy">
+                <p className="my-page__nickname">{profileDraft.name}</p>
+                <p className="my-page__email">{profileDraft.email}</p>
+              </div>
+              {isLoggedIn ? (
+                <button type="button" className="my-page__logout-button" onClick={handleLogout}>
+                  로그아웃
+                </button>
+              ) : null}
+            </div>
           </div>
 
           <div className="my-page__metrics">
             {metrics.map((metric, index) => (
               <Link key={metric.key} to={metric.href} className="my-page__metric">
-                <span
-                  className={`my-page__metric-icon my-page__metric-icon--${metric.key}`}
-                >
+                <span className={`my-page__metric-icon my-page__metric-icon--${metric.key}`}>
                   <MetricIcon type={metric.key} />
                 </span>
                 <strong>{metric.value}</strong>
@@ -585,104 +535,126 @@ export default function MyPage() {
 
           <section className="my-page__section">
             <h2 className="my-page__section-title">최근 본 상품</h2>
-            <div className="my-page__recent-panel">
-              <div
-                ref={recentRailRef}
-                className="my-page__rail"
-                onPointerDown={handleRecentRailPointerDown}
-                onPointerMove={handleRecentRailPointerMove}
-                onPointerUp={handleRecentRailPointerEnd}
-                onPointerCancel={handleRecentRailPointerEnd}
-                onClickCapture={handleRecentRailClickCapture}
-              >
-                {recentProducts.map((product) => (
-                  <ProductRailCard key={product.id} product={product} />
-                ))}
-              </div>
+            <div
+              className={`my-page__recent-panel${
+                recentProducts.length === 0 ? " my-page__recent-panel--empty" : ""
+              }`}
+            >
+              {recentProducts.length > 0 ? (
+                <Swiper
+                  className="my-page__rail"
+                  slidesPerView="auto"
+                  spaceBetween={14}
+                  breakpoints={{
+                    768: {
+                      spaceBetween: 16,
+                    },
+                    1024: {
+                      spaceBetween: 18,
+                    },
+                  }}
+                  watchOverflow
+                >
+                  {recentProducts.map((product, index) => (
+                    <SwiperSlide
+                      key={`${getProductId(product)}-${index}`}
+                      className="my-page__rail-slide"
+                    >
+                      <ProductRailCard product={product} />
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              ) : (
+                <p className="my-page__empty-message">최근 본 상품이 없습니다.</p>
+              )}
             </div>
           </section>
         </div>
 
         <section className="my-page__section">
           <h2 className="my-page__section-title">AI 추천 기록</h2>
-          <div
-            ref={historyShellRef}
-            className="my-page__history-list-shell"
-            style={{ height: `${historyListHeight}px` }}
-            onTransitionEnd={(event) => {
-              if (
-                event.target !== event.currentTarget ||
-                event.propertyName !== "height"
-              ) {
-                return;
-              }
+          {aiHistory.length > 0 ? (
+            <div
+              ref={historyShellRef}
+              className="my-page__history-list-shell"
+              style={{ height: `${historyListHeight}px` }}
+              onTransitionEnd={(event) => {
+                if (event.target !== event.currentTarget || event.propertyName !== "height") {
+                  return;
+                }
 
-              if (pendingHistoryCountRef.current !== null) {
-                const nextCount = pendingHistoryCountRef.current;
-                const nextHeight = pendingHistoryHeightRef.current;
-                pendingHistoryCountRef.current = null;
-                pendingHistoryHeightRef.current = null;
-                setVisibleHistoryCount(nextCount);
-                setRenderedHistoryCount(nextCount);
+                if (pendingHistoryCountRef.current !== null) {
+                  const nextCount = pendingHistoryCountRef.current;
+                  const nextHeight = pendingHistoryHeightRef.current;
+                  pendingHistoryCountRef.current = null;
+                  pendingHistoryHeightRef.current = null;
+                  setVisibleHistoryCount(nextCount);
+                  setRenderedHistoryCount(nextCount);
 
-                historyAnimationFrameRef.current = window.requestAnimationFrame(() => {
-                  if (!historyListRef.current) {
+                  historyAnimationFrameRef.current = window.requestAnimationFrame(() => {
+                    if (!historyListRef.current) {
+                      setIsHistoryAnimating(false);
+                      return;
+                    }
+
+                    setHistoryListHeight(
+                      nextHeight ??
+                        Math.ceil(historyListRef.current.getBoundingClientRect().height),
+                    );
                     setIsHistoryAnimating(false);
-                    return;
-                  }
+                  });
 
-                  setHistoryListHeight(
-                    nextHeight ?? Math.ceil(historyListRef.current.getBoundingClientRect().height),
-                  );
+                  return;
+                }
+
+                if (!historyListRef.current) {
                   setIsHistoryAnimating(false);
-                });
+                  return;
+                }
 
-                return;
-              }
-
-              if (!historyListRef.current) {
+                setHistoryListHeight(historyListRef.current.scrollHeight);
                 setIsHistoryAnimating(false);
-                return;
-              }
+              }}
+            >
+              <div ref={historyListRef} className="my-page__history-list">
+                {visibleHistory.map((history) => (
+                  <article key={history.id} className="my-page__history-group">
+                    <div className="my-page__history-date-row">
+                      <p className="my-page__history-date">{history.date}</p>
+                      <div className="my-page__history-line" />
+                    </div>
 
-              setHistoryListHeight(historyListRef.current.scrollHeight);
-              setIsHistoryAnimating(false);
-            }}
-          >
-            <div ref={historyListRef} className="my-page__history-list">
-              {visibleHistory.map((history) => (
-                <article key={history.date} className="my-page__history-group">
-                  <div className="my-page__history-date-row">
-                    <p className="my-page__history-date">{history.date}</p>
-                    <div className="my-page__history-line" />
-                  </div>
+                    <div className="my-page__history-panel">
+                      <div className="my-page__history-head">
+                        <img src={AiBadgeIcon} alt="" className="my-page__history-badge" />
+                        <div>
+                          <p className="my-page__history-title">{history.title}</p>
+                          <p className="my-page__history-subtitle">{history.subtitle}</p>
+                        </div>
+                      </div>
 
-                  <div className="my-page__history-panel">
-                    <div className="my-page__history-head">
-                      <img src={AiBadgeIcon} alt="" className="my-page__history-badge" />
-                      <div>
-                        <p className="my-page__history-title">{history.title}</p>
-                        <p className="my-page__history-subtitle">{history.subtitle}</p>
+                      <div
+                        className={`my-page__ai-grid ${
+                          history.items.length >= 3 ? "my-page__ai-grid--slider" : ""
+                        }`}
+                      >
+                        {history.items.map((product) => (
+                          <AiRecommendationCard
+                            key={`${history.id}-${getProductListKey(product)}`}
+                            product={product}
+                          />
+                        ))}
                       </div>
                     </div>
-
-                    <div
-                      className={`my-page__ai-grid ${
-                        history.items.length >= 3 ? "my-page__ai-grid--slider" : ""
-                      }`}
-                    >
-                      {history.items.map((product) => (
-                        <AiRecommendationCard
-                          key={`${history.date}-${product.id}`}
-                          product={product}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </article>
-              ))}
+                  </article>
+                ))}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="my-page__history-panel my-page__history-panel--empty">
+              <p className="my-page__empty-message">AI 추천 기록이 없습니다.</p>
+            </div>
+          )}
         </section>
 
         {canToggleHistory ? (
@@ -693,9 +665,7 @@ export default function MyPage() {
               disabled={isHistoryAnimating}
               onClick={() => {
                 if (hasMoreHistory) {
-                  animateHistoryCountChange(
-                    Math.min(visibleHistoryCount + 2, aiHistory.length),
-                  );
+                  animateHistoryCountChange(Math.min(visibleHistoryCount + 2, aiHistory.length));
                   return;
                 }
 

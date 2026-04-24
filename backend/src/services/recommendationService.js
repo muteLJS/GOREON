@@ -192,12 +192,13 @@ const getProductText = (product) =>
     .join(" ")
     .toLowerCase();
 
-const getProductKey = (product) => String(product.id ?? product._id);
+const getProductKey = (product) => String(product._id ?? product.id);
 
 const normalizeProduct = (product) => ({
   ...product,
   productId: product._id,
-  id: product.id ?? product._id,
+  _id: product._id,
+  id: product._id,
   priceNumber: parsePriceNumber(product.price),
 });
 
@@ -297,7 +298,7 @@ const sortByScore = (products, intent, rawQuery) =>
       return scoreGap;
     }
 
-    return (Number(left.id) || 0) - (Number(right.id) || 0);
+    return String(left._id ?? "").localeCompare(String(right._id ?? ""));
   });
 
 const findCandidateProducts = async (intent, rawQuery) => {
@@ -305,7 +306,7 @@ const findCandidateProducts = async (intent, rawQuery) => {
   const projection = "id image url name price priceOptions rating tag";
   const products = await Product.find(query)
     .select(projection)
-    .sort({ id: 1, _id: 1 })
+    .sort({ _id: 1 })
     .limit(DB_QUERY_LIMIT)
     .lean();
   const budgetFiltered = products.filter((product) =>
@@ -327,7 +328,7 @@ const findCandidateProducts = async (intent, rawQuery) => {
 
   const fallbackProducts = await Product.find({})
     .select(projection)
-    .sort({ rating: -1, id: 1, _id: 1 })
+    .sort({ rating: -1, _id: 1 })
     .limit(getCandidateLimit())
     .lean();
 
@@ -364,7 +365,7 @@ const buildFallbackRanking = ({ candidates, intent, limit }) => ({
 
 const createCandidatePayload = (candidate) => ({
   candidateId: getProductKey(candidate),
-  id: candidate.id,
+  id: String(candidate._id),
   name: candidate.name,
   price: candidate.price,
   priceNumber: parsePriceNumber(candidate.price),

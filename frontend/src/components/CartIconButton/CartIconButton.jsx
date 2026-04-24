@@ -1,24 +1,37 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import CartIcon from "@/assets/icons/cart-straight.svg";
+import { useToast } from "@/components/Toast/toastContext";
 import { addToCart } from "@/store/slices/cartSlice";
+import { getProductObjectId } from "@/utils/productIdentity";
 import "./CartIconButton.scss";
 
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
+const buildCartItemId = (productId, optionKey) => `${productId}::${optionKey || "default"}`;
 
 function CartIconButton({ product, className = "", size = "md" }) {
   const dispatch = useDispatch();
+  const { showToast } = useToast();
+  const cartItems = useSelector((state) => state.cart.items);
 
   const handleClick = (event) => {
     event.stopPropagation();
 
-    const productId = product?._id ?? product?.productId ?? product?.id ?? 1;
-    const cartItemId = product?.id ?? productId;
+    const productId = getProductObjectId(product);
+
+    if (!productId) {
+      return;
+    }
+
+    const optionKey = String(product?.optionId ?? product?.option ?? product?.spec ?? "default");
+    const cartItemId = product?.cartItemId ?? buildCartItemId(productId, optionKey);
+    const isAlreadyInCart = cartItems.some((item) => item.id === cartItemId);
 
     dispatch(
       addToCart({
         id: cartItemId,
         productId,
+        _id: productId,
         category: product?.category ?? "상품",
         name: product?.name ?? product?.title ?? "상품명",
         option: product?.option ?? product?.spec ?? "기본 옵션",
@@ -27,6 +40,8 @@ function CartIconButton({ product, className = "", size = "md" }) {
         quantity: 1,
       }),
     );
+
+    showToast(isAlreadyInCart ? "장바구니 수량이 추가되었습니다." : "장바구니에 담았습니다.");
   };
 
   return (

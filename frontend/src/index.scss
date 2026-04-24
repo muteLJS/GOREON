@@ -4,11 +4,11 @@
 /* -------------------------------------------------------------------------- */
 
 // 1. 디자인 토큰
-@import "./styles/variables";
-@import "./styles/mixins";
+@use "./styles/variables" as *;
+@use "./styles/mixins" as *;
 
 // 2. 브라우저 초기화
-@import "./styles/reset";
+@use "./styles/reset";
 
 // 3. 프로젝트 공통 스타일
-@import "./styles/global";
+@use "./styles/global";

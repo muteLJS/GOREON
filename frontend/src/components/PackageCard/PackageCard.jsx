@@ -4,20 +4,26 @@ import { useNavigate } from "react-router-dom";
 
 import LikeAfterIcon from "@/assets/icons/like-after.svg";
 import LikeBeforeIcon from "@/assets/icons/like-before.svg";
+import { useToast } from "@/components/Toast/toastContext";
 import { addToWishlist } from "@/store/slices/wishlistSlice";
+import { buildProductDetailPath, getProductObjectId } from "@/utils/productIdentity";
 import CartIconButton from "components/CartIconButton/CartIconButton";
 
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
 
-const getProductId = (product) => product?._id ?? product?.productId ?? product?.id;
+const toWishlistItem = (product) => {
+  const productId = getProductObjectId(product);
 
-const toWishlistItem = (product) => ({
-  id: getProductId(product),
-  name: product?.name ?? product?.title ?? "상품명",
-  price: parsePrice(product?.price),
-  image: product?.image ?? product?.heroImage ?? "",
-  rating: Number(product?.rating) || 0,
-});
+  return {
+    id: productId,
+    _id: productId,
+    productId,
+    name: product?.name ?? product?.title ?? "상품명",
+    price: parsePrice(product?.price),
+    image: product?.image ?? product?.heroImage ?? "",
+    rating: Number(product?.rating) || 0,
+  };
+};
 
 function PackageCard({
   title,
@@ -30,11 +36,12 @@ function PackageCard({
 }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const wishlistItems = useSelector((state) => state.wishlist.items);
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const packageProduct = product ?? {
-    id: title,
     name: title,
+    title,
     price,
     image: mainImage,
     option: "추천 조합",
@@ -44,26 +51,33 @@ function PackageCard({
   const allPackageItemsWishlisted =
     packageProducts.length > 0 &&
     packageProducts.every((item) =>
-      wishlistItems.some((wishlistItem) => wishlistItem.id === getProductId(item)),
+      wishlistItems.some((wishlistItem) => getProductObjectId(wishlistItem) === getProductObjectId(item)),
     );
 
   const handlePackageWishlistClick = (event) => {
     event.stopPropagation();
+    let addedCount = 0;
 
     packageProducts.forEach((item) => {
       const wishlistItem = toWishlistItem(item);
+      const isAlreadyWishlisted = wishlistItems.some(
+        (existingItem) => getProductObjectId(existingItem) === wishlistItem.productId,
+      );
 
-      if (wishlistItem.id !== undefined) {
+      if (wishlistItem.productId && !isAlreadyWishlisted) {
         dispatch(addToWishlist(wishlistItem));
+        addedCount += 1;
       }
     });
+
+    showToast(addedCount > 0 ? "찜 목록에 추가했습니다." : "이미 찜 목록에 담겨 있습니다.");
   };
 
   const handleDetailItemClick = (item) => {
-    const productId = getProductId(item.product);
+    const detailPath = buildProductDetailPath(item.product);
 
-    if (productId !== undefined && productId !== null) {
-      navigate(`/product/${productId}`);
+    if (detailPath) {
+      navigate(detailPath);
     }
   };
 

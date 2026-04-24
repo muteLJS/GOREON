@@ -1,33 +1,9 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useToast } from "@/components/Toast/toastContext";
 import ReviewWrite from "@/components/ReviewWrite/ReviewWrite";
+import api from "../../utils/api";
 import "./OrderHistory.scss";
-
-const REVIEW_TEST_ITEM = {
-  _id: "69e5c99709b3c5775bf31cb6",
-  category: "노트북",
-  name: "LG전자 2026 그램 프로16",
-  desc: "",
-  option: "SSD 512GB",
-  price: "2,151,850",
-  thumb:
-    "https://img.danuri.io/catalog-image/483/451/103/280fb649a9c8407c90c9aa52c2df7367.jpg?_v=20260417090326",
-};
-
-const ORDER_DATA = [
-  {
-    date: "2026.04.16",
-    items: [{ ...REVIEW_TEST_ITEM }, { ...REVIEW_TEST_ITEM }],
-  },
-  {
-    date: "2026.04.12",
-    items: [{ ...REVIEW_TEST_ITEM }, { ...REVIEW_TEST_ITEM }],
-  },
-  {
-    date: "2026.04.10",
-    items: [{ ...REVIEW_TEST_ITEM }, { ...REVIEW_TEST_ITEM }],
-  },
-];
 
 const PROGRESS_STEPS = [
   { label: "장바구니", num: 1, href: "/cart" },
@@ -35,33 +11,134 @@ const PROGRESS_STEPS = [
   { label: "주문내역", num: 3, href: "/order-history" },
 ];
 
-function OrderHistory() {
-  const [reviewTarget, setReviewTarget] = useState(null);
-  const [confirmedItemKeys, setConfirmedItemKeys] = useState(() => new Set());
+const formatOrderDate = (value) => {
+  const date = new Date(value);
 
-  const handleConfirmPurchase = (itemKey) => {
-    setConfirmedItemKeys((prevKeys) => {
-      const nextKeys = new Set(prevKeys);
-      nextKeys.add(itemKey);
-      return nextKeys;
-    });
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}.${month}.${day}`;
+};
+
+const groupOrdersByDate = (orders) => {
+  const groups = new Map();
+
+  orders.forEach((order) => {
+    const dateKey = formatOrderDate(order.orderedAt);
+
+    if (!groups.has(dateKey)) {
+      groups.set(dateKey, []);
+    }
+
+    const items = Array.isArray(order.items) ? order.items : [];
+
+    groups.get(dateKey).push(
+      ...items.map((item, index) => ({
+        ...item,
+        orderId: order._id,
+        orderStatus: order.status,
+        itemKey: `${order._id}-${item.product}-${index}`,
+      })),
+    );
+  });
+
+  return Array.from(groups.entries()).map(([date, items]) => ({
+    date,
+    items,
+  }));
+};
+
+function OrderHistory() {
+  const navigate = useNavigate();
+  const { showToast } = useToast();
+  const [orders, setOrders] = useState([]);
+  const [fetchStatus, setFetchStatus] = useState("loading");
+  const [reviewTarget, setReviewTarget] = useState(null);
+  const [confirmingOrderIds, setConfirmingOrderIds] = useState([]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchOrders = async () => {
+      try {
+        setFetchStatus("loading");
+
+        const response = await api.get("/orders/me");
+        const nextOrders = Array.isArray(response.data) ? response.data : [];
+
+        if (!isMounted) {
+          return;
+        }
+
+        setOrders(nextOrders);
+        setFetchStatus("success");
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        if (error.response?.status === 401) {
+          navigate("/login", { state: { from: "/order-history" } });
+          return;
+        }
+
+        setOrders([]);
+        setFetchStatus("error");
+      }
+    };
+
+    fetchOrders();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [navigate]);
+
+  const groupedOrders = useMemo(() => groupOrdersByDate(orders), [orders]);
+
+  const handleConfirmPurchase = async (orderId) => {
+    try {
+      setConfirmingOrderIds((prev) => [...prev, orderId]);
+
+      const response = await api.patch(`/orders/${orderId}/confirm`);
+      const confirmedOrder = response.data;
+
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order._id === confirmedOrder._id ? confirmedOrder : order,
+        ),
+      );
+
+      showToast("구매가 확정되었습니다.");
+    } catch (error) {
+      showToast(error.response?.data?.message || "구매 확정에 실패했습니다.");
+    } finally {
+      setConfirmingOrderIds((prev) => prev.filter((id) => id !== orderId));
+    }
   };
 
   const handleTrackDelivery = () => {
-    window.alert("배송 조회 서비스 준비중입니다.");
+    showToast("배송 조회 서비스 준비중입니다.");
   };
 
-  const renderItemActions = (item, itemKey) => {
-    const isConfirmed = confirmedItemKeys.has(itemKey);
+  const renderItemActions = (item) => {
+    const isConfirmed = item.orderStatus === "confirmed";
+    const isConfirming = confirmingOrderIds.includes(item.orderId);
 
     if (!isConfirmed) {
       return (
         <button
           type="button"
           className="order-history-item__action-button order-history-item__action-button--confirm"
-          onClick={() => handleConfirmPurchase(itemKey)}
+          onClick={() => handleConfirmPurchase(item.orderId)}
+          disabled={isConfirming}
         >
-          구매 확정
+          {isConfirming ? "처리중..." : "구매 확정"}
         </button>
       );
     }
@@ -78,7 +155,7 @@ function OrderHistory() {
         <button
           type="button"
           className="order-history-item__action-button order-history-item__action-button--review"
-          onClick={() => setReviewTarget({ productId: item._id })}
+          onClick={() => setReviewTarget({ productId: item.product })}
         >
           리뷰 작성
         </button>
@@ -116,52 +193,74 @@ function OrderHistory() {
 
       <div className="order-history-page__layout">
         <div className="order-history-page__groups">
-          {ORDER_DATA.map((group) => (
-            <section key={group.date} className="order-history-page__group">
-              <div className="order-history-page__date-row">
-                <p className="order-history-page__date">{group.date}</p>
-                <div className="order-history-page__date-line" />
-              </div>
-
+          {fetchStatus === "loading" ? (
+            <section className="order-history-page__group">
               <div className="order-history-page__card">
-                {group.items.map((item, idx) => {
-                  const itemKey = `${group.date}-${item._id}-${idx}`;
-
-                  return (
-                    <div key={itemKey}>
-                      <article className="order-history-item">
-                        <div className="order-history-item__top">
-                          <div className="order-history-item__thumb">
-                            <img src={item.thumb} alt={item.name} />
-                          </div>
-
-                          <div className="order-history-item__info">
-                            <p className="order-history-item__category">{item.category}</p>
-                            <p className="order-history-item__name">{item.name}</p>
-                            <p className="order-history-item__desc">{item.desc}</p>
-                            <p className="order-history-item__option">{item.option}</p>
-                            <span className="order-history-item__price">{item.price}</span>
-                          </div>
-
-                          <div className="order-history-item__action">
-                            {renderItemActions(item, itemKey)}
-                          </div>
-                        </div>
-
-                        <div className="order-history-item__action--mobile">
-                          {renderItemActions(item, itemKey)}
-                        </div>
-                      </article>
-
-                      {idx < group.items.length - 1 && (
-                        <div className="order-history-item__divider" />
-                      )}
-                    </div>
-                  );
-                })}
+                <p>주문내역을 불러오는 중입니다.</p>
               </div>
             </section>
-          ))}
+          ) : fetchStatus === "error" ? (
+            <section className="order-history-page__group">
+              <div className="order-history-page__card">
+                <p>주문내역을 불러오지 못했습니다.</p>
+              </div>
+            </section>
+          ) : groupedOrders.length === 0 ? (
+            <section className="order-history-page__group">
+              <div className="order-history-page__card">
+                <p>주문내역이 없습니다.</p>
+              </div>
+            </section>
+          ) : (
+            groupedOrders.map((group) => (
+              <section key={group.date} className="order-history-page__group">
+                <div className="order-history-page__date-row">
+                  <p className="order-history-page__date">{group.date}</p>
+                  <div className="order-history-page__date-line" />
+                </div>
+
+                <div className="order-history-page__card">
+                  {group.items.map((item, idx) => {
+                    const itemKey = item.itemKey;
+
+                    return (
+                      <div key={itemKey}>
+                        <article className="order-history-item">
+                          <div className="order-history-item__top">
+                            <div className="order-history-item__thumb">
+                              <img src={item.thumb} alt={item.name} />
+                            </div>
+
+                            <div className="order-history-item__info">
+                              <p className="order-history-item__category">{item.category}</p>
+                              <p className="order-history-item__name">{item.name}</p>
+                              <p className="order-history-item__desc" />
+                              <p className="order-history-item__option">{item.option}</p>
+                              <span className="order-history-item__price">
+                                {Number(item.price || 0).toLocaleString("ko-KR")}
+                              </span>
+                            </div>
+
+                            <div className="order-history-item__action">
+                              {renderItemActions(item)}
+                            </div>
+                          </div>
+
+                          <div className="order-history-item__action--mobile">
+                            {renderItemActions(item)}
+                          </div>
+                        </article>
+
+                        {idx < group.items.length - 1 && (
+                          <div className="order-history-item__divider" />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            ))
+          )}
         </div>
       </div>
 

@@ -1,4 +1,5 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
 import ChatPanel from "./ChatPanel";
 import ChatTriggerButton from "./ChatTriggerButton";
@@ -10,8 +11,14 @@ import {
   createLoadingMessage,
   createProductMessage,
   createTextMessage,
-  getMockAssistantReply,
 } from "./chatData";
+import { addAiRecommendationHistory } from "@/store/slices/aiRecommendationHistory";
+import { fetchAiRecommendations } from "@/utils/recommendations";
+import {
+  createAiRecommendationHistoryEntry,
+  normalizeAiRecommendationProduct,
+  toChatRecommendationProduct,
+} from "@/utils/aiRecommendationMappers";
 import "./FloatingChatWidget.scss";
 
 const PREVIEW_DURATION_MS = 3200;
@@ -26,11 +33,14 @@ const createStatusState = () => ({
 });
 
 function FloatingChatWidget() {
+  const dispatch = useDispatch();
   const location = useLocation();
   const widgetRef = useRef(null);
   const initialMessagesRef = useRef(createInitialMessages());
   const timeoutIdsRef = useRef([]);
   const typingTimerRef = useRef(null);
+  const requestAbortRef = useRef(null);
+  const requestSeqRef = useRef(0);
 
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [hasOpenedOnce, setHasOpenedOnce] = useState(false);
@@ -45,7 +55,7 @@ function FloatingChatWidget() {
   const hasChatHistory = messages.length > initialMessagesRef.current.length;
   const visibleMessages = mode === CHAT_MODE.INITIAL ? initialMessagesRef.current : messages;
 
-  const clearResponseTimers = () => {
+  const clearResponseTimers = useCallback(() => {
     timeoutIdsRef.current.forEach((timeoutId) => {
       window.clearTimeout(timeoutId);
     });
@@ -55,14 +65,37 @@ function FloatingChatWidget() {
       window.clearInterval(typingTimerRef.current);
       typingTimerRef.current = null;
     }
-  };
+  }, []);
 
-  const resetChat = () => {
+  const abortRecommendationRequest = useCallback(() => {
+    requestSeqRef.current += 1;
+
+    if (requestAbortRef.current) {
+      requestAbortRef.current.abort();
+      requestAbortRef.current = null;
+    }
+  }, []);
+
+  const clearPendingAssistantMessages = useCallback(() => {
+    setMessages((prevMessages) =>
+      prevMessages.filter((message) => message.type !== "loading" && !message.isStreaming),
+    );
+  }, []);
+
+  const cancelPendingAssistantResponse = useCallback(() => {
     clearResponseTimers();
+    abortRecommendationRequest();
+    setStatus(createStatusState());
+    clearPendingAssistantMessages();
+  }, [abortRecommendationRequest, clearPendingAssistantMessages, clearResponseTimers]);
+
+  const resetChat = useCallback(() => {
+    clearResponseTimers();
+    abortRecommendationRequest();
     setDraft("");
     setMessages(initialMessagesRef.current);
     setStatus(createStatusState());
-  };
+  }, [abortRecommendationRequest, clearResponseTimers]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(hover: none), (pointer: coarse)");
@@ -88,7 +121,13 @@ function FloatingChatWidget() {
     };
   }, []);
 
-  useEffect(() => () => clearResponseTimers(), []);
+  useEffect(
+    () => () => {
+      clearResponseTimers();
+      abortRecommendationRequest();
+    },
+    [abortRecommendationRequest, clearResponseTimers],
+  );
 
   useLayoutEffect(() => {
     const hiddenSections = Array.from(document.querySelectorAll("[data-hide-floating-chat]"));
@@ -138,9 +177,10 @@ function FloatingChatWidget() {
 
   useEffect(() => {
     if (isSuppressed) {
+      cancelPendingAssistantResponse();
       setMode(CHAT_MODE.IDLE);
     }
-  }, [isSuppressed]);
+  }, [cancelPendingAssistantResponse, isSuppressed]);
 
   useEffect(() => {
     if (isSuppressed || !isTouchDevice || hasOpenedOnce || mode !== CHAT_MODE.IDLE) {
@@ -165,12 +205,14 @@ function FloatingChatWidget() {
 
     const handlePointerDown = (event) => {
       if (widgetRef.current && !widgetRef.current.contains(event.target)) {
+        cancelPendingAssistantResponse();
         setMode(CHAT_MODE.IDLE);
       }
     };
 
     const handleEscape = (event) => {
       if (event.key === "Escape") {
+        cancelPendingAssistantResponse();
         setMode(CHAT_MODE.IDLE);
       }
     };
@@ -184,7 +226,7 @@ function FloatingChatWidget() {
       document.removeEventListener("touchstart", handlePointerDown);
       document.removeEventListener("keydown", handleEscape);
     };
-  }, [isOpen]);
+  }, [cancelPendingAssistantResponse, isOpen]);
 
   const handleOpen = () => {
     if (isSuppressed) {
@@ -197,6 +239,7 @@ function FloatingChatWidget() {
 
   const handleToggle = () => {
     if (isOpen) {
+      cancelPendingAssistantResponse();
       setMode(CHAT_MODE.IDLE);
       return;
     }
@@ -217,6 +260,7 @@ function FloatingChatWidget() {
   };
 
   const handleClose = () => {
+    cancelPendingAssistantResponse();
     setMode(CHAT_MODE.IDLE);
   };
 
@@ -225,7 +269,93 @@ function FloatingChatWidget() {
     setMode(CHAT_MODE.INITIAL);
   };
 
-  const handleSendMessage = (question) => {
+  const startAssistantTyping = ({ answerText, loadingMessageId, products, requestSeq }) => {
+    const streamingMessage = createTextMessage({
+      sender: "bot",
+      text: "",
+      isStreaming: true,
+    });
+
+    setMessages((prevMessages) => [
+      ...prevMessages.filter((message) => message.id !== loadingMessageId),
+      streamingMessage,
+    ]);
+    setStatus({
+      isLoading: false,
+      isTyping: true,
+      error: null,
+    });
+
+    let currentIndex = 0;
+
+    typingTimerRef.current = window.setInterval(() => {
+      if (requestSeq !== requestSeqRef.current) {
+        window.clearInterval(typingTimerRef.current);
+        typingTimerRef.current = null;
+        return;
+      }
+
+      currentIndex += 1;
+
+      setMessages((prevMessages) =>
+        prevMessages.map((message) =>
+          message.id === streamingMessage.id
+            ? {
+                ...message,
+                text: answerText.slice(0, currentIndex),
+                isStreaming: currentIndex < answerText.length,
+              }
+            : message,
+        ),
+      );
+
+      if (currentIndex < answerText.length) {
+        return;
+      }
+
+      window.clearInterval(typingTimerRef.current);
+      typingTimerRef.current = null;
+
+      if (requestSeq !== requestSeqRef.current) {
+        return;
+      }
+
+      setStatus({
+        isLoading: false,
+        isTyping: false,
+        error: null,
+      });
+      setMessages((prevMessages) =>
+        prevMessages.map((message) =>
+          message.id === streamingMessage.id ? { ...message, isStreaming: false } : message,
+        ),
+      );
+
+      if (products.length === 0) {
+        return;
+      }
+
+      const productTimerId = window.setTimeout(() => {
+        timeoutIdsRef.current = timeoutIdsRef.current.filter((id) => id !== productTimerId);
+
+        if (requestSeq !== requestSeqRef.current) {
+          return;
+        }
+
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          createProductMessage({
+            text: "추천 상품을 카드로 정리했어요.",
+            products,
+          }),
+        ]);
+      }, PRODUCT_DELAY_MS);
+
+      timeoutIdsRef.current.push(productTimerId);
+    }, TYPING_SPEED_MS);
+  };
+
+  const handleSendMessage = async (question) => {
     const trimmedQuestion = question.trim();
 
     if (!trimmedQuestion || status.isLoading || status.isTyping) {
@@ -233,13 +363,18 @@ function FloatingChatWidget() {
     }
 
     clearResponseTimers();
+    abortRecommendationRequest();
 
     const userMessage = createTextMessage({
       sender: "user",
       text: trimmedQuestion,
     });
     const loadingMessage = createLoadingMessage({});
-    const assistantReply = getMockAssistantReply();
+    const controller = new AbortController();
+
+    requestAbortRef.current = controller;
+    requestSeqRef.current += 1;
+    const requestSeq = requestSeqRef.current;
 
     setDraft("");
     setHasOpenedOnce(true);
@@ -256,78 +391,85 @@ function FloatingChatWidget() {
       return [...nextMessages, userMessage, loadingMessage];
     });
 
-    const loadingTimerId = window.setTimeout(() => {
-      timeoutIdsRef.current = timeoutIdsRef.current.filter((id) => id !== loadingTimerId);
-
-      const streamingMessage = createTextMessage({
-        sender: "bot",
-        text: "",
-        isStreaming: true,
+    try {
+      const result = await fetchAiRecommendations({
+        query: trimmedQuestion,
+        limit: 3,
+        signal: controller.signal,
       });
 
-      setMessages((prevMessages) => [
-        ...prevMessages.filter((message) => message.id !== loadingMessage.id),
-        streamingMessage,
-      ]);
-      setStatus({
-        isLoading: false,
-        isTyping: true,
-        error: null,
-      });
+      if (requestSeq !== requestSeqRef.current || controller.signal.aborted) {
+        return;
+      }
 
-      let currentIndex = 0;
+      const normalizedProducts = Array.isArray(result?.products)
+        ? result.products.map(normalizeAiRecommendationProduct)
+        : [];
+      const answerText =
+        result?.message ||
+        (normalizedProducts.length > 0
+          ? "현재 상품 데이터 기준으로 조건에 가까운 제품을 골랐어요."
+          : "조건에 맞는 상품을 찾지 못했어요. 조건을 조금 더 넓혀볼까요?");
+      const chatProducts = normalizedProducts.map(toChatRecommendationProduct);
 
-      // 추후 스트리밍 응답이 들어오면 이 구간을 chunk append 로직으로 교체하면 된다.
-      typingTimerRef.current = window.setInterval(() => {
-        currentIndex += 1;
-
-        setMessages((prevMessages) =>
-          prevMessages.map((message) =>
-            message.id === streamingMessage.id
-              ? {
-                  ...message,
-                  text: assistantReply.answerText.slice(0, currentIndex),
-                  isStreaming: currentIndex < assistantReply.answerText.length,
-                }
-              : message,
+      if (normalizedProducts.length > 0) {
+        dispatch(
+          addAiRecommendationHistory(
+            createAiRecommendationHistoryEntry({
+              query: trimmedQuestion,
+              message: answerText,
+              products: normalizedProducts,
+            }),
           ),
         );
+      }
 
-        if (currentIndex < assistantReply.answerText.length) {
+      if (requestSeq !== requestSeqRef.current || controller.signal.aborted) {
+        return;
+      }
+
+      const loadingTimerId = window.setTimeout(() => {
+        timeoutIdsRef.current = timeoutIdsRef.current.filter((id) => id !== loadingTimerId);
+
+        if (requestSeq !== requestSeqRef.current || controller.signal.aborted) {
           return;
         }
 
-        window.clearInterval(typingTimerRef.current);
-        typingTimerRef.current = null;
-
-        setStatus({
-          isLoading: false,
-          isTyping: false,
-          error: null,
+        startAssistantTyping({
+          answerText,
+          loadingMessageId: loadingMessage.id,
+          products: chatProducts,
+          requestSeq,
         });
-        setMessages((prevMessages) =>
-          prevMessages.map((message) =>
-            message.id === streamingMessage.id ? { ...message, isStreaming: false } : message,
-          ),
-        );
+      }, LOADING_DURATION_MS);
 
-        const productTimerId = window.setTimeout(() => {
-          timeoutIdsRef.current = timeoutIdsRef.current.filter((id) => id !== productTimerId);
+      timeoutIdsRef.current.push(loadingTimerId);
+    } catch (error) {
+      if (error.name === "CanceledError" || error.name === "AbortError") {
+        return;
+      }
 
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            createProductMessage({
-              text: assistantReply.productSummary,
-              products: assistantReply.products,
-            }),
-          ]);
-        }, PRODUCT_DELAY_MS);
+      if (requestSeq !== requestSeqRef.current || controller.signal.aborted) {
+        return;
+      }
 
-        timeoutIdsRef.current.push(productTimerId);
-      }, TYPING_SPEED_MS);
-    }, LOADING_DURATION_MS);
-
-    timeoutIdsRef.current.push(loadingTimerId);
+      setStatus({
+        isLoading: false,
+        isTyping: false,
+        error: "추천 결과를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.",
+      });
+      setMessages((prevMessages) => [
+        ...prevMessages.filter((message) => message.id !== loadingMessage.id),
+        createTextMessage({
+          sender: "bot",
+          text: "추천 결과를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.",
+        }),
+      ]);
+    } finally {
+      if (requestAbortRef.current === controller) {
+        requestAbortRef.current = null;
+      }
+    }
   };
 
   if (isSuppressed) {

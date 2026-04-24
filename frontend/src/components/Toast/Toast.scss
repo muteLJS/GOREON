@@ -1,0 +1,55 @@
+@use "styles/variables" as *;
+
+.toast {
+  position: fixed;
+  bottom: calc(var(--mobile-bottom-nav-height, 95px) + 20px);
+  left: 50%;
+  z-index: $z-toast;
+  width: min(calc(100vw - 24px), 420px);
+  min-height: 40px;
+  padding: 10px 16px;
+  border: 1px solid rgba(60, 60, 60, 0.24);
+  border-radius: 14px;
+  background: #f4fffe;
+  box-shadow: 0 10px 24px rgba($color-black, 0.12);
+  pointer-events: auto;
+  opacity: 0;
+  transform: translate(-50%, 12px);
+  transition:
+    opacity 0.16s ease-out,
+    transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.toast.is-exiting {
+  opacity: 0;
+  transform: translate(-50%, 0);
+  transition: opacity 0.12s ease-out;
+}
+
+.toast__message {
+  margin: 0;
+  color: $color-text-main;
+  font-size: $font-sm;
+  font-weight: $font-semibold;
+  text-align: center;
+  word-break: keep-all;
+}
+
+@media (min-width: $breakpoint-tablet) and (max-width: #{$breakpoint-desktop - 1px}) {
+  .toast {
+    bottom: calc(var(--mobile-bottom-nav-height, 95px) + 24px);
+    width: min(calc(100vw - 48px), 440px);
+  }
+}
+
+@media (min-width: $breakpoint-desktop) {
+  .toast {
+    bottom: 40px;
+    width: min(calc(100vw - 64px), #{$layout-desktop-max-width - ($layout-desktop-padding * 2)});
+  }
+}

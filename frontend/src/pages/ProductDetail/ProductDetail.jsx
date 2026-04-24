@@ -1,15 +1,17 @@
 ﻿import "./ProductDetail.scss";
-import productList from "@/data/products_list.json";
 import { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { FreeMode } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import arrowIcon from "@/assets/icons/prev.svg";
+import { fetchProductById } from "@/api/products";
+import { useToast } from "@/components/Toast/toastContext";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 import ReviewSection from "../../components/ReviewSection/ReviewSection";
 import { addToCart } from "../../store/slices/cartSlice";
+import { addRecentViewed } from "@/store/slices/recentViewed";
 import ChevronDown from "../../assets/icons/chevron-down.svg";
 import api from "../../utils/api";
 
@@ -37,49 +39,11 @@ const mapReview = (review) => ({
   date: new Date(review.createdAt).toLocaleDateString("ko-KR").replace(/ /g, ""),
   body: review.content || "",
   rating: Number(review.rating) || 0,
-  images: Array.isArray(review.images) ? review.images.map((image) => normalizeImageUrl(image)) : [],
+  images: Array.isArray(review.images)
+    ? review.images.map((image) => normalizeImageUrl(image))
+    : [],
   helpfulCount: 0,
 });
-
-function getProductDetailByIdFromJson(id) {
-  const product = productList.find((item) => String(item.id) === String(id));
-
-  if (!product) {
-    return null;
-  }
-
-  const price = parsePrice(product.price);
-  const tags = Array.isArray(product.tag) ? product.tag : [];
-  const heroImage = normalizeImageUrl(product.image) || ProductHeroImage;
-  const normalizedDetailImages = Array.isArray(product.detailImages)
-    ? product.detailImages.map((src) => normalizeImageUrl(src)).filter(Boolean)
-    : [];
-  const gallery =
-    normalizedDetailImages.length > 0
-      ? normalizedDetailImages
-      : [heroImage, heroImage, heroImage, heroImage, heroImage];
-  const options =
-    Array.isArray(product.priceOptions) && product.priceOptions.length > 0
-      ? product.priceOptions.map((option, index) => ({
-          id: `option-${index + 1}`,
-          label: option.optionName || `옵션 ${index + 1}`,
-          price: parsePrice(option.price) || price,
-        }))
-      : [{ id: "default", label: "기본 옵션", price }];
-
-  return {
-    id: String(product.id),
-    brand: tags[0] || String(product.name ?? "").split(" ")[0] || "브랜드 정보 준비중",
-    title: product.name,
-    subtitle: `${tags[1] || tags[0] || "상품"} 카테고리 추천 상품`,
-    shortDescription: `${product.name}의 핵심 정보와 옵션을 상세 페이지에서 확인할 수 있습니다.`,
-    price,
-    rating: Number(product.rating) || 0,
-    heroImage,
-    gallery,
-    options,
-  };
-}
 
 function getProductDetailFromApi(product) {
   const price = parsePrice(product.price);
@@ -102,7 +66,9 @@ function getProductDetailFromApi(product) {
   const tags = Array.isArray(product.tag) ? product.tag : [];
 
   return {
-    id: String(product._id ?? product.id),
+    _id: String(product._id),
+    productId: String(product._id),
+    legacyId: product.id ? String(product.id) : "",
     brand: tags[0] || String(product.name ?? "").split(" ")[0] || "브랜드 정보 준비중",
     title: product.name,
     subtitle: `${tags[1] || tags[0] || "상품"} 카테고리 추천 상품`,
@@ -119,7 +85,10 @@ function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { showToast } = useToast();
+  const cartItems = useSelector((state) => state.cart.items);
 
+  const tabsRef = useRef(null);
   const overviewRef = useRef(null);
   const reviewsRef = useRef(null);
 
@@ -144,16 +113,12 @@ function ProductDetail() {
       try {
         setStatus("loading");
 
-        const productResponse = await api.get(`/products/${id}`, {
-          signal: controller.signal,
-        });
-
         const nextProduct = getProductDetailFromApi(
-          productResponse.data.data ?? productResponse.data,
+          await fetchProductById(id, { signal: controller.signal }),
         );
         setProduct(nextProduct);
 
-        const reviewResponse = await api.get(`/reviews/${nextProduct.id}`, {
+        const reviewResponse = await api.get(`/reviews/${nextProduct._id}`, {
           signal: controller.signal,
         });
 
@@ -180,8 +145,7 @@ function ProductDetail() {
           return;
         }
 
-        const fallbackProduct = getProductDetailByIdFromJson(id);
-        setProduct(fallbackProduct);
+        setProduct(null);
         setReviews([]);
         setReviewSummary({
           rating: 0,
@@ -189,7 +153,7 @@ function ProductDetail() {
           photoCount: 0,
           gallery: [],
         });
-        setStatus(fallbackProduct ? "success" : "error");
+        setStatus("error");
       }
     };
 
@@ -209,6 +173,54 @@ function ProductDetail() {
     setIsOverviewExpanded(false);
   }, [product]);
 
+  useEffect(() => {
+    if (!product) {
+      return;
+    }
+
+    dispatch(
+      addRecentViewed({
+        _id: product._id,
+        id: product._id,
+        productId: product._id,
+        name: product.title,
+        price: formatPrice(product.price),
+        image: product.heroImage,
+        rating: product.rating,
+      }),
+    );
+  }, [dispatch, id, product]);
+
+  useEffect(() => {
+    if (!product) {
+      return;
+    }
+
+    const updateActiveTabFromScroll = () => {
+      const tabsElement = tabsRef.current;
+      const stickyTop = tabsElement
+        ? Number.parseFloat(window.getComputedStyle(tabsElement).top) || 0
+        : 0;
+      const activationOffset = stickyTop + (tabsElement?.offsetHeight ?? 0) + 24;
+      const reviewsTop =
+        reviewsRef.current?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY;
+
+      setActiveTab((prev) => {
+        const nextTab = reviewsTop <= activationOffset ? "reviews" : "overview";
+        return prev === nextTab ? prev : nextTab;
+      });
+    };
+
+    updateActiveTabFromScroll();
+    window.addEventListener("scroll", updateActiveTabFromScroll, { passive: true });
+    window.addEventListener("resize", updateActiveTabFromScroll);
+
+    return () => {
+      window.removeEventListener("scroll", updateActiveTabFromScroll);
+      window.removeEventListener("resize", updateActiveTabFromScroll);
+    };
+  }, [product]);
+
   if (status === "loading") {
     return (
       <main className="product-detail">
@@ -225,7 +237,7 @@ function ProductDetail() {
         <section className="product-detail__story">
           <h1 className="product-detail__title">상품을 찾을 수 없습니다.</h1>
           <p className="product-detail__feature-body">
-            요청한 상품 id에 해당하는 목록 데이터가 없습니다.
+            요청한 상품 정보를 불러오지 못했습니다.
           </p>
         </section>
       </main>
@@ -237,11 +249,15 @@ function ProductDetail() {
   const totalPrice = displayOption.price * quantity;
   const categoryLabel = product.subtitle.split(" 카테고리")[0] || "상품";
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (shouldShowToast = true) => {
+    const cartItemId = `${product._id}-${displayOption.id}`;
+    const isAlreadyInCart = cartItems.some((item) => item.id === cartItemId);
+
     dispatch(
       addToCart({
-        id: `${product.id}-${displayOption.id}`,
-        productId: product.id,
+        id: cartItemId,
+        _id: product._id,
+        productId: product._id,
         name: product.title,
         option: displayOption.label,
         price: displayOption.price,
@@ -249,10 +265,14 @@ function ProductDetail() {
         quantity,
       }),
     );
+
+    if (shouldShowToast) {
+      showToast(isAlreadyInCart ? "장바구니 수량이 추가되었습니다." : "장바구니에 담았습니다.");
+    }
   };
 
   const handleBuyNow = () => {
-    handleAddToCart();
+    handleAddToCart(false);
     navigate("/payment");
   };
 
@@ -263,21 +283,35 @@ function ProductDetail() {
   const handleTabClick = (tab) => {
     setActiveTab(tab);
     const targetRef = tab === "overview" ? overviewRef : reviewsRef;
-    targetRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!targetRef.current) {
+      return;
+    }
+
+    const tabsElement = tabsRef.current;
+    const stickyTop = tabsElement
+      ? Number.parseFloat(window.getComputedStyle(tabsElement).top) || 0
+      : 0;
+    const scrollOffset = stickyTop + (tabsElement?.offsetHeight ?? 0) + 16;
+    const targetTop = targetRef.current.getBoundingClientRect().top + window.scrollY - scrollOffset;
+
+    window.scrollTo({
+      top: Math.max(0, targetTop),
+      behavior: "smooth",
+    });
   };
 
-  const renderTabs = (visualActiveTab = activeTab) => (
-    <div className="product-detail__tabs">
+  const renderTabs = () => (
+    <div className="product-detail__tabs" ref={tabsRef}>
       <button
         type="button"
-        className={visualActiveTab === "overview" ? "is-active" : ""}
+        className={activeTab === "overview" ? "is-active" : ""}
         onClick={() => handleTabClick("overview")}
       >
-        상품 설명
+        상세정보
       </button>
       <button
         type="button"
-        className={visualActiveTab === "reviews" ? "is-active" : ""}
+        className={activeTab === "reviews" ? "is-active" : ""}
         onClick={() => handleTabClick("reviews")}
       >
         리뷰
@@ -297,7 +331,7 @@ function ProductDetail() {
           watchOverflow
         >
           {reviewSummary.gallery.map((image, index) => (
-            <SwiperSlide key={`${product.id}-review-photo-${index}`}>
+            <SwiperSlide key={`${product._id}-review-photo-${index}`}>
               <img
                 src={image}
                 alt={`리뷰 이미지 ${index + 1}`}
@@ -333,7 +367,8 @@ function ProductDetail() {
 
             <WishlistIconButton
               product={{
-                id: product.id,
+                _id: product._id,
+                productId: product._id,
                 name: product.title,
                 price: product.price,
                 image: product.heroImage,
@@ -427,7 +462,7 @@ function ProductDetail() {
               <div className="product-detail__story-image">
                 {product.gallery.map((image, index) => (
                   <img
-                    key={`${product.id}-detail-${index}`}
+                    key={`${product._id}-detail-${index}`}
                     src={image}
                     alt={`${product.brand} 상세 이미지 ${index + 1}`}
                     onError={(event) => {
@@ -456,8 +491,6 @@ function ProductDetail() {
           />
         </button>
       </section>
-
-      {renderTabs("reviews")}
 
       <section className="product-detail__reviews" ref={reviewsRef}>
         {renderReviewPhotoSwiper()}
