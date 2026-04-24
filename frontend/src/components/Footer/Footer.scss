@@ -1,5 +1,5 @@
-﻿@import "styles/variables";
-@import "styles/mixins";
+@use "styles/variables" as *;
+@use "styles/mixins" as *;
 
 $footer-bg: #005b66;
 $footer-text: rgba(245, 245, 245, 0.74);
