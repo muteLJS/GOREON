@@ -448,6 +448,14 @@
       gap: $space-md;
     }
 
+    &__add-button {
+      min-width: 60px;
+      height: 32px;
+      padding: 0 14px;
+      font-size: $font-sm;
+      font-weight: $font-semibold;
+    }
+
     .filter-button {
       display: none;
     }

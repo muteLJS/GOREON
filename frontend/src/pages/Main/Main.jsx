@@ -428,10 +428,7 @@ function Main() {
     "🖨 가정용 프린터 추천",
   ];
   const updateShowcaseItems = useMemo(
-    () =>
-      UPDATE_SHOWCASE_CONFIG.map((item) =>
-        createUpdateShowcaseItem(catalogProducts, item),
-      ),
+    () => UPDATE_SHOWCASE_CONFIG.map((item) => createUpdateShowcaseItem(catalogProducts, item)),
     [catalogProducts],
   );
   const updateMobileItems = useMemo(
@@ -472,7 +469,7 @@ function Main() {
   const targetUpdateItem = updateShowcaseItems[targetUpdateIndex] ?? updateShowcaseItems[0];
   const visibleUpdateItem = updateShowcaseItems[visibleUpdateIndex] ?? updateShowcaseItems[0];
   const incomingUpdateItem =
-    incomingUpdateIndex === null ? null : updateShowcaseItems[incomingUpdateIndex] ?? null;
+    incomingUpdateIndex === null ? null : (updateShowcaseItems[incomingUpdateIndex] ?? null);
   const isUpdatePreviewing =
     hoveredUpdateIndex !== null && hoveredUpdateIndex !== selectedUpdateIndex;
   const updateMobileRowStartIndices = Array.from(
@@ -652,9 +649,7 @@ function Main() {
         setAiReviewItems(latestReviews);
         setAiReviewStatus(latestReviews.length > 0 ? "success" : "empty");
         setAiReviewMessage(
-          latestReviews.length > 0
-            ? ""
-            : "추천 상품에 아직 등록된 구매 리뷰가 없습니다.",
+          latestReviews.length > 0 ? "" : "추천 상품에 아직 등록된 구매 리뷰가 없습니다.",
         );
       } catch (reviewError) {
         if (reviewError.name === "CanceledError" || reviewError.name === "AbortError") {
@@ -976,9 +971,7 @@ function Main() {
     }
 
     if (aiReviewStatus === "loading") {
-      return (
-        <div className="AI_review_state">추천 상품별 최신 구매 리뷰를 불러오는 중입니다.</div>
-      );
+      return <div className="AI_review_state">추천 상품별 최신 구매 리뷰를 불러오는 중입니다.</div>;
     }
 
     if (aiReviewStatus === "error" || aiReviewStatus === "empty") {
@@ -1082,7 +1075,12 @@ function Main() {
                 variant="result"
                 onSelect={handlePromptSelect}
               />
-              <button className="submit" type="submit" disabled={aiStatus === "loading"}>
+              <button
+                className="submit"
+                type="submit"
+                disabled={aiStatus === "loading"}
+                style={{ paddingRight: "0px" }}
+              >
                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
                   <circle cx="20" cy="20" r="20" fill="#0AA6A6" />
                   <path
@@ -1430,9 +1428,7 @@ function Main() {
                 }
               }}
             >
-              <div
-                className={`main_item__image ${incomingUpdateItem ? "is-transitioning" : ""}`}
-              >
+              <div className={`main_item__image ${incomingUpdateItem ? "is-transitioning" : ""}`}>
                 <img
                   key={`featured-current-${getProductListKey(visibleUpdateItem, "featured-current")}`}
                   src={visibleUpdateItem.featuredImage}
@@ -1467,10 +1463,7 @@ function Main() {
                 </div>
                 <div className="icons">
                   <CartIconButton product={createMainProduct(targetUpdateItem)} size="sm" />
-                  <WishlistIconButton
-                    product={createMainProduct(targetUpdateItem)}
-                    size="sm"
-                  />
+                  <WishlistIconButton product={createMainProduct(targetUpdateItem)} size="sm" />
                 </div>
               </div>
             </div>
@@ -1513,11 +1506,7 @@ function Main() {
                     >
                       <div className="items">
                         <div className="item_img_box">
-                          <img
-                            src={item.thumbnailImage}
-                            alt={item.name}
-                            className="item_img"
-                          />
+                          <img src={item.thumbnailImage} alt={item.name} className="item_img" />
                           <div className="icons">
                             <CartIconButton product={createMainProduct(item)} size="sm" />
                             <WishlistIconButton product={createMainProduct(item)} size="sm" />
