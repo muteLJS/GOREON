@@ -1,26 +1,27 @@
-﻿import React, { useEffect } from "react";
+import React, { Suspense, lazy, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 
-import MainLayout from "./layouts/MainLayout/MainLayout";
-import Main from "./pages/Main/Main";
-import Search from "./pages/Search/Search";
-import Login from "./pages/Login/Login";
-import Cart from "./pages/Cart/Cart";
-import Wishlist from "./pages/Wishlist/Wishlist";
-import ProductDetail from "./pages/ProductDetail/ProductDetail";
-import Payment from "./pages/Payment/Payment";
-import MyPage from "./pages/MyPage/MyPage";
-import Category from "./pages/Category/Category";
-import PcAssembly from "./pages/PcAssembly/PcAssembly";
-import PcAssemblyQuote from "./pages/PcAssemblyQuote/PcAssemblyQuote";
-import Register from "./pages/Register/Register";
-import List from "./pages/List/List";
-import OrderHistory from "./pages/OrderHistory/OrderHistory";
-import SocialLoginCallback from "./pages/SocialLoginCallback/SocialLoginCallback";
-import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
+import MainLayout from "./layouts/MainLayout/MainLayout";
 import { logout } from "./store/slices/userSlice";
+
+const Main = lazy(() => import("./pages/Main/Main"));
+const Search = lazy(() => import("./pages/Search/Search"));
+const Login = lazy(() => import("./pages/Login/Login"));
+const Cart = lazy(() => import("./pages/Cart/Cart"));
+const Wishlist = lazy(() => import("./pages/Wishlist/Wishlist"));
+const ProductDetail = lazy(() => import("./pages/ProductDetail/ProductDetail"));
+const Payment = lazy(() => import("./pages/Payment/Payment"));
+const MyPage = lazy(() => import("./pages/MyPage/MyPage"));
+const Category = lazy(() => import("./pages/Category/Category"));
+const PcAssembly = lazy(() => import("./pages/PcAssembly/PcAssembly"));
+const PcAssemblyQuote = lazy(() => import("./pages/PcAssemblyQuote/PcAssemblyQuote"));
+const Register = lazy(() => import("./pages/Register/Register"));
+const List = lazy(() => import("./pages/List/List"));
+const OrderHistory = lazy(() => import("./pages/OrderHistory/OrderHistory"));
+const SocialLoginCallback = lazy(() => import("./pages/SocialLoginCallback/SocialLoginCallback"));
 
 function App() {
   const dispatch = useDispatch();
@@ -37,39 +38,41 @@ function App() {
   return (
     <>
       <ScrollToTop />
-      <Routes>
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<Main />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/category" element={<Category />} />
-          <Route path="/pc-assembly" element={<PcAssembly />} />
-          <Route path="/pc-assembly-quote" element={<PcAssemblyQuote />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/auth/social/callback" element={<SocialLoginCallback />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/wishlist" element={<Wishlist />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/payment" element={<Payment />} />
-          <Route
-            path="/mypage"
-            element={
-              <ProtectedRoute>
-                <MyPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/list" element={<List />} />
-          <Route
-            path="/order-history"
-            element={
-              <ProtectedRoute>
-                <OrderHistory />
-              </ProtectedRoute>
-            }
-          />
-        </Route>
-      </Routes>
+      <Suspense fallback={<main className="route-loading">페이지를 불러오는 중입니다...</main>}>
+        <Routes>
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<Main />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/category" element={<Category />} />
+            <Route path="/pc-assembly" element={<PcAssembly />} />
+            <Route path="/pc-assembly-quote" element={<PcAssemblyQuote />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/auth/social/callback" element={<SocialLoginCallback />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/wishlist" element={<Wishlist />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/payment" element={<Payment />} />
+            <Route
+              path="/mypage"
+              element={
+                <ProtectedRoute>
+                  <MyPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/list" element={<List />} />
+            <Route
+              path="/order-history"
+              element={
+                <ProtectedRoute>
+                  <OrderHistory />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
+        </Routes>
+      </Suspense>
     </>
   );
 }
