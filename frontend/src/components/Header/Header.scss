@@ -4,9 +4,9 @@
 .header {
   --mobile-header-height: 76px;
   --mobile-bottom-nav-height: 95px;
-  --nav-label-font-size: clamp(18px, 5.2vw, 20px);
-  --menu-title-font-size: clamp(22px, 6vw, 24px);
-  --menu-item-font-size: clamp(18px, 5.2vw, 20px);
+  --nav-label-font-size: clamp(18px, 5.2vw, 18px);
+  --menu-title-font-size: clamp(22px, 6vw, 22px);
+  --menu-item-font-size: clamp(18px, 5.2vw, 18px);
   width: 100%;
   background: $color-white;
   position: sticky;
@@ -100,9 +100,9 @@
   pointer-events: none;
   transform: translateY(-8px);
   transition:
-    opacity $transition-fast,
-    transform $transition-fast,
-    visibility $transition-fast;
+    opacity $transition-fast-2,
+    transform $transition-fast-2,
+    visibility $transition-fast-2;
   z-index: calc(#{$z-header} + 2);
 }
 
@@ -181,7 +181,7 @@
   line-height: 1.3;
   text-align: left;
   cursor: pointer;
-  transition: color $transition-fast;
+  transition: color $transition-fast-2;
 
   &:hover {
     color: $color-text-sub;
@@ -257,8 +257,8 @@
     visibility: hidden;
     pointer-events: none;
     transition:
-      opacity $transition-fast,
-      visibility $transition-fast;
+      opacity $transition-fast-2,
+      visibility $transition-fast-2;
 
     &.is-open {
       display: block;
@@ -281,9 +281,9 @@
   pointer-events: none;
   transform: translateY(10px);
   transition:
-    opacity $transition-fast,
-    transform $transition-fast,
-    visibility $transition-fast;
+    opacity $transition-fast-2,
+    transform $transition-fast-2,
+    visibility $transition-fast-2;
   overflow-y: auto;
 }
 
@@ -321,7 +321,7 @@
   font-weight: $font-bold;
   line-height: 1;
   cursor: pointer;
-  transition: color $transition-fast;
+  transition: color $transition-fast-2;
 
   &::after {
     content: "";
@@ -333,7 +333,7 @@
     background: $color-text-sub;
     transform: scaleX(0);
     transform-origin: center;
-    transition: transform $transition-fast;
+    transition: transform $transition-fast-2;
   }
 }
 
@@ -371,7 +371,7 @@
   width: 18px;
   height: 18px;
   transform: rotate(0deg);
-  transition: transform $transition-fast;
+  transition: transform $transition-fast-2;
 }
 
 .mobile-menu__chevron.is-open {
@@ -395,8 +395,29 @@
 }
 
 .mobile-menu__list--brand .mobile-menu__list-item a {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   color: $color-text-main;
-  font-weight: $font-semibold;
+  font-weight: $font-medium;
+}
+
+.brand-menu__icon {
+  display: block;
+  flex: 0 0 auto;
+  object-fit: contain;
+  @include mobile {
+    display: none;
+  }
+  @include tablet {
+    display: none;
+  }
+}
+
+
+.brand-menu__icon--mobile {
+  width: 22px;
+  height: 22px;
 }
 
 .mobile-menu__cta {
@@ -458,7 +479,8 @@ body.mobile-menu-open {
 @include desktop-up {
   .header {
     position: relative;
-    border-bottom: 1px solid rgba($color-black, 0.08);
+    // border-bottom: 10px solid rgba($color-black, 0.08);
+    box-shadow: 0 2px 2px rgba($color: $color-black, $alpha: 0.05);
   }
 
   .header__mobile-back,
@@ -540,7 +562,7 @@ body.mobile-menu-open {
     height: 3px;
     background: $color-text-sub;
     transform: translateX(-50%);
-    transition: width $transition-fast;
+    transition: width $transition-fast-2;
   }
 
   .header__search:hover .header__icon-btn--search::after,
@@ -645,7 +667,7 @@ body.mobile-menu-open {
   .header__nav {
     display: block;
     position: relative;
-    border-top: 1px solid rgba($color-black, 0.04);
+    // border-top: 1px solid rgba($color-black, 0.04);
   }
 
   .gnb {
@@ -689,7 +711,7 @@ body.mobile-menu-open {
       height: 2px;
       background: $color-text-sub;
       transform: translateX(-50%);
-      transition: width $transition-fast;
+      transition: width $transition-fast-2;
     }
   }
 
@@ -720,9 +742,9 @@ body.mobile-menu-open {
     pointer-events: none;
     transform: translateY(-6px);
     transition:
-      opacity $transition-fast,
-      transform $transition-fast,
-      visibility $transition-fast;
+      opacity $transition-fast-2,
+      transform $transition-fast-2,
+      visibility $transition-fast-2;
   }
 
   .dropdown__panel {
@@ -772,18 +794,28 @@ body.mobile-menu-open {
   .dropdown__list-item a {
     color: $color-text-main;
     font-size: var(--menu-item-font-size);
-    font-weight: $font-regular;
+    font-weight: $font-medium;
     line-height: 1.25;
     text-decoration: none;
-    transition: all $transition-fast;
+    transition: color $transition-fast-2;
   }
 
   .dropdown__list-item a:hover {
     color: $color-text-sub;
-    font-weight: $font-semibold;
   }
 
   .dropdown__brand-item a {
     display: inline-flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .dropdown__brand-item a span {
+    display: inline-block;
+  }
+
+  .brand-menu__icon--desktop {
+    width: 24px;
+    height: 24px;
   }
 }

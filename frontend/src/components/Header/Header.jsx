@@ -9,6 +9,15 @@ import Cart from "@/assets/header/header-icons/cart.svg";
 import Like from "@/assets/header/header-icons/like.svg";
 import Search from "@/assets/header/header-icons/search.svg";
 import User from "@/assets/header/header-icons/user.svg";
+import AcerBrandIcon from "@/assets/header/nav/Acer.svg";
+import AppleBrandIcon from "@/assets/header/nav/Apple.svg";
+import AsusBrandIcon from "@/assets/header/nav/Asus.svg";
+import DellBrandIcon from "@/assets/header/nav/Dell.svg";
+import HpBrandIcon from "@/assets/header/nav/Hp.svg";
+import LenovoBrandIcon from "@/assets/header/nav/Lenovo.svg";
+import LGBrandIcon from "@/assets/header/nav/LG.svg";
+import MsiBrandIcon from "@/assets/header/nav/Msi.svg";
+import SamsungBrandIcon from "@/assets/header/nav/Samsung.svg";
 import ChevronDown from "@/assets/icons/chevron-down.svg";
 import Prev from "@/assets/icons/prev.svg";
 import {
@@ -33,6 +42,18 @@ const DESKTOP_SEARCH_ICON_STYLE = {
   "--icon-height": "24px",
 };
 
+const BRAND_ICONS = {
+  acer: AcerBrandIcon,
+  apple: AppleBrandIcon,
+  asus: AsusBrandIcon,
+  dell: DellBrandIcon,
+  hp: HpBrandIcon,
+  lenovo: LenovoBrandIcon,
+  lg: LGBrandIcon,
+  msi: MsiBrandIcon,
+  samsung: SamsungBrandIcon,
+};
+
 const createExpandedState = (sections) =>
   sections.reduce((acc, section) => {
     acc[section.key] = true;
@@ -43,6 +64,24 @@ const createInitialExpandedMenus = () => ({
   category: createExpandedState(CATEGORY_MENU),
   brand: createExpandedState(BRAND_MENU),
 });
+
+function BrandMenuLabel({ item, iconClassName = "" }) {
+  const icon = BRAND_ICONS[item.type];
+
+  return (
+    <>
+      {icon ? (
+        <img
+          src={icon}
+          alt=""
+          aria-hidden="true"
+          className={["brand-menu__icon", iconClassName].filter(Boolean).join(" ")}
+        />
+      ) : null}
+      <span>{item.label}</span>
+    </>
+  );
+}
 
 function HeaderSearchForm({ searchQuery, onQueryChange, onSubmit, onSuggestionClick, onFocus }) {
   return (
@@ -487,7 +526,16 @@ function Header() {
                           <ul className="dropdown__list">
                             {section.items.map((menuItem) => (
                               <li className={listItemClassName} key={menuItem.type}>
-                                <Link to={`/list?type=${menuItem.type}`}>{menuItem.label}</Link>
+                                <Link to={`/list?type=${menuItem.type}`}>
+                                  {item.variant === "brand" ? (
+                                    <BrandMenuLabel
+                                      item={menuItem}
+                                      iconClassName="brand-menu__icon--desktop"
+                                    />
+                                  ) : (
+                                    menuItem.label
+                                  )}
+                                </Link>
                               </li>
                             ))}
                           </ul>
@@ -564,7 +612,11 @@ function Header() {
                     {section.items.map((item) => (
                       <li key={item.type} className="mobile-menu__list-item">
                         <Link to={`/list?type=${item.type}`} onClick={handleMobileMenuLinkClick}>
-                          {item.label}
+                          {isBrandTab ? (
+                            <BrandMenuLabel item={item} iconClassName="brand-menu__icon--mobile" />
+                          ) : (
+                            item.label
+                          )}
                         </Link>
                       </li>
                     ))}

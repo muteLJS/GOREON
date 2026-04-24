@@ -5,6 +5,12 @@
   position: fixed;
   right: 16px;
   bottom: 111px;
+  --chat-widget-action-size: 88px;
+  --chat-widget-trigger-size: calc(var(--chat-widget-action-size) * 0.7273);
+  --chat-widget-trigger-icon-size: 24px;
+  --chat-widget-scroll-offset: calc(
+    (var(--chat-widget-trigger-size) - var(--chat-widget-action-size)) / 2
+  );
   z-index: $z-modal - 1;
   display: flex;
   flex-direction: column;
@@ -466,15 +472,27 @@
 .chat-widget__trigger-wrap {
   @include flex(center, flex-end);
   gap: 10px;
-  min-height: 64px;
+  min-height: var(--chat-widget-action-size);
   pointer-events: auto;
 }
 
 .chat-widget__scroll-top {
-  width: 88px;
-  height: 88px;
-  margin-right: -12px;
-  flex-shrink: 0;
+  width: var(--chat-widget-action-size);
+  height: var(--chat-widget-action-size);
+  margin-right: var(--chat-widget-scroll-offset);
+  flex: 0 0 var(--chat-widget-action-size);
+}
+
+.chat-widget__scroll-top.scroll-top-button {
+  @include flex-center;
+  width: var(--chat-widget-action-size);
+  height: var(--chat-widget-action-size);
+
+  img {
+    width: calc(var(--chat-widget-action-size) * 1.375);
+    height: calc(var(--chat-widget-action-size) * 1.375);
+    flex: 0 0 auto;
+  }
 }
 
 .chat-widget__tooltip {
@@ -512,13 +530,14 @@
 
 .chat-widget__trigger {
   @include flex-center;
-  width: 64px;
-  height: 64px;
+  width: var(--chat-widget-trigger-size);
+  height: var(--chat-widget-trigger-size);
+  flex: 0 0 var(--chat-widget-trigger-size);
   padding: 0;
   border: 0;
   border-radius: $radius-full;
   background: $color-white;
-  box-shadow: 0 8px 24px rgba($color-black, 0.15);
+  box-shadow: 0 4px 12px rgba($color-black, 0.1);
   cursor: pointer;
   transition:
     transform $transition-fast,
@@ -527,7 +546,7 @@
 
 .chat-widget__trigger:hover,
 .chat-widget__trigger.is-open {
-  box-shadow: 0 10px 26px rgba($color-black, 0.18);
+  box-shadow: 0 6px 16px rgba($color-black, 0.12);
 }
 
 .chat-widget__trigger.is-open {
@@ -536,8 +555,8 @@
 
 .chat-widget__trigger-icon {
   @include flex-center;
-  width: 29px;
-  height: 29px;
+  width: var(--chat-widget-trigger-icon-size);
+  height: var(--chat-widget-trigger-icon-size);
 
   .ai-character {
     width: 100%;
@@ -551,6 +570,9 @@
   .chat-widget {
     right: 24px;
     bottom: 119px;
+    --chat-widget-action-size: 64px;
+    --chat-widget-trigger-size: calc(var(--chat-widget-action-size) * 0.7273);
+    --chat-widget-trigger-icon-size: 18px;
   }
 
   .chat-widget__window {
@@ -558,16 +580,14 @@
     max-height: calc(100vh - 176px);
   }
 
-  .chat-widget__scroll-top {
-    width: 64px;
-    height: 64px;
-    margin-right: 0;
-  }
 }
 
 @include desktop-up {
   .chat-widget {
     bottom: 32px;
+    --chat-widget-action-size: 88px;
+    --chat-widget-trigger-size: calc(var(--chat-widget-action-size) * 0.7273);
+    --chat-widget-trigger-icon-size: 24px;
   }
 
   .chat-widget__window {
@@ -575,11 +595,6 @@
     max-height: calc(100vh - 96px);
   }
 
-  .chat-widget__scroll-top {
-    width: 88px;
-    height: 88px;
-    margin-right: -12px;
-  }
 }
 
 @include mobile {
@@ -588,6 +603,9 @@
     left: 12px;
     bottom: calc(var(--mobile-bottom-nav-height, 95px) + 12px);
     gap: 6px;
+    --chat-widget-action-size: 52px;
+    --chat-widget-trigger-size: calc(var(--chat-widget-action-size) * 0.7273);
+    --chat-widget-trigger-icon-size: 16px;
   }
 
   .chat-widget__window {
@@ -606,24 +624,13 @@
   }
 
   .chat-widget__trigger-wrap {
-    min-height: 56px;
     gap: 8px;
   }
 
-  .chat-widget__scroll-top {
-    width: 56px;
-    height: 56px;
-    margin-right: 0;
-  }
-
-  .chat-widget__trigger {
-    width: 56px;
-    height: 56px;
-  }
 
   .chat-widget__trigger-icon {
-    width: 26px;
-    height: 26px;
+    width: var(--chat-widget-trigger-icon-size);
+    height: var(--chat-widget-trigger-icon-size);
   }
 
   .chat-widget__tooltip {

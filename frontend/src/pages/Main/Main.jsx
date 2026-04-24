@@ -296,6 +296,7 @@ const createUpdateShowcaseItem = (products, { productName, brand, description, f
 };
 
 const UPDATE_IMAGE_TRANSITION_DURATION = 220;
+const CATEGORY_ITEMS_TRANSITION_DURATION = 420;
 
 const toDisplayPrice = (product) => `￦${product.price}`;
 
@@ -399,6 +400,9 @@ function Main() {
   const [aiReviewItems, setAiReviewItems] = useState([]);
   const [aiReviewMessage, setAiReviewMessage] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("direct");
+  const [visibleCategory, setVisibleCategory] = useState("direct");
+  const [previousCategory, setPreviousCategory] = useState(null);
+  const [isCategoryItemsTransitioning, setIsCategoryItemsTransitioning] = useState(false);
   const [selectedSpecProduct, setSelectedSpecProduct] = useState(null);
   const [selectedUpdateIndex, setSelectedUpdateIndex] = useState(0);
   const [hoveredUpdateIndex, setHoveredUpdateIndex] = useState(null);
@@ -416,6 +420,7 @@ function Main() {
   const aiRequestAbortRef = useRef(null);
   const updateImageTransitionTimeoutRef = useRef(null);
   const updateImageTransitionRafRef = useRef(null);
+  const categoryTransitionTimeoutRef = useRef(null);
   const updateImageCacheRef = useRef(new Set());
   const aiResultSectionRef = useRef(null);
   const categorySwiperRef = useRef(null);
@@ -479,6 +484,8 @@ function Main() {
   const selectedCategorySection =
     categorySections.find((section) => section.id === selectedCategory) ?? categorySections[0];
   const categoryItems = selectedCategorySection.items;
+  const getCategoryItemsById = (categoryId) =>
+    (categorySections.find((section) => section.id === categoryId) ?? categorySections[0])?.items ?? [];
   const aiResultItems = aiResults;
   const handleInput = (e) => {
     const el = e.target;
@@ -802,9 +809,54 @@ function Main() {
       if (updateImageTransitionRafRef.current) {
         window.cancelAnimationFrame(updateImageTransitionRafRef.current);
       }
+
+      if (categoryTransitionTimeoutRef.current) {
+        window.clearTimeout(categoryTransitionTimeoutRef.current);
+      }
     },
     [],
   );
+
+  useEffect(() => {
+    if (selectedCategory === visibleCategory) {
+      return undefined;
+    }
+
+    setCategorySwiperState((prev) => ({
+      ...prev,
+      progress: 0,
+    }));
+
+    if (categoryTransitionTimeoutRef.current) {
+      window.clearTimeout(categoryTransitionTimeoutRef.current);
+      categoryTransitionTimeoutRef.current = null;
+    }
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (prefersReducedMotion) {
+      setVisibleCategory(selectedCategory);
+      setPreviousCategory(null);
+      setIsCategoryItemsTransitioning(false);
+      return undefined;
+    }
+
+    setPreviousCategory(visibleCategory);
+    setVisibleCategory(selectedCategory);
+    setIsCategoryItemsTransitioning(true);
+    categoryTransitionTimeoutRef.current = window.setTimeout(() => {
+      setPreviousCategory(null);
+      setIsCategoryItemsTransitioning(false);
+      categoryTransitionTimeoutRef.current = null;
+    }, CATEGORY_ITEMS_TRANSITION_DURATION);
+
+    return () => {
+      if (categoryTransitionTimeoutRef.current) {
+        window.clearTimeout(categoryTransitionTimeoutRef.current);
+        categoryTransitionTimeoutRef.current = null;
+      }
+    };
+  }, [selectedCategory, visibleCategory]);
 
   useEffect(() => {
     if (aiStatus !== "success" || aiResults.length === 0 || !showAiResult || !isDesktopCategory) {
@@ -1128,31 +1180,58 @@ function Main() {
     );
   };
 
-  const renderCategoryItems = () => {
+  const renderCategorySwiper = (categoryId, { layer = "active", isInteractive = true } = {}) => {
     const isDesktop = isDesktopCategory;
+    const items = getCategoryItemsById(categoryId);
 
     return (
-      <>
+      <div
+        className={`category-items-layer category-items-layer--${layer} ${
+          isCategoryItemsTransitioning ? "is-transitioning" : ""
+        }`.trim()}
+        aria-hidden={!isInteractive}
+      >
         <Swiper
-          key={`category-swiper-${selectedCategory}-${
+          key={`category-swiper-${categoryId}-${
             isDesktop ? "desktop" : isTabletCategory ? "tablet" : "mobile"
           }`}
           className="item_box category_swiper"
           spaceBetween={isDesktop ? 20 : isTabletCategory ? 24 : 10}
           slidesPerView={isDesktop ? 3.15 : isTabletCategory ? 2.7 : 2.1}
           onSwiper={(swiper) => {
-            categorySwiperRef.current = swiper;
-            updateCategorySwiperState(swiper);
+            if (isInteractive) {
+              categorySwiperRef.current = swiper;
+              updateCategorySwiperState(swiper);
+            }
           }}
-          onProgress={updateCategorySwiperState}
-          onSlideChange={updateCategorySwiperState}
+          onProgress={isInteractive ? updateCategorySwiperState : undefined}
+          onSlideChange={isInteractive ? updateCategorySwiperState : undefined}
+          allowTouchMove={isInteractive}
         >
-          {categoryItems.map((item) => (
+          {items.map((item) => (
             <SwiperSlide key={getProductListKey(item, item.name)}>
               {renderCategoryCard(item)}
             </SwiperSlide>
           ))}
         </Swiper>
+      </div>
+    );
+  };
+
+  const renderCategoryItems = () => {
+    const isDesktop = isDesktopCategory;
+
+    return (
+      <>
+        <div className="category-items-stage">
+          {renderCategorySwiper(visibleCategory, { layer: "active", isInteractive: true })}
+          {previousCategory
+            ? renderCategorySwiper(previousCategory, {
+                layer: "previous",
+                isInteractive: false,
+              })
+            : null}
+        </div>
         <div
           className={`unfilled ${isDesktop ? "unfilled--desktop" : ""}`}
           ref={categoryProgressRef}

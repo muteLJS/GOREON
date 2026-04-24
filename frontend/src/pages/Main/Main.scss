@@ -99,29 +99,41 @@
   }
   .AI_description {
     @include flex(flex-start, space-between, column);
+    align-items: flex-start;
+    min-width: 0;
     gap: $space-sm;
-  }
-  button {
-    padding: 5px;
-    @include flex(center, space-between);
-    color: $color-text-sub;
-    background-color: $color-button;
-    border: 1px solid $color-text-sub;
-    border-radius: 25.5px;
-    font-weight: $font-bold;
-    font-size: $font-xxs;
-    gap: 5px;
-    .circle {
-      width: 6px;
-      height: 6px;
-      border-radius: $radius-full;
-      background-color: $color-text-sub;
+
+    > button {
+      width: fit-content;
+      max-width: 100%;
+      padding: 5px;
+      @include flex(center, center);
+      color: $color-text-sub;
+      background-color: $color-button;
+      border: 1px solid $color-text-sub;
+      border-radius: 25.5px;
+      font-weight: $font-bold;
+      font-size: $font-xxs;
+      line-height: 1.2;
+      gap: 5px;
+      white-space: nowrap;
+      flex: 0 0 auto;
+
+      .circle {
+        width: 6px;
+        height: 6px;
+        border-radius: $radius-full;
+        background-color: $color-text-sub;
+      }
     }
   }
   .AI_Main_text {
+    width: 100%;
+    min-width: 0;
     color: $color-text-main;
     font-size: $font-xl;
     font-weight: $font-black;
+    line-height: 1.18;
 
     .input {
       color: $color-text-sub;
@@ -129,6 +141,8 @@
   }
   .AI_sub_text {
     display: none;
+    width: 100%;
+    min-width: 0;
   }
 }
 
@@ -225,9 +239,13 @@
 }
 
 .AI_Chat_row_2 {
+  width: 100%;
+  min-width: 0;
   @include flex(flex-start, space-between, column);
   gap: 12px;
   .buttons {
+    width: 100%;
+    min-width: 0;
     @include flex(flex-start, space-between, column);
     gap: 12px;
     button {
@@ -238,6 +256,9 @@
       border-radius: $radius-full;
       font-size: $font-xs;
       font-weight: $font-bold;
+      line-height: 1.2;
+      white-space: nowrap;
+      flex: 0 0 auto;
     }
 
     .buttons__slide {
@@ -306,7 +327,7 @@
     font-weight: $font-bold;
   }
   textarea.is-ai-input-error::placeholder {
-    color: $color-error;
+    color: rgba($color-text-main, 0.58);
   }
   textarea {
     background-color: $color-white;
@@ -364,19 +385,13 @@
       font-weight: $font-bold;
       font-size: $font-sm;
       display: block;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      @include ellipsis;
     }
     .description {
       color: $color-sub-category-text;
       font-weight: $font-medium;
       font-size: $font-xs;
-      display: -webkit-box;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 3;
+      @include ellipsis-multi(3);
     }
   }
   .AI_review_state {
@@ -491,25 +506,22 @@
         p:first-child,
         p:last-child {
           width: 100%;
-          display: -webkit-box;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
         }
 
         p:first-child {
+          @include ellipsis-multi(2);
           font-size: $font-md;
           font-weight: $font-bold;
           color: $color-category-text;
           line-height: 1.35;
           min-height: calc(1.35em * 2);
-          -webkit-line-clamp: 2;
         }
 
         p:last-child {
+          @include ellipsis-multi(3);
           font-size: $font-xs-2;
           line-height: 1.45;
           min-height: calc(1.45em * 3);
-          -webkit-line-clamp: 3;
           color: $color-sub-category-text;
         }
       }
@@ -855,25 +867,22 @@
           p:first-child,
           p:last-child {
             width: 100%;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
           }
 
           p:first-child {
+            @include ellipsis-multi(2);
             font-size: $font-lg;
             font-weight: $font-bold;
             color: $color-category-text;
             line-height: 1.35;
             min-height: calc(1.35em * 2);
-            -webkit-line-clamp: 2;
           }
 
           p:last-child {
+            @include ellipsis-multi(3);
             font-size: $font-xs-2;
             line-height: 1.45;
             min-height: calc(1.45em * 3);
-            -webkit-line-clamp: 3;
             color: $color-sub-category-text;
           }
         }
@@ -1184,6 +1193,31 @@
   @include flex(flex-start, center, column);
   gap: 12px;
   overflow: hidden;
+
+  @keyframes categoryItemsFadeIn {
+    from {
+      opacity: 0;
+      transform: translate3d(18px, 0, 0) scale(0.985);
+    }
+
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+  }
+
+  @keyframes categoryItemsFadeOut {
+    from {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    to {
+      opacity: 0;
+      transform: translate3d(-18px, 0, 0) scale(0.985);
+    }
+  }
+
   .category_top {
     @include flex(flex-start, center, column);
     gap: 8px;
@@ -1213,22 +1247,56 @@
       background-color: $color-white;
       border-radius: $radius-full;
       cursor: pointer;
-      transition: $transition-base;
+      will-change: background-color, transform;
+      transition:
+        background-color 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
       img {
         width: 16px;
         flex-shrink: 0;
+        opacity: 0.72;
+        filter: grayscale(1) saturate(0) brightness(0.78);
+        transition:
+          filter 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+          transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
       }
       span {
         font-weight: $font-medium;
         font-size: $font-sm;
         color: $color-sub-category-text;
         white-space: nowrap;
+        transition: color 0.36s cubic-bezier(0.22, 1, 0.36, 1);
       }
-      &:hover span {
-        color: $color-category-text;
+
+      &:hover {
+        background-color: $color-gray-100;
+
+        img {
+          opacity: 1;
+          filter: none;
+          transform: scale(1.04);
+        }
+
+        span {
+          color: $color-category-text;
+        }
       }
+
+      &:active {
+        transform: scale(0.985);
+      }
+
       &.is-active {
         background-color: $color-gray-100;
+        box-shadow: inset 0 0 0 1px rgba($color-text-sub, 0.08);
+
+        img {
+          opacity: 1;
+          filter: none;
+          transform: scale(1.04);
+        }
 
         span {
           color: $color-category-text;
@@ -1240,6 +1308,48 @@
       }
     }
   }
+
+  .category-items-stage {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .category-items-layer {
+    width: 100%;
+    will-change: opacity, transform;
+
+    &--active {
+      position: relative;
+      z-index: 1;
+    }
+
+    &--previous {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    &--active.is-transitioning {
+      animation: categoryItemsFadeIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    &--previous.is-transitioning {
+      animation: categoryItemsFadeOut 0.32s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .categories .category,
+    .categories .category img,
+    .categories .category span,
+    .category-items-layer {
+      transition: none;
+      animation: none !important;
+    }
+  }
+
   .item_box {
     @include flex(flex-start, center);
     gap: 12px;
@@ -1320,9 +1430,7 @@
     line-height: 1.35;
     cursor: pointer;
     display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    @include ellipsis;
   }
 
   .options {
@@ -1353,6 +1461,7 @@
     .colors {
       width: 20px;
       height: 20px;
+      cursor: pointer;
       border-radius: $radius-full;
     }
     .color1 {
@@ -1407,6 +1516,7 @@
       width: auto;
       height: auto;
       display: flex;
+      align-items: flex-start;
     }
   }
 
@@ -1462,6 +1572,7 @@
       width: 100%;
       overflow: hidden;
       opacity: 1;
+      padding-top: 10px;
       transition:
         grid-template-rows 0.55s ease,
         opacity 0.4s ease,
@@ -1492,30 +1603,60 @@
       .pakage_item {
         min-width: 0;
         flex: 1 1 auto;
+        width: auto;
+        max-width: none;
+        align-self: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 2px;
+        min-height: calc(68px - #{$space-xs});
         padding: 0;
         border: 0;
         background: transparent;
         color: inherit;
+        overflow: hidden;
         text-align: left;
         cursor: pointer;
         p {
-          font-size: $font-xs-2;
+          min-width: 0;
+          max-width: 100%;
+          font-size: clamp(#{$font-xs-2}, 1.9vw, #{$font-sm});
           line-height: 1.35;
           overflow-wrap: anywhere;
         }
+        > p:first-child {
+          font-size: clamp(#{$font-sm}, 2.3vw, #{$font-lg});
+          font-weight: $font-bold;
+          line-height: 1.25;                    
+        }
         .gray_text {
-          font-size: $font-xs;
+          font-size: clamp(#{$font-xs}, 2vw, #{$font-md});
+          font-weight: $font-medium;
+        }
+        .pakage_detail_group {
+          display: grid;
+          gap: 0;
+          min-width: 0;
+          max-width: 100%;
         }
         .pakage_item_title {
-          display: -webkit-box;
-          overflow: hidden;
-          -webkit-box-orient: vertical;
-          -webkit-line-clamp: 2;
+          min-width: 0;
+          width: 100%;
+          max-width: 100%;
+          @include ellipsis-multi(1);
+          white-space: normal;
+          overflow-wrap: normal;
+          word-break: keep-all;
         }
         .pakage_item_option {
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
+          min-width: 0;
+          width: 100%;
+          max-width: 100%;
+          @include ellipsis-multi(1);
+          white-space: normal;
+          overflow-wrap: normal;
+          word-break: keep-all;
         }
       }
     }
@@ -1642,9 +1783,7 @@
         font-size: $font-md;
         line-height: 1.35;
         display: block;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        @include ellipsis;
       }
       .item_price {
         font-size: $font-md;
@@ -1827,7 +1966,7 @@
       font-size: $font-xl;
       line-height: 1.4;
     }
-    button {
+    .AI_description > button {
       font-size: $font-xs;
       padding: 8px 20px;
       gap: 10px;
@@ -1942,21 +2081,18 @@
           p:first-child,
           p:last-child {
             width: 100%;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
           }
 
           p:first-child {
+            @include ellipsis-multi(2);
             line-height: 1.35;
             min-height: calc(1.35em * 2);
-            -webkit-line-clamp: 2;
           }
 
           p:last-child {
+            @include ellipsis-multi(3);
             line-height: 1.45;
             min-height: calc(1.45em * 3);
-            -webkit-line-clamp: 3;
           }
         }
         .go {
@@ -2152,8 +2288,6 @@
         gap: 9px;
         padding: 10px 12px;
         background-color: $color-white;
-        transition: $transition-base;
-
         img {
           width: 18px;
         }
@@ -2162,14 +2296,8 @@
           font-size: $font-md;
         }
 
-        &:hover,
-        &:active,
         &.is-active {
           background-color: $color-gray-100;
-
-          span {
-            color: $color-category-text;
-          }
         }
       }
     }
@@ -2276,7 +2404,7 @@
         .pakage_texts {
           gap: 8px;
           > p:not(.gray_text) {
-            font-size: $font-xl;
+            font-size: $font-xl-2;
             line-height: 1.25;
           }
           .gray_text {
@@ -2326,19 +2454,60 @@
       .pakage_item {
         min-width: 0;
         flex: 1 1 auto;
+        width: auto;
+        max-width: none;
+        align-self: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 4px;
+        min-height: calc(88px - #{$space-sm});
         padding: 0;
         border: 0;
         background: transparent;
         color: inherit;
+        overflow: hidden;
         text-align: left;
         cursor: pointer;
         p {
-          font-size: $font-md;
+          min-width: 0;
+          max-width: 100%;
+          font-size: clamp(#{$font-md}, 1.45vw, #{$font-lg});
           font-weight: $font-bold;
           overflow-wrap: anywhere;
+          line-height: 1.35;
+        }
+        > p:first-child {
+          font-size: clamp(#{$font-lg-2}, 1.8vw, #{$font-xl});
+          line-height: 1.25;
         }
         .gray_text {
-          font-size: $font-sm;
+          font-size: clamp(#{$font-md}, 1.35vw, #{$font-lg});
+          font-weight: $font-medium;
+        }
+        .pakage_detail_group {
+          display: grid;
+          gap: 0;
+          min-width: 0;
+          max-width: 100%;
+        }
+        .pakage_item_title {
+          min-width: 0;
+          width: 100%;
+          max-width: 100%;
+          @include ellipsis-multi(1);
+          white-space: normal;
+          overflow-wrap: normal;
+          word-break: keep-all;
+        }
+        .pakage_item_option {
+          min-width: 0;
+          width: 100%;
+          max-width: 100%;
+          @include ellipsis-multi(1);
+          white-space: normal;
+          overflow-wrap: normal;
+          word-break: keep-all;
         }
       }
     }
@@ -2481,15 +2650,19 @@
 
             .cart-icon-button,
             .wishlist-icon-button {
-              display: grid;
-              place-items: center;
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
               width: 50px;
               height: 50px;
               flex: 0 0 50px;
+              padding: 0;
+              line-height: 0;
               border: 1.5px solid rgba($color-text-main, 0.18);
               box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
 
               img {
+                display: block;
                 width: 24px;
                 height: 24px;
               }
@@ -2634,10 +2807,7 @@
               font-size: 26px;
               font-weight: $font-bold;
               line-height: 1.1;
-              display: -webkit-box;
-              -webkit-box-orient: vertical;
-              -webkit-line-clamp: 2;
-              overflow: hidden;
+              @include ellipsis-multi(2);
             }
 
             .gray_text {
@@ -2646,10 +2816,7 @@
               font-size: 16px;
               font-weight: $font-medium;
               line-height: 1.2;
-              display: -webkit-box;
-              -webkit-box-orient: vertical;
-              -webkit-line-clamp: 2;
-              overflow: hidden;
+              @include ellipsis-multi(2);
             }
           }
 

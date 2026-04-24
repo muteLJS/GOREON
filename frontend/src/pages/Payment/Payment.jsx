@@ -119,6 +119,7 @@ export default function Payment() {
   const [shippingForm, setShippingForm] = useState(initialShippingForm);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const shouldRemovePurchasedCartItems = state?.checkoutSource !== "direct-buy";
 
   const orderItems = useMemo(() => {
     if (Array.isArray(state?.orderItems)) {
@@ -217,7 +218,10 @@ export default function Payment() {
       setIsSubmitting(true);
 
       await api.post("/orders", payload);
-      dispatch(removeCartItems(orderItems.map((item) => item.id)));
+
+      if (shouldRemovePurchasedCartItems) {
+        dispatch(removeCartItems(orderItems.map((item) => item.id)));
+      }
 
       showToast("주문이 완료되었습니다.");
       navigate("/order-history");
