@@ -1,5 +1,4 @@
 ﻿import "./ProductDetail.scss";
-import productList from "@/data/products_list.json";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -7,6 +6,7 @@ import { FreeMode } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import arrowIcon from "@/assets/icons/prev.svg";
+import { fetchProductById } from "@/api/products";
 import { useToast } from "@/components/Toast/toastContext";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 import ReviewSection from "../../components/ReviewSection/ReviewSection";
@@ -45,46 +45,6 @@ const mapReview = (review) => ({
   helpfulCount: 0,
 });
 
-function getProductDetailByIdFromJson(id) {
-  const product = productList.find((item) => String(item.id) === String(id));
-
-  if (!product) {
-    return null;
-  }
-
-  const price = parsePrice(product.price);
-  const tags = Array.isArray(product.tag) ? product.tag : [];
-  const heroImage = normalizeImageUrl(product.image) || ProductHeroImage;
-  const normalizedDetailImages = Array.isArray(product.detailImages)
-    ? product.detailImages.map((src) => normalizeImageUrl(src)).filter(Boolean)
-    : [];
-  const gallery =
-    normalizedDetailImages.length > 0
-      ? normalizedDetailImages
-      : [heroImage, heroImage, heroImage, heroImage, heroImage];
-  const options =
-    Array.isArray(product.priceOptions) && product.priceOptions.length > 0
-      ? product.priceOptions.map((option, index) => ({
-          id: `option-${index + 1}`,
-          label: option.optionName || `옵션 ${index + 1}`,
-          price: parsePrice(option.price) || price,
-        }))
-      : [{ id: "default", label: "기본 옵션", price }];
-
-  return {
-    id: String(product.id),
-    brand: tags[0] || String(product.name ?? "").split(" ")[0] || "브랜드 정보 준비중",
-    title: product.name,
-    subtitle: `${tags[1] || tags[0] || "상품"} 카테고리 추천 상품`,
-    shortDescription: `${product.name}의 핵심 정보와 옵션을 상세 페이지에서 확인할 수 있습니다.`,
-    price,
-    rating: Number(product.rating) || 0,
-    heroImage,
-    gallery,
-    options,
-  };
-}
-
 function getProductDetailFromApi(product) {
   const price = parsePrice(product.price);
   const heroImage = normalizeImageUrl(product.image) || ProductHeroImage;
@@ -106,8 +66,9 @@ function getProductDetailFromApi(product) {
   const tags = Array.isArray(product.tag) ? product.tag : [];
 
   return {
-    id: String(product._id ?? product.id),
-    _id: product._id ? String(product._id) : "",
+    _id: String(product._id),
+    productId: String(product._id),
+    legacyId: product.id ? String(product.id) : "",
     brand: tags[0] || String(product.name ?? "").split(" ")[0] || "브랜드 정보 준비중",
     title: product.name,
     subtitle: `${tags[1] || tags[0] || "상품"} 카테고리 추천 상품`,
@@ -152,16 +113,12 @@ function ProductDetail() {
       try {
         setStatus("loading");
 
-        const productResponse = await api.get(`/products/${id}`, {
-          signal: controller.signal,
-        });
-
         const nextProduct = getProductDetailFromApi(
-          productResponse.data.data ?? productResponse.data,
+          await fetchProductById(id, { signal: controller.signal }),
         );
         setProduct(nextProduct);
 
-        const reviewResponse = await api.get(`/reviews/${nextProduct.id}`, {
+        const reviewResponse = await api.get(`/reviews/${nextProduct._id}`, {
           signal: controller.signal,
         });
 
@@ -188,8 +145,7 @@ function ProductDetail() {
           return;
         }
 
-        const fallbackProduct = getProductDetailByIdFromJson(id);
-        setProduct(fallbackProduct);
+        setProduct(null);
         setReviews([]);
         setReviewSummary({
           rating: 0,
@@ -197,7 +153,7 @@ function ProductDetail() {
           photoCount: 0,
           gallery: [],
         });
-        setStatus(fallbackProduct ? "success" : "error");
+        setStatus("error");
       }
     };
 
@@ -224,8 +180,9 @@ function ProductDetail() {
 
     dispatch(
       addRecentViewed({
-        id: product.id,
-        productId: product.id,
+        _id: product._id,
+        id: product._id,
+        productId: product._id,
         name: product.title,
         price: formatPrice(product.price),
         image: product.heroImage,
@@ -280,7 +237,7 @@ function ProductDetail() {
         <section className="product-detail__story">
           <h1 className="product-detail__title">상품을 찾을 수 없습니다.</h1>
           <p className="product-detail__feature-body">
-            요청한 상품 id에 해당하는 목록 데이터가 없습니다.
+            요청한 상품 정보를 불러오지 못했습니다.
           </p>
         </section>
       </main>
@@ -293,13 +250,14 @@ function ProductDetail() {
   const categoryLabel = product.subtitle.split(" 카테고리")[0] || "상품";
 
   const handleAddToCart = (shouldShowToast = true) => {
-    const cartItemId = `${product.id}-${displayOption.id}`;
+    const cartItemId = `${product._id}-${displayOption.id}`;
     const isAlreadyInCart = cartItems.some((item) => item.id === cartItemId);
 
     dispatch(
       addToCart({
         id: cartItemId,
-        productId: product._id ?? product.id,
+        _id: product._id,
+        productId: product._id,
         name: product.title,
         option: displayOption.label,
         price: displayOption.price,
@@ -373,7 +331,7 @@ function ProductDetail() {
           watchOverflow
         >
           {reviewSummary.gallery.map((image, index) => (
-            <SwiperSlide key={`${product.id}-review-photo-${index}`}>
+            <SwiperSlide key={`${product._id}-review-photo-${index}`}>
               <img
                 src={image}
                 alt={`리뷰 이미지 ${index + 1}`}
@@ -409,7 +367,8 @@ function ProductDetail() {
 
             <WishlistIconButton
               product={{
-                id: product.id,
+                _id: product._id,
+                productId: product._id,
                 name: product.title,
                 price: product.price,
                 image: product.heroImage,
@@ -503,7 +462,7 @@ function ProductDetail() {
               <div className="product-detail__story-image">
                 {product.gallery.map((image, index) => (
                   <img
-                    key={`${product.id}-detail-${index}`}
+                    key={`${product._id}-detail-${index}`}
                     src={image}
                     alt={`${product.brand} 상세 이미지 ${index + 1}`}
                     onError={(event) => {

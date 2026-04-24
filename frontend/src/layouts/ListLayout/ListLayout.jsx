@@ -12,6 +12,7 @@ import ProductCardVertical from "@/components/ProductCard/ProductCardVertical";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 
 import resetIcon from "@/assets/icons/reset.svg";
+import { compareProductsByNewest, getProductListKey } from "@/utils/productIdentity";
 import { useSearchParams } from "react-router-dom";
 
 const TYPE_LABEL_MAP = {
@@ -335,7 +336,7 @@ const sortProducts = (products, sortValue) => {
   const sortedProducts = [...products];
 
   if (sortValue === "최신상품") {
-    return sortedProducts.sort((left, right) => (Number(right.id) || 0) - (Number(left.id) || 0));
+    return sortedProducts.sort(compareProductsByNewest);
   }
 
   if (sortValue === "인기상품" || sortValue === "리뷰 많은 상품") {
@@ -628,7 +629,7 @@ export default function ListLayout({
                 <div className="list-assembly__product-grid">
                   {visibleProducts.map((product) => (
                     <ProductCardVertical
-                      key={product.id}
+                      key={getProductListKey(product)}
                       product={product}
                       action={
                         <div className="list-assembly__button-container">

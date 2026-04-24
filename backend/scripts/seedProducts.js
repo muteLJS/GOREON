@@ -11,8 +11,8 @@ dotenv.config({
   path: path.resolve(__dirname, "../.env"),
 });
 
-const DATA_SOURCE = "products_list.json";
-const dataPath = path.resolve(__dirname, "../../frontend/src/data/products_list.json");
+const DATA_SOURCE = "backend/data/products_list.json";
+const dataPath = path.resolve(__dirname, "../data/products_list.json");
 
 const seedProducts = async () => {
   if (!process.env.MONGODB_URI) {

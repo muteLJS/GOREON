@@ -4,6 +4,7 @@ import LikeAfterIcon from "@/assets/icons/like-after.svg";
 import LikeBeforeIcon from "@/assets/icons/like-before.svg";
 import { useToast } from "@/components/Toast/toastContext";
 import { addToWishlist, removeFromWishlist } from "@/store/slices/wishlistSlice";
+import { getProductObjectId } from "@/utils/productIdentity";
 import "./WishlistIconButton.scss";
 
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
@@ -12,11 +13,15 @@ function WishlistIconButton({ product, className = "", iconClassName = "", size 
   const dispatch = useDispatch();
   const { showToast } = useToast();
   const wishlistItems = useSelector((state) => state.wishlist.items);
-  const productId = product?._id ?? product?.productId ?? product?.id ?? 1;
-  const isWishlisted = wishlistItems.some((item) => item.id === productId);
+  const productId = getProductObjectId(product);
+  const isWishlisted = wishlistItems.some((item) => getProductObjectId(item) === productId);
 
   const handleClick = (event) => {
     event.stopPropagation();
+
+    if (!productId) {
+      return;
+    }
 
     if (isWishlisted) {
       dispatch(removeFromWishlist(productId));
@@ -27,6 +32,8 @@ function WishlistIconButton({ product, className = "", iconClassName = "", size 
     dispatch(
       addToWishlist({
         id: productId,
+        _id: productId,
+        productId,
         name: product?.name ?? product?.title ?? "상품명",
         price: parsePrice(product?.price),
         image: product?.image ?? product?.heroImage ?? "",

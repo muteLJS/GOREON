@@ -4,7 +4,7 @@ const RECENT_VIEWED_STORAGE_KEY = "recentViewedItems";
 const MAX_RECENT_VIEWED = 10;
 
 const getRecentViewedItemKey = (item) => {
-  const candidates = [item?.productId, item?.id, item?._id];
+  const candidates = [item?._id, item?.productId, item?.id];
 
   for (const candidate of candidates) {
     const normalized = String(candidate ?? "").trim();
@@ -26,6 +26,7 @@ const normalizeRecentViewedItem = (item) => {
 
   return {
     ...item,
+    _id: key,
     id: key,
     productId: key,
   };

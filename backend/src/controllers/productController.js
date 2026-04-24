@@ -5,7 +5,7 @@ const getProducts = async (req, res, next) => {
   try {
     const { category, keyword, type } = req.query;
     const query = buildProductQuery({ category, keyword, type });
-    const products = await Product.find(query).sort({ id: 1, _id: 1 }).lean();
+    const products = await Product.find(query).sort({ _id: 1 }).lean();
 
     res.json({ data: products });
   } catch (error) {

@@ -1,24 +1,27 @@
-import "./PcAssemblyQuote.scss";
-import PcAssemblyQuoteList from "@/components/PcAssemblyQuoteList/PcAssemblyQuoteList";
-import CheckIcon from "@/assets/icons/check.svg";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+
+import CheckIcon from "@/assets/icons/check.svg";
+import PcAssemblyQuoteList from "@/components/PcAssemblyQuoteList/PcAssemblyQuoteList";
+import useProductCatalog from "@/hooks/useProductCatalog";
 import {
   addQuoteItem,
-  updateQuoteItemQuantity,
-  removeQuoteItems,
   clearQuoteItems,
+  removeQuoteItems,
+  updateQuoteItemQuantity,
 } from "@/store/slices/quoteSlice";
 import {
   getPcAssemblyPerformanceChecks,
   getPcAssemblyRecommendations,
 } from "@/utils/pcAssemblyProducts";
+import "./PcAssemblyQuote.scss";
 
 function PcAssemblyQuote({ isModal = false }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const items = useSelector((state) => state.quote.items);
+  const { products } = useProductCatalog();
   const [selectedIds, setSelectedIds] = useState([]);
   const [analysisIds, setAnalysisIds] = useState([]);
   const isAllSelected = items.length > 0 && selectedIds.length === items.length;
@@ -37,8 +40,8 @@ function PcAssemblyQuote({ isModal = false }) {
   const hasAnalyzedItems = analyzedItems.length > 0;
 
   const performanceChecks = useMemo(
-    () => getPcAssemblyPerformanceChecks(analyzedItems),
-    [analyzedItems],
+    () => getPcAssemblyPerformanceChecks(analyzedItems, products),
+    [analyzedItems, products],
   );
   const visiblePerformanceChecks = useMemo(() => {
     const textSet = new Set();
@@ -65,7 +68,10 @@ function PcAssemblyQuote({ isModal = false }) {
     return { level: "ok", text: "호환성 모두 이상 없음" };
   }, [performanceChecks]);
 
-  const recommendItems = useMemo(() => getPcAssemblyRecommendations(items), [items]);
+  const recommendItems = useMemo(
+    () => getPcAssemblyRecommendations(items, products),
+    [items, products],
+  );
 
   useEffect(() => {
     const itemIds = new Set(items.map((item) => item.id));
@@ -123,14 +129,15 @@ function PcAssemblyQuote({ isModal = false }) {
         ? crypto.randomUUID()
         : `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-    return `${product.category}-${product.id}-${randomId}`;
+    return `${product.category}-${product._id}-${randomId}`;
   };
 
   const handleRecommendAdd = (product) => {
     dispatch(
       addQuoteItem({
         id: createRecommendationQuoteId(product),
-        productId: product.id,
+        _id: product._id,
+        productId: product._id,
         category: product.category,
         name: product.name,
         option: product.option,
@@ -229,7 +236,7 @@ function PcAssemblyQuote({ isModal = false }) {
               <h3 className="pc-assembly-quote__section-title">업그레이드 추천</h3>
               <div className="pc-assembly-quote__recommend-list">
                 {recommendItems.map((item) => (
-                  <article className="pc-assembly-quote__recommend-card" key={item.id}>
+                  <article className="pc-assembly-quote__recommend-card" key={item._id}>
                     <div className="pc-assembly-quote__recommend-thumb">
                       <img src={item.image} alt={item.name} />
                     </div>
@@ -237,7 +244,7 @@ function PcAssemblyQuote({ isModal = false }) {
                       <button
                         type="button"
                         className="pc-assembly-quote__recommend-name"
-                        onClick={() => handleRecommendClick(item.id)}
+                        onClick={() => handleRecommendClick(item._id)}
                       >
                         {item.name}
                       </button>

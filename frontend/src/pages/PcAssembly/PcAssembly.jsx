@@ -1,26 +1,27 @@
-﻿import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addQuoteItem } from "@/store/slices/quoteSlice";
-import "./PcAssembly.scss";
-
-import ProductCardVertical from "@/components/ProductCard/ProductCardVertical";
-import ProductCardHorizontal from "@/components/ProductCard/ProductCardHorizontal";
-import Modal from "@/components/Modal/Modal";
-import PcAssemblyQuote from "@/pages/PcAssemblyQuote/PcAssemblyQuote";
 
 import banner1 from "@/assets/banner/banner-1.jpg";
 import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
 import CheckIcon from "@/assets/icons/check.svg";
 import CloseIcon from "@/assets/event/close.svg";
+import Modal from "@/components/Modal/Modal";
+import ProductCardHorizontal from "@/components/ProductCard/ProductCardHorizontal";
+import ProductCardVertical from "@/components/ProductCard/ProductCardVertical";
+import useProductCatalog from "@/hooks/useProductCatalog";
+import PcAssemblyQuote from "@/pages/PcAssemblyQuote/PcAssemblyQuote";
+import { addQuoteItem } from "@/store/slices/quoteSlice";
 import {
   PC_ASSEMBLY_CATEGORIES,
   getPcAssemblyPerformanceChecks,
-  pcAssemblyProducts,
+  getPcAssemblyProducts,
 } from "@/utils/pcAssemblyProducts";
+import "./PcAssembly.scss";
 
 function PcAssembly() {
   const dispatch = useDispatch();
   const items = useSelector((state) => state.quote.items);
+  const { products } = useProductCatalog();
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isQuoteOpen, setIsQuoteOpen] = useState(false);
@@ -92,6 +93,7 @@ function PcAssembly() {
     };
   }, [isDesktop, isQuoteOpen]);
 
+  const pcAssemblyProducts = useMemo(() => getPcAssemblyProducts(products), [products]);
   const getQuoteItemQuantity = (item) => Number(item.quantity) || 1;
   const quoteItemCount = items.reduce((sum, item) => sum + getQuoteItemQuantity(item), 0);
   const totalPrice = items.reduce(
@@ -102,9 +104,12 @@ function PcAssembly() {
 
   const filteredProducts = useMemo(
     () => pcAssemblyProducts.filter((product) => product.category === selectedCategory),
-    [selectedCategory],
+    [pcAssemblyProducts, selectedCategory],
   );
-  const compatibilityChecks = useMemo(() => getPcAssemblyPerformanceChecks(items), [items]);
+  const compatibilityChecks = useMemo(
+    () => getPcAssemblyPerformanceChecks(items, products),
+    [items, products],
+  );
   const compatibilityStatus = useMemo(() => {
     if (!compatibilityChecks.length) return null;
     if (compatibilityChecks.some((row) => row.level === "error")) {
@@ -116,8 +121,9 @@ function PcAssembly() {
   const handleAddQuoteItem = (product) => {
     dispatch(
       addQuoteItem({
-        id: `${product.category}-${product.id}`,
-        productId: product.id,
+        id: `${product.category}-${product._id}`,
+        _id: product._id,
+        productId: product._id,
         category: product.category,
         name: product.name,
         option: product.option,
@@ -191,7 +197,7 @@ function PcAssembly() {
         <div className="pc-assembly__product-grid">
           {filteredProducts.map((product) => (
             <ProductCardVertical
-              key={product.id}
+              key={product._id}
               product={product}
               action={
                 <button
@@ -220,7 +226,7 @@ function PcAssembly() {
           <div className="pc-assembly__desktop-list">
             {filteredProducts.map((product) => (
               <ProductCardHorizontal
-                key={product.id}
+                key={product._id}
                 product={product}
                 action={
                   <button
