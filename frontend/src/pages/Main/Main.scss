@@ -711,19 +711,6 @@
       }
     }
 
-    .AI_container {
-      width: 60px;
-      flex: 0 0 auto;
-      align-self: center;
-      padding-right: 6px;
-      overflow: visible;
-
-      .AI_logo {
-        width: 100%;
-        display: block;
-        height: auto;
-      }
-    }
   }
 }
 
@@ -2863,6 +2850,10 @@
 }
 
 @media (max-width: 767px) {
+  .main-page__section--ai-review {
+    margin-top: 15px;
+  }
+
   .section__AI {
     .AI_container {
       align-items: flex-start;
@@ -2871,6 +2862,22 @@
         width: 34%;
         max-width: 128px;
         margin-top: 6px;
+      }
+    }
+  }
+
+  .section__AI_Review {
+    .review_box.review_swiper {
+      overflow: visible;
+
+      .swiper-slide {
+        display: flex;
+        height: auto;
+      }
+
+      .review_main {
+        width: 100%;
+        min-height: 100%;
       }
     }
   }

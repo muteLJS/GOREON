@@ -1042,6 +1042,26 @@ function Main() {
       );
     }
 
+    const isMobileAiReview = !isTabletCategory && !isDesktopCategory;
+
+    if (isMobileAiReview) {
+      return (
+        <Swiper className="review_box review_swiper" slidesPerView={1.12} spaceBetween={12}>
+          {aiReviewItems.map((review) => (
+            <SwiperSlide key={review.id}>
+              <ReviewCard
+                userImage={review.userImage}
+                userName={review.userName}
+                productName={review.productName}
+                description={review.description}
+                rating={review.rating}
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      );
+    }
+
     return (
       <div className="review_box">
         {aiReviewItems.map((review) => (
@@ -1418,9 +1438,6 @@ function Main() {
               </button>
             </div>
           </form>
-          <div className="AI_container">
-            <AICharacter className="AI_logo" />
-          </div>
         </div>
       </div>
     </div>
