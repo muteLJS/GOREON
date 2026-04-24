@@ -109,7 +109,7 @@ export default function Cart() {
           <div className="cart-page__progress-step">
             <Link
               to="/payment"
-              state={{ orderItems: selectedItems, shippingForm }}
+              state={{ orderItems: selectedItems, shippingForm, checkoutSource: "cart" }}
               className="cart-page__progress-link"
             >
               2
@@ -264,7 +264,7 @@ export default function Cart() {
 
           <Link
             to="/payment"
-            state={{ orderItems: selectedItems, shippingForm }}
+            state={{ orderItems: selectedItems, shippingForm, checkoutSource: "cart" }}
             className="cart-page__checkout-button"
           >
             결제하기

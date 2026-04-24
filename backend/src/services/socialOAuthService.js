@@ -19,7 +19,7 @@ const PROVIDER_CONFIG = {
     authorizeUrl: "https://kauth.kakao.com/oauth/authorize",
     tokenUrl: "https://kauth.kakao.com/oauth/token",
     userInfoUrl: "https://kapi.kakao.com/v2/user/me",
-    scope: "account_email profile_nickname profile_image",
+    scope: "profile_nickname profile_image",
     optionalSecret: true,
   },
   naver: {

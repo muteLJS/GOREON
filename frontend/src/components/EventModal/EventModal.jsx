@@ -75,13 +75,19 @@ function EventModal({
 
   useEffect(() => {
     if (!shouldRenderModal) {
-      document.body.style.overflow = "";
-      document.documentElement.style.overflow = "";
       return undefined;
     }
 
     const previousBodyOverflow = document.body.style.overflow;
+    const previousBodyPaddingRight = document.body.style.paddingRight;
     const previousHtmlOverflow = document.documentElement.style.overflow;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    const currentBodyPaddingRight =
+      Number.parseFloat(window.getComputedStyle(document.body).paddingRight) || 0;
+
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${currentBodyPaddingRight + scrollbarWidth}px`;
+    }
 
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
@@ -96,6 +102,7 @@ function EventModal({
 
     return () => {
       document.body.style.overflow = previousBodyOverflow;
+      document.body.style.paddingRight = previousBodyPaddingRight;
       document.documentElement.style.overflow = previousHtmlOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
@@ -144,9 +151,6 @@ function EventModal({
 
     window.localStorage.setItem(EVENT_MODAL_DISMISS_STORAGE_KEY, String(dismissUntil.getTime()));
     setIsDismissedForToday(true);
-
-    document.body.style.overflow = "";
-    document.documentElement.style.overflow = "";
 
     onDismissToday?.(dismissUntil);
     onClose?.();
