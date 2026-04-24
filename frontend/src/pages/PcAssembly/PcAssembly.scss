@@ -128,9 +128,7 @@
     justify-content: flex-start;
     font-size: $font-sm;
     font-weight: $font-semibold;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    @include ellipsis;
 
     &--warning {
       color: $color-warning;
@@ -282,8 +280,7 @@
     &__total {
       min-height: 42px;
       font-size: clamp($font-sm, 4vw, $font-md);
-      overflow: hidden;
-      text-overflow: ellipsis;
+      @include ellipsis;
     }
 
     &__compatibility {

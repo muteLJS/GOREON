@@ -41,6 +41,23 @@
         // 공통 input mixin 사용
         @include input();
         font-size: $font-xs;
+
+        input {
+          color: $color-text-main;
+
+          &::placeholder {
+            color: $color-placeholder;
+          }
+
+          &:-webkit-autofill,
+          &:-webkit-autofill:hover,
+          &:-webkit-autofill:focus {
+            -webkit-text-fill-color: $color-text-main;
+            -webkit-box-shadow: 0 0 0 1000px $color-white inset;
+            box-shadow: 0 0 0 1000px $color-white inset;
+            transition: background-color 9999s ease-out 0s;
+          }
+        }
       }
     }
   }
@@ -246,6 +263,23 @@
         @include input();
         width: 100%;
         font-size: $font-xs;
+
+        input {
+          color: $color-text-main;
+
+          &::placeholder {
+            color: $color-placeholder;
+          }
+
+          &:-webkit-autofill,
+          &:-webkit-autofill:hover,
+          &:-webkit-autofill:focus {
+            -webkit-text-fill-color: $color-text-main;
+            -webkit-box-shadow: 0 0 0 1000px $color-white inset;
+            box-shadow: 0 0 0 1000px $color-white inset;
+            transition: background-color 9999s ease-out 0s;
+          }
+        }
       }
     }
 

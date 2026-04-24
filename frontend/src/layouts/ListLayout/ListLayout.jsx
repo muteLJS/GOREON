@@ -616,6 +616,13 @@ export default function ListLayout({
                   {selectedSort}순 <img src={ChevronDownIcon} alt="down" />
                 </button>
               </div>
+              <button
+                type="button"
+                className="list-assembly__desktop-sort-button"
+                onClick={() => setIsSortModalOpen(true)}
+              >
+                {selectedSort}순 <img src={ChevronDownIcon} alt="down" />
+              </button>
             </section>
             <section className="list-assembly__content">
               {status === "loading" ? (

@@ -14,24 +14,12 @@ import { addToCart } from "../../store/slices/cartSlice";
 import { addRecentViewed } from "@/store/slices/recentViewed";
 import ChevronDown from "../../assets/icons/chevron-down.svg";
 import api from "../../utils/api";
+import { normalizeImageUrl } from "@/utils/image";
 
 import ProductHeroImage from "../../assets/img/intel-core-ultra5-250kf-plus-product-image-genuine.jpg";
 
 const formatPrice = (price) => `￦ ${price.toLocaleString("ko-KR")}`;
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
-const normalizeImageUrl = (value) => {
-  const raw = String(value ?? "").trim();
-  if (!raw) {
-    return "";
-  }
-  if (raw.startsWith("http:///")) {
-    return "";
-  }
-  if (raw.startsWith("http://")) {
-    return `https://${raw.slice("http://".length)}`;
-  }
-  return raw;
-};
 
 const mapReview = (review) => ({
   id: String(review._id),
@@ -248,23 +236,22 @@ function ProductDetail() {
   const displayOption = selectedOption || product.options[0];
   const totalPrice = displayOption.price * quantity;
   const categoryLabel = product.subtitle.split(" 카테고리")[0] || "상품";
+  const checkoutItem = {
+    id: `${product._id}-${displayOption.id}`,
+    _id: product._id,
+    productId: product._id,
+    category: categoryLabel,
+    name: product.title,
+    option: displayOption.label,
+    price: displayOption.price,
+    image: product.heroImage,
+    quantity,
+  };
 
   const handleAddToCart = (shouldShowToast = true) => {
-    const cartItemId = `${product._id}-${displayOption.id}`;
-    const isAlreadyInCart = cartItems.some((item) => item.id === cartItemId);
+    const isAlreadyInCart = cartItems.some((item) => item.id === checkoutItem.id);
 
-    dispatch(
-      addToCart({
-        id: cartItemId,
-        _id: product._id,
-        productId: product._id,
-        name: product.title,
-        option: displayOption.label,
-        price: displayOption.price,
-        image: product.heroImage,
-        quantity,
-      }),
-    );
+    dispatch(addToCart(checkoutItem));
 
     if (shouldShowToast) {
       showToast(isAlreadyInCart ? "장바구니 수량이 추가되었습니다." : "장바구니에 담았습니다.");
@@ -272,8 +259,12 @@ function ProductDetail() {
   };
 
   const handleBuyNow = () => {
-    handleAddToCart(false);
-    navigate("/payment");
+    navigate("/payment", {
+      state: {
+        orderItems: [checkoutItem],
+        checkoutSource: "direct-buy",
+      },
+    });
   };
 
   const handleQuantityChange = (delta) => {

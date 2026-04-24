@@ -163,19 +163,23 @@
 
 .order-history-item__action--mobile {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   margin-top: 12px;
 }
 
 .order-history-item__action-button {
   width: 100%;
+  min-width: 0;
   height: 44px;
+  padding: 0 10px;
   border: 2px solid $color-text-main;
   border-radius: 12px;
   background: $color-white;
   color: $color-text-main;
   font-size: 14px;
   font-weight: $font-bold;
+  line-height: 1.2;
   cursor: pointer;
 }
 
@@ -183,6 +187,10 @@
 .order-history-item__action-button--delivery {
   background: $color-text-main;
   color: $color-white;
+}
+
+.order-history-item__action--mobile .order-history-item__action-button--confirm {
+  grid-column: 1 / -1;
 }
 
 .order-history-item__action-button--review {

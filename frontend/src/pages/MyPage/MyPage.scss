@@ -13,7 +13,9 @@
   --my-page-email-size: 12px;
   --my-page-logout-height: 32px;
   --my-page-logout-padding-x: 12px;
-  --my-page-logout-font-size: 13px;
+  --my-page-button-radius: #{$radius-btn};
+  --my-page-button-font-size: #{$font-sm};
+  --my-page-logout-font-size: var(--my-page-button-font-size);
   --my-page-metrics-min-height: 78px;
   --my-page-metric-gap: 8px;
   --my-page-metric-padding: 14px 8px;
@@ -33,8 +35,8 @@
   --my-page-input-font-size: 14px;
   --my-page-action-width: 72px;
   --my-page-action-height: 40px;
-  --my-page-action-radius: 12px;
-  --my-page-action-font-size: 13px;
+  --my-page-action-radius: var(--my-page-button-radius);
+  --my-page-action-font-size: var(--my-page-button-font-size);
   --my-page-ai-slider-column-width: 192px;
   --my-page-recent-card-width: 176px;
   --my-page-recent-card-height: 194px;
@@ -128,7 +130,7 @@
   height: var(--my-page-logout-height);
   padding: 0 var(--my-page-logout-padding-x);
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--my-page-button-radius);
   background: $color-text-sub;
   color: $color-white;
   font-size: var(--my-page-logout-font-size);
@@ -296,14 +298,14 @@
 
 .my-page__edit-button--edit {
   border: 0;
-  background: #12b8c0;
+  background: $color-text-sub;
   color: $color-white;
 }
 
 .my-page__edit-button--done {
-  border: 2px solid #12b8c0;
+  border: 1px solid $color-text-sub;
   background: $color-white;
-  color: #12b8c0;
+  color: $color-text-sub;
 }
 
 .my-page__recent-panel {
@@ -381,6 +383,7 @@
 .my-page__rail-card-actions {
   flex: 0 0 auto;
   gap: 4px;
+  justify-self: end;
 }
 
 .my-page__rail-card-copy {
@@ -400,10 +403,11 @@
 }
 
 .my-page__rail-card-footer {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  column-gap: 10px;
+  width: 100%;
 }
 
 .my-page__rail-card-price {
@@ -728,7 +732,7 @@
   .my-page__profile-card {
     margin-top: 56px;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 340px;
+    grid-template-columns: 1fr 1fr;
     gap: 12px;
   }
 
@@ -736,6 +740,7 @@
   .my-page__metrics {
     min-height: 78px;
     border-radius: 16px;
+    
   }
 
   .my-page__profile-top {
