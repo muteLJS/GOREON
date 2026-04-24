@@ -1,17 +1,28 @@
 import "./ProductCardHorizontal.scss";
 import { useNavigate } from "react-router-dom";
+
 import Rating from "@/components/Rating/Rating";
+import { buildProductDetailPath } from "@/utils/productIdentity";
 
 function ProductCardHorizontal({ product, action }) {
   const navigate = useNavigate();
-  const productId = product?._id ?? product?.productId ?? product?.id;
+  const detailPath = buildProductDetailPath(product);
 
   const handleTitleClick = () => {
-    navigate(`/product/${product.id}`);
+    if (detailPath) {
+      navigate(detailPath);
+    }
   };
 
   return (
-    <div className="product-card-horizontal" onClick={() => navigate(`/product/${productId}`)}>
+    <div
+      className="product-card-horizontal"
+      onClick={() => {
+        if (detailPath) {
+          navigate(detailPath);
+        }
+      }}
+    >
       <img className="product-card-horizontal__thumbnail" src={product.image} alt={product.name} />
       <div className="product-card-horizontal__content">
         <button

@@ -3,49 +3,20 @@ import { useNavigate } from "react-router-dom";
 
 import PrevIcon from "assets/icons/prev.svg";
 import CouponIcon from "assets/event/couponIcon.svg";
-import productList from "@/data/products_list.json";
-import api from "@/utils/api";
+import { fetchProducts as fetchProductList } from "@/api/products";
 
 import EventModalStepShell from "./EventModalStepShell";
 
 const formatPrice = (price) => `${Number(price).toLocaleString("ko-KR")}원`;
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
 
-const flattenCatalogProducts = (catalog) =>
-  catalog.flatMap((entry, entryIndex) => {
-    const hasNestedProducts = Array.isArray(entry?.products) || Array.isArray(entry?.subCategories);
-    const categoryName = entry.categoryName ?? "";
-    const routePrefix = entry.categoryId ?? (categoryName || entryIndex + 1);
-
-    if (!hasNestedProducts) {
-      return [
-        {
-          ...entry,
-          routeId: String(entry?.id ?? entryIndex + 1),
-        },
-      ];
-    }
-
-    const directProducts = (entry.products ?? []).map((product, productIndex) => ({
-      ...product,
-      routeId: `${routePrefix}-${product.id ?? productIndex + 1}-${productIndex}`,
-    }));
-
-    const nestedProducts = (entry.subCategories ?? []).flatMap((subCategory, subIndex) =>
-      (subCategory.products ?? []).map((product, productIndex) => ({
-        ...product,
-        routeId: `${routePrefix}-${subCategory.categoryId ?? subIndex}-${product.id ?? productIndex + 1}-${productIndex}`,
-      })),
-    );
-
-    return [...directProducts, ...nestedProducts];
-  });
-
 const toProductSummary = (product) => {
   const image = product.image || product.thumbnail || "";
 
   return {
-    id: String(product._id ?? product.routeId ?? product.id),
+    id: String(product._id),
+    _id: String(product._id),
+    productId: String(product._id),
     name: product.name,
     option:
       product.priceOptions?.[0]?.optionName ||
@@ -59,14 +30,7 @@ const toProductSummary = (product) => {
 function MyBenefitView({ titleId, benefitConfigs, coupon, onBack }) {
   const navigate = useNavigate();
   const benefitConfig = benefitConfigs[0];
-  const fallbackProducts = useMemo(() => {
-    return flattenCatalogProducts(productList)
-      .filter((product) => Array.isArray(product.tag) && product.tag.includes(benefitConfig.productFallbackTag))
-      .sort((a, b) => parsePrice(b.price) - parsePrice(a.price))
-      .slice(0, benefitConfig.productLimit)
-      .map((product) => toProductSummary(product));
-  }, [benefitConfig.productFallbackTag, benefitConfig.productLimit]);
-  const [products, setProducts] = useState(fallbackProducts);
+  const [products, setProducts] = useState([]);
 
   const productItems = useMemo(() => {
     return products.map((product) => ({
@@ -80,31 +44,29 @@ function MyBenefitView({ titleId, benefitConfigs, coupon, onBack }) {
   useEffect(() => {
     const controller = new AbortController();
 
-    const fetchProducts = async () => {
+    const loadProducts = async () => {
       try {
-        const response = await api.get("/products", {
-          params: { type: benefitConfig.productQueryType },
-          signal: controller.signal,
-        });
-
-        const nextProducts = (response.data.data ?? response.data ?? [])
+        const nextProducts = (
+          await fetchProductList({
+            params: { type: benefitConfig.productQueryType },
+            signal: controller.signal,
+          })
+        )
           .slice(0, benefitConfig.productLimit)
           .map((product) => toProductSummary(product));
 
-        if (nextProducts.length > 0) {
-          setProducts(nextProducts);
-        }
+        setProducts(nextProducts);
       } catch (error) {
         if (error.name !== "CanceledError") {
-          setProducts(fallbackProducts);
+          setProducts([]);
         }
       }
     };
 
-    fetchProducts();
+    loadProducts();
 
     return () => controller.abort();
-  }, [benefitConfig.productLimit, benefitConfig.productQueryType, fallbackProducts]);
+  }, [benefitConfig.productLimit, benefitConfig.productQueryType]);
 
   const handleProductClick = (productId) => {
     navigate(`/product/${productId}`);
@@ -148,11 +110,11 @@ function MyBenefitView({ titleId, benefitConfigs, coupon, onBack }) {
 
       <ul className="event-modal-benefit__list">
         {productItems.map((product) => (
-          <li key={product.id} className="event-modal-benefit__item">
+          <li key={product._id} className="event-modal-benefit__item">
             <button
               type="button"
               className="event-modal-benefit__link"
-              onClick={() => handleProductClick(product.id)}
+              onClick={() => handleProductClick(product._id)}
             >
               <img src={product.image} alt={product.name} className="event-modal-benefit__thumb" />
               <div className="event-modal-benefit__item-body">

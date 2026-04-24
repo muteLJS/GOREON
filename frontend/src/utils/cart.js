@@ -1,3 +1,5 @@
+import { getProductObjectId } from "@/utils/productIdentity";
+
 export const EMPTY_SHIPPING_FORM = {
   postalCode: "",
   recipient: "",
@@ -12,10 +14,12 @@ export function formatPrice(price) {
 
 export function toCartItem(item, index) {
   const quantity = Number(item.quantity) || 1;
+  const productId = getProductObjectId(item);
 
   return {
     id: item.id ?? `cart-item-${index}`,
-    productId: item.productId ?? item.id ?? index + 1,
+    productId,
+    _id: productId,
     category: item.category ?? "상품",
     name: item.name ?? item.title ?? "상품명",
     option: item.option ?? item.spec ?? "옵션 정보가 없습니다.",

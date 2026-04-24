@@ -1,4 +1,6 @@
 import { useEffect, useRef } from "react";
+
+import { getProductListKey } from "@/utils/productIdentity";
 import AICharacter from "../AICharacter/AICharacter";
 import ChatProductCard from "./ChatProductCard";
 
@@ -76,7 +78,7 @@ function ChatMessageList({ messages, isInitialView }) {
 
                 <div className="chat-widget__product-list">
                   {message.products.map((product) => (
-                    <ChatProductCard key={product.id} product={product} />
+                    <ChatProductCard key={getProductListKey(product)} product={product} />
                   ))}
                 </div>
               </div>

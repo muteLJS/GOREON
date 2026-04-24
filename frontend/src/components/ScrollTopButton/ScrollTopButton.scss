@@ -1,4 +1,4 @@
-@import "styles/variables";
+@use "styles/variables" as *;
 
 .scroll-top-button {
   width: 64px;

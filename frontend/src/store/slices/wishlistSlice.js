@@ -4,6 +4,7 @@
 /* -------------------------------------------------------------------------- */
 
 import { createSlice } from "@reduxjs/toolkit";
+import { getProductObjectId } from "@/utils/productIdentity";
 
 const WISHLIST_STORAGE_KEY = "wishlistItems";
 
@@ -36,19 +37,23 @@ const initialState = {
   items: loadWishlistItems(),
 };
 
+const getWishlistProductId = (item) => getProductObjectId(item);
+
 const wishlistSlice = createSlice({
   name: "wishlist",
   initialState,
   reducers: {
     addToWishlist: (state, action) => {
-      const existing = state.items.find((item) => item.id === action.payload.id);
+      const nextProductId = getWishlistProductId(action.payload);
+      const existing = state.items.find((item) => getWishlistProductId(item) === nextProductId);
       if (!existing) {
         state.items.push(action.payload);
         persistWishlistItems(state.items);
       }
     },
     removeFromWishlist: (state, action) => {
-      state.items = state.items.filter((item) => item.id !== action.payload);
+      const targetProductId = getProductObjectId(action.payload);
+      state.items = state.items.filter((item) => getWishlistProductId(item) !== targetProductId);
       persistWishlistItems(state.items);
     },
   },

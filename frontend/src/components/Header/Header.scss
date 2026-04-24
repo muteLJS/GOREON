@@ -1,5 +1,5 @@
-@import "styles/variables";
-@import "styles/mixins";
+@use "styles/variables" as *;
+@use "styles/mixins" as *;
 
 .header {
   --mobile-header-height: 76px;
@@ -650,7 +650,7 @@ body.mobile-menu-open {
 
   .gnb {
     @include flex(center, center);
-    gap: clamp(80px, 14vw, 220px);
+    gap: clamp(80px, 8vw, 220px);
     max-width: $layout-desktop-max-width;
     height: 54px;
     margin: 0 auto;
@@ -659,6 +659,7 @@ body.mobile-menu-open {
 
   .gnb__item {
     @include flex-center;
+    flex: 0 0 clamp(96px, 8vw, 124px);
     height: 100%;
   }
 
@@ -666,6 +667,7 @@ body.mobile-menu-open {
   .gnb__link {
     @include flex-center;
     position: relative;
+    width: 100%;
     height: 100%;
     padding: 0 6px;
     border: 0;

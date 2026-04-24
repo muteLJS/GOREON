@@ -13,6 +13,7 @@ import CartIconButton from "@/components/CartIconButton/CartIconButton";
 import { useToast } from "@/components/Toast/toastContext";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 import { logout, updateUserInfo } from "@/store/slices/userSlice";
+import { getProductListKey, getProductObjectId } from "@/utils/productIdentity";
 import api from "@/utils/api";
 
 const FALLBACK_USER = {
@@ -30,7 +31,7 @@ const INFO_FIELDS = [
 const INITIAL_HISTORY_COUNT = 2;
 
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
-const getProductId = (product) => product?._id ?? product?.productId ?? product?.id ?? 1;
+const getProductId = (product) => getProductObjectId(product) ?? "1";
 
 const formatPrice = (value) => `₩${new Intl.NumberFormat("ko-KR").format(parsePrice(value))}`;
 const showActionAlert = (message) => window.alert(message);
@@ -195,8 +196,9 @@ export default function MyPage() {
         subtitle: history.message || "상품 데이터 기준으로 추천한 결과입니다.",
         items: Array.isArray(history.products)
           ? history.products.map((product) => ({
-              id: product.id ?? product.productId,
-              productId: product.productId ?? product.id,
+              id: getProductObjectId(product),
+              _id: getProductObjectId(product),
+              productId: getProductObjectId(product),
               name: product.name ?? "추천 상품",
               price: formatPrice(product.price),
               image: product.image ?? "",
@@ -638,7 +640,7 @@ export default function MyPage() {
                       >
                         {history.items.map((product) => (
                           <AiRecommendationCard
-                            key={`${history.id}-${product.id}`}
+                            key={`${history.id}-${getProductListKey(product)}`}
                             product={product}
                           />
                         ))}
