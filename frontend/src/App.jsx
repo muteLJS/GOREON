@@ -45,17 +45,26 @@ function App() {
     }
 
     let isMounted = true;
+    const controller = new AbortController();
 
     const restoreSession = async () => {
       try {
-        const response = await api.get("/users/me");
+        const response = await api.get("/users/me", {
+          signal: controller.signal,
+          skipAuthRefresh: true,
+          skipAuthLogout: true,
+        });
 
         if (!isMounted) {
           return;
         }
 
         dispatch(login({ user: response.data?.data || response.data }));
-      } catch {
+      } catch (error) {
+        if (error.name === "CanceledError" || error.name === "AbortError") {
+          return;
+        }
+
         if (!isMounted) {
           return;
         }
@@ -68,6 +77,7 @@ function App() {
 
     return () => {
       isMounted = false;
+      controller.abort();
     };
   }, [authChecked, dispatch, isLoggedIn, location.pathname]);
 
