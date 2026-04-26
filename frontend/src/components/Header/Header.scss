@@ -62,12 +62,34 @@
   display: block;
   width: 34px;
   height: 34px;
+  object-fit: contain;
 }
 
-.header__logo-full,
+.header__logo-full {
+  display: block;
+  width: 96px;
+  height: auto;
+}
+
 .header__right,
 .header__nav {
   display: none;
+}
+
+.header__logo--mobile {
+  .header__logo-icon {
+    display: block;
+    width: 28px;
+    height: 28px;
+  }
+
+  .header__logo-full {
+    display: none;
+  }
+
+  a {
+    gap: 0;
+  }
 }
 
 .header__mobile-user {
@@ -467,6 +489,13 @@ body.mobile-menu-open {
   .header__mobile-user {
     width: 32px;
     height: 32px;
+  }
+
+  .header__logo--mobile {
+    .header__logo-icon {
+      width: 32px;
+      height: 32px;
+    }
   }
 
   .mobile-menu__tabs,

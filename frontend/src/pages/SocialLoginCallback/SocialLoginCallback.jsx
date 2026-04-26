@@ -7,14 +7,6 @@ import api from "@/utils/api";
 
 const getHashParams = () => new URLSearchParams(window.location.hash.replace(/^#/, ""));
 
-const getSocialDebugContext = () => ({
-  currentUrl: window.location.href,
-  callbackPath: window.location.pathname,
-  hash: window.location.hash,
-  referrer: document.referrer || "(empty)",
-  userAgent: window.navigator.userAgent,
-});
-
 const normalizeUser = (user) => ({
   id: user.id || user._id,
   name: user.name,
@@ -44,21 +36,7 @@ function SocialLoginCallback() {
       const success = params.get("success");
       const provider = params.get("provider") || "unknown";
 
-      console.info("[auth][social-callback] started", {
-        provider,
-        success,
-        error,
-        ...getSocialDebugContext(),
-      });
-
       if (error || success !== "1") {
-        console.error("[auth][social-callback] provider callback failed", {
-          provider,
-          success,
-          error,
-          hint:
-            "OAuth provider callback did not complete normally. Check backend Render logs for [auth][social-oauth-callback] details.",
-        });
         setMessage("소셜 로그인에 실패했습니다.");
         navigate("/login", { replace: true, state: { authError: error, authProvider: provider } });
         return;
@@ -75,19 +53,6 @@ function SocialLoginCallback() {
         navigate("/", { replace: true });
       } catch (requestError) {
         const status = requestError.response?.status;
-
-        console.error("[auth][social-callback] request failed", {
-          provider,
-          message: requestError.message,
-          status,
-          responseData: requestError.response?.data,
-          requestUrl: requestError.config?.url,
-          probableCause:
-            status === 401
-              ? "Social login succeeded, but the auth cookie was not included on /users/me. Check Set-Cookie on the OAuth callback response and Cookie on the subsequent /users/me request."
-              : "Check backend logs and network response details.",
-          ...getSocialDebugContext(),
-        });
 
         localStorage.removeItem("userInfo");
         setMessage("소셜 로그인 정보를 가져오지 못했습니다.");

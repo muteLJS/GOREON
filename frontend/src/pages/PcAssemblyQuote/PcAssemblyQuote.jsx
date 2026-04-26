@@ -4,7 +4,9 @@ import { useNavigate } from "react-router-dom";
 
 import CheckIcon from "@/assets/icons/check.svg";
 import PcAssemblyQuoteList from "@/components/PcAssemblyQuoteList/PcAssemblyQuoteList";
+import { useToast } from "@/components/Toast/toastContext";
 import useProductCatalog from "@/hooks/useProductCatalog";
+import { addToCart } from "@/store/slices/cartSlice";
 import {
   addQuoteItem,
   clearQuoteItems,
@@ -20,6 +22,7 @@ import "./PcAssemblyQuote.scss";
 function PcAssemblyQuote({ isModal = false }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const items = useSelector((state) => state.quote.items);
   const { products } = useProductCatalog();
   const [selectedIds, setSelectedIds] = useState([]);
@@ -43,24 +46,34 @@ function PcAssemblyQuote({ isModal = false }) {
     () => getPcAssemblyPerformanceChecks(analyzedItems, products),
     [analyzedItems, products],
   );
+
   const visiblePerformanceChecks = useMemo(() => {
     const textSet = new Set();
 
     return performanceChecks.filter((row) => {
-      if (textSet.has(row.text)) return false;
+      if (textSet.has(row.text)) {
+        return false;
+      }
+
       textSet.add(row.text);
       return true;
     });
   }, [performanceChecks]);
+
   const compatibilityLevelMap = useMemo(
     () => new Map(performanceChecks.map((row) => [row.id, row.level])),
     [performanceChecks],
   );
+
   const compatibilityStatus = useMemo(() => {
-    if (!performanceChecks.length) return null;
+    if (!performanceChecks.length) {
+      return null;
+    }
+
     if (performanceChecks.some((row) => row.level === "error")) {
       return { level: "error", text: "호환성 확인 필요" };
     }
+
     if (performanceChecks.some((row) => row.level === "warning")) {
       return { level: "warning", text: "일부 부품 확인 필요" };
     }
@@ -108,7 +121,28 @@ function PcAssemblyQuote({ isModal = false }) {
   };
 
   const handleAddCart = () => {
-    console.log("장바구니 담기", items);
+    if (items.length === 0) {
+      showToast("장바구니에 담을 상품이 없습니다.");
+      return;
+    }
+
+    items.forEach((item) => {
+      dispatch(
+        addToCart({
+          id: item.id,
+          productId: item.productId ?? item._id ?? item.id,
+          _id: item._id ?? item.productId ?? item.id,
+          category: item.category ?? "상품",
+          name: item.name ?? "상품명",
+          option: item.option ?? item.spec ?? "기본 옵션",
+          price: Number(item.price) || 0,
+          image: item.image ?? item.heroImage ?? "",
+          quantity: getItemQuantity(item),
+        }),
+      );
+    });
+
+    showToast(`장바구니에 ${items.length}개 상품을 담았습니다.`);
   };
 
   const handleDecreaseQuantity = (item) => {
@@ -205,7 +239,7 @@ function PcAssemblyQuote({ isModal = false }) {
         </section>
 
         <strong className="pc-assembly-quote__total">
-          TOTAL : ₩{totalPrice.toLocaleString("ko-KR")}
+          TOTAL : {totalPrice.toLocaleString("ko-KR")}원
         </strong>
 
         <div className="pc-assembly-quote__right">
@@ -251,7 +285,7 @@ function PcAssemblyQuote({ isModal = false }) {
                       <p className="pc-assembly-quote__recommend-meta">{item.option}</p>
                       <div className="pc-assembly-quote__recommend-bottom">
                         <strong className="pc-assembly-quote__recommend-price">
-                          ₩{item.price.toLocaleString("ko-KR")}
+                          {item.price.toLocaleString("ko-KR")}원
                         </strong>
                         <button
                           type="button"

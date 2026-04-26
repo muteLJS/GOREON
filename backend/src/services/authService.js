@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+
 const User = require("../models/User");
 const ApiError = require("../utils/ApiError");
 const generateToken = require("../utils/generateToken");
@@ -34,7 +35,6 @@ const createAuthResult = (user) => ({
   ),
 });
 
-/* ---------------- 일반 회원가입 ---------------- */
 const registerUser = async ({ name, email, password, phone }) => {
   const normalizedEmail = email?.trim().toLowerCase();
 
@@ -65,7 +65,6 @@ const registerUser = async ({ name, email, password, phone }) => {
   return createAuthResult(user);
 };
 
-/* ---------------- 일반 로그인 ---------------- */
 const loginUser = async ({ email, password }) => {
   const normalizedEmail = email?.trim().toLowerCase();
 
@@ -88,7 +87,6 @@ const loginUser = async ({ email, password }) => {
   return createAuthResult(user);
 };
 
-/* ---------------- 토큰 재발급 ---------------- */
 const refreshAuth = async (refreshToken) => {
   if (!refreshToken) {
     throw new ApiError(401, "Authentication required");
@@ -115,7 +113,6 @@ const refreshAuth = async (refreshToken) => {
   return createAuthResult(user);
 };
 
-/* ---------------- 로그아웃 ---------------- */
 const logoutUser = async (refreshToken) => {
   if (!refreshToken) {
     return;
@@ -130,18 +127,11 @@ const logoutUser = async (refreshToken) => {
 
     await User.findByIdAndUpdate(decoded.userId, { $inc: { tokenVersion: 1 } });
   } catch (error) {
-    // 로그아웃은 클라이언트 쿠키 정리가 핵심이므로 만료/변조 토큰은 무시합니다.
+    // Cookie removal on the client is enough when the refresh token is already invalid.
   }
 };
 
-/* ---------------- 소셜 로그인 ---------------- */
-const socialLogin = async ({
-  provider,
-  providerId,
-  email,
-  name,
-  profileImage,
-}) => {
+const socialLogin = async ({ provider, providerId, email, name, profileImage }) => {
   const normalizedProvider = provider?.trim().toLowerCase();
   const normalizedProviderId = String(providerId ?? "").trim();
   const normalizedEmail = email?.trim().toLowerCase();
@@ -161,7 +151,7 @@ const socialLogin = async ({
 
   if (!user) {
     user = await User.create({
-      name: name || `${normalizedProvider} 사용자`,
+      name: name || `${normalizedProvider} user`,
       email: normalizedEmail,
       provider: normalizedProvider,
       providerId: normalizedProviderId,
@@ -170,10 +160,21 @@ const socialLogin = async ({
   } else {
     const updates = {};
 
-    if (!user.providerId && user.provider !== "local") updates.providerId = normalizedProviderId;
-    if (!user.email && normalizedEmail) updates.email = normalizedEmail;
-    if (name && user.name !== name) updates.name = name;
-    if (profileImage && user.profileImage !== profileImage) updates.profileImage = profileImage;
+    if (!user.providerId && user.provider !== "local") {
+      updates.providerId = normalizedProviderId;
+    }
+
+    if (!user.email && normalizedEmail) {
+      updates.email = normalizedEmail;
+    }
+
+    if (name && user.name !== name) {
+      updates.name = name;
+    }
+
+    if (profileImage && user.profileImage !== profileImage) {
+      updates.profileImage = profileImage;
+    }
 
     if (Object.keys(updates).length > 0) {
       user.set(updates);

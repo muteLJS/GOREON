@@ -561,12 +561,6 @@ export default function Login({ initialMode = "login" }) {
       const providerLabel = providerLabelMap[provider] || "소셜";
       const authError = location.state?.authError;
 
-      console.error("[auth][login-page] social login failed", {
-        provider,
-        authError,
-        locationState: location.state,
-      });
-
       if (authError === "social_session_missing") {
         setLoginError(
           `${providerLabel} 로그인은 완료됐지만 세션을 확인하지 못했습니다. 브라우저 쿠키 설정을 확인 후 다시 시도해주세요.`,
