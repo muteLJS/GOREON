@@ -22,7 +22,12 @@ const getClientSocialCallbackUrl = (params) => {
 
 const sendAuthResponse = (res, statusCode, result) => {
   setAuthCookies(res, result);
-  res.status(statusCode).json({ data: { user: result.user } });
+  res.status(statusCode).json({
+    data: {
+      user: result.user,
+      accessToken: result.accessToken,
+    },
+  });
 };
 
 const register = async (req, res, next) => {
@@ -84,7 +89,12 @@ const socialOAuthCallback = async (req, res) => {
   try {
     const result = await handleSocialCallback(req.params.provider, req.query);
     setAuthCookies(res, result);
-    res.redirect(getClientSocialCallbackUrl({ success: "1" }));
+    res.redirect(
+      getClientSocialCallbackUrl({
+        success: "1",
+        accessToken: result.accessToken,
+      }),
+    );
   } catch (error) {
     const message = error.statusCode === 500 ? "social_login_failed" : error.message;
     clearAuthCookies(res);

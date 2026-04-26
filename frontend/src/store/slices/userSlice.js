@@ -23,6 +23,7 @@ const parsePersistedUser = () => {
 const initialUser = parsePersistedUser();
 
 const initialState = {
+  authChecked: Boolean(initialUser),
   isLoggedIn: Boolean(initialUser),
   token: null,
   userInfo: initialUser,
@@ -33,11 +34,13 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     login: (state, action) => {
+      state.authChecked = true;
       state.isLoggedIn = true;
       state.userInfo = action.payload.user;
       state.token = null;
     },
     logout: (state) => {
+      state.authChecked = true;
       state.isLoggedIn = false;
       state.userInfo = null;
       state.token = null;
@@ -45,11 +48,15 @@ const userSlice = createSlice({
       localStorage.removeItem("userInfo");
     },
     updateUserInfo: (state, action) => {
+      state.authChecked = true;
       state.userInfo = action.payload;
       localStorage.setItem("userInfo", JSON.stringify(action.payload));
+    },
+    completeAuthCheck: (state) => {
+      state.authChecked = true;
     },
   },
 });
 
-export const { login, logout, updateUserInfo } = userSlice.actions;
+export const { login, logout, updateUserInfo, completeAuthCheck } = userSlice.actions;
 export default userSlice.reducer;
