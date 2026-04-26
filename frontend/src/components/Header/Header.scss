@@ -78,11 +78,17 @@
 
 .header__logo--mobile {
   .header__logo-icon {
-    display: none;
+    display: block;
+    width: 28px;
+    height: 28px;
   }
 
   .header__logo-full {
-    width: 108px;
+    display: none;
+  }
+
+  a {
+    gap: 0;
   }
 }
 
@@ -483,6 +489,13 @@ body.mobile-menu-open {
   .header__mobile-user {
     width: 32px;
     height: 32px;
+  }
+
+  .header__logo--mobile {
+    .header__logo-icon {
+      width: 32px;
+      height: 32px;
+    }
   }
 
   .mobile-menu__tabs,
