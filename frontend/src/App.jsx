@@ -40,7 +40,7 @@ function App() {
   }, [dispatch]);
 
   useEffect(() => {
-    if (authChecked || isLoggedIn || location.pathname === "/auth/social/callback") {
+    if (authChecked || location.pathname === "/auth/social/callback") {
       return;
     }
 
@@ -69,6 +69,11 @@ function App() {
           return;
         }
 
+        if (error.response?.status === 401) {
+          dispatch(logout());
+          return;
+        }
+
         dispatch(completeAuthCheck());
       }
     };
@@ -79,7 +84,7 @@ function App() {
       isMounted = false;
       controller.abort();
     };
-  }, [authChecked, dispatch, isLoggedIn, location.pathname]);
+  }, [authChecked, dispatch, location.pathname]);
 
   return (
     <>

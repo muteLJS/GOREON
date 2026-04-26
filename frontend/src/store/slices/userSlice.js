@@ -23,8 +23,8 @@ const parsePersistedUser = () => {
 const initialUser = parsePersistedUser();
 
 const initialState = {
-  authChecked: Boolean(initialUser),
-  isLoggedIn: Boolean(initialUser),
+  authChecked: false,
+  isLoggedIn: false,
   token: null,
   userInfo: initialUser,
 };
