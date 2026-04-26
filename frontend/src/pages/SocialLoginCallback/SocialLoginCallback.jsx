@@ -27,6 +27,7 @@ function SocialLoginCallback() {
       const params = getHashParams();
       const error = params.get("error");
       const success = params.get("success");
+      const accessToken = params.get("accessToken");
 
       if (error || success !== "1") {
         setMessage("소셜 로그인에 실패했습니다.");
@@ -35,7 +36,12 @@ function SocialLoginCallback() {
       }
 
       try {
-        localStorage.removeItem("authToken");
+        if (accessToken) {
+          localStorage.setItem("authToken", accessToken);
+        } else {
+          localStorage.removeItem("authToken");
+        }
+
         const response = await api.get("/users/me");
         const user = normalizeUser(response.data?.data || response.data);
 

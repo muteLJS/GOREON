@@ -26,12 +26,18 @@ const defaultRegisterForm = {
 };
 
 const persistAuth = (payload) => {
-  localStorage.removeItem("authToken");
+  if (payload.accessToken) {
+    localStorage.setItem("authToken", payload.accessToken);
+  } else {
+    localStorage.removeItem("authToken");
+  }
+
   localStorage.setItem("userInfo", JSON.stringify(payload.user));
 };
 
 const normalizeAuthPayload = (auth) => ({
   user: auth.user,
+  accessToken: auth.accessToken || null,
 });
 
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
