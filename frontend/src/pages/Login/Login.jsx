@@ -552,7 +552,34 @@ export default function Login({ initialMode = "login" }) {
 
   useEffect(() => {
     if (location.state?.authError) {
-      setLoginError("소셜 로그인에 실패했습니다. 다시 시도해주세요.");
+      const providerLabelMap = {
+        kakao: "카카오",
+        google: "구글",
+        naver: "네이버",
+      };
+      const provider = location.state?.authProvider;
+      const providerLabel = providerLabelMap[provider] || "소셜";
+      const authError = location.state?.authError;
+
+      console.error("[auth][login-page] social login failed", {
+        provider,
+        authError,
+        locationState: location.state,
+      });
+
+      if (authError === "social_session_missing") {
+        setLoginError(
+          `${providerLabel} 로그인은 완료됐지만 세션을 확인하지 못했습니다. 브라우저 쿠키 설정을 확인 후 다시 시도해주세요.`,
+        );
+        return;
+      }
+
+      if (authError === "social_profile_fetch_failed") {
+        setLoginError(`${providerLabel} 로그인 후 사용자 정보를 가져오지 못했습니다. 다시 시도해주세요.`);
+        return;
+      }
+
+      setLoginError(`${providerLabel} 로그인에 실패했습니다. 다시 시도해주세요.`);
     }
   }, [location.state]);
 
