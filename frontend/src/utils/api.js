@@ -5,9 +5,7 @@ const api = axios.create({
   withCredentials: true,
 });
 
-const getStoredAccessToken = () => localStorage.getItem("authToken");
 const clearStoredAuth = () => {
-  localStorage.removeItem("authToken");
   localStorage.removeItem("userInfo");
 };
 
@@ -18,25 +16,17 @@ const shouldSkipRefresh = (url = "") =>
 
 let refreshPromise = null;
 
-api.interceptors.request.use((config) => {
-  const accessToken = getStoredAccessToken();
-
-  if (accessToken) {
-    config.headers = config.headers || {};
-    config.headers.Authorization = `Bearer ${accessToken}`;
-  }
-
-  return config;
-});
-
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config || {};
+    const shouldSkipAuthRecovery =
+      originalRequest.skipAuthRefresh === true || originalRequest.skipAuthLogout === true;
 
     if (
       error.response?.status !== 401 ||
       originalRequest._retry ||
+      shouldSkipAuthRecovery ||
       shouldSkipRefresh(originalRequest.url)
     ) {
       return Promise.reject(error);
@@ -46,17 +36,15 @@ api.interceptors.response.use(
 
     try {
       refreshPromise = refreshPromise || api.post("/auth/refresh");
-      const refreshResponse = await refreshPromise;
-      const nextAccessToken = refreshResponse.data?.data?.accessToken;
-
-      if (nextAccessToken) {
-        localStorage.setItem("authToken", nextAccessToken);
-      }
-
+      await refreshPromise;
       return api(originalRequest);
     } catch (refreshError) {
       clearStoredAuth();
-      window.dispatchEvent(new Event("auth:logout"));
+
+      if (!originalRequest.skipAuthLogout) {
+        window.dispatchEvent(new Event("auth:logout"));
+      }
+
       return Promise.reject(refreshError);
     } finally {
       refreshPromise = null;
