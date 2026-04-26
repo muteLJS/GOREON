@@ -58,19 +58,9 @@ const parseCookies = (req) => {
   }, {});
 };
 
-const getBearerToken = (req) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return null;
-  }
-
-  return authHeader.split(" ")[1] || null;
-};
-
 const getAccessTokenFromRequest = (req) => {
   const cookies = parseCookies(req);
-  return cookies[ACCESS_COOKIE_NAME] || getBearerToken(req);
+  return cookies[ACCESS_COOKIE_NAME] || null;
 };
 
 const getRefreshTokenFromRequest = (req) => {

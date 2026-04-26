@@ -1,6 +1,6 @@
 import React, { Suspense, lazy, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
@@ -28,6 +28,7 @@ function App() {
   const dispatch = useDispatch();
   const authChecked = useSelector((state) => state.user.authChecked);
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const location = useLocation();
 
   useEffect(() => {
     const handleAuthLogout = () => {
@@ -39,22 +40,31 @@ function App() {
   }, [dispatch]);
 
   useEffect(() => {
-    if (authChecked || isLoggedIn) {
+    if (authChecked || isLoggedIn || location.pathname === "/auth/social/callback") {
       return;
     }
 
     let isMounted = true;
+    const controller = new AbortController();
 
     const restoreSession = async () => {
       try {
-        const response = await api.get("/users/me");
+        const response = await api.get("/users/me", {
+          signal: controller.signal,
+          skipAuthRefresh: true,
+          skipAuthLogout: true,
+        });
 
         if (!isMounted) {
           return;
         }
 
         dispatch(login({ user: response.data?.data || response.data }));
-      } catch {
+      } catch (error) {
+        if (error.name === "CanceledError" || error.name === "AbortError") {
+          return;
+        }
+
         if (!isMounted) {
           return;
         }
@@ -67,8 +77,9 @@ function App() {
 
     return () => {
       isMounted = false;
+      controller.abort();
     };
-  }, [authChecked, dispatch, isLoggedIn]);
+  }, [authChecked, dispatch, isLoggedIn, location.pathname]);
 
   return (
     <>

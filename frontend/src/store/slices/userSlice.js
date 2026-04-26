@@ -44,7 +44,6 @@ const userSlice = createSlice({
       state.isLoggedIn = false;
       state.userInfo = null;
       state.token = null;
-      localStorage.removeItem("authToken");
       localStorage.removeItem("userInfo");
     },
     updateUserInfo: (state, action) => {
