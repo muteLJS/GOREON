@@ -62,12 +62,28 @@
   display: block;
   width: 34px;
   height: 34px;
+  object-fit: contain;
 }
 
-.header__logo-full,
+.header__logo-full {
+  display: block;
+  width: 96px;
+  height: auto;
+}
+
 .header__right,
 .header__nav {
   display: none;
+}
+
+.header__logo--mobile {
+  .header__logo-icon {
+    display: none;
+  }
+
+  .header__logo-full {
+    width: 108px;
+  }
 }
 
 .header__mobile-user {

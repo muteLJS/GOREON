@@ -137,10 +137,19 @@
 
     .social-icon-button {
       @include flex-center;
+      width: 50px;
+      height: 50px;
       padding: 0;
       border: 0;
       background: transparent;
       cursor: pointer;
+
+      img {
+        display: block;
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+      }
     }
   }
 }
@@ -324,10 +333,19 @@
 
       .social-icon-button {
         @include flex-center;
+        width: 50px;
+        height: 50px;
         padding: 0;
         border: 0;
         background: transparent;
         cursor: pointer;
+
+        img {
+          display: block;
+          width: 50px;
+          height: 50px;
+          object-fit: contain;
+        }
       }
     }
   }
