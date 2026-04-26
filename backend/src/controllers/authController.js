@@ -91,8 +91,20 @@ const socialOAuthCallback = async (req, res) => {
     res.redirect(getClientSocialCallbackUrl({ success: "1" }));
   } catch (error) {
     const message = error.statusCode === 500 ? "social_login_failed" : error.message;
+    console.error("[auth][social-oauth-callback] failed", {
+      provider: req.params.provider,
+      path: req.originalUrl,
+      query: req.query,
+      statusCode: error.statusCode || 500,
+      message: error.message,
+    });
     clearAuthCookies(res);
-    res.redirect(getClientSocialCallbackUrl({ error: message || "social_login_failed" }));
+    res.redirect(
+      getClientSocialCallbackUrl({
+        error: message || "social_login_failed",
+        provider: req.params.provider,
+      }),
+    );
   }
 };
 
