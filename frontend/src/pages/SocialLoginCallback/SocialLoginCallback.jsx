@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
@@ -21,8 +21,15 @@ function SocialLoginCallback() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [message, setMessage] = useState("소셜 로그인 처리 중입니다...");
+  const hasStartedRef = useRef(false);
 
   useEffect(() => {
+    if (hasStartedRef.current) {
+      return;
+    }
+
+    hasStartedRef.current = true;
+
     const completeSocialLogin = async () => {
       const params = getHashParams();
       const error = params.get("error");
@@ -41,6 +48,8 @@ function SocialLoginCallback() {
         } else {
           localStorage.removeItem("authToken");
         }
+
+        window.history.replaceState(null, "", window.location.pathname);
 
         const response = await api.get("/users/me");
         const user = normalizeUser(response.data?.data || response.data);
