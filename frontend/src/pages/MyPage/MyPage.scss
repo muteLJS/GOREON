@@ -1,6 +1,13 @@
 @use "styles/variables" as *;
 @use "styles/mixins" as *;
 
+.main-layout{
+  @include desktop-up{
+    background-color: $color-gray-100;
+  }
+  
+}
+
 .my-page {
   width: 100%;
   padding-top: $page-content-start-mobile;
@@ -23,7 +30,7 @@
   --my-page-metric-icon-size: 38px;
   --my-page-metric-image-size: 28px;
   --my-page-section-gap: 36px;
-  --my-page-section-title-size: 17px;
+  --my-page-section-title-size: 20px;
   --my-page-info-panel-padding: 24px 16px 28px;
   --my-page-info-item-gap: 18px;
   --my-page-info-label-size: 14px;
@@ -63,7 +70,7 @@
 .my-page__recent-panel,
 .my-page__history-panel {
   background: $color-white;
-  border: 1px solid rgba($color-text-main, 0.1);
+  // border: 1px solid rgba($color-text-main, 0.1);
   border-radius: var(--my-page-card-radius);
 }
 
@@ -76,7 +83,7 @@
 .my-page__profile-main,
 .my-page__metrics {
   background: $color-white;
-  border: 1px solid rgba($color-text-main, 0.1);
+  // border: 1px solid rgba($color-text-main, 0.1);
   border-radius: var(--my-page-card-radius);
 }
 
@@ -226,7 +233,7 @@
 .my-page__section-title {
   margin: 0 0 14px;
   font-size: var(--my-page-section-title-size);
-  font-weight: $font-black;
+  font-weight: $font-bold;
   line-height: 1.25;
 }
 
@@ -257,7 +264,7 @@
   padding: 0 var(--my-page-input-padding-x);
   border: 1px solid rgba($color-text-main, 0.22);
   border-radius: var(--my-page-input-radius);
-  background: rgba($color-bg, 0.9);
+  background: $color-gray-100;
   display: flex;
   align-items: center;
 
@@ -322,6 +329,7 @@
 }
 
 .my-page__rail {
+  width: 100%;
   padding-bottom: 0;
   overflow: visible;
 
@@ -442,7 +450,7 @@
 
 .my-page__history-group {
   display: grid;
-  gap: 10px;
+  gap: 35px;
 }
 
 .my-page__history-date-row {
@@ -453,7 +461,7 @@
 .my-page__history-date {
   margin: 0;
   flex-shrink: 0;
-  color: rgba($color-text-main, 0.48);
+  color:$color-sub-category-text;
   font-size: 12px;
   font-weight: $font-semibold;
   line-height: 1.2;
@@ -461,8 +469,8 @@
 
 .my-page__history-line {
   width: 100%;
-  height: 1px;
-  background: rgba($color-text-main, 0.12);
+  height: 2px;
+  background: $color-gray-300;
 }
 
 .my-page__history-panel {
@@ -586,7 +594,7 @@
   margin: 0;
   min-height: 32px;
   font-size: 12px;
-  font-weight: $font-black;
+  font-weight: $font-bold;
   line-height: 1.35;
 }
 
@@ -594,9 +602,9 @@
   @include ellipsis-multi(2);
   margin: 0;
   min-height: calc(2 * 1.45em);
-  color: rgba($color-text-main, 0.78);
+  color: $color-text-main;
   font-size: 9px;
-  font-weight: $font-semibold;
+  font-weight: $font-medium;
   line-height: 1.45;
   overflow-wrap: anywhere;
 }
@@ -710,7 +718,8 @@
 
 @include desktop-up {
   .my-page {
-    padding-top: $page-content-start-tablet;
+    background-color: $color-gray-100;
+    padding-top: $page-content-start-desktop;
     padding-bottom: 172px;
   }
 
@@ -730,7 +739,7 @@
   }
 
   .my-page__profile-card {
-    margin-top: 56px;
+    margin-top: 120px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
@@ -739,8 +748,22 @@
   .my-page__profile-main,
   .my-page__metrics {
     min-height: 78px;
-    border-radius: 16px;
-    
+    border-radius: 16px;       
+  }
+
+  .my-page__profile-main{
+    @include desktop-up{
+       .my-page__profile-copy{
+         text-indent: 10%;
+         .my-page__nickname{
+         font-size: $font-xl-2;
+       }
+       .my-page__email{
+         font-size: $font-md;
+       }
+       }
+      
+    }
   }
 
   .my-page__profile-top {
@@ -805,17 +828,17 @@
   }
 
   .my-page__overview-grid .my-page__section {
-    margin-top: 68px;
+    margin-top: 120px;
     display: flex;
     flex-direction: column;
   }
 
   .my-page__section {
-    margin-top: 68px;
+    margin-top: 120px;
   }
 
   .my-page__section-title {
-    margin-bottom: 16px;
+    margin-bottom: 20px;
   }
 
   .my-page__info-panel {
@@ -885,7 +908,7 @@
   }
 
   .my-page__history-list {
-    gap: 18px;
+    gap: 30px;
   }
 
   .my-page__history-date-row {

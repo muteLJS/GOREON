@@ -2,18 +2,30 @@
 @use "styles/mixins" as *;
 
 .more {
-  @include flex(center, flex-start);
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
   gap: 8px;
+  width: fit-content;
+  max-width: 100%;
   cursor: pointer;
+
   p {
+    margin: 0;
     color: $color-category-text;
     font-weight: $font-bold;
     font-size: $font-xs-2;
+    line-height: 1;
+    white-space: nowrap;
+    word-break: keep-all;
+    writing-mode: horizontal-tb;
   }
+
   .icon_box {
     width: 49px;
     height: 31px;
-    flex: 0 0 70px;
+    flex: 0 0 49px;
 
     svg {
       display: block;

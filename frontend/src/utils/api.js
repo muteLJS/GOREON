@@ -5,12 +5,29 @@ const api = axios.create({
   withCredentials: true,
 });
 
+const getStoredAccessToken = () => localStorage.getItem("authToken");
+const clearStoredAuth = () => {
+  localStorage.removeItem("authToken");
+  localStorage.removeItem("userInfo");
+};
+
 const shouldSkipRefresh = (url = "") =>
   ["/auth/login", "/auth/register", "/auth/social", "/auth/refresh", "/auth/logout"].some((path) =>
     url.includes(path),
   );
 
 let refreshPromise = null;
+
+api.interceptors.request.use((config) => {
+  const accessToken = getStoredAccessToken();
+
+  if (accessToken) {
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+
+  return config;
+});
 
 api.interceptors.response.use(
   (response) => response,
@@ -29,11 +46,16 @@ api.interceptors.response.use(
 
     try {
       refreshPromise = refreshPromise || api.post("/auth/refresh");
-      await refreshPromise;
+      const refreshResponse = await refreshPromise;
+      const nextAccessToken = refreshResponse.data?.data?.accessToken;
+
+      if (nextAccessToken) {
+        localStorage.setItem("authToken", nextAccessToken);
+      }
+
       return api(originalRequest);
     } catch (refreshError) {
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("userInfo");
+      clearStoredAuth();
       window.dispatchEvent(new Event("auth:logout"));
       return Promise.reject(refreshError);
     } finally {

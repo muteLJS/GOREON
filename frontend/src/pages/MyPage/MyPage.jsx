@@ -553,6 +553,9 @@ export default function MyPage() {
                       spaceBetween: 18,
                     },
                   }}
+                  grabCursor={recentProducts.length > 1}
+                  allowTouchMove={recentProducts.length > 1}
+                  simulateTouch={recentProducts.length > 1}
                   watchOverflow
                 >
                   {recentProducts.map((product, index) => (

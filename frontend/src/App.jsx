@@ -1,11 +1,12 @@
 import React, { Suspense, lazy, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import MainLayout from "./layouts/MainLayout/MainLayout";
-import { logout } from "./store/slices/userSlice";
+import { completeAuthCheck, login, logout } from "./store/slices/userSlice";
+import api from "./utils/api";
 
 const Main = lazy(() => import("./pages/Main/Main"));
 const Search = lazy(() => import("./pages/Search/Search"));
@@ -25,6 +26,8 @@ const SocialLoginCallback = lazy(() => import("./pages/SocialLoginCallback/Socia
 
 function App() {
   const dispatch = useDispatch();
+  const authChecked = useSelector((state) => state.user.authChecked);
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 
   useEffect(() => {
     const handleAuthLogout = () => {
@@ -34,6 +37,38 @@ function App() {
     window.addEventListener("auth:logout", handleAuthLogout);
     return () => window.removeEventListener("auth:logout", handleAuthLogout);
   }, [dispatch]);
+
+  useEffect(() => {
+    if (authChecked || isLoggedIn) {
+      return;
+    }
+
+    let isMounted = true;
+
+    const restoreSession = async () => {
+      try {
+        const response = await api.get("/users/me");
+
+        if (!isMounted) {
+          return;
+        }
+
+        dispatch(login({ user: response.data?.data || response.data }));
+      } catch {
+        if (!isMounted) {
+          return;
+        }
+
+        dispatch(completeAuthCheck());
+      }
+    };
+
+    restoreSession();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [authChecked, dispatch, isLoggedIn]);
 
   return (
     <>
