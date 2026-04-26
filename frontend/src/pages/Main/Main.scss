@@ -1409,6 +1409,7 @@
     width: 100%;
     min-width: 0;
     min-height: 44px;
+    margin: 0;
     padding: 0;
     border: 0;
     background: transparent;
@@ -2296,14 +2297,16 @@
 
     .items {
       width: 100%;
-      gap: 13px;
+      gap: 10px;
 
       .item_name {
         font-size: $font-xl;
+        min-height: 0;
       }
 
       .options {
         gap: 8px;
+        min-height: 0;
 
         p {
           font-size: $font-sm;
@@ -2919,12 +2922,12 @@
     }
 
     .item_name {
-      min-height: 38px;
+      min-height: 0;
     }
 
     .options {
       gap: 5px;
-      min-height: 38px;
+      min-height: 0;
     }
   }
 }
