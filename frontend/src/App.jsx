@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useLocation } from "react-router-dom";
 
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import RouteLoading from "./components/RouteLoading/RouteLoading";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import MainLayout from "./layouts/MainLayout/MainLayout";
 import { completeAuthCheck, login, logout } from "./store/slices/userSlice";
@@ -27,7 +28,6 @@ const SocialLoginCallback = lazy(() => import("./pages/SocialLoginCallback/Socia
 function App() {
   const dispatch = useDispatch();
   const authChecked = useSelector((state) => state.user.authChecked);
-  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   const location = useLocation();
 
   useEffect(() => {
@@ -89,7 +89,7 @@ function App() {
   return (
     <>
       <ScrollToTop />
-      <Suspense fallback={<main className="route-loading">페이지를 불러오는 중입니다...</main>}>
+      <Suspense fallback={<RouteLoading message="페이지를 불러오는 중입니다..." />}>
         <Routes>
           <Route element={<MainLayout />}>
             <Route path="/" element={<Main />} />

@@ -57,6 +57,46 @@ const getAuthErrorMessage = (error, fallbackMessage) => {
   return messageMap[serverMessage] || serverMessage;
 };
 
+const getSocialAuthErrorMessage = (providerLabel, authError) => {
+  if (authError === "social_session_missing") {
+    return `${providerLabel} 로그인은 완료됐지만 세션을 확인하지 못했습니다. 브라우저 쿠키 설정을 확인 후 다시 시도해주세요.`;
+  }
+
+  if (authError === "social_profile_fetch_failed") {
+    return `${providerLabel} 로그인 후 사용자 정보를 가져오지 못했습니다. 다시 시도해주세요.`;
+  }
+
+  if (authError === "social_login_failed") {
+    return `${providerLabel} 로그인 처리 중 서버 오류가 발생했습니다. 백엔드 로그를 확인해주세요.`;
+  }
+
+  if (authError === "Authorization code is required") {
+    return `${providerLabel} 로그인 승인 코드가 전달되지 않았습니다. 다시 시도해주세요.`;
+  }
+
+  if (authError?.includes("social login is not configured")) {
+    return `${providerLabel} 소셜 로그인 설정이 완료되지 않았습니다. 서버 환경변수를 확인해주세요.`;
+  }
+
+  if (authError?.includes("Failed to exchange")) {
+    return `${providerLabel} 인증 토큰 교환에 실패했습니다. 소셜 앱 설정의 Redirect URI를 확인해주세요.`;
+  }
+
+  if (authError?.includes("Failed to fetch")) {
+    return `${providerLabel} 사용자 프로필 조회에 실패했습니다. 소셜 제공자 동의 항목과 앱 권한을 확인해주세요.`;
+  }
+
+  if (authError === "Invalid social login payload") {
+    return `${providerLabel}에서 필수 사용자 정보를 받지 못했습니다. 동의 항목과 계정 정보를 확인해주세요.`;
+  }
+
+  if (authError) {
+    return `${providerLabel} 로그인에 실패했습니다. 사유: ${authError}`;
+  }
+
+  return `${providerLabel} 로그인에 실패했습니다. 다시 시도해주세요.`;
+};
+
 const validateLoginForm = (form) => {
   if (!form.email.trim()) {
     return "이메일을 입력해주세요.";
@@ -561,19 +601,7 @@ export default function Login({ initialMode = "login" }) {
       const providerLabel = providerLabelMap[provider] || "소셜";
       const authError = location.state?.authError;
 
-      if (authError === "social_session_missing") {
-        setLoginError(
-          `${providerLabel} 로그인은 완료됐지만 세션을 확인하지 못했습니다. 브라우저 쿠키 설정을 확인 후 다시 시도해주세요.`,
-        );
-        return;
-      }
-
-      if (authError === "social_profile_fetch_failed") {
-        setLoginError(`${providerLabel} 로그인 후 사용자 정보를 가져오지 못했습니다. 다시 시도해주세요.`);
-        return;
-      }
-
-      setLoginError(`${providerLabel} 로그인에 실패했습니다. 다시 시도해주세요.`);
+      setLoginError(getSocialAuthErrorMessage(providerLabel, authError));
     }
   }, [location.state]);
 
