@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 import LikeAfterIcon from "@/assets/icons/like-after.svg";
 import LikeBeforeIcon from "@/assets/icons/like-before.svg";
@@ -25,12 +27,37 @@ const toWishlistItem = (product) => {
   };
 };
 
+const normalizeImageSrc = (src) => {
+  const imageSrc = String(src ?? "").trim();
+
+  if (!imageSrc || imageSrc.startsWith("http:///")) {
+    return "";
+  }
+
+  return imageSrc;
+};
+
+const ImageOrSkeleton = ({ src, alt, className = "" }) => {
+  const imageSrc = normalizeImageSrc(src);
+
+  if (!imageSrc) {
+    return (
+      <Skeleton
+        className={`package-image-skeleton ${className}`.trim()}
+        containerClassName="package-image-skeleton-container"
+      />
+    );
+  }
+
+  return <img src={imageSrc} alt={alt} className={className} />;
+};
+
 function PackageCard({
   title,
   description,
   price,
   mainImage,
-  detailItems,
+  detailItems = [],
   product,
   defaultOpen = false,
 }) {
@@ -39,27 +66,35 @@ function PackageCard({
   const { showToast } = useToast();
   const wishlistItems = useSelector((state) => state.wishlist.items);
   const [isOpen, setIsOpen] = useState(defaultOpen);
-  const packageProduct = product ?? {
-    name: title,
-    title,
-    price,
-    image: mainImage,
-    option: "추천 조합",
-  };
+
+  const packageProduct = product
+    ? {
+        name: title,
+        title,
+        price,
+        image: mainImage,
+        option: "추천 조합",
+      }
+    : null;
 
   const packageProducts = detailItems.map((item) => item.product).filter(Boolean);
+
   const allPackageItemsWishlisted =
     packageProducts.length > 0 &&
     packageProducts.every((item) =>
-      wishlistItems.some((wishlistItem) => getProductObjectId(wishlistItem) === getProductObjectId(item)),
+      wishlistItems.some(
+        (wishlistItem) => getProductObjectId(wishlistItem) === getProductObjectId(item),
+      ),
     );
 
   const handlePackageWishlistClick = (event) => {
     event.stopPropagation();
+
     let addedCount = 0;
 
     packageProducts.forEach((item) => {
       const wishlistItem = toWishlistItem(item);
+
       const isAlreadyWishlisted = wishlistItems.some(
         (existingItem) => getProductObjectId(existingItem) === wishlistItem.productId,
       );
@@ -84,14 +119,18 @@ function PackageCard({
   return (
     <div className={`pakage_box ${isOpen ? "is-open" : ""}`}>
       <div className="pakage_big">
-        <img src={mainImage} alt="pakage_img" className="pakage_img" />
+        <ImageOrSkeleton src={mainImage} alt={title || "추천 조합 이미지"} className="pakage_img" />
+
         <div className="pakage_texts">
           <p>{title}</p>
           <p className="gray_text">{description}</p>
+
           <div className="pakage_bottom">
             <p>{price}</p>
+
             <div className="icons">
               <CartIconButton product={packageProduct} size="sm" />
+
               <button
                 type="button"
                 className="wishlist-icon-button wishlist-icon-button--sm"
@@ -104,6 +143,7 @@ function PackageCard({
           </div>
         </div>
       </div>
+
       <div className="pakage_small">
         <div className="pakage_small_inner">
           {detailItems.map((item, index) => (
@@ -114,8 +154,9 @@ function PackageCard({
                 onClick={() => handleDetailItemClick(item)}
                 aria-label={`${item.title} 상세페이지로 이동`}
               >
-                <img src={item.image} alt="" />
+                <ImageOrSkeleton src={item.image} alt={item.title || item.label || "상품 이미지"} />
               </button>
+
               <button
                 type="button"
                 className="pakage_item"
@@ -129,6 +170,7 @@ function PackageCard({
           ))}
         </div>
       </div>
+
       <button
         type="button"
         className={`chevron ${!isOpen ? "is-open" : ""}`}

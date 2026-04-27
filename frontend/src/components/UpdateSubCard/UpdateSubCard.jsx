@@ -1,3 +1,31 @@
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+
+const normalizeImageSrc = (src) => {
+  const imageSrc = String(src ?? "").trim();
+
+  if (!imageSrc || imageSrc.startsWith("http:///")) {
+    return "";
+  }
+
+  return imageSrc;
+};
+
+const ImageOrSkeleton = ({ src, alt, className = "" }) => {
+  const imageSrc = normalizeImageSrc(src);
+
+  if (!imageSrc) {
+    return (
+      <Skeleton
+        className={`update-sub-card-skeleton ${className}`.trim()}
+        containerClassName="update-sub-card-skeleton-container"
+      />
+    );
+  }
+
+  return <img src={imageSrc} alt={alt} className={className} />;
+};
+
 function UpdateSubCard({
   thumbnailImage,
   title,
@@ -31,22 +59,19 @@ function UpdateSubCard({
       onFocusCapture={onFocus}
       onBlurCapture={handleBlur}
     >
-      <button
-        type="button"
-        className="sub_info__content"
-        onClick={onClick}
-        aria-pressed={isActive}
-      >
+      <button type="button" className="sub_info__content" onClick={onClick} aria-pressed={isActive}>
         <div className="sub_title">
           <div className="pakage_img_box">
-            <img src={thumbnailImage} alt={title} className="pakage_img" />
+            <ImageOrSkeleton src={thumbnailImage} alt={title} className="pakage_img" />
           </div>
+
           <div className="pakage_texts">
             <p className="title">{title}</p>
             <p className="gray_text">{description}</p>
           </div>
         </div>
       </button>
+
       <button
         type="button"
         className="chevron"
