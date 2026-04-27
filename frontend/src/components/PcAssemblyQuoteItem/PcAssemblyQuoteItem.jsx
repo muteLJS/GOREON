@@ -55,9 +55,7 @@ function PcAssemblyQuoteItem({
         </div>
 
         <div className="pc-assembly-quote-item__info-bottom">
-          <div className="pc-assembly-quote-item__info-price">
-            ₩{price.toLocaleString("ko-KR")}
-          </div>
+          <div className="pc-assembly-quote-item__info-price">₩{price.toLocaleString("ko-KR")}</div>
           <div className="pc-assembly-quote-item__info-action">
             <button
               type="button"

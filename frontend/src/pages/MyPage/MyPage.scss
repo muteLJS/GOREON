@@ -1,12 +1,6 @@
 @use "styles/variables" as *;
 @use "styles/mixins" as *;
 
-.main-layout {
-  @include desktop-up {
-    background-color: $color-gray-100;
-  }
-}
-
 .my-page {
   width: 100%;
   padding-top: $page-content-start-mobile;
@@ -1063,5 +1057,11 @@
 
   .my-page__more-wrap {
     margin-top: 40px;
+  }
+}
+
+.my-page-layout {
+  @include desktop-up {
+    background-color: $color-gray-100;
   }
 }

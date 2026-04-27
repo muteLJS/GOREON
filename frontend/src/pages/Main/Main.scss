@@ -710,7 +710,6 @@
         display: none;
       }
     }
-
   }
 }
 
@@ -1616,7 +1615,7 @@
         > p:first-child {
           font-size: clamp(#{$font-sm}, 2.3vw, #{$font-lg});
           font-weight: $font-bold;
-          line-height: 1.25;                    
+          line-height: 1.25;
         }
         .gray_text {
           font-size: clamp(#{$font-xs}, 2vw, #{$font-md});
@@ -1806,8 +1805,7 @@
   overflow: hidden;
   border: 1px solid $color-border;
   border-radius: 8px;
-  background: $color-gray-100;
-
+  background: white;
   img {
     width: 86%;
     height: 86%;

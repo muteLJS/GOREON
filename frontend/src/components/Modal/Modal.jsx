@@ -22,24 +22,6 @@ function Modal({
   const dragStateRef = useRef({ isDragging: false, pointerId: null, startY: 0 });
   const [dragOffset, setDragOffset] = useState(0);
 
-  useEffect(() => {
-    const prevOverflow = document.body.style.overflow;
-    const prevPaddingRight = document.body.style.paddingRight;
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-    const currentPaddingRight = Number.parseFloat(getComputedStyle(document.body).paddingRight) || 0;
-
-    if (scrollbarWidth > 0) {
-      document.body.style.paddingRight = `${currentPaddingRight + scrollbarWidth}px`;
-    }
-
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow = prevOverflow;
-      document.body.style.paddingRight = prevPaddingRight;
-    };
-  }, []);
-
   const resetDragState = () => {
     dragStateRef.current = { isDragging: false, pointerId: null, startY: 0 };
     setDragOffset(0);

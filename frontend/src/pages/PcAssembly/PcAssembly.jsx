@@ -17,8 +17,10 @@ import {
   getPcAssemblyProducts,
 } from "@/utils/pcAssemblyProducts";
 import "./PcAssembly.scss";
+import { useToast } from "@/components/Toast/toastContext";
 
 function PcAssembly() {
+  const { showToast } = useToast();
   const dispatch = useDispatch();
   const items = useSelector((state) => state.quote.items);
   const { products } = useProductCatalog();
@@ -96,10 +98,7 @@ function PcAssembly() {
   const pcAssemblyProducts = useMemo(() => getPcAssemblyProducts(products), [products]);
   const getQuoteItemQuantity = (item) => Number(item.quantity) || 1;
   const quoteItemCount = items.reduce((sum, item) => sum + getQuoteItemQuantity(item), 0);
-  const totalPrice = items.reduce(
-    (sum, item) => sum + item.price * getQuoteItemQuantity(item),
-    0,
-  );
+  const totalPrice = items.reduce((sum, item) => sum + item.price * getQuoteItemQuantity(item), 0);
   const formattedTotalPrice = totalPrice.toLocaleString("ko-KR");
 
   const filteredProducts = useMemo(
@@ -134,6 +133,7 @@ function PcAssembly() {
         compatibility: "ok",
         status: "ok",
       }),
+      showToast("견적 리스트에 담았습니다."),
     );
   };
 
@@ -202,7 +202,11 @@ function PcAssembly() {
               action={
                 <button
                   className="pc-assembly__add-button"
-                  onClick={() => handleAddQuoteItem(product)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleAddQuoteItem(product);
+                  }}
                 >
                   담기
                 </button>
@@ -231,7 +235,11 @@ function PcAssembly() {
                 action={
                   <button
                     className="pc-assembly__add-button"
-                    onClick={() => handleAddQuoteItem(product)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleAddQuoteItem(product);
+                    }}
                   >
                     담기
                   </button>
