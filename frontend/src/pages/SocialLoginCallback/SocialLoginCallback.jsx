@@ -37,6 +37,11 @@ function SocialLoginCallback() {
       const provider = params.get("provider") || "unknown";
 
       if (error || success !== "1") {
+        console.error("[auth][social] callback failed before session restore", {
+          provider,
+          success,
+          error,
+        });
         setMessage("소셜 로그인에 실패했습니다.");
         navigate("/login", { replace: true, state: { authError: error, authProvider: provider } });
         return;
@@ -53,6 +58,12 @@ function SocialLoginCallback() {
         navigate("/", { replace: true });
       } catch (requestError) {
         const status = requestError.response?.status;
+        console.error("[auth][social] session restore failed after callback", {
+          provider,
+          status,
+          message: requestError.message,
+          data: requestError.response?.data,
+        });
 
         localStorage.removeItem("userInfo");
         setMessage("소셜 로그인 정보를 가져오지 못했습니다.");
