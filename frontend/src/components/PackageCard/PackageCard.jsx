@@ -4,8 +4,10 @@ import { useNavigate } from "react-router-dom";
 
 import LikeAfterIcon from "@/assets/icons/like-after.svg";
 import LikeBeforeIcon from "@/assets/icons/like-before.svg";
+import ProductHeroImage from "@/assets/img/intel-core-ultra5-250kf-plus-product-image-genuine.jpg";
 import { useToast } from "@/components/Toast/toastContext";
 import { addToWishlist } from "@/store/slices/wishlistSlice";
+import { normalizeImageUrl } from "@/utils/image";
 import { buildProductDetailPath, getProductObjectId } from "@/utils/productIdentity";
 import CartIconButton from "components/CartIconButton/CartIconButton";
 
@@ -39,6 +41,7 @@ function PackageCard({
   const { showToast } = useToast();
   const wishlistItems = useSelector((state) => state.wishlist.items);
   const [isOpen, setIsOpen] = useState(defaultOpen);
+  const mainImageSrc = normalizeImageUrl(mainImage) || ProductHeroImage;
   const packageProduct = product ?? {
     name: title,
     title,
@@ -84,7 +87,15 @@ function PackageCard({
   return (
     <div className={`pakage_box ${isOpen ? "is-open" : ""}`}>
       <div className="pakage_big">
-        <img src={mainImage} alt="pakage_img" className="pakage_img" />
+        <img
+          src={mainImageSrc}
+          alt="pakage_img"
+          className="pakage_img"
+          onError={(event) => {
+            event.currentTarget.onerror = null;
+            event.currentTarget.src = ProductHeroImage;
+          }}
+        />
         <div className="pakage_texts">
           <p>{title}</p>
           <p className="gray_text">{description}</p>
@@ -114,7 +125,14 @@ function PackageCard({
                 onClick={() => handleDetailItemClick(item)}
                 aria-label={`${item.title} 상세페이지로 이동`}
               >
-                <img src={item.image} alt="" />
+                <img
+                  src={normalizeImageUrl(item.image) || ProductHeroImage}
+                  alt=""
+                  onError={(event) => {
+                    event.currentTarget.onerror = null;
+                    event.currentTarget.src = ProductHeroImage;
+                  }}
+                />
               </button>
               <button
                 type="button"

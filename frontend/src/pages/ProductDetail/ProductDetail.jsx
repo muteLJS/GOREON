@@ -28,7 +28,7 @@ const mapReview = (review) => ({
   body: review.content || "",
   rating: Number(review.rating) || 0,
   images: Array.isArray(review.images)
-    ? review.images.map((image) => normalizeImageUrl(image))
+    ? review.images.map((image) => normalizeImageUrl(image)).filter(Boolean)
     : [],
   helpfulCount: 0,
 });

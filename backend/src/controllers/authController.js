@@ -25,6 +25,7 @@ const sendAuthResponse = (res, statusCode, result) => {
   res.status(statusCode).json({
     data: {
       user: result.user,
+      accessToken: result.accessToken,
     },
   });
 };
@@ -88,7 +89,12 @@ const socialOAuthCallback = async (req, res) => {
   try {
     const result = await handleSocialCallback(req.params.provider, req.query);
     setAuthCookies(res, result);
-    res.redirect(getClientSocialCallbackUrl({ success: "1" }));
+    res.redirect(
+      getClientSocialCallbackUrl({
+        success: "1",
+        accessToken: result.accessToken,
+      }),
+    );
   } catch (error) {
     const message = error.statusCode === 500 ? "social_login_failed" : error.message;
     console.error("[auth][social-oauth-callback] failed", {
