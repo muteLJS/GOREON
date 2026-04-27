@@ -1,11 +1,10 @@
 @use "styles/variables" as *;
 @use "styles/mixins" as *;
 
-.main-layout{
-  @include desktop-up{
+.main-layout {
+  @include desktop-up {
     background-color: $color-gray-100;
   }
-  
 }
 
 .my-page {
@@ -461,7 +460,7 @@
 .my-page__history-date {
   margin: 0;
   flex-shrink: 0;
-  color:$color-sub-category-text;
+  color: $color-sub-category-text;
   font-size: 12px;
   font-weight: $font-semibold;
   line-height: 1.2;
@@ -748,21 +747,20 @@
   .my-page__profile-main,
   .my-page__metrics {
     min-height: 78px;
-    border-radius: 16px;       
+    border-radius: 16px;
   }
 
-  .my-page__profile-main{
-    @include desktop-up{
-       .my-page__profile-copy{
-         text-indent: 10%;
-         .my-page__nickname{
-         font-size: $font-xl-2;
-       }
-       .my-page__email{
-         font-size: $font-md;
-       }
-       }
-      
+  .my-page__profile-main {
+    @include desktop-up {
+      .my-page__profile-copy {
+        text-indent: 10%;
+        .my-page__nickname {
+          font-size: $font-xl-2;
+        }
+        .my-page__email {
+          font-size: $font-md;
+        }
+      }
     }
   }
 
