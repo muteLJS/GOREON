@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
+import RouteLoading from "@/components/RouteLoading/RouteLoading";
 import { login } from "@/store/slices/userSlice";
 import api from "@/utils/api";
 
@@ -81,9 +82,7 @@ function SocialLoginCallback() {
   }, [dispatch, navigate]);
 
   return (
-    <main className="social-login-callback" aria-live="polite">
-      {message}
-    </main>
+    <RouteLoading message={message} />
   );
 }
 
