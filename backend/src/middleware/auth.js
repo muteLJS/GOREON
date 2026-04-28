@@ -1,10 +1,21 @@
 const jwt = require("jsonwebtoken");
+
 const User = require("../models/User");
 const { getAccessTokenFromRequest } = require("../utils/authCookies");
 
+const getBearerTokenFromRequest = (req) => {
+  const authorizationHeader = String(req.headers.authorization || "").trim();
+
+  if (!authorizationHeader.startsWith("Bearer ")) {
+    return null;
+  }
+
+  return authorizationHeader.slice("Bearer ".length).trim() || null;
+};
+
 const auth = async (req, res, next) => {
   try {
-    const token = getAccessTokenFromRequest(req);
+    const token = getAccessTokenFromRequest(req) || getBearerTokenFromRequest(req);
 
     if (!token) {
       return res.status(401).json({ message: "인증이 필요합니다." });

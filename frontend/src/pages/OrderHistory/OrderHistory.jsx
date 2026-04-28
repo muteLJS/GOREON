@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import ProductHeroImage from "@/assets/img/intel-core-ultra5-250kf-plus-product-image-genuine.jpg";
 import { useToast } from "@/components/Toast/toastContext";
 import ReviewWrite from "@/components/ReviewWrite/ReviewWrite";
+import { normalizeImageUrl } from "@/utils/image";
 import api from "../../utils/api";
 import "./OrderHistory.scss";
 
@@ -222,13 +224,21 @@ function OrderHistory() {
                 <div className="order-history-page__card">
                   {group.items.map((item, idx) => {
                     const itemKey = item.itemKey;
+                    const thumbSrc = normalizeImageUrl(item.thumb) || ProductHeroImage;
 
                     return (
                       <div key={itemKey}>
                         <article className="order-history-item">
                           <div className="order-history-item__top">
                             <div className="order-history-item__thumb">
-                              <img src={item.thumb} alt={item.name} />
+                              <img
+                                src={thumbSrc}
+                                alt={item.name}
+                                onError={(event) => {
+                                  event.currentTarget.onerror = null;
+                                  event.currentTarget.src = ProductHeroImage;
+                                }}
+                              />
                             </div>
 
                             <div className="order-history-item__info">
