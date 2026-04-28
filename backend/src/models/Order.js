@@ -37,6 +37,11 @@ const orderItemSchema = new mongoose.Schema(
       min: 1,
       default: 1,
     },
+    status: {
+      type: String,
+      enum: ["placed", "confirmed"],
+      default: "placed",
+    },
   },
   { _id: false },
 );
