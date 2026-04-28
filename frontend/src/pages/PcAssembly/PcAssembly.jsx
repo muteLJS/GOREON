@@ -117,7 +117,9 @@ function PcAssembly() {
     return null;
   }, [compatibilityChecks]);
 
-  const handleAddQuoteItem = (product) => {
+  const handleAddQuoteItem = (product, event) => {
+    event?.stopPropagation();
+
     dispatch(
       addQuoteItem({
         id: `${product.category}-${product._id}`,
@@ -201,6 +203,7 @@ function PcAssembly() {
               product={product}
               action={
                 <button
+                  type="button"
                   className="pc-assembly__add-button"
                   onClick={(e) => {
                     e.preventDefault();
@@ -234,6 +237,7 @@ function PcAssembly() {
                 product={product}
                 action={
                   <button
+                    type="button"
                     className="pc-assembly__add-button"
                     onClick={(e) => {
                       e.preventDefault();

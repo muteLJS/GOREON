@@ -2,6 +2,8 @@ import "./PcAssemblyQuoteItem.scss";
 import { useNavigate } from "react-router-dom";
 import QuantityUp from "@/assets/icons/quantity-up.svg";
 import QuantityDown from "@/assets/icons/quantity-down.svg";
+import ProductHeroImage from "@/assets/img/intel-core-ultra5-250kf-plus-product-image-genuine.jpg";
+import { normalizeImageUrl } from "@/utils/image";
 
 function PcAssemblyQuoteItem({
   isSelected,
@@ -19,6 +21,7 @@ function PcAssemblyQuoteItem({
 }) {
   const navigate = useNavigate();
   const currentQuantity = Number(quantity) || 1;
+  const imageSrc = normalizeImageUrl(image) || ProductHeroImage;
 
   const handleDetailClick = () => {
     if (productId) navigate(`/product/${productId}`);
@@ -32,7 +35,14 @@ function PcAssemblyQuoteItem({
       </label>
 
       <div className="pc-assembly-quote-item__image">
-        <img src={image} alt={name} />
+        <img
+          src={imageSrc}
+          alt={name}
+          onError={(event) => {
+            event.currentTarget.onerror = null;
+            event.currentTarget.src = ProductHeroImage;
+          }}
+        />
       </div>
 
       <div className="pc-assembly-quote-item__info">

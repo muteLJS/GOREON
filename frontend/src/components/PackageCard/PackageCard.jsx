@@ -6,8 +6,10 @@ import "react-loading-skeleton/dist/skeleton.css";
 
 import LikeAfterIcon from "@/assets/icons/like-after.svg";
 import LikeBeforeIcon from "@/assets/icons/like-before.svg";
+import ProductHeroImage from "@/assets/img/intel-core-ultra5-250kf-plus-product-image-genuine.jpg";
 import { useToast } from "@/components/Toast/toastContext";
 import { addToWishlist } from "@/store/slices/wishlistSlice";
+import { normalizeImageUrl } from "@/utils/image";
 import { buildProductDetailPath, getProductObjectId } from "@/utils/productIdentity";
 import CartIconButton from "components/CartIconButton/CartIconButton";
 

@@ -1,5 +1,7 @@
 import axios from "axios";
 
+export const ACCESS_TOKEN_STORAGE_KEY = "accessToken";
+
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8081/api",
   withCredentials: true,
@@ -7,6 +9,7 @@ const api = axios.create({
 
 const clearStoredAuth = () => {
   localStorage.removeItem("userInfo");
+  localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
 };
 
 const shouldSkipRefresh = (url = "") =>
@@ -15,6 +18,17 @@ const shouldSkipRefresh = (url = "") =>
   );
 
 let refreshPromise = null;
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
+
+  if (token) {
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
 
 api.interceptors.response.use(
   (response) => response,

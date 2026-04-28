@@ -4,6 +4,12 @@ import Footer from "../../components/Footer/Footer";
 import FloatingChatWidget from "../../components/chat/FloatingChatWidget";
 import { Outlet, useLocation } from "react-router-dom";
 
+import RouteLoading from "../../components/RouteLoading/RouteLoading";
+import FloatingChatWidget from "../../components/chat/FloatingChatWidget";
+import Footer from "../../components/Footer/Footer";
+import Header from "../../components/Header/Header";
+import "./MainLayout.scss";
+
 function MainLayout() {
   const location = useLocation();
   const isMyPage = location.pathname === "/mypage";
@@ -12,7 +18,9 @@ function MainLayout() {
       <Header />
       <div className={`main-layout ${isMyPage ? "my-page-layout" : ""}`}>
         <main className="main-layout__inner">
-          <Outlet />
+          <Suspense fallback={<RouteLoading message="페이지를 불러오는 중입니다..." />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
       <Footer />

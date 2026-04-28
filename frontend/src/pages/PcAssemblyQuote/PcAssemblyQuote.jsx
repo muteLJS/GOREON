@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 import CheckIcon from "@/assets/icons/check.svg";
+import ProductHeroImage from "@/assets/img/intel-core-ultra5-250kf-plus-product-image-genuine.jpg";
 import PcAssemblyQuoteList from "@/components/PcAssemblyQuoteList/PcAssemblyQuoteList";
 import { useToast } from "@/components/Toast/toastContext";
 import useProductCatalog from "@/hooks/useProductCatalog";
@@ -17,6 +18,7 @@ import {
   getPcAssemblyPerformanceChecks,
   getPcAssemblyRecommendations,
 } from "@/utils/pcAssemblyProducts";
+import { normalizeImageUrl } from "@/utils/image";
 import "./PcAssemblyQuote.scss";
 
 function PcAssemblyQuote({ isModal = false }) {
@@ -166,7 +168,9 @@ function PcAssemblyQuote({ isModal = false }) {
     return `${product.category}-${product._id}-${randomId}`;
   };
 
-  const handleRecommendAdd = (product) => {
+  const handleRecommendAdd = (product, event) => {
+    event?.stopPropagation();
+
     dispatch(
       addQuoteItem({
         id: createRecommendationQuoteId(product),
@@ -272,7 +276,14 @@ function PcAssemblyQuote({ isModal = false }) {
                 {recommendItems.map((item) => (
                   <article className="pc-assembly-quote__recommend-card" key={item._id}>
                     <div className="pc-assembly-quote__recommend-thumb">
-                      <img src={item.image} alt={item.name} />
+                      <img
+                        src={normalizeImageUrl(item.image) || ProductHeroImage}
+                        alt={item.name}
+                        onError={(event) => {
+                          event.currentTarget.onerror = null;
+                          event.currentTarget.src = ProductHeroImage;
+                        }}
+                      />
                     </div>
                     <div className="pc-assembly-quote__recommend-main">
                       <button
@@ -290,7 +301,7 @@ function PcAssemblyQuote({ isModal = false }) {
                         <button
                           type="button"
                           className="pc-assembly-quote__recommend-add"
-                          onClick={() => handleRecommendAdd(item)}
+                          onClick={(event) => handleRecommendAdd(item, event)}
                         >
                           담기
                         </button>

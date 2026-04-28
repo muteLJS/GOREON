@@ -1,0 +1,88 @@
+@use "../../styles/variables" as *;
+
+.route-loading {
+  --route-loading-header-height: 76px;
+  width: 100vw;
+  margin-right: calc(50% - 50vw);
+  margin-left: calc(50% - 50vw);
+  box-sizing: border-box;
+  min-height: calc(100vh - var(--route-loading-header-height));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  background:
+    radial-gradient(circle at top, rgba(122, 224, 212, 0.16), transparent 38%),
+    linear-gradient(180deg, rgba(248, 255, 254, 0.96) 0%, rgba(238, 248, 247, 0.94) 100%);
+  color: $color-text-main;
+}
+
+.route-loading__content {
+  width: min(100%, 360px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  text-align: center;
+}
+
+.route-loading__spinner {
+  position: relative;
+  flex: 0 0 auto;
+  width: 72px;
+  height: 72px;
+}
+
+.route-loading__segment {
+  --rotation: calc(var(--segment-index) * 30deg);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 16px;
+  border-radius: 999px;
+  background: rgba(10, 165, 165, 0.16);
+  transform: translate(-50%, -50%) rotate(var(--rotation)) translateY(-26px);
+  animation: route-loading-fade 1.45s linear infinite;
+  animation-delay: calc(var(--segment-index) * 0.09s);
+}
+
+.route-loading__message {
+  width: 100%;
+  margin: 0;
+  font-size: $font-lg-2;
+  font-weight: $font-regular;
+  line-height: 1.5;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 768px) {
+  .route-loading {
+    --route-loading-header-height: 84px;
+    padding: 64px 24px;
+  }
+
+  .route-loading__content {
+    gap: 32px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .route-loading {
+    --route-loading-header-height: 140px;
+  }
+}
+
+@keyframes route-loading-fade {
+  0% {
+    background: rgba(10, 165, 165, 0.95);
+    box-shadow: 0 0 10px rgba(10, 165, 165, 0.18);
+  }
+
+  100% {
+    background: rgba(10, 165, 165, 0.14);
+    box-shadow: none;
+  }
+}

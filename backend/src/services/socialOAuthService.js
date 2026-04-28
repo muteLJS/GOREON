@@ -19,7 +19,7 @@ const PROVIDER_CONFIG = {
     authorizeUrl: "https://kauth.kakao.com/oauth/authorize",
     tokenUrl: "https://kauth.kakao.com/oauth/token",
     userInfoUrl: "https://kapi.kakao.com/v2/user/me",
-    scope: "profile_nickname profile_image",
+    scope: "profile_nickname profile_image account_email",
     optionalSecret: true,
   },
   naver: {
@@ -175,6 +175,12 @@ const mapProviderUser = (provider, profile) => {
   };
 };
 
+const assertRequiredProviderData = ({ provider, email }) => {
+  if (provider === "kakao" && !email) {
+    throw new ApiError(400, "Kakao email consent is required");
+  }
+};
+
 const handleSocialCallback = async (provider, query) => {
   const config = getProviderConfig(provider);
 
@@ -198,7 +204,10 @@ const handleSocialCallback = async (provider, query) => {
     `Failed to fetch ${config.provider} profile`,
   );
 
-  return socialLogin(mapProviderUser(config.provider, profile));
+  const providerUser = mapProviderUser(config.provider, profile);
+  assertRequiredProviderData(providerUser);
+
+  return socialLogin(providerUser);
 };
 
 module.exports = {

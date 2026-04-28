@@ -9,10 +9,12 @@ import AiBadgeIcon from "@/assets/icons/mypage_ai.png";
 import MypageCartIcon from "@/assets/icons/Mypage_cart.svg";
 import MypageLikeIcon from "@/assets/icons/Mypage_like.svg";
 import ReviewIcon from "@/assets/icons/review.png";
+import ProductHeroImage from "@/assets/img/intel-core-ultra5-250kf-plus-product-image-genuine.jpg";
 import CartIconButton from "@/components/CartIconButton/CartIconButton";
 import { useToast } from "@/components/Toast/toastContext";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 import { logout, updateUserInfo } from "@/store/slices/userSlice";
+import { normalizeImageUrl } from "@/utils/image";
 import { getProductListKey, getProductObjectId } from "@/utils/productIdentity";
 import api from "@/utils/api";
 
@@ -116,12 +118,21 @@ function EditableField({ field, value, activeField, onChange, onToggle }) {
 
 function ProductRailCard({ product }) {
   const productId = getProductId(product);
+  const imageSrc = normalizeImageUrl(product.image) || ProductHeroImage;
 
   return (
     <article className="my-page__rail-card">
       <div className="my-page__rail-card-media-wrap">
         <Link to={`/product/${productId}`} className="my-page__rail-card-media" draggable={false}>
-          <img src={product.image} alt={product.name} draggable={false} />
+          <img
+            src={imageSrc}
+            alt={product.name}
+            draggable={false}
+            onError={(event) => {
+              event.currentTarget.onerror = null;
+              event.currentTarget.src = ProductHeroImage;
+            }}
+          />
         </Link>
       </div>
       <Link to={`/product/${productId}`} className="my-page__rail-card-copy" draggable={false}>
@@ -140,12 +151,20 @@ function ProductRailCard({ product }) {
 
 function AiRecommendationCard({ product }) {
   const productId = getProductId(product);
+  const imageSrc = normalizeImageUrl(product.image) || ProductHeroImage;
 
   return (
     <article className="my-page__ai-card">
       <div className="my-page__ai-card-media-wrap">
         <Link to={`/product/${productId}`} className="my-page__ai-card-media">
-          <img src={product.image} alt={product.name} />
+          <img
+            src={imageSrc}
+            alt={product.name}
+            onError={(event) => {
+              event.currentTarget.onerror = null;
+              event.currentTarget.src = ProductHeroImage;
+            }}
+          />
         </Link>
       </div>
 

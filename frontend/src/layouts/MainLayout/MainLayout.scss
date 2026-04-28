@@ -3,13 +3,12 @@
 
 .main-layout {
   width: 100%;
-  min-height: 100vh;
   padding: 0;
 }
 
 .main-layout__inner {
   width: 100%;
-  min-height: 100vh;
+  min-height: 0;
   padding: 0 $layout-mobile-padding;
 }
 
@@ -26,4 +25,3 @@
     padding: 0 $layout-desktop-padding;
   }
 }
-

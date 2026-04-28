@@ -8,6 +8,8 @@
   --chat-widget-action-size: 88px;
   --chat-widget-trigger-size: calc(var(--chat-widget-action-size) * 0.7273);
   --chat-widget-trigger-icon-size: 24px;
+  --chat-widget-send-size: 34px;
+  --chat-widget-send-icon-size: calc(var(--chat-widget-send-size) * 0.53);
   --chat-widget-scroll-offset: calc(
     (var(--chat-widget-trigger-size) - var(--chat-widget-action-size)) / 2
   );
@@ -426,8 +428,8 @@
 
   button {
     @include flex-center;
-    width: 34px;
-    height: 34px;
+    width: var(--chat-widget-send-size);
+    height: var(--chat-widget-send-size);
     flex-shrink: 0;
     padding: 0;
     border: 0;
@@ -447,8 +449,9 @@
     }
 
     svg {
-      width: 18px;
-      height: 18px;
+      width: var(--chat-widget-send-icon-size);
+      height: var(--chat-widget-send-icon-size);
+      flex: 0 0 var(--chat-widget-send-icon-size);
     }
 
     path {
@@ -470,6 +473,8 @@
 }
 
 .chat-widget__trigger-wrap {
+  position: relative;
+  z-index: 1;
   @include flex(center, flex-end);
   gap: 10px;
   min-height: var(--chat-widget-action-size);
@@ -477,6 +482,10 @@
 }
 
 .chat-widget__scroll-top {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
   width: var(--chat-widget-action-size);
   height: var(--chat-widget-action-size);
   margin-right: var(--chat-widget-scroll-offset);
@@ -576,7 +585,7 @@
   }
 
   .chat-widget__window {
-    height: min(560px, calc(100vh - 176px));
+    height: min(560px, calc(100vh - 176px));https://github.com/muteLJS/GOREON/pull/150/conflict?name=frontend%252Fsrc%252Flayouts%252FMainLayout%252FMainLayout.jsx&ancestor_oid=2da3df3c2af259153239088ccb46852e7bce0a28&base_oid=85ed7302d904d3578d44a97bf1124dec17428919&head_oid=0ca3b4df2825ddc59f08762474d8d4bccc49cb47
     max-height: calc(100vh - 176px);
   }
 }
