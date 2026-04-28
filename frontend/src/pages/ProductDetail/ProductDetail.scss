@@ -39,7 +39,7 @@
   border: 1px solid $color-gray-400;
   border-radius: $radius-md;
   background: $color-white;
-    height: min(366px, calc((100vw - #{$layout-mobile-padding * 2}) * 0.9892));
+  height: min(366px, calc((100vw - #{$layout-mobile-padding * 2}) * 0.9892));
   min-height: 320px;
   padding: 0;
 }
@@ -96,7 +96,7 @@
 .product-detail__feature-card,
 .product-detail__specs {
   border: 1px solid rgba($color-black, 0.08);
-  border-radius: 24px;
+  border-radius: $radius-xl;
   background: $color-white;
   box-shadow: 0 18px 36px rgba($color-black, 0.04);
 }
@@ -117,14 +117,14 @@
 .product-detail__field select {
   appearance: none;
   width: 100%;
-  height: 30px;
+  height: 40px;
   padding: 0 30px 0 10px;
   border: 1px solid $color-gray-300;
   border-radius: 5px;
   background: $color-white url("../../assets/icons/chevron-down.svg") no-repeat right 10px center /
     12px 6px;
   color: $color-gray-500;
-  font-size: 12px;
+  font-size: $font-sm;
   font-weight: $font-medium;
   cursor: pointer;
 
@@ -145,9 +145,9 @@
 
 .product-detail__selected-label {
   color: $color-text-main;
-  font-size: 12px;
+  font-size: $font-sm;
   font-weight: $font-bold;
-  line-height: 15px;
+  line-height: 20px;
 }
 
 .product-detail__selected-controls {
@@ -166,26 +166,26 @@
   }
 
   button {
+    @include flex-center;
     border: 1px solid rgba($color-text-main, 0.3);
     border-radius: 5px;
     background: $color-gray-100;
     color: $color-text-main;
-    font-size: 10px;
-    line-height: 1;
+    font-size: $font-sm;     
     cursor: pointer;
   }
 
   span {
     @include flex-center;
     color: $color-text-main;
-    font-size: 12px;
+    font-size: $font-sm;
     font-weight: $font-bold;
   }
 }
 
 .product-detail__selected-price {
   color: $color-text-main;
-  font-size: 12px;
+  font-size: $font-sm;
   font-weight: $font-bold;
   line-height: 15px;
   white-space: nowrap;
@@ -195,13 +195,15 @@
   @include flex(center, flex-end);
   gap: 6px;
   margin-top: 15px;
-  color: #003a43;
+  color: $color-category-text;
   font-size: 8px;
   font-weight: $font-medium;
   text-align: right;
+  padding-right: 10px;
 
   span {
-    color: #003a43;
+    color: $color-category-text;
+    font-size: $font-xs;
   }
 
   strong {
@@ -219,10 +221,10 @@
 }
 
 .product-detail__button {
-  height: 32px;
+  height: 40px;
   border-radius: 5px;
-  font-size: 10px;
-  font-weight: $font-bold;
+  font-size: $font-sm;
+  font-weight: $font-medium;
   cursor: pointer;
 }
 
@@ -240,26 +242,26 @@
 
 .product-detail__tabs {
   @include flex(center, center);
-  gap: 0;
+  gap: 10px;
   position: sticky;
   top: var(--product-detail-tab-top);
   z-index: 5;
-  width: min(184px, 100%);
+  width: min(204px, 100%);
   margin: 20px auto;
   padding: 4px;
   border: 1px solid rgba($color-gray-500, 0.24);
-  border-radius: 999px;
+  border-radius: $radius-full;
   background: $color-white;
   backdrop-filter: none;
 
   button {
     flex: 1;
-    height: 17px;
+    height: 24px;
     border: 0;
-    border-radius: 999px;
+    border-radius: $radius-full;
     background: transparent;
     color: $color-gray-500;
-    font-size: 10px;
+    font-size: $font-sm;
     font-weight: $font-medium;
     cursor: pointer;
   }
@@ -410,7 +412,7 @@
 
 .product-detail__reason-card {
   padding: 18px;
-  border-radius: 20px;
+  border-radius: $radius-lg;
   background: linear-gradient(180deg, rgba(#263238, 0.92) 0%, rgba(#56646e, 0.9) 100%);
   color: $color-white;
 }
@@ -451,7 +453,7 @@
   gap: 16px;
   padding: 14px 16px;
   border-radius: 16px;
-  background: #f6fbfb;
+  background: $color-bg;
 
   span {
     color: rgba($color-black, 0.5);
@@ -509,7 +511,7 @@
 .product-detail .review-section__summary {
   display: block;
   height: 101px;
-  padding: 5px 0 0;
+  padding: 18px 0 0 4px;
   border: 0;
   border-radius: 0;
   background: $color-white;
@@ -529,15 +531,15 @@
 }
 
 .product-detail .review-section__score {
-  font-size: 16px;
-  line-height: 20px;
+  font-size: 18px;
+  line-height: 22px;
 }
 
 .product-detail .review-section__score::after {
   content: "/5";
   margin-left: 2px;
-  font-size: 8px;
-  line-height: 10px;
+  font-size: 10px;
+  line-height: 12px;
 }
 
 .product-detail .review-section__stars {
@@ -557,9 +559,9 @@
 .product-detail .review-section__meta {
   margin-top: 9px;
   color: $color-text-main;
-  font-size: 8px;
+  font-size: 10px;
   font-weight: $font-bold;
-  line-height: 10px;
+  line-height: 12px;
 }
 
 .product-detail .review-section__meta::before {
@@ -590,15 +592,15 @@
 }
 
 .product-detail .review-card__author {
-  font-size: 12px;
-  line-height: 15px;
+  font-size: 14px;
+  line-height: 17px;
 }
 
 .product-detail .review-card__date {
-  color: #b3b3b3;
-  font-size: 12px;
+  color: $color-placeholder;
+  font-size: 14px;
   font-weight: $font-medium;
-  line-height: 15px;
+  line-height: 17px;
 }
 
 .product-detail .review-card__rating {
@@ -617,10 +619,10 @@
 .product-detail .review-card__body {
   order: 2;
   margin-top: 12px;
-  color: #003a43;
-  font-size: 10px;
+  color: $color-category-text;
+  font-size: 12px;
   font-weight: $font-medium;
-  line-height: 12.5px;
+  line-height: 15px;
 }
 
 .product-detail .review-card__images {
@@ -646,7 +648,7 @@
   border-color: $color-gray-300;
   border-radius: 5px;
   color: $color-gray-500;
-  font-size: 10px;
+  font-size: 12px;
   box-shadow: none;
 }
 
@@ -845,13 +847,13 @@
   }
 
   .product-detail .review-section__score {
-    font-size: 22px;
-    line-height: 28px;
+    font-size: 24px;
+    line-height: 30px;
   }
 
   .product-detail .review-section__score::after {
-    font-size: 12px;
-    line-height: 15px;
+    font-size: 14px;
+    line-height: 17px;
   }
 
   .product-detail .review-section__stars {
@@ -865,8 +867,8 @@
 
   .product-detail .review-section__meta {
     margin-top: 14px;
-    font-size: 12px;
-    line-height: 15px;
+    font-size: 14px;
+    line-height: 17px;
   }
 
   .product-detail .review-section__list {
@@ -881,8 +883,8 @@
 
   .product-detail .review-card__author,
   .product-detail .review-card__date {
-    font-size: 15px;
-    line-height: 19px;
+    font-size: 17px;
+    line-height: 21px;
   }
 
   .product-detail .review-card__rating .rating img {
@@ -892,8 +894,8 @@
 
   .product-detail .review-card__body {
     margin-top: 16px;
-    font-size: 13px;
-    line-height: 18px;
+    font-size: 15px;
+    line-height: 20px;
   }
 
   .product-detail .review-card__images {
@@ -910,7 +912,7 @@
   .product-detail .review-section__more {
     height: 40px;
     margin-top: 16px;
-    font-size: 14px;
+    font-size: 16px;
   }
 
   .product-detail__reason-grid {
@@ -1007,18 +1009,14 @@
   .product-detail__title {
     width: 82.72%;
     margin-top: 0;
-    color: $color-text-main;
     font-size: clamp(30px, 2.92vw, 40px);
-    font-weight: $font-bold;
     line-height: clamp(38px, 3.66vw, 50px);
   }
 
   .product-detail__price {
     width: 82.72%;
     margin-top: 24px;
-    color: $color-text-main;
     font-size: clamp(30px, 2.92vw, 40px);
-    font-weight: $font-bold;
     line-height: clamp(38px, 3.66vw, 50px);
   }
 
@@ -1098,6 +1096,7 @@
     color: $color-text-main;
     font-size: clamp(12px, 1.17vw, 16px);
     font-weight: $font-medium;
+    
 
     span {
       width: 30.83%;
@@ -1153,80 +1152,40 @@
 
   .product-detail .review-section {
     position: relative;
-    gap: 0;
-    margin-top: 0;
-  }
-
-  .product-detail__reviews {
-    position: relative;
   }
 
   .product-detail__review-photo-swiper {
-    display: block;
-    position: absolute;
     top: 22px;
     right: 30px;
     left: 336px;
-    z-index: 2;
-    overflow: hidden;
-
-    .swiper {
-      overflow: visible;
-    }
 
     .swiper-slide {
       width: 140px;
       height: 140px;
-      overflow: hidden;
       border-radius: $radius-md;
-      background: $color-white;
-    }
-
-    img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
     }
   }
 
   .product-detail .review-section__summary {
     position: relative;
-    display: block;
     height: 183px;
     padding: 22px 30px;
     border: 1px solid $color-gray-300;
-    border-radius: 0;
-    background: $color-white;
-    box-shadow: none;
-  }
-
-  .product-detail .review-section__eyebrow,
-  .product-detail .review-section__photo-box,
-  .product-detail .review-section__gallery,
-  .product-detail .review-section__sort {
-    display: none;
-  }
-
-  .product-detail .review-section__score-row {
-    display: block;
-    margin-top: 0;
   }
 
   .product-detail .review-section__score {
-    font-size: 24px;
-    line-height: 30px;
+    font-size: 26px;
+    line-height: 32px;
   }
 
   .product-detail .review-section__score::after {
     content: "/ 5";
     margin-left: 2px;
-    font-size: 24px;
-    line-height: 30px;
+    font-size: 26px;
+    line-height: 32px;
   }
 
   .product-detail .review-section__stars {
-    display: block;
     margin-top: 16px;
   }
 
@@ -1237,18 +1196,8 @@
 
   .product-detail .review-section__meta {
     margin-top: 21px;
-    color: $color-text-main;
-    font-size: 20px;
-    font-weight: $font-bold;
-    line-height: 25px;
-  }
-
-  .product-detail .review-section__meta::before {
-    content: "(";
-  }
-
-  .product-detail .review-section__meta::after {
-    content: ")";
+    font-size: 22px;
+    line-height: 27px;
   }
 
   .product-detail .review-section__gallery-item {
@@ -1269,18 +1218,17 @@
     padding: 20px 22px;
     border-color: $color-gray-300;
     border-radius: $radius-md;
-    box-shadow: none;
   }
 
   .product-detail .review-card__author {
-    font-size: 24px;
-    line-height: 30px;
+    font-size: 26px;
+    line-height: 32px;
   }
 
   .product-detail .review-card__date {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: $font-medium;
-    line-height: 20px;
+    line-height: 22px;
   }
 
   .product-detail .review-card__rating .rating img {
@@ -1296,23 +1244,19 @@
   .product-detail .review-card__image {
     width: 140px;
     height: 140px;
-    border: 0;
     border-radius: $radius-md;
   }
 
   .product-detail .review-card__body {
     margin-top: 16px;
     color: $color-text-main;
-    font-size: 16px;
-    line-height: 20px;
+    font-size: 18px;
+    line-height: 22px;
   }
 
   .product-detail .review-section__more {
     height: 50px;
     margin-top: 38px;
-    border-color: $color-gray-300;
-    border-radius: 5px;
-    color: $color-gray-500;
-    font-size: 16px;
+    font-size: 18px;
   }
 }

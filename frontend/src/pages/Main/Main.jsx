@@ -1208,7 +1208,14 @@ function Main() {
     return (
       <div className="items" key={getProductListKey(item, item.name)}>
         <div className="item_img_box">
-          <SkeletonImage src={item.image} alt={item.name} className="item_img" onClick={() => navigateToProduct(item)}/>
+          <button
+            type="button"
+            className="item_img_link"
+            onClick={() => navigateToProduct(item)}
+            aria-label={`${item.name} 상세페이지로 이동`}
+          >
+            <SkeletonImage src={item.image} alt={item.name} className="item_img" />
+          </button>
           <div className="icons" onClick={stopCardAction}>
             <CartIconButton product={product} size="sm" />
             <WishlistIconButton product={product} size="sm" />
