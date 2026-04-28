@@ -266,6 +266,7 @@
 
     &__quote-overlay {
       &.modal-overlay--fullscreen {
+        height: calc(100vh - (var(--mobile-header-height) + 95px));
         align-items: flex-end;
         padding-top: 12px;
       }
