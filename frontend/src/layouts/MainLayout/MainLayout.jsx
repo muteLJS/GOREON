@@ -1,6 +1,7 @@
 import "./MainLayout.scss";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
+import ScrollTopButton from "@/components/ScrollTopButton/ScrollTopButton";
 import FloatingChatWidget from "../../components/chat/FloatingChatWidget";
 import { Outlet, useLocation } from "react-router-dom";
 import { Suspense } from "react";
@@ -23,6 +24,7 @@ function MainLayout() {
         </main>
       </div>
       <Footer />
+      <ScrollTopButton />
       <FloatingChatWidget />
     </>
   );
