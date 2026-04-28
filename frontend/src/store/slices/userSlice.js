@@ -4,6 +4,7 @@
 /* -------------------------------------------------------------------------- */
 
 import { createSlice } from "@reduxjs/toolkit";
+import { ACCESS_TOKEN_STORAGE_KEY } from "../../utils/api";
 
 const persistedUser = localStorage.getItem("userInfo");
 
@@ -45,6 +46,7 @@ const userSlice = createSlice({
       state.userInfo = null;
       state.token = null;
       localStorage.removeItem("userInfo");
+      localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
     },
     updateUserInfo: (state, action) => {
       state.authChecked = true;

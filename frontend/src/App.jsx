@@ -1,9 +1,8 @@
-import React, { Suspense, lazy, useEffect } from "react";
+import React, { lazy, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useLocation } from "react-router-dom";
 
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
-import RouteLoading from "./components/RouteLoading/RouteLoading";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import MainLayout from "./layouts/MainLayout/MainLayout";
 import { completeAuthCheck, login, logout } from "./store/slices/userSlice";
@@ -89,41 +88,39 @@ function App() {
   return (
     <>
       <ScrollToTop />
-      <Suspense fallback={<RouteLoading message="페이지를 불러오는 중입니다..." />}>
-        <Routes>
-          <Route element={<MainLayout />}>
-            <Route path="/" element={<Main />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/category" element={<Category />} />
-            <Route path="/pc-assembly" element={<PcAssembly />} />
-            <Route path="/pc-assembly-quote" element={<PcAssemblyQuote />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/auth/social/callback" element={<SocialLoginCallback />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/wishlist" element={<Wishlist />} />
-            <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/payment" element={<Payment />} />
-            <Route
-              path="/mypage"
-              element={
-                <ProtectedRoute>
-                  <MyPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/list" element={<List />} />
-            <Route
-              path="/order-history"
-              element={
-                <ProtectedRoute>
-                  <OrderHistory />
-                </ProtectedRoute>
-              }
-            />
-          </Route>
-        </Routes>
-      </Suspense>
+      <Routes>
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Main />} />
+          <Route path="/search" element={<Search />} />
+          <Route path="/category" element={<Category />} />
+          <Route path="/pc-assembly" element={<PcAssembly />} />
+          <Route path="/pc-assembly-quote" element={<PcAssemblyQuote />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/auth/social/callback" element={<SocialLoginCallback />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route
+            path="/mypage"
+            element={
+              <ProtectedRoute>
+                <MyPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/list" element={<List />} />
+          <Route
+            path="/order-history"
+            element={
+              <ProtectedRoute>
+                <OrderHistory />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
+      </Routes>
     </>
   );
 }

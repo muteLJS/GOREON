@@ -10,7 +10,7 @@ import { useDispatch } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { login } from "../../store/slices/userSlice";
-import api from "../../utils/api";
+import api, { ACCESS_TOKEN_STORAGE_KEY } from "../../utils/api";
 
 const defaultLoginForm = {
   email: "",
@@ -27,10 +27,15 @@ const defaultRegisterForm = {
 
 const persistAuth = (payload) => {
   localStorage.setItem("userInfo", JSON.stringify(payload.user));
+
+  if (payload.accessToken) {
+    localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, payload.accessToken);
+  }
 };
 
 const normalizeAuthPayload = (auth) => ({
   user: auth.user,
+  accessToken: auth.accessToken,
 });
 
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
