@@ -95,6 +95,10 @@ const getSocialAuthErrorMessage = (providerLabel, authError) => {
     return `${providerLabel}에서 필수 사용자 정보를 받지 못했습니다. 동의 항목과 계정 정보를 확인해주세요.`;
   }
 
+  if (authError === "Kakao email consent is required") {
+    return "카카오 이메일 제공 동의가 필요합니다. 카카오 로그인 동의항목에서 이메일 제공에 동의해주세요.";
+  }
+
   if (authError) {
     return `${providerLabel} 로그인에 실패했습니다. 사유: ${authError}`;
   }
