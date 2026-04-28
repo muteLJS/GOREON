@@ -4,7 +4,7 @@
   position: fixed;
   bottom: calc(var(--mobile-bottom-nav-height, 95px) + 20px);
   left: 50%;
-  z-index: $z-toast;
+  z-index: 99999;
   width: min(calc(100vw - 24px), 420px);
   min-height: 40px;
   padding: 10px 16px;

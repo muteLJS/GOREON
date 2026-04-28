@@ -31,6 +31,7 @@ const INFO_FIELDS = [
 ];
 
 const INITIAL_HISTORY_COUNT = 2;
+const DESKTOP_BREAKPOINT = 1024;
 
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
 const getProductId = (product) => getProductObjectId(product) ?? "1";
@@ -239,6 +240,9 @@ export default function MyPage() {
   const [renderedHistoryCount, setRenderedHistoryCount] = useState(INITIAL_HISTORY_COUNT);
   const [isHistoryAnimating, setIsHistoryAnimating] = useState(false);
   const [savingField, setSavingField] = useState("");
+  const [isDesktopViewport, setIsDesktopViewport] = useState(() =>
+    typeof window === "undefined" ? false : window.innerWidth >= DESKTOP_BREAKPOINT,
+  );
   const historyShellRef = useRef(null);
   const historyListRef = useRef(null);
   const historyAnimationFrameRef = useRef(null);
@@ -249,6 +253,33 @@ export default function MyPage() {
   useEffect(() => {
     setProfileDraft(displayUser);
   }, [displayUser]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const desktopQuery = window.matchMedia(`(min-width: ${DESKTOP_BREAKPOINT}px)`);
+    const syncViewportState = () => {
+      setIsDesktopViewport(desktopQuery.matches);
+    };
+
+    syncViewportState();
+
+    if (desktopQuery.addEventListener) {
+      desktopQuery.addEventListener("change", syncViewportState);
+    } else {
+      desktopQuery.addListener(syncViewportState);
+    }
+
+    return () => {
+      if (desktopQuery.removeEventListener) {
+        desktopQuery.removeEventListener("change", syncViewportState);
+      } else {
+        desktopQuery.removeListener(syncViewportState);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const defaultVisibleCount = Math.min(INITIAL_HISTORY_COUNT, aiHistory.length);
@@ -280,10 +311,6 @@ export default function MyPage() {
     const fetchMe = async () => {
       try {
         const response = await api.get("/users/me");
-
-        if (!isMounted) {
-          return;
-        }
 
         dispatch(updateUserInfo(response.data));
       } catch (error) {
@@ -352,6 +379,48 @@ export default function MyPage() {
     { key: "wish", label: "찜한 상품", value: wishlistCount, href: "/wishlist" },
     { key: "review", label: "주문내역", value: 3, href: "/order-history" },
   ];
+
+  const renderAiRecommendationItems = (history) => {
+    const shouldUseSlider = history.items.length >= 3;
+    const gridClassName = `my-page__ai-grid ${shouldUseSlider ? "my-page__ai-grid--slider" : ""}`;
+
+    if (shouldUseSlider && !isDesktopViewport) {
+      return (
+        <Swiper
+          className={gridClassName}
+          slidesPerView="auto"
+          spaceBetween={10}
+          breakpoints={{
+            768: {
+              spaceBetween: 14,
+            },
+          }}
+          grabCursor
+          watchOverflow
+        >
+          {history.items.map((product) => (
+            <SwiperSlide
+              key={`${history.id}-${getProductListKey(product)}`}
+              className="my-page__ai-slide"
+            >
+              <AiRecommendationCard product={product} />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      );
+    }
+
+    return (
+      <div className={gridClassName}>
+        {history.items.map((product) => (
+          <AiRecommendationCard
+            key={`${history.id}-${getProductListKey(product)}`}
+            product={product}
+          />
+        ))}
+      </div>
+    );
+  };
 
   const handleFieldChange = (field, nextValue) => {
     setProfileDraft((prev) => ({
@@ -655,18 +724,7 @@ export default function MyPage() {
                         </div>
                       </div>
 
-                      <div
-                        className={`my-page__ai-grid ${
-                          history.items.length >= 3 ? "my-page__ai-grid--slider" : ""
-                        }`}
-                      >
-                        {history.items.map((product) => (
-                          <AiRecommendationCard
-                            key={`${history.id}-${getProductListKey(product)}`}
-                            product={product}
-                          />
-                        ))}
-                      </div>
+                      {renderAiRecommendationItems(history)}
                     </div>
                   </article>
                 ))}

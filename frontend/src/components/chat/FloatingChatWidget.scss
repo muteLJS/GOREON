@@ -581,16 +581,13 @@
     bottom: 119px;
     --chat-widget-action-size: 64px;
     --chat-widget-trigger-size: calc(var(--chat-widget-action-size) * 0.7273);
-    --chat-widget-trigger-icon-size: 18px;
-    --chat-widget-send-size: 34px;
-    --chat-widget-send-icon-size: calc(var(--chat-widget-send-size) * 0.52);
+    --chat-widget-trigger-icon-size: 30px;
   }
 
   .chat-widget__window {
     height: min(560px, calc(100vh - 176px));
     max-height: calc(100vh - 176px);
   }
-
 }
 
 @include desktop-up {
@@ -598,16 +595,13 @@
     bottom: 32px;
     --chat-widget-action-size: 88px;
     --chat-widget-trigger-size: calc(var(--chat-widget-action-size) * 0.7273);
-    --chat-widget-trigger-icon-size: 24px;
-    --chat-widget-send-size: 36px;
-    --chat-widget-send-icon-size: calc(var(--chat-widget-send-size) * 0.52);
+    --chat-widget-trigger-icon-size: 50px;
   }
 
   .chat-widget__window {
     height: min(644px, calc(100vh - 96px));
     max-height: calc(100vh - 96px);
   }
-
 }
 
 @include mobile {
@@ -616,11 +610,9 @@
     left: 12px;
     bottom: calc(var(--mobile-bottom-nav-height, 95px) + 12px);
     gap: 6px;
-    --chat-widget-action-size: 52px;
+    --chat-widget-action-size: 64px;
     --chat-widget-trigger-size: calc(var(--chat-widget-action-size) * 0.7273);
-    --chat-widget-trigger-icon-size: 16px;
-    --chat-widget-send-size: 32px;
-    --chat-widget-send-icon-size: calc(var(--chat-widget-send-size) * 0.5);
+    --chat-widget-trigger-icon-size: 34px;
   }
 
   .chat-widget__window {
@@ -641,7 +633,6 @@
   .chat-widget__trigger-wrap {
     gap: 8px;
   }
-
 
   .chat-widget__trigger-icon {
     width: var(--chat-widget-trigger-icon-size);
