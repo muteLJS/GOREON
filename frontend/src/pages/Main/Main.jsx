@@ -1208,7 +1208,7 @@ function Main() {
     return (
       <div className="items" key={getProductListKey(item, item.name)}>
         <div className="item_img_box">
-          <SkeletonImage src={item.image} alt={item.name} className="item_img" />
+          <SkeletonImage src={item.image} alt={item.name} className="item_img" onClick={() => navigateToProduct(item)}/>
           <div className="icons" onClick={stopCardAction}>
             <CartIconButton product={product} size="sm" />
             <WishlistIconButton product={product} size="sm" />
