@@ -9,6 +9,7 @@ import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
 import CartIconButton from "@/components/CartIconButton/CartIconButton";
 import Modal from "@/components/Modal/Modal";
 import ProductCardVertical from "@/components/ProductCard/ProductCardVertical";
+import RouteLoading from "@/components/RouteLoading/RouteLoading";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 
 import resetIcon from "@/assets/icons/reset.svg";
@@ -626,7 +627,7 @@ export default function ListLayout({
             </section>
             <section className="list-assembly__content">
               {status === "loading" ? (
-                <p className="list-assembly__state">상품을 불러오는 중입니다.</p>
+                <RouteLoading message="상품을 불러오는 중입니다..." variant="inline" />
               ) : null}
               {status === "error" ? <p className="list-assembly__state">{errorMessage}</p> : null}
               {status === "success" && visibleProducts.length === 0 ? (

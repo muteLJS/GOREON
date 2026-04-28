@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ProductHeroImage from "@/assets/img/intel-core-ultra5-250kf-plus-product-image-genuine.jpg";
+import RouteLoading from "@/components/RouteLoading/RouteLoading";
 import { useToast } from "@/components/Toast/toastContext";
 import ReviewWrite from "@/components/ReviewWrite/ReviewWrite";
 import { normalizeImageUrl } from "@/utils/image";
@@ -201,9 +202,7 @@ function OrderHistory() {
         <div className="order-history-page__groups">
           {fetchStatus === "loading" ? (
             <section className="order-history-page__group">
-              <div className="order-history-page__card">
-                <p>주문내역을 불러오는 중입니다.</p>
-              </div>
+              <RouteLoading message="주문내역을 불러오는 중입니다..." variant="card" />
             </section>
           ) : fetchStatus === "error" ? (
             <section className="order-history-page__group">

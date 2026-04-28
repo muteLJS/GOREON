@@ -1385,6 +1385,23 @@
       border: 1px solid $color-gray-300;
       border-radius: $radius-md;
       background-color: $color-white;
+
+      .item_img_link {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        padding: 0;
+        border: 0;
+        border-radius: inherit;
+        background: transparent;
+        cursor: pointer;
+
+        &:focus-visible {
+          outline: 2px solid $color-text-main;
+          outline-offset: 3px;
+        }
+      }
+
       .item_img {
         position: absolute;
         width: min(72%, 170px);

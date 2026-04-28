@@ -1,4 +1,4 @@
-import "./Main.scss";
+﻿import "./Main.scss";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -1208,7 +1208,14 @@ function Main() {
     return (
       <div className="items" key={getProductListKey(item, item.name)}>
         <div className="item_img_box">
-          <SkeletonImage src={item.image} alt={item.name} className="item_img" onClick={() => navigateToProduct(item)}/>
+          <button
+            type="button"
+            className="item_img_link"
+            onClick={() => navigateToProduct(item)}
+            aria-label={`${item.name} 상세페이지로 이동`}
+          >
+            <SkeletonImage src={item.image} alt={item.name} className="item_img" />
+          </button>
           <div className="icons" onClick={stopCardAction}>
             <CartIconButton product={product} size="sm" />
             <WishlistIconButton product={product} size="sm" />
@@ -1696,7 +1703,7 @@ function Main() {
               <button
                 type="button"
                 className="main-spec-modal__button main-spec-modal__button--ghost"
-                onClick={() => setSelectedSpecProduct(null)}
+                onClick={() => setSelectedSpecProduct(false)}
               >
                 닫기
               </button>

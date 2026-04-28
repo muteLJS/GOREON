@@ -46,7 +46,7 @@ function CartIconButton({ product, className = "", size = "md" }) {
   };
 
   const handleAddToCart = () => {
-    trackAddToCart(product.name);
+    trackAddToCart(product?.name ?? product?.title ?? "상품명");
   };
 
   return (
@@ -54,8 +54,8 @@ function CartIconButton({ product, className = "", size = "md" }) {
       type="button"
       className={`cart-icon-button cart-icon-button--${size} ${className}`.trim()}
       aria-label="장바구니 담기"
-      onClick={() => {
-        handleClick();
+      onClick={(event) => {
+        handleClick(event);
         handleAddToCart();
       }}
     >

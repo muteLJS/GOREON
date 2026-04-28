@@ -22,6 +22,14 @@ function Modal({
   const dragStateRef = useRef({ isDragging: false, pointerId: null, startY: 0 });
   const [dragOffset, setDragOffset] = useState(0);
 
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
+
   const resetDragState = () => {
     dragStateRef.current = { isDragging: false, pointerId: null, startY: 0 };
     setDragOffset(0);
@@ -69,7 +77,7 @@ function Modal({
   return (
     <div className={`modal-overlay ${overlayClassName}`.trim()} onClick={onClose}>
       <div
-        className={`modal ${dragToClose ? "modal--draggable" : ""} ${className}`.trim()}
+        className={`modal ${dragToClose ? "modal--draggable" : ""} ${dragOffset > 0 ? "modal--dragging" : ""} ${className}`.trim()}
         style={dragOffset > 0 ? { transform: `translateY(${dragOffset}px)` } : undefined}
         onClick={(e) => e.stopPropagation()}
       >

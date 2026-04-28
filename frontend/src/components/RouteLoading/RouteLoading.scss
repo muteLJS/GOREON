@@ -17,6 +17,28 @@
   color: $color-text-main;
 }
 
+.route-loading--inline {
+  width: 100%;
+  min-height: 320px;
+  margin-right: 0;
+  margin-left: 0;
+  padding: 40px 16px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top, rgba(122, 224, 212, 0.14), transparent 42%),
+    rgba(248, 255, 254, 0.78);
+}
+
+.route-loading--card {
+  width: 100%;
+  min-height: 220px;
+  margin-right: 0;
+  margin-left: 0;
+  padding: 32px 16px;
+  border-radius: 20px;
+  background: $color-white;
+}
+
 .route-loading__content {
   width: min(100%, 360px);
   display: flex;
@@ -62,6 +84,14 @@
   .route-loading {
     --route-loading-header-height: 84px;
     padding: 64px 24px;
+  }
+
+  .route-loading--inline {
+    padding: 48px 24px;
+  }
+
+  .route-loading--card {
+    padding: 40px 24px;
   }
 
   .route-loading__content {

@@ -46,7 +46,7 @@ function WishlistIconButton({ product, className = "", iconClassName = "", size 
   };
 
   const handleWishlist = () => {
-    trackWishlist(product.name);
+    trackWishlist(product?.name ?? product?.title ?? "상품명");
   };
 
   return (
@@ -54,8 +54,8 @@ function WishlistIconButton({ product, className = "", iconClassName = "", size 
       type="button"
       className={`wishlist-icon-button wishlist-icon-button--${size} ${className}`.trim()}
       aria-label={isWishlisted ? "찜 해제" : "찜하기"}
-      onClick={() => {
-        handleClick();
+      onClick={(event) => {
+        handleClick(event);
         handleWishlist();
       }}
     >
