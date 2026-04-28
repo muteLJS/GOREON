@@ -1,4 +1,4 @@
-import "./Main.scss";
+﻿import "./Main.scss";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -1696,7 +1696,7 @@ function Main() {
               <button
                 type="button"
                 className="main-spec-modal__button main-spec-modal__button--ghost"
-                onClick={() => setSelectedSpecProduct(null)}
+                onClick={() => setSelectedSpecProduct(false)}
               >
                 닫기
               </button>
