@@ -85,6 +85,14 @@ function App() {
     };
   }, [authChecked, dispatch, location.pathname]);
 
+  useEffect(() => {
+  if (window.gtag) {
+    window.gtag("config", "G-0NK3T2R6XR", {
+      page_path: location.pathname,
+    });
+  }
+}, [location]);
+
   return (
     <>
       <ScrollToTop />
