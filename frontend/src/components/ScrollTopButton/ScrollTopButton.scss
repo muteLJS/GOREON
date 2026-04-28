@@ -6,6 +6,8 @@
   padding: 0;
   border: 0;
   background: transparent;
+  position: sticky;
+  top: -65px;  
   cursor: pointer;
   opacity: 0;
   visibility: hidden;
@@ -40,9 +42,11 @@
   border-radius: $radius-full;
 }
 
+
 @media (min-width: $breakpoint-tablet) {
   .scroll-top-button {
     width: 64px;
     height: 64px;
+    top: -75px;  
   }
 }
