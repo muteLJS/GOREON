@@ -51,10 +51,10 @@
 
   &__add-button {
     @include button-base();
-      min-width: 44px;
-      height: 20px;
-      padding: 0px 0px;    
-      font-size: $font-xs;
+    min-width: 44px;
+    height: 20px;
+    padding: 0px 0px;
+    font-size: $font-xs;
   }
 
   &__section-bar {

@@ -3,6 +3,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useNavigate } from "react-router-dom";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 import "swiper/css";
 import AICharacter from "components/AICharacter/AICharacter";
 import Review_user from "assets/icons/review_user.svg";
@@ -35,6 +37,7 @@ import newProduct2 from "assets/products/newProduct2.png";
 import newProduct3 from "assets/products/newProduct3.png";
 
 const EMPTY_AI_PLACEHOLDER = "검색어를 입력해주세요!";
+
 const UPDATE_SHOWCASE_CONFIG = [
   {
     productName: "LG전자 2026 그램 프로16 16Z95U-GS5WK",
@@ -322,6 +325,27 @@ const normalizeImageUrl = (value) => {
   return raw;
 };
 
+const SkeletonImage = ({
+  src,
+  alt,
+  className = "",
+  skeletonClassName = "",
+  containerClassName = "skeleton-image-container",
+}) => {
+  const imageSrc = normalizeImageUrl(src);
+
+  if (!imageSrc) {
+    return (
+      <Skeleton
+        className={`skeleton-image ${className} ${skeletonClassName}`.trim()}
+        containerClassName={containerClassName}
+      />
+    );
+  }
+
+  return <img src={imageSrc} alt={alt} className={className} />;
+};
+
 const getAiReviewProductId = (product) => getProductObjectId(product);
 
 const getProductRouteId = (product) => getProductObjectId(product);
@@ -432,10 +456,12 @@ function Main() {
     "👨‍👩‍👦 부모님 쉽게 쓸 테블릿",
     "🖨 가정용 프린터 추천",
   ];
+
   const updateShowcaseItems = useMemo(
     () => UPDATE_SHOWCASE_CONFIG.map((item) => createUpdateShowcaseItem(catalogProducts, item)),
     [catalogProducts],
   );
+
   const updateMobileItems = useMemo(
     () => [
       ...updateShowcaseItems,
@@ -443,6 +469,7 @@ function Main() {
     ],
     [catalogProducts, updateShowcaseItems],
   );
+
   const categorySections = useMemo(
     () =>
       CATEGORY_SECTION_CONFIG.map((section) => ({
@@ -453,6 +480,7 @@ function Main() {
       })),
     [catalogProducts],
   );
+
   const packageCards = useMemo(
     () =>
       PACKAGE_CARD_CONFIG.map((card) => ({
@@ -470,6 +498,7 @@ function Main() {
       })),
     [catalogProducts],
   );
+
   const targetUpdateIndex = hoveredUpdateIndex ?? selectedUpdateIndex;
   const targetUpdateItem = updateShowcaseItems[targetUpdateIndex] ?? updateShowcaseItems[0];
   const visibleUpdateItem = updateShowcaseItems[visibleUpdateIndex] ?? updateShowcaseItems[0];
@@ -485,8 +514,10 @@ function Main() {
     categorySections.find((section) => section.id === selectedCategory) ?? categorySections[0];
   const categoryItems = selectedCategorySection.items;
   const getCategoryItemsById = (categoryId) =>
-    (categorySections.find((section) => section.id === categoryId) ?? categorySections[0])?.items ?? [];
+    (categorySections.find((section) => section.id === categoryId) ?? categorySections[0])?.items ??
+    [];
   const aiResultItems = aiResults;
+
   const handleInput = (e) => {
     const el = e.target;
     el.style.height = "auto";
@@ -716,7 +747,7 @@ function Main() {
       };
       preloadImage.src = imageSrc;
     });
-  }, []);
+  }, [updateShowcaseItems]);
 
   useEffect(() => {
     const targetItem = updateShowcaseItems[targetUpdateIndex] ?? updateShowcaseItems[0];
@@ -790,7 +821,7 @@ function Main() {
       nextImage.onload = null;
       nextImage.onerror = null;
     };
-  }, [targetUpdateIndex, visibleUpdateIndex]);
+  }, [targetUpdateIndex, visibleUpdateIndex, updateShowcaseItems]);
 
   useEffect(
     () => () => {
@@ -1177,7 +1208,7 @@ function Main() {
     return (
       <div className="items" key={getProductListKey(item, item.name)}>
         <div className="item_img_box">
-          <img src={item.image} alt={item.name} className="item_img" />
+          <SkeletonImage src={item.image} alt={item.name} className="item_img" />
           <div className="icons" onClick={stopCardAction}>
             <CartIconButton product={product} size="sm" />
             <WishlistIconButton product={product} size="sm" />
@@ -1362,7 +1393,7 @@ function Main() {
                     }
                   }}
                 >
-                  <img src={item.image} alt={item.name} />
+                  <SkeletonImage src={item.image} alt={item.name} className="recommend_img" />
                   <div className="texts">
                     <p>{item.name}</p>
                     <p>{item.spec}</p>
@@ -1525,7 +1556,7 @@ function Main() {
               }}
             >
               <div className={`main_item__image ${incomingUpdateItem ? "is-transitioning" : ""}`}>
-                <img
+                <SkeletonImage
                   key={`featured-current-${getProductListKey(visibleUpdateItem, "featured-current")}`}
                   src={visibleUpdateItem.featuredImage}
                   alt={visibleUpdateItem.title}
@@ -1534,7 +1565,7 @@ function Main() {
                   }`}
                 />
                 {incomingUpdateItem && (
-                  <img
+                  <SkeletonImage
                     key={`featured-next-${getProductListKey(incomingUpdateItem, "featured-next")}`}
                     src={incomingUpdateItem.featuredImage}
                     alt={incomingUpdateItem.title}
@@ -1567,7 +1598,7 @@ function Main() {
               {updateShowcaseItems.map((item, index) => (
                 <UpdateSubCard
                   key={getProductListKey(item, item.name)}
-                  thumbnailImage={item.thumbnailImage}
+                  thumbnailImage={normalizeImageUrl(item.thumbnailImage)}
                   title={item.title}
                   description={item.description}
                   isActive={selectedUpdateIndex === index}
@@ -1602,7 +1633,11 @@ function Main() {
                     >
                       <div className="items">
                         <div className="item_img_box">
-                          <img src={item.thumbnailImage} alt={item.name} className="item_img" />
+                          <SkeletonImage
+                            src={item.thumbnailImage}
+                            alt={item.name}
+                            className="item_img"
+                          />
                           <div className="icons">
                             <CartIconButton product={createMainProduct(item)} size="sm" />
                             <WishlistIconButton product={createMainProduct(item)} size="sm" />
@@ -1638,7 +1673,11 @@ function Main() {
           <div className="main-spec-modal">
             <div className="main-spec-modal__summary">
               <div className="main-spec-modal__image">
-                <img src={selectedSpecProduct.image} alt={selectedSpecProduct.name} />
+                <SkeletonImage
+                  src={selectedSpecProduct.image}
+                  alt={selectedSpecProduct.name}
+                  className="main-spec-modal__img"
+                />
               </div>
               <div className="main-spec-modal__product">
                 <p className="main-spec-modal__name">{selectedSpecProduct.name}</p>
