@@ -15,6 +15,7 @@ import { addRecentViewed } from "@/store/slices/recentViewed";
 import ChevronDown from "../../assets/icons/chevron-down.svg";
 import api from "../../utils/api";
 import { normalizeImageUrl } from "@/utils/image";
+import { trackViewProduct } from "@/utils/analytics";
 
 import ProductHeroImage from "../../assets/img/intel-core-ultra5-250kf-plus-product-image-genuine.jpg";
 
@@ -208,6 +209,12 @@ function ProductDetail() {
       window.removeEventListener("resize", updateActiveTabFromScroll);
     };
   }, [product]);
+
+  useEffect(() => {
+  if (product?.name) {
+    trackViewProduct(product.name);
+  }
+}, [product]);
 
   if (status === "loading") {
     return (

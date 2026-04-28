@@ -6,6 +6,7 @@ import { useToast } from "@/components/Toast/toastContext";
 import { addToWishlist, removeFromWishlist } from "@/store/slices/wishlistSlice";
 import { getProductObjectId } from "@/utils/productIdentity";
 import "./WishlistIconButton.scss";
+import { trackWishlist } from "@/utils/analytics";
 
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
 
@@ -44,12 +45,19 @@ function WishlistIconButton({ product, className = "", iconClassName = "", size 
     showToast("찜 목록에 추가했습니다.");
   };
 
+  const handleWishlist = () => {
+    trackWishlist(product.name);
+  };
+
   return (
     <button
       type="button"
       className={`wishlist-icon-button wishlist-icon-button--${size} ${className}`.trim()}
       aria-label={isWishlisted ? "찜 해제" : "찜하기"}
-      onClick={handleClick}
+      onClick={() => {
+        handleClick();
+        handleWishlist();
+      }}
     >
       <img
         src={isWishlisted ? LikeAfterIcon : LikeBeforeIcon}

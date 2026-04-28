@@ -7,6 +7,7 @@ import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import MainLayout from "./layouts/MainLayout/MainLayout";
 import { completeAuthCheck, login, logout } from "./store/slices/userSlice";
 import api from "./utils/api";
+import { trackPageView } from "@/utils/analytics";
 
 const Main = lazy(() => import("./pages/Main/Main"));
 const Search = lazy(() => import("./pages/Search/Search"));
@@ -85,12 +86,8 @@ function App() {
     };
   }, [authChecked, dispatch, location.pathname]);
 
-  useEffect(() => {
-  if (window.gtag) {
-    window.gtag("config", "G-0NK3T2R6XR", {
-      page_path: location.pathname,
-    });
-  }
+useEffect(() => {
+  trackPageView(location.pathname);
 }, [location]);
 
   return (

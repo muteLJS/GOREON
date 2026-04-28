@@ -5,6 +5,7 @@ import { useToast } from "@/components/Toast/toastContext";
 import { addToCart } from "@/store/slices/cartSlice";
 import { getProductObjectId } from "@/utils/productIdentity";
 import "./CartIconButton.scss";
+import { trackAddToCart } from "@/utils/analytics";
 
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
 const buildCartItemId = (productId, optionKey) => `${productId}::${optionKey || "default"}`;
@@ -44,12 +45,19 @@ function CartIconButton({ product, className = "", size = "md" }) {
     showToast(isAlreadyInCart ? "장바구니 수량이 추가되었습니다." : "장바구니에 담았습니다.");
   };
 
+  const handleAddToCart = () => {
+    trackAddToCart(product.name);
+  };
+
   return (
     <button
       type="button"
       className={`cart-icon-button cart-icon-button--${size} ${className}`.trim()}
       aria-label="장바구니 담기"
-      onClick={handleClick}
+      onClick={() => {
+        handleClick();
+        handleAddToCart();
+      }}
     >
       <img src={CartIcon} alt="" />
     </button>
