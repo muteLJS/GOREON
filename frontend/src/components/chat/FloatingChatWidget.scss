@@ -116,6 +116,7 @@
 }
 
 .chat-widget__content.is-chatting {
+  height: 300px;
   gap: 14px;
 }
 
@@ -585,7 +586,7 @@
   }
 
   .chat-widget__window {
-    height: min(560px, calc(100vh - 176px));
+    height: 100%;
     max-height: calc(100vh - 176px);
   }
 }
@@ -599,7 +600,7 @@
   }
 
   .chat-widget__window {
-    height: min(644px, calc(100vh - 96px));
+    height: 100%;
     max-height: calc(100vh - 96px);
   }
 }
@@ -617,7 +618,7 @@
 
   .chat-widget__window {
     width: 100%;
-    height: min(644px, calc(100vh - 150px));
+    height: 100%;
     transform-origin: bottom center;
   }
 

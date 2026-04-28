@@ -477,12 +477,7 @@ function FloatingChatWidget() {
   }
 
   return (
-    <div
-      className="chat-widget"
-      ref={widgetRef}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
+    <div className="chat-widget" ref={widgetRef}>
       {isOpen && (
         <ChatPanel
           isOpen={isOpen}
@@ -506,6 +501,8 @@ function FloatingChatWidget() {
         isOpen={isOpen}
         isPreviewVisible={isPreviewVisible}
         onToggle={handleToggle}
+        onPreviewEnter={handleMouseEnter}
+        onPreviewLeave={handleMouseLeave}
       />
     </div>
   );

@@ -28,6 +28,10 @@
     touch-action: pan-y;
   }
 
+  &--dragging {
+    transition: none;
+  }
+
   &__drag-zone {
     display: flex;
     justify-content: center;
