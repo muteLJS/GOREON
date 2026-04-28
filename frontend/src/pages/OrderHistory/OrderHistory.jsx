@@ -43,7 +43,8 @@ const groupOrdersByDate = (orders) => {
       ...items.map((item, index) => ({
         ...item,
         orderId: order._id,
-        orderStatus: order.status,
+        itemStatus: order.status === "confirmed" ? "confirmed" : item.status || order.status,
+        itemIndex: index,
         itemKey: `${order._id}-${item.product}-${index}`,
       })),
     );
@@ -61,7 +62,7 @@ function OrderHistory() {
   const [orders, setOrders] = useState([]);
   const [fetchStatus, setFetchStatus] = useState("loading");
   const [reviewTarget, setReviewTarget] = useState(null);
-  const [confirmingOrderIds, setConfirmingOrderIds] = useState([]);
+  const [confirmingItemKeys, setConfirmingItemKeys] = useState([]);
 
   useEffect(() => {
     let isMounted = true;
@@ -103,11 +104,13 @@ function OrderHistory() {
 
   const groupedOrders = useMemo(() => groupOrdersByDate(orders), [orders]);
 
-  const handleConfirmPurchase = async (orderId) => {
-    try {
-      setConfirmingOrderIds((prev) => [...prev, orderId]);
+  const handleConfirmPurchase = async (orderId, itemIndex) => {
+    const confirmingKey = `${orderId}-${itemIndex}`;
 
-      const response = await api.patch(`/orders/${orderId}/confirm`);
+    try {
+      setConfirmingItemKeys((prev) => [...prev, confirmingKey]);
+
+      const response = await api.patch(`/orders/${orderId}/items/${itemIndex}/confirm`);
       const confirmedOrder = response.data;
 
       setOrders((prevOrders) =>
@@ -120,7 +123,7 @@ function OrderHistory() {
     } catch (error) {
       showToast(error.response?.data?.message || "구매 확정에 실패했습니다.");
     } finally {
-      setConfirmingOrderIds((prev) => prev.filter((id) => id !== orderId));
+      setConfirmingItemKeys((prev) => prev.filter((key) => key !== confirmingKey));
     }
   };
 
@@ -129,15 +132,16 @@ function OrderHistory() {
   };
 
   const renderItemActions = (item) => {
-    const isConfirmed = item.orderStatus === "confirmed";
-    const isConfirming = confirmingOrderIds.includes(item.orderId);
+    const isConfirmed = item.itemStatus === "confirmed";
+    const confirmingKey = `${item.orderId}-${item.itemIndex}`;
+    const isConfirming = confirmingItemKeys.includes(confirmingKey);
 
     if (!isConfirmed) {
       return (
         <button
           type="button"
           className="order-history-item__action-button order-history-item__action-button--confirm"
-          onClick={() => handleConfirmPurchase(item.orderId)}
+          onClick={() => handleConfirmPurchase(item.orderId, item.itemIndex)}
           disabled={isConfirming}
         >
           {isConfirming ? "처리중..." : "구매 확정"}
