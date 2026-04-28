@@ -7,6 +7,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import arrowIcon from "@/assets/icons/prev.svg";
 import { fetchProductById } from "@/api/products";
+import RouteLoading from "@/components/RouteLoading/RouteLoading";
 import { useToast } from "@/components/Toast/toastContext";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 import ReviewSection from "../../components/ReviewSection/ReviewSection";
@@ -217,13 +218,7 @@ function ProductDetail() {
 }, [product]);
 
   if (status === "loading") {
-    return (
-      <main className="product-detail">
-        <section className="product-detail__story">
-          <h1 className="product-detail__title">상품을 불러오는 중입니다.</h1>
-        </section>
-      </main>
-    );
+    return <RouteLoading message="상품을 불러오는 중입니다..." />;
   }
 
   if (!product) {
