@@ -9,7 +9,7 @@
   --chat-widget-trigger-size: calc(var(--chat-widget-action-size) * 0.7273);
   --chat-widget-trigger-icon-size: 24px;
   --chat-widget-send-size: 34px;
-  --chat-widget-send-icon-size: calc(var(--chat-widget-send-size) * 0.53);
+  --chat-widget-send-icon-size: calc(var(--chat-widget-send-size) * 0.75);
   --chat-widget-scroll-offset: calc(
     (var(--chat-widget-trigger-size) - var(--chat-widget-action-size)) / 2
   );

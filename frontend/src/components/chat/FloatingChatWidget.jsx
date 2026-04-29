@@ -25,12 +25,78 @@ const PREVIEW_DURATION_MS = 3200;
 const LOADING_DURATION_MS = 700;
 const PRODUCT_DELAY_MS = 200;
 const TYPING_SPEED_MS = 45;
+const CHAT_MESSAGES_STORAGE_KEY = "goreon:chat-widget:messages";
 
 const createStatusState = () => ({
   isLoading: false,
   isTyping: false,
   error: null,
 });
+
+const getChatStorage = () => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+};
+
+const removePendingAssistantMessages = (messages) =>
+  messages.filter((message) => message.type !== "loading" && !message.isStreaming);
+
+const isValidStoredMessages = (messages) =>
+  Array.isArray(messages) &&
+  messages.length > 0 &&
+  messages.every(
+    (message) =>
+      message &&
+      typeof message.id === "string" &&
+      typeof message.sender === "string" &&
+      typeof message.type === "string",
+  );
+
+const loadStoredMessages = (fallbackMessages) => {
+  const storage = getChatStorage();
+
+  if (!storage) {
+    return fallbackMessages;
+  }
+
+  try {
+    const rawMessages = storage.getItem(CHAT_MESSAGES_STORAGE_KEY);
+
+    if (!rawMessages) {
+      return fallbackMessages;
+    }
+
+    const storedMessages = removePendingAssistantMessages(JSON.parse(rawMessages));
+
+    return isValidStoredMessages(storedMessages) ? storedMessages : fallbackMessages;
+  } catch {
+    return fallbackMessages;
+  }
+};
+
+const persistMessages = (messages) => {
+  const storage = getChatStorage();
+
+  if (!storage) {
+    return;
+  }
+
+  try {
+    storage.setItem(
+      CHAT_MESSAGES_STORAGE_KEY,
+      JSON.stringify(removePendingAssistantMessages(messages)),
+    );
+  } catch {
+    // localStorage may be unavailable in private mode or when quota is exceeded.
+  }
+};
 
 function FloatingChatWidget() {
   const dispatch = useDispatch();
@@ -46,7 +112,7 @@ function FloatingChatWidget() {
   const [hasOpenedOnce, setHasOpenedOnce] = useState(false);
   const [mode, setMode] = useState(CHAT_MODE.IDLE);
   const [draft, setDraft] = useState("");
-  const [messages, setMessages] = useState(initialMessagesRef.current);
+  const [messages, setMessages] = useState(() => loadStoredMessages(initialMessagesRef.current));
   const [status, setStatus] = useState(createStatusState());
   const [isSuppressed, setIsSuppressed] = useState(false);
 
@@ -128,6 +194,10 @@ function FloatingChatWidget() {
     },
     [abortRecommendationRequest, clearResponseTimers],
   );
+
+  useEffect(() => {
+    persistMessages(messages);
+  }, [messages]);
 
   useLayoutEffect(() => {
     const hiddenSections = Array.from(document.querySelectorAll("[data-hide-floating-chat]"));
@@ -260,6 +330,11 @@ function FloatingChatWidget() {
   };
 
   const handleClose = () => {
+    cancelPendingAssistantResponse();
+    setMode(CHAT_MODE.IDLE);
+  };
+
+  const handleProductDetailClick = () => {
     cancelPendingAssistantResponse();
     setMode(CHAT_MODE.IDLE);
   };
@@ -489,6 +564,7 @@ function FloatingChatWidget() {
           onDraftChange={setDraft}
           onSendMessage={handleSendMessage}
           onSuggestionClick={handleSendMessage}
+          onProductDetailClick={handleProductDetailClick}
           onBack={handleBack}
           onClose={handleClose}
         />

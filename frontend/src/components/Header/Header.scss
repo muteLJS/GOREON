@@ -809,6 +809,11 @@ body.mobile-menu-open {
     font-size: var(--menu-title-font-size);
     font-weight: $font-bold;
     background: $color-white;
+    cursor: pointer;
+  }
+
+  .dropdown__title:hover {
+    color: $color-text-sub;
   }
 
   .dropdown__list {

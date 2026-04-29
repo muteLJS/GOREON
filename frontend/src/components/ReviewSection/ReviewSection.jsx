@@ -14,10 +14,6 @@ function ReviewSection({
   photoCount,
   gallery,
   reviews,
-  currentUserId = "",
-  currentUserName = "",
-  ownedReviewId = "",
-  canManageReviewsFallback = false,
   onEditReview,
   onDeleteReview,
 }) {
@@ -144,15 +140,7 @@ function ReviewSection({
       liked: false,
     };
 
-  const normalizeName = (name) => String(name || "").trim();
-
-  const isMyReview = (review) =>
-    review.isMine ||
-    (ownedReviewId && String(review.id) === String(ownedReviewId)) ||
-    (currentUserId && String(review.userId) === String(currentUserId)) ||
-    (normalizeName(currentUserName) &&
-      normalizeName(review.author) === normalizeName(currentUserName)) ||
-    canManageReviewsFallback;
+  const isMyReview = (review) => Boolean(review.isMine);
 
   const sortedReviews = [...reviews].sort((a, b) => {
     if (sortType === "rating") {
@@ -339,9 +327,33 @@ function ReviewSection({
                     <Rating rating={review.rating ?? rating} />
                   </div>
                 </div>
-                <time className="review-card__date" dateTime={review.date}>
-                  {review.date}
-                </time>
+                <div className="review-card__meta">
+                  <time className="review-card__date" dateTime={review.date}>
+                    {review.date}
+                  </time>
+                  {canManageReview ? (
+                    <div className="review-card__manage-actions" aria-label="내 리뷰 관리">
+                      <button
+                        type="button"
+                        className="review-card__manage-button"
+                        onClick={() => onEditReview?.(review)}
+                      >
+                        수정
+                      </button>
+                      <button
+                        type="button"
+                        className="review-card__manage-button review-card__manage-button--danger"
+                        onClick={() => onDeleteReview?.(review)}
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  ) : (
+                    <button type="button" className="review-card__report">
+                      신고하기
+                    </button>
+                  )}
+                </div>
               </div>
 
               {review.images?.length ? (
@@ -371,29 +383,6 @@ function ReviewSection({
                   <img src={ThumbsUp} alt="" aria-hidden="true" />
                   <span>도움돼요 {helpfulState.count}</span>
                 </button>
-
-                {canManageReview ? (
-                  <div className="review-card__manage-actions" aria-label="내 리뷰 관리">
-                    <button
-                      type="button"
-                      className="review-card__manage-button"
-                      onClick={() => onEditReview?.(review)}
-                    >
-                      수정
-                    </button>
-                    <button
-                      type="button"
-                      className="review-card__manage-button review-card__manage-button--danger"
-                      onClick={() => onDeleteReview?.(review)}
-                    >
-                      삭제
-                    </button>
-                  </div>
-                ) : (
-                  <button type="button" className="review-card__report">
-                    신고하기
-                  </button>
-                )}
               </div>
             </article>
           );

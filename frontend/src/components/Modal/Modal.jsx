@@ -1,6 +1,7 @@
 /* [컴포넌트] 모달창 (Modal)                   */
 /* 모바일에서 모달창을 그리는 컴포넌트 입니다. */
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import "./Modal.scss";
 import CloseIcon from "@/assets/event/close.svg";
 import { lockPageScroll } from "@/utils/scrollLock";
@@ -69,7 +70,7 @@ function Modal({
     }
   };
 
-  return (
+  const modalMarkup = (
     <div className={`modal-overlay ${overlayClassName}`.trim()} onClick={onClose}>
       <div
         className={`modal ${dragToClose ? "modal--draggable" : ""} ${dragOffset > 0 ? "modal--dragging" : ""} ${className}`.trim()}
@@ -97,6 +98,12 @@ function Modal({
       </div>
     </div>
   );
+
+  if (typeof document === "undefined") {
+    return modalMarkup;
+  }
+
+  return createPortal(modalMarkup, document.body);
 }
 
 export default Modal;

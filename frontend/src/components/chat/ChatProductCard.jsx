@@ -6,7 +6,7 @@ import { buildProductDetailPath } from "@/utils/productIdentity";
 import CartIconButton from "../CartIconButton/CartIconButton";
 import WishlistIconButton from "../WishlistIconButton/WishlistIconButton";
 
-function ChatProductCard({ product }) {
+function ChatProductCard({ product, onViewDetails }) {
   const tags = Array.isArray(product.tags) ? product.tags : [];
   const detailPath = product.detailPath ?? buildProductDetailPath(product) ?? "/product";
   const imageSrc = normalizeImageUrl(product.image) || ProductHeroImage;
@@ -46,7 +46,7 @@ function ChatProductCard({ product }) {
 
         <p className="chat-widget__product-price">{product.price}</p>
 
-        <Link to={detailPath} className="chat-widget__product-link">
+        <Link to={detailPath} className="chat-widget__product-link" onClick={onViewDetails}>
           {product.ctaLabel}
         </Link>
       </div>
