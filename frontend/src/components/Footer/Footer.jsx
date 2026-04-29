@@ -1,6 +1,7 @@
 import "./Footer.scss";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import FacebookIcon from "@/assets/footer/pc/facebook.svg";
 import YoutubeIcon from "@/assets/footer/pc/youtube.svg";
@@ -23,6 +24,7 @@ const searchSuggestions = [
 function Footer() {
   const navigate = useNavigate();
   const location = useLocation();
+  const cartItems = useSelector((state) => state.cart.items);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -50,6 +52,9 @@ function Footer() {
     { id: 2, name: "youtube", src: YoutubeIcon, link: "/" },
     { id: 3, name: "instagram", src: InstagramIcon, link: "/" },
   ];
+
+  const cartItemCount = cartItems.reduce((total, item) => total + (Number(item.quantity) || 1), 0);
+  const cartBadgeLabel = cartItemCount > 99 ? "99+" : String(cartItemCount);
 
   const mobileQuickLinks = [
     { id: 1, name: "home", src: HomeIcon, link: "/" },
@@ -268,9 +273,14 @@ function Footer() {
               to={item.link}
               key={item.id}
               className="footer__mobile-link"
-              aria-label={item.name}
+              aria-label={item.name === "cart" ? `장바구니 ${cartItemCount}개` : item.name}
             >
               <img src={item.src} alt={item.name} />
+              {item.name === "cart" && cartItemCount > 0 ? (
+                <span className="footer__cart-badge" aria-hidden="true">
+                  {cartBadgeLabel}
+                </span>
+              ) : null}
             </Link>
           ),
         )}

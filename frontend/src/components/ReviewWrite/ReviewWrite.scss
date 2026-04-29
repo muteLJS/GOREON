@@ -85,21 +85,32 @@
 }
 
 .review-write-modal-overlay {
-  align-items: center;
-  padding: 32px;
+  align-items: flex-end;
+  padding: 0;
+  background: rgba($color-black, 0.18);
 }
 
 .review-write-modal {
-  bottom: auto;
+  bottom: 95px;
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -12px 28px rgba($color-black, 0.12);
 }
 
 @include desktop-up {
+  .review-write-modal-overlay {
+    align-items: center;
+    padding: 32px;
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+
   .review-write-modal {
+    bottom: auto;
     width: min(520px, 100%);
     max-width: 520px;
     max-height: calc(100dvh - 64px);
     overflow-y: auto;
     border-radius: 20px;
     padding: 28px;
+    box-shadow: none;
   }
 }

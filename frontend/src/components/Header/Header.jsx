@@ -124,6 +124,7 @@ function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const cartItems = useSelector((state) => state.cart.items);
   const desktopSearchRef = useRef(null);
   const searchCloseTimerRef = useRef(null);
 
@@ -135,6 +136,9 @@ function Header() {
   const [isSearchPinned, setIsSearchPinned] = useState(false);
   const [activeDesktopMenu, setActiveDesktopMenu] = useState(null);
   const [hoveredDesktopMenu, setHoveredDesktopMenu] = useState(null);
+
+  const cartItemCount = cartItems.reduce((total, item) => total + (Number(item.quantity) || 1), 0);
+  const cartBadgeLabel = cartItemCount > 99 ? "99+" : String(cartItemCount);
 
   const headerIcons = [
     { key: "cart", src: Cart, alt: "장바구니", to: "/cart", width: 26, height: 23 },
@@ -439,10 +443,15 @@ function Header() {
                   "--icon-width": `${icon.width}px`,
                   "--icon-height": `${icon.height}px`,
                 }}
-                aria-label={icon.alt}
+                aria-label={icon.key === "cart" ? `${icon.alt} ${cartItemCount}개` : icon.alt}
                 onClick={() => navigate(icon.to)}
               >
                 <img src={icon.src} alt="" />
+                {icon.key === "cart" && cartItemCount > 0 ? (
+                  <span className="header__cart-badge" aria-hidden="true">
+                    {cartBadgeLabel}
+                  </span>
+                ) : null}
               </button>
             ))}
           </div>

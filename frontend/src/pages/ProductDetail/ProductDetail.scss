@@ -592,7 +592,7 @@
 
 .product-detail .review-card__top { 
   order: 1;
-  > div{
+  .review-card__author-container{
     @include flex(flex-start, space-between,column);
     gap: 4px;
     @include desktop-up {
