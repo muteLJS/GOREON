@@ -141,7 +141,7 @@ $footer-divider: rgba(255, 255, 255, 0.45);
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: $z-header + 1;
+  z-index: $z-toast;
   background: rgba($color-white, 0.98);
   border-top: 1px solid rgba($color-black, 0.08);
   height: 95px;
@@ -275,6 +275,7 @@ $footer-divider: rgba(255, 255, 255, 0.45);
 
 .footer__mobile-link {
   @include flex-center;
+  position: relative;
   flex: 1;
   height: 100%;
   border: 0;
@@ -286,6 +287,22 @@ $footer-divider: rgba(255, 255, 255, 0.45);
     height: 25px;
     width: 25px;
   }
+}
+
+.footer__cart-badge {
+  @include flex-center;
+  position: absolute;
+  top: 28px;
+  left: calc(50% + 8px);
+  min-width: 15px;
+  height: 15px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: $color-text-sub;
+  color: $color-white;
+  font-size: 9px;
+  font-weight: $font-bold;
+  line-height: 1;
 }
 
 .footer__mobile-link--menu {

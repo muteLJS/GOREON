@@ -261,8 +261,8 @@
   display: flex;
   align-items: center;
 
-  &:focus {
-    background-color: $color-white;
+  &--editing {
+    background: $color-white;
   }
 
   span {

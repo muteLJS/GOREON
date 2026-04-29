@@ -71,9 +71,9 @@ $range-thumb-half: 9px;
         min-height: 32px;
         border: 1px solid #60606024;
         border-radius: 999px;
-        font-size: 11px;
+        font-size: $font-xs-2;
         line-height: 1;
-        gap: 5px;
+        gap: 6px;
         padding: 5px 10px;
         background-color: #ffffff;
         white-space: nowrap;
@@ -553,7 +553,7 @@ $range-thumb-half: 9px;
 .list-mobile-filter-modal,
 .list-mobile-sort-modal {
   .modal__title {
-    margin-bottom: 12px;
+    margin: 12px 0 16px;
   }
 }
 
@@ -561,10 +561,9 @@ $range-thumb-half: 9px;
   padding: 0 0 8px;
 
   &__tabs {
-    display: flex;
-    gap: 16px;
-    overflow-x: auto;
-    padding-bottom: 10px;
+    @include flex(center, space-between);
+    padding: 0 16px 14px  ;    
+    overflow-x: auto;    
     white-space: nowrap;
     scrollbar-width: none;
   }
@@ -578,7 +577,7 @@ $range-thumb-half: 9px;
     border: 0;
     background: transparent;
     color: $color-sub-category-text;
-    font-size: $font-sm;
+    font-size: $font-md;
     font-weight: $font-medium;
   }
 
@@ -595,6 +594,7 @@ $range-thumb-half: 9px;
   &__options {
     display: flex;
     flex-wrap: wrap;
+    padding: 0 16px;
     gap: 12px 18px;
   }
 
