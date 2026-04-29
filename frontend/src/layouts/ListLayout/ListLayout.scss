@@ -75,6 +75,7 @@ $range-thumb-touch-bg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2
         border: 1px solid #60606024;
         border-radius: 999px;
         font-size: $font-xs-2;
+        font-weight: $font-medium;
         line-height: 1;
         gap: 6px;
         padding: 5px 10px;
@@ -557,6 +558,7 @@ $range-thumb-touch-bg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2
 .list-mobile-filter-modal,
 .list-mobile-sort-modal {
   .modal__title {
+    font-size: $font-lg;
     margin: 12px 0 16px;
   }
 }
@@ -566,7 +568,7 @@ $range-thumb-touch-bg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2
 
   &__tabs {
     @include flex(center, space-between);
-    padding: 0 16px 14px  ;    
+    padding-bottom: 14px;    
     overflow-x: auto;    
     white-space: nowrap;
     scrollbar-width: none;
@@ -581,7 +583,7 @@ $range-thumb-touch-bg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2
     border: 0;
     background: transparent;
     color: $color-sub-category-text;
-    font-size: $font-md;
+    font-size: $font-sm-2;
     font-weight: $font-medium;
   }
 
@@ -597,8 +599,7 @@ $range-thumb-touch-bg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2
 
   &__options {
     display: flex;
-    flex-wrap: wrap;
-    padding: 0 16px;
+    flex-wrap: wrap;    
     gap: 12px 18px;
   }
 
