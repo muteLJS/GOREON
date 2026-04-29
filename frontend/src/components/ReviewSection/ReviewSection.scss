@@ -144,6 +144,8 @@
   padding: 18px;
   border: 1px solid rgba($color-black, 0.08);
   border-radius: 18px;
+  display: flex;
+  flex-direction: column;
   background: $color-white;
   box-shadow: 0 12px 28px rgba($color-black, 0.04);
 }
@@ -168,6 +170,11 @@
   }
 }
 
+.review-card__meta {
+  @include flex(flex-end, flex-start, column);
+  gap: 12px;
+}
+
 .review-card__date {
   color: rgba($color-black, 0.45);
   font-size: 15px;
@@ -183,9 +190,11 @@
 }
 
 .review-card__actions {
-  @include flex(center, space-between);
+  @include flex(center, flex-end);
+  width: 100%;
   gap: 12px;
-  margin-top: 18px;
+  margin-top: auto;
+  padding-top: 18px;
 }
 
 .review-card__helpful,
@@ -215,7 +224,10 @@
   }
 
   &.is-active {
-    background: rgba($color-text-sub, 0.08);
+    // background: rgba($color-text-sub, 0.08);
+    img{
+      fill: $color-text-main;
+    }
   }
 }
 
@@ -230,11 +242,12 @@
 
 .review-card__manage-actions {
   @include flex(center, flex-end);
+  width: 100%;
   gap: 10px;
 }
 
 .review-card__manage-button--danger {
-  color: #d92d20;
+  color: $color-text-main;
 }
 
 .review-card__images {
@@ -438,7 +451,8 @@
     }
   }
 
-  .review-card__report {
+  .review-card__report,
+  .review-card__manage-button {
     font-size: 14px;
   }
 
@@ -511,7 +525,8 @@
     font-size: 15px;
   }
 
-  .review-card__report {
+  .review-card__report,
+  .review-card__manage-button {
     font-size: 15px;
   }
 

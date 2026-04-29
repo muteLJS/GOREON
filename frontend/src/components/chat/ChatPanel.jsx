@@ -13,6 +13,7 @@ function ChatPanel({
   onDraftChange,
   onSendMessage,
   onSuggestionClick,
+  onProductDetailClick,
   onBack,
   onClose,
 }) {
@@ -48,7 +49,11 @@ function ChatPanel({
 
       <div className="chat-widget__body">
         <div className={`chat-widget__content ${isInitialView ? "is-initial" : "is-chatting"}`}>
-          <ChatMessageList messages={messages} isInitialView={isInitialView} />
+          <ChatMessageList
+            messages={messages}
+            isInitialView={isInitialView}
+            onProductDetailClick={onProductDetailClick}
+          />
 
           {isInitialView && (
             <div className="chat-widget__quick-replies">

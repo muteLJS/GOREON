@@ -25,7 +25,7 @@ const initialUser = parsePersistedUser();
 
 const initialState = {
   authChecked: false,
-  isLoggedIn: false,
+  isLoggedIn: Boolean(initialUser),
   token: null,
   userInfo: initialUser,
 };

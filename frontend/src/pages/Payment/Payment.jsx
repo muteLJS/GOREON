@@ -22,7 +22,7 @@ import { removeCartItems } from "../../store/slices/cartSlice";
 import api from "../../utils/api";
 
 const PAYMENT_OPTIONS = [
-  { id: "card", label: "신용 카드", icon: CreditCardIcon, iconAlt: "신용 카드", available: true },
+  { id: "card", label: "신용 카드", icon: CreditCardIcon, iconAlt: "신용 카드", available: false },
   {
     id: "kakao-pay",
     label: "카카오 페이",
@@ -238,6 +238,7 @@ export default function Payment() {
     }
   };
 
+  
   return (
     <section className="payment-page">
       <div className="payment-page__header">

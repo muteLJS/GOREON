@@ -522,7 +522,11 @@ function Header() {
                     <div className={innerClassName}>
                       {item.sections.map((section) => (
                         <div className="dropdown__column" key={section.key}>
-                          <div className="dropdown__title">{section.title}</div>
+                          <div className="dropdown__title">                          
+                            <Link to={`/list?type=${section.title}`}>
+                                {section.title}                            
+                            </Link>
+                            </div>
                           <ul className="dropdown__list">
                             {section.items.map((menuItem) => (
                               <li className={listItemClassName} key={menuItem.type}>

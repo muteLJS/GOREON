@@ -4,7 +4,7 @@ import { getProductListKey } from "@/utils/productIdentity";
 import AICharacter from "../AICharacter/AICharacter";
 import ChatProductCard from "./ChatProductCard";
 
-function ChatMessageList({ messages, isInitialView }) {
+function ChatMessageList({ messages, isInitialView, onProductDetailClick }) {
   const listRef = useRef(null);
   const scrollStateRef = useRef({
     messageCount: 0,
@@ -77,7 +77,11 @@ function ChatMessageList({ messages, isInitialView }) {
 
                 <div className="chat-widget__product-list">
                   {message.products.map((product) => (
-                    <ChatProductCard key={getProductListKey(product)} product={product} />
+                    <ChatProductCard
+                      key={getProductListKey(product)}
+                      product={product}
+                      onViewDetails={onProductDetailClick}
+                    />
                   ))}
                 </div>
               </div>

@@ -84,14 +84,17 @@
   }
 }
 
-@include desktop-up {
-  .review-write-modal-overlay {
-    align-items: center;
-    padding: 32px;
-  }
+.review-write-modal-overlay {
+  align-items: center;
+  padding: 32px;
+}
 
+.review-write-modal {
+  bottom: auto;
+}
+
+@include desktop-up {
   .review-write-modal {
-    bottom: auto;
     width: min(520px, 100%);
     max-width: 520px;
     max-height: calc(100dvh - 64px);
