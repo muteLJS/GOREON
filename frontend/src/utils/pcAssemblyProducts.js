@@ -155,25 +155,33 @@ const getCategoryPerformance = (item, context) => {
     case "CPU": {
       const cpuClass = getCpuClass(analysisItem, context);
       if (cpuClass === "high") return { level: "ok", message: "상위 작업/게임 성능권" };
-      if (cpuClass === "middle") return { level: "warning", message: "일반 작업은 충분, 고사양 작업은 확인 필요" };
+      if (cpuClass === "middle")
+        return { level: "warning", message: "일반 작업은 충분, 고사양 작업은 확인 필요" };
       return { level: "error", message: "고사양 작업 기준 CPU 성능 부족 가능" };
     }
     case "그래픽카드": {
       const gpuClass = getGpuClass(analysisItem, context);
       const memoryGb = getGpuMemoryGb(analysisItem);
-      if (gpuClass === "high") return { level: "ok", message: `GPU 성능 여유${memoryGb ? ` · VRAM ${memoryGb}GB` : ""}` };
-      if (gpuClass === "middle") return { level: "warning", message: `FHD/QHD 중심 권장${memoryGb ? ` · VRAM ${memoryGb}GB` : ""}` };
+      if (gpuClass === "high")
+        return { level: "ok", message: `GPU 성능 여유${memoryGb ? ` · VRAM ${memoryGb}GB` : ""}` };
+      if (gpuClass === "middle")
+        return {
+          level: "warning",
+          message: `FHD/QHD 중심 권장${memoryGb ? ` · VRAM ${memoryGb}GB` : ""}`,
+        };
       return { level: "error", message: "그래픽 성능/VRAM 확인 필요" };
     }
     case "램": {
       const capacityGb = getCapacityGb(analysisItem);
       if (capacityGb >= 32) return { level: "ok", message: `메모리 용량 충분 · ${capacityGb}GB` };
-      if (capacityGb >= 16) return { level: "warning", message: `기본 사용 가능 · ${capacityGb}GB` };
+      if (capacityGb >= 16)
+        return { level: "warning", message: `기본 사용 가능 · ${capacityGb}GB` };
       return { level: "error", message: "RAM 용량 확인 필요" };
     }
     case "저장장치": {
       const capacityGb = getCapacityGb(analysisItem);
-      if (capacityGb >= 2048) return { level: "ok", message: `저장공간 여유 · ${capacityGb / 1024}TB` };
+      if (capacityGb >= 2048)
+        return { level: "ok", message: `저장공간 여유 · ${capacityGb / 1024}TB` };
       if (capacityGb >= 1024) return { level: "warning", message: "일반 사용 가능 · 1TB급" };
       return { level: "error", message: "저장공간 부족 가능" };
     }
@@ -181,7 +189,10 @@ const getCategoryPerformance = (item, context) => {
       const watt = getPowerWatt(analysisItem);
       if (watt >= 850) return { level: "ok", message: `고성능 구성 여유 · ${watt}W` };
       if (watt >= 700) return { level: "warning", message: `중급 구성 권장 · ${watt}W` };
-      return { level: "error", message: watt ? `파워 용량 확인 필요 · ${watt}W` : "파워 용량 확인 필요" };
+      return {
+        level: "error",
+        message: watt ? `파워 용량 확인 필요 · ${watt}W` : "파워 용량 확인 필요",
+      };
     }
     case "메인보드":
       return getGenericLevel(analysisItem, context) === "ok"

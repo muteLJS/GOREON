@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { lockPageScroll } from "@/utils/scrollLock";
 
 import banner1 from "@/assets/banner/banner-1.jpg";
 import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
@@ -81,18 +82,8 @@ function PcAssembly() {
   }, [isDesktop, isQuoteOpen]);
 
   useEffect(() => {
-    if (!(isDesktop && isQuoteOpen)) return;
-    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
-    const prevOverflow = document.body.style.overflow;
-    const prevPaddingRight = document.body.style.paddingRight;
-
-    document.body.style.overflow = "hidden";
-    document.body.style.paddingRight = `${scrollBarWidth}px`;
-
-    return () => {
-      document.body.style.overflow = prevOverflow;
-      document.body.style.paddingRight = prevPaddingRight;
-    };
+    if (!(isDesktop && isQuoteOpen)) return undefined;
+    return lockPageScroll();
   }, [isDesktop, isQuoteOpen]);
 
   const pcAssemblyProducts = useMemo(() => getPcAssemblyProducts(products), [products]);

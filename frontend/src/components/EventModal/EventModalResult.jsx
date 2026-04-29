@@ -47,7 +47,11 @@ function EventModalResult({ titleId, content, coupon, onContinueShopping, onOpen
           >
             {content.continueButtonLabel}
           </button>
-          <button type="button" className="event-modal__button event-modal__button--primary" onClick={onOpenBenefits}>
+          <button
+            type="button"
+            className="event-modal__button event-modal__button--primary"
+            onClick={onOpenBenefits}
+          >
             {content.benefitButtonLabel}
           </button>
         </>

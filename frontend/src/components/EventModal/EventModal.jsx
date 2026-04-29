@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import CloseIcon from "assets/event/close.svg";
+import { lockPageScroll } from "@/utils/scrollLock";
 
 import "./EventModal.scss";
 import EventModalDrawing from "./EventModalDrawing";
@@ -78,19 +79,7 @@ function EventModal({
       return undefined;
     }
 
-    const previousBodyOverflow = document.body.style.overflow;
-    const previousBodyPaddingRight = document.body.style.paddingRight;
-    const previousHtmlOverflow = document.documentElement.style.overflow;
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-    const currentBodyPaddingRight =
-      Number.parseFloat(window.getComputedStyle(document.body).paddingRight) || 0;
-
-    if (scrollbarWidth > 0) {
-      document.body.style.paddingRight = `${currentBodyPaddingRight + scrollbarWidth}px`;
-    }
-
-    document.body.style.overflow = "hidden";
-    document.documentElement.style.overflow = "hidden";
+    const releaseScrollLock = lockPageScroll({ lockHtml: true });
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
@@ -101,9 +90,7 @@ function EventModal({
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow = previousBodyOverflow;
-      document.body.style.paddingRight = previousBodyPaddingRight;
-      document.documentElement.style.overflow = previousHtmlOverflow;
+      releaseScrollLock();
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [shouldRenderModal, onClose]);

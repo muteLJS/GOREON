@@ -260,7 +260,14 @@ const SocialLoginButtons = ({ onSocialLogin = startSocialLogin }) => (
   </div>
 );
 
-const MobileLogin = ({ onShowRegister, loginForm, setLoginForm, onSubmit, error, onSocialLogin }) => {
+const MobileLogin = ({
+  onShowRegister,
+  loginForm,
+  setLoginForm,
+  onSubmit,
+  error,
+  onSocialLogin,
+}) => {
   return (
     <>
       <section className="mobile-login">
@@ -315,7 +322,14 @@ const MobileLogin = ({ onShowRegister, loginForm, setLoginForm, onSubmit, error,
     </>
   );
 };
-const MobileRegister = ({ onShowLogin, registerForm, setRegisterForm, onSubmit, error, onSocialLogin }) => {
+const MobileRegister = ({
+  onShowLogin,
+  registerForm,
+  setRegisterForm,
+  onSubmit,
+  error,
+  onSocialLogin,
+}) => {
   return (
     <>
       <section className="mobile-register">

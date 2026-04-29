@@ -87,6 +87,16 @@
   padding: 14px 0;
 }
 
+.order-history-item--clickable {
+  cursor: pointer;
+}
+
+.order-history-item--clickable:focus-visible {
+  outline: 3px solid rgba($color-text-main, 0.28);
+  outline-offset: 4px;
+  border-radius: 14px;
+}
+
 .order-history-item__top {
   display: grid;
   grid-template-columns: 80px minmax(0, 1fr);

@@ -385,8 +385,7 @@ function FloatingChatWidget() {
       error: null,
     });
     setMessages((prevMessages) => {
-      const nextMessages =
-        mode === CHAT_MODE.INITIAL ? initialMessagesRef.current : prevMessages;
+      const nextMessages = mode === CHAT_MODE.INITIAL ? initialMessagesRef.current : prevMessages;
 
       return [...nextMessages, userMessage, loadingMessage];
     });

@@ -1,5 +1,5 @@
 ﻿import "./ProductDetail.scss";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { FreeMode } from "swiper/modules";
@@ -11,6 +11,7 @@ import RouteLoading from "@/components/RouteLoading/RouteLoading";
 import { useToast } from "@/components/Toast/toastContext";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 import ReviewSection from "../../components/ReviewSection/ReviewSection";
+import ReviewWrite from "@/components/ReviewWrite/ReviewWrite";
 import { addToCart } from "../../store/slices/cartSlice";
 import { addRecentViewed } from "@/store/slices/recentViewed";
 import ChevronDown from "../../assets/icons/chevron-down.svg";
@@ -23,17 +24,42 @@ import ProductHeroImage from "../../assets/img/intel-core-ultra5-250kf-plus-prod
 const formatPrice = (price) => `￦ ${price.toLocaleString("ko-KR")}`;
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
 
+const getUserId = (user) => String(user?._id ?? user?.id ?? user?.userId ?? user ?? "");
+
 const mapReview = (review) => ({
   id: String(review._id),
+  _id: String(review._id),
+  product: String(review.product?._id ?? review.product ?? ""),
+  userId: getUserId(review.user),
   author: review.user?.name || "익명",
   date: new Date(review.createdAt).toLocaleDateString("ko-KR").replace(/ /g, ""),
+  createdAt: review.createdAt,
+  content: review.content || "",
   body: review.content || "",
   rating: Number(review.rating) || 0,
   images: Array.isArray(review.images)
     ? review.images.map((image) => normalizeImageUrl(image)).filter(Boolean)
     : [],
   helpfulCount: 0,
+  isMine: Boolean(review.isMine),
 });
+
+const buildReviewSummary = (mappedReviews) => {
+  const gallery = mappedReviews.flatMap((review) => review.images || []);
+  const reviewCount = mappedReviews.length;
+  const photoCount = gallery.length;
+  const rating =
+    reviewCount > 0
+      ? mappedReviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount
+      : 0;
+
+  return {
+    rating,
+    reviewCount,
+    photoCount,
+    gallery,
+  };
+};
 
 function getProductDetailFromApi(product) {
   const price = parsePrice(product.price);
@@ -77,6 +103,10 @@ function ProductDetail() {
   const dispatch = useDispatch();
   const { showToast } = useToast();
   const cartItems = useSelector((state) => state.cart.items);
+  const authChecked = useSelector((state) => state.user.authChecked);
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const currentUserId = useSelector((state) => getUserId(state.user.userInfo));
+  const currentUserName = useSelector((state) => state.user.userInfo?.name || "");
 
   const tabsRef = useRef(null);
   const overviewRef = useRef(null);
@@ -89,14 +119,15 @@ function ProductDetail() {
   const [activeTab, setActiveTab] = useState("overview");
   const [isOverviewExpanded, setIsOverviewExpanded] = useState(false);
   const [reviews, setReviews] = useState([]);
-  const [reviewSummary, setReviewSummary] = useState({
-    rating: 0,
-    reviewCount: 0,
-    photoCount: 0,
-    gallery: [],
-  });
+  const [editingReview, setEditingReview] = useState(null);
+  const [ownedReviewId, setOwnedReviewId] = useState("");
+  const reviewSummary = useMemo(() => buildReviewSummary(reviews), [reviews]);
 
   useEffect(() => {
+    if (!authChecked) {
+      return undefined;
+    }
+
     const controller = new AbortController();
 
     const fetchProduct = async () => {
@@ -113,21 +144,21 @@ function ProductDetail() {
         });
 
         const mappedReviews = reviewResponse.data.map(mapReview);
-        const gallery = mappedReviews.flatMap((review) => review.images || []);
-        const reviewCount = mappedReviews.length;
-        const photoCount = gallery.length;
-        const rating =
-          reviewCount > 0
-            ? mappedReviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount
-            : 0;
 
         setReviews(mappedReviews);
-        setReviewSummary({
-          rating,
-          reviewCount,
-          photoCount,
-          gallery,
-        });
+
+        if (isLoggedIn) {
+          try {
+            const myReviewResponse = await api.get(`/reviews/${nextProduct._id}/me`, {
+              signal: controller.signal,
+            });
+            setOwnedReviewId(myReviewResponse.data?._id ? String(myReviewResponse.data._id) : "");
+          } catch {
+            setOwnedReviewId("");
+          }
+        } else {
+          setOwnedReviewId("");
+        }
 
         setStatus("success");
       } catch (error) {
@@ -137,12 +168,8 @@ function ProductDetail() {
 
         setProduct(null);
         setReviews([]);
-        setReviewSummary({
-          rating: 0,
-          reviewCount: 0,
-          photoCount: 0,
-          gallery: [],
-        });
+        setEditingReview(null);
+        setOwnedReviewId("");
         setStatus("error");
       }
     };
@@ -150,7 +177,7 @@ function ProductDetail() {
     fetchProduct();
 
     return () => controller.abort();
-  }, [id]);
+  }, [authChecked, id, isLoggedIn]);
 
   useEffect(() => {
     if (!product) {
@@ -212,10 +239,10 @@ function ProductDetail() {
   }, [product]);
 
   useEffect(() => {
-  if (product?.name) {
-    trackViewProduct(product.name);
-  }
-}, [product]);
+    if (product?.name) {
+      trackViewProduct(product.name);
+    }
+  }, [product]);
 
   if (status === "loading") {
     return <RouteLoading message="상품을 불러오는 중입니다..." />;
@@ -226,9 +253,7 @@ function ProductDetail() {
       <main className="product-detail">
         <section className="product-detail__story">
           <h1 className="product-detail__title">상품을 찾을 수 없습니다.</h1>
-          <p className="product-detail__feature-body">
-            요청한 상품 정보를 불러오지 못했습니다.
-          </p>
+          <p className="product-detail__feature-body">요청한 상품 정보를 불러오지 못했습니다.</p>
         </section>
       </main>
     );
@@ -257,6 +282,37 @@ function ProductDetail() {
 
     if (shouldShowToast) {
       showToast(isAlreadyInCart ? "장바구니 수량이 추가되었습니다." : "장바구니에 담았습니다.");
+    }
+  };
+
+  const handleReviewSaved = (savedReview) => {
+    const mappedReview = { ...mapReview(savedReview), isMine: true };
+
+    setReviews((prevReviews) => {
+      const hasReview = prevReviews.some((review) => review.id === mappedReview.id);
+      return hasReview
+        ? prevReviews.map((review) => (review.id === mappedReview.id ? mappedReview : review))
+        : [mappedReview, ...prevReviews];
+    });
+    setOwnedReviewId(mappedReview.id);
+    setEditingReview(null);
+  };
+
+  const handleDeleteReview = async (review) => {
+    if (!window.confirm("작성한 리뷰를 삭제하시겠습니까?")) {
+      return;
+    }
+
+    try {
+      await api.delete(`/reviews/${review.id}`);
+
+      setReviews((prevReviews) => prevReviews.filter((item) => item.id !== review.id));
+      if (String(ownedReviewId) === String(review.id)) {
+        setOwnedReviewId("");
+      }
+      showToast("리뷰가 삭제되었습니다.");
+    } catch (error) {
+      showToast(error.response?.data?.message || "리뷰 삭제에 실패했습니다.");
     }
   };
 
@@ -493,8 +549,23 @@ function ProductDetail() {
           photoCount={reviewSummary.photoCount}
           gallery={reviewSummary.gallery}
           reviews={reviews}
+          currentUserId={currentUserId}
+          currentUserName={currentUserName}
+          ownedReviewId={ownedReviewId}
+          canManageReviewsFallback={isLoggedIn && !ownedReviewId}
+          onEditReview={setEditingReview}
+          onDeleteReview={handleDeleteReview}
         />
       </section>
+
+      {editingReview && (
+        <ReviewWrite
+          productId={product._id}
+          initialReview={editingReview}
+          onClose={() => setEditingReview(null)}
+          onSaved={handleReviewSaved}
+        />
+      )}
     </main>
   );
 }

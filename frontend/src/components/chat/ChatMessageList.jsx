@@ -30,8 +30,7 @@ function ChatMessageList({ messages, isInitialView }) {
     }
 
     const { messageCount, lastMessageId, lastTextLength } = scrollStateRef.current;
-    const hasNewMessage =
-      messages.length !== messageCount || lastMessage?.id !== lastMessageId;
+    const hasNewMessage = messages.length !== messageCount || lastMessage?.id !== lastMessageId;
     const hasTypingProgress = (lastMessage?.text?.length ?? 0) !== lastTextLength;
 
     if (hasNewMessage || hasTypingProgress) {

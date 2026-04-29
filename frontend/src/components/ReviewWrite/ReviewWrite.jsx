@@ -4,17 +4,21 @@ import UploadIcon from "@/assets/icons/upload.svg";
 import { useToast } from "@/components/Toast/toastContext";
 import { useState, useRef, useEffect } from "react";
 import api from "@/utils/api";
+import { normalizeImageUrl } from "@/utils/image";
 import "./ReviewWrite.scss";
 
-function ReviewWrite({ productId, onClose }) {
+function ReviewWrite({ productId, initialReview = null, onClose, onSaved }) {
   const MAX_CONTENT_LENGTH = 300;
+  const isEditMode = Boolean(initialReview?._id);
   const { showToast } = useToast();
   const [review, setReview] = useState({
-    rating: 0,
-    content: "",
+    rating: initialReview?.rating || 0,
+    content: initialReview?.content || "",
     images: [],
   });
+  const [existingImages, setExistingImages] = useState(initialReview?.images || []);
   const [previews, setPreviews] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -23,11 +27,18 @@ function ReviewWrite({ productId, onClose }) {
         URL.revokeObjectURL(preview);
       });
     };
-  });
+  }, [previews]);
 
   const handleSubmit = async () => {
-    if (!review.rating) return;
-    if (!review.content.trim()) return;
+    if (!review.rating) {
+      showToast("별점을 선택해 주세요.");
+      return;
+    }
+
+    if (!review.content.trim()) {
+      showToast("리뷰 내용을 입력해 주세요.");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("product", productId);
@@ -39,23 +50,41 @@ function ReviewWrite({ productId, onClose }) {
     });
 
     try {
-      await api.post("/reviews", formData);
-      showToast("리뷰가 등록되었습니다.");
+      setIsSubmitting(true);
+
+      const response = isEditMode
+        ? await api.patch(`/reviews/${initialReview._id}`, formData)
+        : await api.post("/reviews", formData);
+
+      showToast(isEditMode ? "리뷰가 수정되었습니다." : "리뷰가 등록되었습니다.");
+      onSaved?.(response.data);
       onClose();
-    } catch {
-      showToast("리뷰 등록에 실패했습니다.");
+    } catch (error) {
+      showToast(
+        error.response?.data?.message ||
+          (isEditMode ? "리뷰 수정에 실패했습니다." : "리뷰 등록에 실패했습니다."),
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
+    const files = Array.from(e.target.files || []);
+
+    if (files.length === 0) {
+      return;
+    }
+
     const previewUrls = files.map((file) => URL.createObjectURL(file));
 
     setReview((prev) => {
       return { ...prev, images: files };
     });
 
+    setExistingImages([]);
     setPreviews(previewUrls);
+    e.target.value = "";
   };
 
   const handleContentChange = (e) => {
@@ -65,7 +94,12 @@ function ReviewWrite({ productId, onClose }) {
   };
 
   return (
-    <Modal title="리뷰 작성하기" className="review-write-modal">
+    <Modal
+      title={isEditMode ? "리뷰 수정하기" : "리뷰 작성하기"}
+      className="review-write-modal"
+      overlayClassName="review-write-modal-overlay"
+      onClose={onClose}
+    >
       <div className="review-write">
         <section className="review-write__rating">
           <p className="review-write__title">
@@ -109,17 +143,26 @@ function ReviewWrite({ productId, onClose }) {
               onChange={handleImageChange}
             />
 
+            {existingImages.map((image, index) => (
+              <img
+                key={`existing-${image}-${index}`}
+                className="review-write__image-preview"
+                src={normalizeImageUrl(image) || image}
+                alt=""
+              />
+            ))}
+
             {previews.map((preview, index) => (
               <img key={index} className="review-write__image-preview" src={preview} alt="" />
             ))}
           </div>
         </section>
         <div className="review-write__actions">
-          <button type="button" onClick={onClose}>
-            작성 취소
+          <button type="button" onClick={onClose} disabled={isSubmitting}>
+            {isEditMode ? "수정 취소" : "작성 취소"}
           </button>
-          <button type="button" onClick={handleSubmit}>
-            리뷰 등록
+          <button type="button" onClick={handleSubmit} disabled={isSubmitting}>
+            {isSubmitting ? "처리중..." : isEditMode ? "리뷰 수정" : "리뷰 등록"}
           </button>
         </div>
       </div>

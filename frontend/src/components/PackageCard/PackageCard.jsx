@@ -6,14 +6,34 @@ import "react-loading-skeleton/dist/skeleton.css";
 
 import LikeAfterIcon from "@/assets/icons/like-after.svg";
 import LikeBeforeIcon from "@/assets/icons/like-before.svg";
-import ProductHeroImage from "@/assets/img/intel-core-ultra5-250kf-plus-product-image-genuine.jpg";
+import CartIcon from "@/assets/icons/cart-straight.svg";
 import { useToast } from "@/components/Toast/toastContext";
-import { addToWishlist } from "@/store/slices/wishlistSlice";
-import { normalizeImageUrl } from "@/utils/image";
+import { addToCart } from "@/store/slices/cartSlice";
+import { addToWishlist, removeFromWishlist } from "@/store/slices/wishlistSlice";
+import { trackAddToCart } from "@/utils/analytics";
 import { buildProductDetailPath, getProductObjectId } from "@/utils/productIdentity";
-import CartIconButton from "components/CartIconButton/CartIconButton";
 
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
+const buildCartItemId = (productId, optionKey) => `${productId}::${optionKey || "default"}`;
+
+const toCartItem = (product, label) => {
+  const productId = getProductObjectId(product);
+  const option =
+    product?.option ?? product?.spec ?? product?.priceOptions?.[0]?.optionName ?? "기본 옵션";
+  const optionKey = String(product?.optionId ?? option ?? "default");
+
+  return {
+    id: product?.cartItemId ?? buildCartItemId(productId, optionKey),
+    productId,
+    _id: productId,
+    category: product?.category ?? label ?? "상품",
+    name: product?.name ?? product?.title ?? "상품명",
+    option,
+    price: parsePrice(product?.price),
+    image: product?.image ?? product?.heroImage ?? "",
+    quantity: 1,
+  };
+};
 
 const toWishlistItem = (product) => {
   const productId = getProductObjectId(product);
@@ -60,7 +80,6 @@ function PackageCard({
   price,
   mainImage,
   detailItems = [],
-  product,
   defaultOpen = false,
 }) {
   const dispatch = useDispatch();
@@ -69,17 +88,27 @@ function PackageCard({
   const wishlistItems = useSelector((state) => state.wishlist.items);
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
-  const packageProduct = product
-    ? {
-        name: title,
-        title,
-        price,
-        image: mainImage,
-        option: "추천 조합",
-      }
-    : null;
-
   const packageProducts = detailItems.map((item) => item.product).filter(Boolean);
+
+  const handlePackageCartClick = (event) => {
+    event.stopPropagation();
+
+    let addedCount = 0;
+
+    detailItems.forEach((item) => {
+      const cartItem = toCartItem(item.product, item.label);
+
+      if (cartItem.productId) {
+        dispatch(addToCart(cartItem));
+        addedCount += 1;
+      }
+    });
+
+    if (addedCount > 0) {
+      trackAddToCart(title ?? "추천 조합");
+      showToast("추천 조합 상품을 장바구니에 담았습니다.");
+    }
+  };
 
   const allPackageItemsWishlisted =
     packageProducts.length > 0 &&
@@ -91,6 +120,19 @@ function PackageCard({
 
   const handlePackageWishlistClick = (event) => {
     event.stopPropagation();
+
+    if (allPackageItemsWishlisted) {
+      packageProducts.forEach((item) => {
+        const productId = getProductObjectId(item);
+
+        if (productId) {
+          dispatch(removeFromWishlist(productId));
+        }
+      });
+
+      showToast("찜 목록에서 제거했습니다.");
+      return;
+    }
 
     let addedCount = 0;
 
@@ -131,12 +173,21 @@ function PackageCard({
             <p>{price}</p>
 
             <div className="icons">
-              <CartIconButton product={packageProduct} size="sm" />
+              <button
+                type="button"
+                className="cart-icon-button cart-icon-button--sm"
+                aria-label="추천 조합 전체 장바구니 담기"
+                onClick={handlePackageCartClick}
+              >
+                <img src={CartIcon} alt="" />
+              </button>
 
               <button
                 type="button"
                 className="wishlist-icon-button wishlist-icon-button--sm"
-                aria-label="추천 조합 전체 찜하기"
+                aria-label={
+                  allPackageItemsWishlisted ? "추천 조합 전체 찜 해제" : "추천 조합 전체 찜하기"
+                }
                 onClick={handlePackageWishlistClick}
               >
                 <img src={allPackageItemsWishlisted ? LikeAfterIcon : LikeBeforeIcon} alt="" />
