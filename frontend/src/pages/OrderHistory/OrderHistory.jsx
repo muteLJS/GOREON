@@ -5,6 +5,7 @@ import RouteLoading from "@/components/RouteLoading/RouteLoading";
 import { useToast } from "@/components/Toast/toastContext";
 import ReviewWrite from "@/components/ReviewWrite/ReviewWrite";
 import { normalizeImageUrl } from "@/utils/image";
+import { buildProductDetailPath } from "@/utils/productIdentity";
 import api from "../../utils/api";
 import "./OrderHistory.scss";
 
@@ -63,6 +64,7 @@ function OrderHistory() {
   const [orders, setOrders] = useState([]);
   const [fetchStatus, setFetchStatus] = useState("loading");
   const [reviewTarget, setReviewTarget] = useState(null);
+  const [productReviews, setProductReviews] = useState({});
   const [confirmingItemKeys, setConfirmingItemKeys] = useState([]);
 
   useEffect(() => {
@@ -105,6 +107,65 @@ function OrderHistory() {
 
   const groupedOrders = useMemo(() => groupOrdersByDate(orders), [orders]);
 
+  useEffect(() => {
+    const confirmedProductIds = [
+      ...new Set(
+        orders.flatMap((order) =>
+          (Array.isArray(order.items) ? order.items : [])
+            .filter(
+              (item) =>
+                (order.status === "confirmed" ? "confirmed" : item.status || order.status) ===
+                "confirmed",
+            )
+            .map((item) => item.product)
+            .filter(Boolean)
+            .map(String),
+        ),
+      ),
+    ];
+
+    if (confirmedProductIds.length === 0) {
+      setProductReviews({});
+      return undefined;
+    }
+
+    let isMounted = true;
+
+    const fetchMyReviews = async () => {
+      const reviewEntries = await Promise.all(
+        confirmedProductIds.map(async (productId) => {
+          try {
+            const response = await api.get(`/reviews/${productId}/me`);
+            return [productId, response.data || null];
+          } catch {
+            return [productId, null];
+          }
+        }),
+      );
+
+      if (isMounted) {
+        setProductReviews(Object.fromEntries(reviewEntries));
+      }
+    };
+
+    fetchMyReviews();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [orders]);
+
+  const handleReviewSaved = (savedReview) => {
+    if (savedReview?.product) {
+      setProductReviews((prevReviews) => ({
+        ...prevReviews,
+        [String(savedReview.product)]: savedReview,
+      }));
+    }
+
+    setReviewTarget(null);
+  };
+
   const handleConfirmPurchase = async (orderId, itemIndex) => {
     const confirmingKey = `${orderId}-${itemIndex}`;
 
@@ -115,9 +176,7 @@ function OrderHistory() {
       const confirmedOrder = response.data;
 
       setOrders((prevOrders) =>
-        prevOrders.map((order) =>
-          order._id === confirmedOrder._id ? confirmedOrder : order,
-        ),
+        prevOrders.map((order) => (order._id === confirmedOrder._id ? confirmedOrder : order)),
       );
 
       showToast("구매가 확정되었습니다.");
@@ -132,10 +191,26 @@ function OrderHistory() {
     showToast("배송 조회 서비스 준비중입니다.");
   };
 
+  const handleItemSelect = (detailPath) => {
+    if (detailPath) {
+      navigate(detailPath);
+    }
+  };
+
+  const handleItemKeyDown = (event, detailPath) => {
+    if (!detailPath || (event.key !== "Enter" && event.key !== " ")) {
+      return;
+    }
+
+    event.preventDefault();
+    navigate(detailPath);
+  };
+
   const renderItemActions = (item) => {
     const isConfirmed = item.itemStatus === "confirmed";
     const confirmingKey = `${item.orderId}-${item.itemIndex}`;
     const isConfirming = confirmingItemKeys.includes(confirmingKey);
+    const existingReview = productReviews[String(item.product)] || null;
 
     if (!isConfirmed) {
       return (
@@ -162,9 +237,9 @@ function OrderHistory() {
         <button
           type="button"
           className="order-history-item__action-button order-history-item__action-button--review"
-          onClick={() => setReviewTarget({ productId: item.product })}
+          onClick={() => setReviewTarget({ productId: item.product, review: existingReview })}
         >
-          리뷰 작성
+          {existingReview ? "리뷰 수정" : "리뷰 작성"}
         </button>
       </>
     );
@@ -228,10 +303,17 @@ function OrderHistory() {
                   {group.items.map((item, idx) => {
                     const itemKey = item.itemKey;
                     const thumbSrc = normalizeImageUrl(item.thumb) || ProductHeroImage;
+                    const detailPath = buildProductDetailPath(item.product);
 
                     return (
                       <div key={itemKey}>
-                        <article className="order-history-item">
+                        <article
+                          className={`order-history-item${detailPath ? " order-history-item--clickable" : ""}`}
+                          role={detailPath ? "link" : undefined}
+                          tabIndex={detailPath ? 0 : undefined}
+                          onClick={() => handleItemSelect(detailPath)}
+                          onKeyDown={(event) => handleItemKeyDown(event, detailPath)}
+                        >
                           <div className="order-history-item__top">
                             <div className="order-history-item__thumb">
                               <img
@@ -254,12 +336,20 @@ function OrderHistory() {
                               </span>
                             </div>
 
-                            <div className="order-history-item__action">
+                            <div
+                              className="order-history-item__action"
+                              onClick={(event) => event.stopPropagation()}
+                              onKeyDown={(event) => event.stopPropagation()}
+                            >
                               {renderItemActions(item)}
                             </div>
                           </div>
 
-                          <div className="order-history-item__action--mobile">
+                          <div
+                            className="order-history-item__action--mobile"
+                            onClick={(event) => event.stopPropagation()}
+                            onKeyDown={(event) => event.stopPropagation()}
+                          >
                             {renderItemActions(item)}
                           </div>
                         </article>
@@ -278,7 +368,12 @@ function OrderHistory() {
       </div>
 
       {reviewTarget && (
-        <ReviewWrite productId={reviewTarget.productId} onClose={() => setReviewTarget(null)} />
+        <ReviewWrite
+          productId={reviewTarget.productId}
+          initialReview={reviewTarget.review}
+          onClose={() => setReviewTarget(null)}
+          onSaved={handleReviewSaved}
+        />
       )}
     </section>
   );

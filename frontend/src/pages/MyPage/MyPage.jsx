@@ -37,7 +37,6 @@ const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")
 const getProductId = (product) => getProductObjectId(product) ?? "1";
 
 const formatPrice = (value) => `₩${new Intl.NumberFormat("ko-KR").format(parsePrice(value))}`;
-const showActionAlert = (message) => window.alert(message);
 const formatHistoryDate = (value) => {
   const date = new Date(value);
 
@@ -306,8 +305,6 @@ export default function MyPage() {
       return;
     }
 
-    let isMounted = true;
-
     const fetchMe = async () => {
       try {
         const response = await api.get("/users/me");
@@ -323,10 +320,6 @@ export default function MyPage() {
     };
 
     fetchMe();
-
-    return () => {
-      isMounted = false;
-    };
   }, [dispatch, isLoggedIn]);
 
   useEffect(() => {

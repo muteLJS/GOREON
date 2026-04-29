@@ -85,8 +85,18 @@
 }
 
 @include desktop-up {
+  .review-write-modal-overlay {
+    align-items: center;
+    padding: 32px;
+  }
+
   .review-write-modal {
-    width: 100%;
-    max-width: $layout-desktop-max-width;
+    bottom: auto;
+    width: min(520px, 100%);
+    max-width: 520px;
+    max-height: calc(100dvh - 64px);
+    overflow-y: auto;
+    border-radius: 20px;
+    padding: 28px;
   }
 }

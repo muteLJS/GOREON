@@ -3,8 +3,7 @@ const DEFAULT_PRODUCT_SPEC = "상품 데이터 기준 추천";
 const DEFAULT_PRODUCT_DESCRIPTION = "조건에 맞는 추천 상품입니다.";
 const DEFAULT_CHAT_TAG = "#AI추천";
 
-const createAiRecommendationId = () =>
-  `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+const createAiRecommendationId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 
 const normalizeMatchedCriteria = (matchedCriteria) =>
   Array.isArray(matchedCriteria) ? matchedCriteria.filter(Boolean) : [];

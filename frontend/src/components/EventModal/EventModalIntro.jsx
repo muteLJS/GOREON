@@ -12,7 +12,11 @@ function EventModalIntro({ titleId, onStart, onDismissToday }) {
       eyebrow={EVENT_MODAL_INTRO_CONTENT.eyebrow}
       title={EVENT_MODAL_INTRO_CONTENT.title}
       actions={
-        <button type="button" className="event-modal__button event-modal__button--primary" onClick={onStart}>
+        <button
+          type="button"
+          className="event-modal__button event-modal__button--primary"
+          onClick={onStart}
+        >
           {EVENT_MODAL_INTRO_CONTENT.primaryButtonLabel}
         </button>
       }
@@ -29,8 +33,12 @@ function EventModalIntro({ titleId, onStart, onDismissToday }) {
       <div className="event-modal-intro__info">
         <img src={InfoIcon} alt="" className="event-modal-intro__info-icon" />
         <div className="event-modal-intro__info-copy">
-          <strong className="event-modal-intro__info-title">{EVENT_MODAL_INTRO_CONTENT.infoTitle}</strong>
-          <p className="event-modal-intro__info-description">{EVENT_MODAL_INTRO_CONTENT.infoDescription}</p>
+          <strong className="event-modal-intro__info-title">
+            {EVENT_MODAL_INTRO_CONTENT.infoTitle}
+          </strong>
+          <p className="event-modal-intro__info-description">
+            {EVENT_MODAL_INTRO_CONTENT.infoDescription}
+          </p>
         </div>
       </div>
     </EventModalStepShell>

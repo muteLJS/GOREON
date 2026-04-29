@@ -9,7 +9,9 @@ function normalizeRating(value) {
 
 async function syncProductRating(productId) {
   const targetProductId =
-    typeof productId === "string" ? new mongoose.Types.ObjectId(productId) : productId;
+    typeof productId === "string"
+      ? new mongoose.Types.ObjectId(productId)
+      : productId;
 
   const [result] = await Review.aggregate([
     { $match: { product: targetProductId } },
@@ -17,6 +19,7 @@ async function syncProductRating(productId) {
       $group: {
         _id: "$product",
         averageRating: { $avg: "$rating" },
+        reviewCount: { $sum: 1 },
       },
     },
   ]);
@@ -28,6 +31,7 @@ async function syncProductRating(productId) {
     {
       $set: {
         rating: nextRating,
+        reviewCount: Number(result?.reviewCount) || 0,
       },
     },
   );
@@ -41,11 +45,12 @@ async function syncAllProductRatings() {
       $group: {
         _id: "$product",
         averageRating: { $avg: "$rating" },
+        reviewCount: { $sum: 1 },
       },
     },
   ]);
 
-  await Product.updateMany({}, { $set: { rating: 0 } });
+  await Product.updateMany({}, { $set: { rating: 0, reviewCount: 0 } });
 
   if (ratingSummaries.length === 0) {
     return { matchedProducts: 0 };
@@ -57,6 +62,7 @@ async function syncAllProductRatings() {
       update: {
         $set: {
           rating: normalizeRating(summary.averageRating),
+          reviewCount: Number(summary.reviewCount) || 0,
         },
       },
     },

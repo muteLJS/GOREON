@@ -88,6 +88,10 @@ $range-thumb-half: 9px;
         display: none;
       }
 
+      &__desktop-sort {
+        display: none;
+      }
+
       &__content {
         min-width: 0;
         margin-top: $space-md;
@@ -338,7 +342,6 @@ $range-thumb-half: 9px;
 
             overflow: hidden;
             transition: max-height 0.4s ease-out;
-
           }
         }
       }
@@ -350,6 +353,12 @@ $range-thumb-half: 9px;
           }
           .filter-container {
             display: none;
+          }
+
+          .list-assembly__desktop-sort {
+            position: relative;
+            display: inline-flex;
+            justify-content: flex-end;
           }
 
           .list-assembly__desktop-sort-button {
@@ -371,6 +380,42 @@ $range-thumb-half: 9px;
               width: $font-sm;
               flex: 0 0 auto;
             }
+          }
+
+          .list-assembly__desktop-sort-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            z-index: 20;
+            min-width: 150px;
+            padding: 8px;
+            border: 1px solid rgba($color-text-sub, 0.14);
+            border-radius: 14px;
+            background: $color-white;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+          }
+
+          .list-assembly__desktop-sort-option {
+            width: 100%;
+            padding: 10px 12px;
+            border: 0;
+            border-radius: 10px;
+            background: transparent;
+            color: $color-sub-category-text;
+            font-size: $font-sm;
+            font-weight: $font-medium;
+            line-height: 1.2;
+            text-align: left;
+            white-space: nowrap;
+            cursor: pointer;
+          }
+
+          .list-assembly__desktop-sort-option:hover,
+          .list-assembly__desktop-sort-option:focus-visible,
+          .list-assembly__desktop-sort-option.is-active {
+            background: rgba($color-text-sub, 0.08);
+            color: $color-text-main;
+            font-weight: $font-bold;
           }
         }
         &__content {
@@ -435,9 +480,7 @@ $range-thumb-half: 9px;
 
   .range-slider__active {
     left: calc(#{$range-thumb-half} + ((100% - #{$range-thumb-size}) * var(--range-left) / 100));
-    right: calc(
-      #{$range-thumb-half} + ((100% - #{$range-thumb-size}) * var(--range-right) / 100)
-    );
+    right: calc(#{$range-thumb-half} + ((100% - #{$range-thumb-size}) * var(--range-right) / 100));
     background-color: $color-text-sub;
   }
 

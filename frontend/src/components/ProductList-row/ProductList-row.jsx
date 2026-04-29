@@ -2,7 +2,6 @@ import "./ProductList-row.scss";
 
 import { Link } from "react-router-dom";
 
-
 import WishlistIconButton from "../WishlistIconButton/WishlistIconButton";
 import ProductListNamePrice from "../ProductList-name,price/ProductList-name,price";
 import { formatPrice } from "../../utils/cart";
@@ -38,7 +37,6 @@ function ProductListRow({ item, isSelected, onSelect, onDecrease, onIncrease }) 
           <ProductThumbnail imageSrc={imageSrc} name={item.name} />
         </Link>
 
-      
         <WishlistIconButton
           product={item}
           className="product-list-row__overlay-button product-list-row__overlay-button--wish"

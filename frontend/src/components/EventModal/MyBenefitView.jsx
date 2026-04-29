@@ -18,10 +18,7 @@ const toProductSummary = (product) => {
     _id: String(product._id),
     productId: String(product._id),
     name: product.name,
-    option:
-      product.priceOptions?.[0]?.optionName ||
-      product.option ||
-      "옵션명: 용량, 뭐 등등",
+    option: product.priceOptions?.[0]?.optionName || product.option || "옵션명: 용량, 뭐 등등",
     originalPrice: parsePrice(product.price),
     image,
   };
@@ -37,7 +34,9 @@ function MyBenefitView({ titleId, benefitConfigs, coupon, onBack }) {
       ...product,
       originalPriceText: formatPrice(product.originalPrice),
       discountLabel: `${coupon.discountRate}% 쿠폰 적용가`,
-      discountPriceText: formatPrice(Math.round(product.originalPrice * (1 - coupon.discountRate / 100))),
+      discountPriceText: formatPrice(
+        Math.round(product.originalPrice * (1 - coupon.discountRate / 100)),
+      ),
     }));
   }, [coupon.discountRate, products]);
 
@@ -100,8 +99,12 @@ function MyBenefitView({ titleId, benefitConfigs, coupon, onBack }) {
 
       <section className="event-modal-benefit__recommendation">
         <div className="event-modal-benefit__recommendation-header">
-          <h2 className="event-modal-benefit__recommendation-title">{benefitConfig.recommendationTitle}</h2>
-          <span className="event-modal-benefit__recommendation-badge">{benefitConfig.recommendationBadge}</span>
+          <h2 className="event-modal-benefit__recommendation-title">
+            {benefitConfig.recommendationTitle}
+          </h2>
+          <span className="event-modal-benefit__recommendation-badge">
+            {benefitConfig.recommendationBadge}
+          </span>
         </div>
         <p className="event-modal-benefit__recommendation-description">
           {benefitConfig.recommendationDescription}
@@ -122,8 +125,12 @@ function MyBenefitView({ titleId, benefitConfigs, coupon, onBack }) {
                 <p className="event-modal-benefit__item-option">{product.option}</p>
                 <p className="event-modal-benefit__item-price">{product.originalPriceText}</p>
                 <div className="event-modal-benefit__item-discount">
-                  <span className="event-modal-benefit__item-discount-label">{product.discountLabel}</span>
-                  <strong className="event-modal-benefit__item-discount-price">{product.discountPriceText}</strong>
+                  <span className="event-modal-benefit__item-discount-label">
+                    {product.discountLabel}
+                  </span>
+                  <strong className="event-modal-benefit__item-discount-price">
+                    {product.discountPriceText}
+                  </strong>
                 </div>
               </div>
             </button>

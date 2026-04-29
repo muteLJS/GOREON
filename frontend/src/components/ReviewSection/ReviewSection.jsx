@@ -1,12 +1,26 @@
 import "./ReviewSection.scss";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Rating from "../Rating/Rating";
 import ChevronDown from "../../assets/icons/chevron-down.svg";
 import ThumbsUp from "../../assets/icons/Thumbs_up.svg";
+import { lockPageScroll } from "@/utils/scrollLock";
 
-function ReviewSection({ rating, reviewCount, photoCount, gallery, reviews }) {
+function ReviewSection({
+  rating,
+  reviewCount,
+  photoCount,
+  gallery,
+  reviews,
+  currentUserId = "",
+  currentUserName = "",
+  ownedReviewId = "",
+  canManageReviewsFallback = false,
+  onEditReview,
+  onDeleteReview,
+}) {
   const REVIEW_PREVIEW_COUNT = 5;
   const navigate = useNavigate();
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
@@ -29,8 +43,7 @@ function ReviewSection({ rating, reviewCount, photoCount, gallery, reviews }) {
       return undefined;
     }
 
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const releaseScrollLock = lockPageScroll();
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
@@ -67,7 +80,7 @@ function ReviewSection({ rating, reviewCount, photoCount, gallery, reviews }) {
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow = previousOverflow;
+      releaseScrollLock();
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [lightbox]);
@@ -131,25 +144,114 @@ function ReviewSection({ rating, reviewCount, photoCount, gallery, reviews }) {
       liked: false,
     };
 
+  const normalizeName = (name) => String(name || "").trim();
+
+  const isMyReview = (review) =>
+    review.isMine ||
+    (ownedReviewId && String(review.id) === String(ownedReviewId)) ||
+    (currentUserId && String(review.userId) === String(currentUserId)) ||
+    (normalizeName(currentUserName) &&
+      normalizeName(review.author) === normalizeName(currentUserName)) ||
+    canManageReviewsFallback;
+
   const sortedReviews = [...reviews].sort((a, b) => {
     if (sortType === "rating") {
       return (b.rating ?? rating) - (a.rating ?? rating);
     }
 
     if (sortType === "latest") {
-      return new Date(b.date.replaceAll(".", "-")) - new Date(a.date.replaceAll(".", "-"));
+      return (
+        new Date(b.createdAt || b.date.replaceAll(".", "-")) -
+        new Date(a.createdAt || a.date.replaceAll(".", "-"))
+      );
     }
 
     if (sortType === "oldest") {
-      return new Date(a.date.replaceAll(".", "-")) - new Date(b.date.replaceAll(".", "-"));
+      return (
+        new Date(a.createdAt || a.date.replaceAll(".", "-")) -
+        new Date(b.createdAt || b.date.replaceAll(".", "-"))
+      );
     }
 
     return getHelpfulState(b).count - getHelpfulState(a).count;
   });
 
-  const visibleReviews = isExpanded
-    ? sortedReviews
-    : sortedReviews.slice(0, REVIEW_PREVIEW_COUNT);
+  const visibleReviews = isExpanded ? sortedReviews : sortedReviews.slice(0, REVIEW_PREVIEW_COUNT);
+  const lightboxMarkup = lightbox ? (
+    <div className="review-lightbox" onClick={() => setLightbox(null)}>
+      <button
+        type="button"
+        className="review-lightbox__close"
+        onClick={() => setLightbox(null)}
+        aria-label="이미지 닫기"
+      >
+        ×
+      </button>
+
+      <button
+        type="button"
+        className="review-lightbox__nav review-lightbox__nav--prev"
+        onClick={(event) => {
+          event.stopPropagation();
+          moveLightbox(-1);
+        }}
+        aria-label="이전 이미지"
+      >
+        ‹
+      </button>
+
+      <div className="review-lightbox__dialog" onClick={(event) => event.stopPropagation()}>
+        <div className="review-lightbox__stage">
+          <img
+            src={lightbox.images[lightbox.index]}
+            alt={`${lightbox.author} 리뷰 이미지 ${lightbox.index + 1}`}
+            className="review-lightbox__image"
+          />
+        </div>
+
+        <div className="review-lightbox__footer">
+          <div className="review-lightbox__thumbs">
+            {lightbox.images.map((image, index) => (
+              <button
+                type="button"
+                key={`${image}-${index}`}
+                className={`review-lightbox__thumb ${index === lightbox.index ? "is-active" : ""}`}
+                onClick={() =>
+                  setLightbox((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          index,
+                        }
+                      : prev,
+                  )
+                }
+                aria-label={`이미지 ${index + 1} 보기`}
+              >
+                <img src={image} alt="" aria-hidden="true" />
+              </button>
+            ))}
+          </div>
+
+          <div className="review-lightbox__count">
+            {lightbox.index + 1}/{lightbox.images.length}
+          </div>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        className="review-lightbox__nav review-lightbox__nav--next"
+        onClick={(event) => {
+          event.stopPropagation();
+          moveLightbox(1);
+        }}
+        aria-label="다음 이미지"
+      >
+        ›
+      </button>
+    </div>
+  ) : null;
 
   if (!hasReviews) {
     return (
@@ -226,6 +328,7 @@ function ReviewSection({ rating, reviewCount, photoCount, gallery, reviews }) {
       <div className="review-section__list">
         {visibleReviews.map((review) => {
           const helpfulState = getHelpfulState(review);
+          const canManageReview = isMyReview(review);
 
           return (
             <article className="review-card" key={review.id}>
@@ -269,9 +372,28 @@ function ReviewSection({ rating, reviewCount, photoCount, gallery, reviews }) {
                   <span>도움돼요 {helpfulState.count}</span>
                 </button>
 
-                <button type="button" className="review-card__report">
-                  신고하기
-                </button>
+                {canManageReview ? (
+                  <div className="review-card__manage-actions" aria-label="내 리뷰 관리">
+                    <button
+                      type="button"
+                      className="review-card__manage-button"
+                      onClick={() => onEditReview?.(review)}
+                    >
+                      수정
+                    </button>
+                    <button
+                      type="button"
+                      className="review-card__manage-button review-card__manage-button--danger"
+                      onClick={() => onDeleteReview?.(review)}
+                    >
+                      삭제
+                    </button>
+                  </div>
+                ) : (
+                  <button type="button" className="review-card__report">
+                    신고하기
+                  </button>
+                )}
               </div>
             </article>
           );
@@ -294,83 +416,7 @@ function ReviewSection({ rating, reviewCount, photoCount, gallery, reviews }) {
         </button>
       ) : null}
 
-      {lightbox ? (
-        <div className="review-lightbox" onClick={() => setLightbox(null)}>
-          <button
-            type="button"
-            className="review-lightbox__close"
-            onClick={() => setLightbox(null)}
-            aria-label="이미지 닫기"
-          >
-            ×
-          </button>
-
-          <button
-            type="button"
-            className="review-lightbox__nav review-lightbox__nav--prev"
-            onClick={(event) => {
-              event.stopPropagation();
-              moveLightbox(-1);
-            }}
-            aria-label="이전 이미지"
-          >
-            ‹
-          </button>
-
-          <div className="review-lightbox__dialog" onClick={(event) => event.stopPropagation()}>
-            <div className="review-lightbox__stage">
-              <img
-                src={lightbox.images[lightbox.index]}
-                alt={`${lightbox.author} 리뷰 이미지 ${lightbox.index + 1}`}
-                className="review-lightbox__image"
-              />
-            </div>
-
-            <div className="review-lightbox__footer">
-              <div className="review-lightbox__thumbs">
-                {lightbox.images.map((image, index) => (
-                  <button
-                    type="button"
-                    key={`${image}-${index}`}
-                    className={`review-lightbox__thumb ${
-                      index === lightbox.index ? "is-active" : ""
-                    }`}
-                    onClick={() =>
-                      setLightbox((prev) =>
-                        prev
-                          ? {
-                              ...prev,
-                              index,
-                            }
-                          : prev,
-                      )
-                    }
-                    aria-label={`이미지 ${index + 1} 보기`}
-                  >
-                    <img src={image} alt="" aria-hidden="true" />
-                  </button>
-                ))}
-              </div>
-
-              <div className="review-lightbox__count">
-                {lightbox.index + 1}/{lightbox.images.length}
-              </div>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            className="review-lightbox__nav review-lightbox__nav--next"
-            onClick={(event) => {
-              event.stopPropagation();
-              moveLightbox(1);
-            }}
-            aria-label="다음 이미지"
-          >
-            ›
-          </button>
-        </div>
-      ) : null}
+      {lightboxMarkup ? createPortal(lightboxMarkup, document.body) : null}
     </section>
   );
 }
