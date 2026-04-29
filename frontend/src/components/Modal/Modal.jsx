@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import "./Modal.scss";
 import CloseIcon from "@/assets/event/close.svg";
+import { lockPageScroll } from "@/utils/scrollLock";
 
 /**
  * 모바일 화면의 하단에서 열리는 모달창 컴포넌트
@@ -22,13 +23,7 @@ function Modal({
   const dragStateRef = useRef({ isDragging: false, pointerId: null, startY: 0 });
   const [dragOffset, setDragOffset] = useState(0);
 
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, []);
+  useEffect(() => lockPageScroll(), []);
 
   const resetDragState = () => {
     dragStateRef.current = { isDragging: false, pointerId: null, startY: 0 };

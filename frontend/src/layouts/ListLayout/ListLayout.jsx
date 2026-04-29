@@ -2,7 +2,7 @@
 /* [페이지] 검색 결과 (Search)                                                */
 /* 사용자가 입력한 검색어에 일치하는 상품 및 스펙 비교 결과를 나열합니다.     */
 /* -------------------------------------------------------------------------- */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./ListLayout.scss";
 import banner1 from "@/assets/banner/banner-1.jpg";
 import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
@@ -51,6 +51,7 @@ const TYPE_LABEL_MAP = {
 
 const SORT_OPTIONS = ["인기상품", "최신상품", "리뷰 많은 상품"];
 const DEFAULT_SORT_OPTION = SORT_OPTIONS[0];
+const DESKTOP_MEDIA_QUERY = "(min-width: 1024px)";
 
 const DEFAULT_FILTER_GROUPS = [
   {
@@ -333,6 +334,16 @@ const matchesSelectedFilters = (product, selectedFilters) => {
   });
 };
 
+const getReviewCount = (product) =>
+  Number(
+    product.reviewCount ??
+      product.reviewsCount ??
+      product.review_count ??
+      product.ratingCount ??
+      product.reviews?.length ??
+      0,
+  ) || 0;
+
 const sortProducts = (products, sortValue) => {
   const sortedProducts = [...products];
 
@@ -340,7 +351,11 @@ const sortProducts = (products, sortValue) => {
     return sortedProducts.sort(compareProductsByNewest);
   }
 
-  if (sortValue === "인기상품" || sortValue === "리뷰 많은 상품") {
+  if (sortValue === "리뷰 많은 상품") {
+    return sortedProducts.sort((left, right) => getReviewCount(right) - getReviewCount(left));
+  }
+
+  if (sortValue === "인기상품") {
     return sortedProducts.sort(
       (left, right) => (Number(right.rating) || 0) - (Number(left.rating) || 0),
     );
@@ -458,8 +473,10 @@ export default function ListLayout({
   const [selectedFilters, setSelectedFilters] = useState({});
   const [selectedSort, setSelectedSort] = useState(DEFAULT_SORT_OPTION);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [isSortModalOpen, setIsSortModalOpen] = useState(false);
+  const [isMobileSortModalOpen, setIsMobileSortModalOpen] = useState(false);
+  const [isDesktopSortMenuOpen, setIsDesktopSortMenuOpen] = useState(false);
   const [activeMobileFilterTab, setActiveMobileFilterTab] = useState("");
+  const desktopSortRef = useRef(null);
 
   const filterGroups = getFilterGroupsByType(type);
   const mobileFilterGroups = useMemo(() => filterGroups, [filterGroups]);
@@ -553,6 +570,51 @@ export default function ListLayout({
     setActiveMobileFilterTab(mobileFilterGroups[0]?.title ?? "가격");
   }, [mobileFilterGroups]);
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(DESKTOP_MEDIA_QUERY);
+    const syncSortSurfaceToViewport = (event = mediaQuery) => {
+      if (event.matches) {
+        setIsMobileSortModalOpen(false);
+        return;
+      }
+
+      setIsDesktopSortMenuOpen(false);
+    };
+
+    syncSortSurfaceToViewport();
+    mediaQuery.addEventListener("change", syncSortSurfaceToViewport);
+
+    return () => {
+      mediaQuery.removeEventListener("change", syncSortSurfaceToViewport);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isDesktopSortMenuOpen) {
+      return undefined;
+    }
+
+    const handlePointerDown = (event) => {
+      if (!desktopSortRef.current?.contains(event.target)) {
+        setIsDesktopSortMenuOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setIsDesktopSortMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isDesktopSortMenuOpen]);
+
   return (
     <>
       <main className="list-wrap">
@@ -612,18 +674,47 @@ export default function ListLayout({
                 <button
                   type="button"
                   className="filter-button"
-                  onClick={() => setIsSortModalOpen(true)}
+                  onClick={() => setIsMobileSortModalOpen(true)}
                 >
                   {selectedSort}순 <img src={ChevronDownIcon} alt="down" />
                 </button>
               </div>
-              <button
-                type="button"
-                className="list-assembly__desktop-sort-button"
-                onClick={() => setIsSortModalOpen(true)}
-              >
-                {selectedSort}순 <img src={ChevronDownIcon} alt="down" />
-              </button>
+              <div className="list-assembly__desktop-sort" ref={desktopSortRef}>
+                <button
+                  type="button"
+                  className="list-assembly__desktop-sort-button"
+                  onClick={() => setIsDesktopSortMenuOpen((isOpen) => !isOpen)}
+                  aria-haspopup="listbox"
+                  aria-expanded={isDesktopSortMenuOpen}
+                >
+                  {selectedSort}순 <img src={ChevronDownIcon} alt="down" />
+                </button>
+                {isDesktopSortMenuOpen ? (
+                  <div
+                    className="list-assembly__desktop-sort-menu"
+                    role="listbox"
+                    aria-label="상품 정렬"
+                  >
+                    {SORT_OPTIONS.map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        className={`list-assembly__desktop-sort-option ${
+                          selectedSort === option ? "is-active" : ""
+                        }`}
+                        onClick={() => {
+                          setSelectedSort(option);
+                          setIsDesktopSortMenuOpen(false);
+                        }}
+                        role="option"
+                        aria-selected={selectedSort === option}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
             </section>
             <section className="list-assembly__content">
               {status === "loading" ? (
@@ -703,7 +794,9 @@ export default function ListLayout({
                     <FilterMenuList
                       key={`${activeMobileFilterGroup.title}-${item}`}
                       inputId={`mobile-${activeMobileFilterGroup.title}-${item}`}
-                      checked={(selectedFilters[activeMobileFilterGroup.title] ?? []).includes(item)}
+                      checked={(selectedFilters[activeMobileFilterGroup.title] ?? []).includes(
+                        item,
+                      )}
                       onChange={() => handleFilterToggle(activeMobileFilterGroup.title, item)}
                     >
                       {item}
@@ -725,10 +818,10 @@ export default function ListLayout({
           </div>
         </Modal>
       ) : null}
-      {isSortModalOpen ? (
+      {isMobileSortModalOpen ? (
         <Modal
           title="정렬"
-          onClose={() => setIsSortModalOpen(false)}
+          onClose={() => setIsMobileSortModalOpen(false)}
           className="list-mobile-sort-modal"
           showCloseButton={false}
         >
@@ -743,7 +836,7 @@ export default function ListLayout({
                   }`}
                   onClick={() => {
                     setSelectedSort(option);
-                    setIsSortModalOpen(false);
+                    setIsMobileSortModalOpen(false);
                   }}
                 >
                   {option}

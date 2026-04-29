@@ -2,6 +2,7 @@ import "./AddressModal.scss";
 
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { lockPageScroll } from "@/utils/scrollLock";
 
 const DESKTOP_POSTCODE_MIN_HEIGHT = 460;
 const MOBILE_POSTCODE_MIN_HEIGHT = 320;
@@ -34,7 +35,7 @@ function AddressModal({ isOpen, onClose, onSelectAddress }) {
     }
 
     previousFocusRef.current = document.activeElement;
-    document.body.style.overflow = "hidden";
+    const releaseScrollLock = lockPageScroll();
     closeButtonRef.current?.focus();
 
     const handleKeyDown = (event) => {
@@ -46,7 +47,7 @@ function AddressModal({ isOpen, onClose, onSelectAddress }) {
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow = "";
+      releaseScrollLock();
       window.removeEventListener("keydown", handleKeyDown);
 
       if (previousFocusRef.current instanceof HTMLElement) {
@@ -104,7 +105,11 @@ function AddressModal({ isOpen, onClose, onSelectAddress }) {
   }
 
   return createPortal(
-    <div className="address-modal" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+    <div
+      className="address-modal"
+      role="presentation"
+      onMouseDown={(event) => event.target === event.currentTarget && onClose()}
+    >
       <div
         className="address-modal__dialog"
         role="dialog"

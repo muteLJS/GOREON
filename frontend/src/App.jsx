@@ -86,9 +86,9 @@ function App() {
     };
   }, [authChecked, dispatch, location.pathname]);
 
-useEffect(() => {
-  trackPageView(location.pathname);
-}, [location]);
+  useEffect(() => {
+    trackPageView(location.pathname);
+  }, [location]);
 
   return (
     <>

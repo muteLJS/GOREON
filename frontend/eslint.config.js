@@ -7,7 +7,7 @@ import eslintConfigPrettier from "eslint-config-prettier";
 
 export default [
   {
-    ignores: ["dist/**", "node_modules/**"],
+    ignores: ["dist/**", "node_modules/**", ".tmp-playwright/**", "test-results/**"],
   },
   js.configs.recommended,
   {

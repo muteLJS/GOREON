@@ -65,9 +65,7 @@ export function ToastProvider({ children }) {
       enterAnimationFrameRef.current = window.requestAnimationFrame(() => {
         enterAnimationFrameRef.current = null;
         setToast((currentToast) =>
-          currentToast?.id === nextToastId
-            ? { ...currentToast, stage: "visible" }
-            : currentToast,
+          currentToast?.id === nextToastId ? { ...currentToast, stage: "visible" } : currentToast,
         );
       });
 

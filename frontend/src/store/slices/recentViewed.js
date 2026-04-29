@@ -96,8 +96,10 @@ const recentViewedSlice = createSlice({
 
       const nextKey = getRecentViewedItemKey(nextItem);
 
-      state.items = [nextItem, ...state.items.filter((item) => getRecentViewedItemKey(item) !== nextKey)]
-        .slice(0, MAX_RECENT_VIEWED);
+      state.items = [
+        nextItem,
+        ...state.items.filter((item) => getRecentViewedItemKey(item) !== nextKey),
+      ].slice(0, MAX_RECENT_VIEWED);
 
       persistRecentViewedItems(state.items);
     },

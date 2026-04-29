@@ -189,7 +189,8 @@
 }
 
 .review-card__helpful,
-.review-card__report {
+.review-card__report,
+.review-card__manage-button {
   padding: 0;
   border: 0;
   background: transparent;
@@ -218,12 +219,22 @@
   }
 }
 
-.review-card__report {
+.review-card__report,
+.review-card__manage-button {
   color: rgba($color-black, 0.44);
   font-size: 12px;
   font-weight: $font-semibold;
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+.review-card__manage-actions {
+  @include flex(center, flex-end);
+  gap: 10px;
+}
+
+.review-card__manage-button--danger {
+  color: #d92d20;
 }
 
 .review-card__images {

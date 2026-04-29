@@ -1318,7 +1318,6 @@ function Main() {
       {packageCards.map((card) => (
         <PackageCard
           key={getProductListKey(card.product, card.title)}
-          product={card.product}
           title={card.title}
           description={card.description}
           price={toDisplayPrice(card.product)}
@@ -1343,7 +1342,6 @@ function Main() {
         {packageCards.map((card) => (
           <SwiperSlide key={`package-${getProductListKey(card.product, card.title)}`}>
             <PackageCard
-              product={card.product}
               title={card.title}
               description={card.description}
               price={toDisplayPrice(card.product)}
