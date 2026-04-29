@@ -9,8 +9,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
+
 import AddressModal from "../../components/AddressModal/AddressModal";
 import ProductList from "../../components/ProductList/ProductList";
+import { useToast } from "@/components/Toast/toastContext";
 import { removeCartItems, updateCartQuantity } from "../../store/slices/cartSlice";
 import { EMPTY_SHIPPING_FORM, formatPrice, getCartItems, summarizeOrder } from "../../utils/cart";
 
@@ -92,6 +94,12 @@ export default function Cart() {
     },
     [closeAddressModal],
   );
+const { showToast } = useToast();
+const handleClick = (event) => {
+    event.stopPropagation();
+    
+    showToast("MVP로 구현되어 작성 없이 결제하기 버튼을 눌러도 결제가 완료됩니다.");
+  };
 
   return (
     <section className="cart-page">
@@ -266,6 +274,7 @@ export default function Cart() {
             to="/payment"
             state={{ orderItems: selectedItems, shippingForm, checkoutSource: "cart" }}
             className="cart-page__checkout-button"
+            onClick={(event) => {handleClick(event);}}
           >
             결제하기
           </Link>

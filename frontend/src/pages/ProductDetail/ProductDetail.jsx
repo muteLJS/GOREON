@@ -105,8 +105,6 @@ function ProductDetail() {
   const cartItems = useSelector((state) => state.cart.items);
   const authChecked = useSelector((state) => state.user.authChecked);
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
-  const currentUserId = useSelector((state) => getUserId(state.user.userInfo));
-  const currentUserName = useSelector((state) => state.user.userInfo?.name || "");
 
   const tabsRef = useRef(null);
   const overviewRef = useRef(null);
@@ -549,10 +547,6 @@ function ProductDetail() {
           photoCount={reviewSummary.photoCount}
           gallery={reviewSummary.gallery}
           reviews={reviews}
-          currentUserId={currentUserId}
-          currentUserName={currentUserName}
-          ownedReviewId={ownedReviewId}
-          canManageReviewsFallback={isLoggedIn && !ownedReviewId}
           onEditReview={setEditingReview}
           onDeleteReview={handleDeleteReview}
         />
