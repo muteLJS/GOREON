@@ -171,7 +171,7 @@
 }
 
 .review-card__meta {
-  @include flex(flex-end, flex-start, column);
+  @include flex(flex-end, flex-end, column);
   gap: 12px;
 }
 

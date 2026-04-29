@@ -321,7 +321,7 @@ function ReviewSection({
           return (
             <article className="review-card" key={review.id}>
               <div className="review-card__top">
-                <div>
+                <div className="review-card__author-container">
                   <p className="review-card__author">{review.author}</p>
                   <div className="review-card__rating">
                     <Rating rating={review.rating ?? rating} />
@@ -381,7 +381,8 @@ function ReviewSection({
                   onClick={() => handleHelpfulClick(review.id)}
                 >
                   <img src={ThumbsUp} alt="" aria-hidden="true" />
-                  <span>도움돼요 {helpfulState.count}</span>
+                  <span className="review-card__helpful-label">도움돼요</span>
+                  <span className="review-card__helpful-count">{helpfulState.count}</span>
                 </button>
               </div>
             </article>
