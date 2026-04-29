@@ -90,7 +90,9 @@ function EditableField({ field, value, activeField, onChange, onToggle }) {
     <div className="my-page__info-item">
       <p className="my-page__info-label">{field.label}</p>
       <div className="my-page__info-row">
-        <div className="my-page__info-value">
+        <div
+          className={`my-page__info-value ${isEditing ? "my-page__info-value--editing" : ""}`.trim()}
+        >
           {isEditing ? (
             <input
               type={field.key === "email" ? "email" : "text"}

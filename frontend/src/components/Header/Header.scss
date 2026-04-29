@@ -581,6 +581,22 @@ body.mobile-menu-open {
     height: 70px;
   }
 
+  .header__cart-badge {
+    @include flex-center;
+    position: absolute;
+    top: 18px;
+    right: 17px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: $color-text-sub;
+    color: $color-white;
+    font-size: 10px;
+    font-weight: $font-bold;
+    line-height: 1;
+  }
+
   .header__icon-btn--search::after {
     content: "";
     position: absolute;
