@@ -39,7 +39,12 @@ function PcAssembly() {
   useEffect(() => {
     const desktopMq = window.matchMedia("(min-width: 1024px)");
     const mobileMq = window.matchMedia("(max-width: 767px)");
-    const handleDesktopChange = (event) => setIsDesktop(event.matches);
+    const handleDesktopChange = (event) => {
+      setIsDesktop(event.matches);
+      if (event.matches) {
+        setIsFilterOpen(false);
+      }
+    };
     const handleMobileChange = (event) => setIsMobile(event.matches);
 
     desktopMq.addEventListener("change", handleDesktopChange);
@@ -288,7 +293,7 @@ function PcAssembly() {
         </div>
       </section>
 
-      {isFilterOpen && (
+      {!isDesktop && isFilterOpen && (
         <Modal
           title="필터"
           onClose={() => setIsFilterOpen(false)}
