@@ -716,6 +716,20 @@ function Main() {
     }
   };
 
+  const handleAiInputKeyDown = (e) => {
+    if (e.key !== "Enter" || e.shiftKey || e.nativeEvent?.isComposing) {
+      return;
+    }
+
+    e.preventDefault();
+
+    if (aiStatus === "loading") {
+      return;
+    }
+
+    handleAiSubmit(e);
+  };
+
   const navigateToProduct = (product) => {
     const productId =
       typeof product === "object" && product !== null ? getProductRouteId(product) : product;
@@ -1081,6 +1095,7 @@ function Main() {
           {aiReviewItems.map((review) => (
             <SwiperSlide key={review.id}>
               <ReviewCard
+                reviewId={review.id}
                 userImage={review.userImage}
                 userName={review.userName}
                 productName={review.productName}
@@ -1098,6 +1113,7 @@ function Main() {
         {aiReviewItems.map((review) => (
           <ReviewCard
             key={review.id}
+            reviewId={review.id}
             userImage={review.userImage}
             userName={review.userName}
             productName={review.productName}
@@ -1158,6 +1174,7 @@ function Main() {
                 placeholder={isAiInputEmptyError ? EMPTY_AI_PLACEHOLDER : "무엇이든 물어보세요!"}
                 value={aiQuery}
                 onChange={handleAiInput}
+                onKeyDown={handleAiInputKeyDown}
               />
               <button className="submit" type="submit" disabled={aiStatus === "loading"}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -1444,6 +1461,7 @@ function Main() {
                 }
                 value={aiQuery}
                 onChange={handleAiInput}
+                onKeyDown={handleAiInputKeyDown}
               />
               <button className="submit" type="submit" disabled={aiStatus === "loading"}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -1674,7 +1692,11 @@ function Main() {
 
       <EventModal isOpen={isEventModalOpen} onClose={() => setIsEventModalOpen(false)} />
       {selectedSpecProduct && (
-        <Modal title="주요스펙" onClose={() => setSelectedSpecProduct(null)}>
+        <Modal
+          title="주요스펙"
+          onClose={() => setSelectedSpecProduct(null)}
+          className="main-spec-sheet-modal"
+        >
           <div className="main-spec-modal">
             <div className="main-spec-modal__summary">
               <div className="main-spec-modal__image">
@@ -1701,7 +1723,7 @@ function Main() {
               <button
                 type="button"
                 className="main-spec-modal__button main-spec-modal__button--ghost"
-                onClick={() => setSelectedSpecProduct(false)}
+                onClick={() => setSelectedSpecProduct(null)}
               >
                 닫기
               </button>

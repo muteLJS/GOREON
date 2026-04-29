@@ -12,48 +12,79 @@
     }
   }
   .list-wrap-content {
+    min-width: 0;
+
     .side_menu {
       display: none;
     }
     .list-assembly {
+      min-width: 0;
+
       &__top {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        min-width: 0;
+        gap: $space-sm;
         margin-top: $space-md;
 
         span {
           font-size: $font-xs;
-          margin-left: 4px;
+          margin-left: 0;
           font-weight: $font-bold;
         }
       }
 
       &__title {
-        font-size: 1.25rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0 4px;
+        width: 100%;
+        min-width: 0;
+        font-size: clamp(#{$font-lg}, 4vw, 1.25rem);
         font-weight: $font-bold;
+        line-height: 1.35;
+        word-break: keep-all;
+        overflow-wrap: anywhere;
       }
 
       .filter-container {
         display: flex;
-        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        align-self: flex-end;
+        gap: 8px;
+        width: auto;
+        max-width: 100%;
       }
 
       .filter-button {
-        display: flex;
+        display: inline-flex;
         align-items: center;
+        justify-content: center;
+        flex: 0 1 auto;
+        min-width: fit-content;
+        min-height: 32px;
         border: 1px solid #60606024;
         border-radius: 999px;
-        font-size: $font-xs;
-        gap: $space-xs;
-        padding: $space-xxs $space-xs;
+        background-color: #ffffff;
+        font-size: $font-xs-2;
+        font-weight: $font-medium;
+        line-height: 1;
+        gap: 6px;
+        padding: 5px 10px;
+        white-space: nowrap;
 
         img {
           width: $font-xs;
+          flex: 0 0 auto;
         }
       }
 
       &__content {
+        min-width: 0;
         margin-top: $space-md;
       }
 
@@ -65,8 +96,52 @@
 
       &__product-grid {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: $space-md;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: stretch;
+        min-width: 0;
+        gap: 12px;
+
+        .product-card-vertical {
+          height: 100%;
+          min-width: 0;
+        }
+
+        .product-card-vertical__rating {
+          min-height: $font-xs;
+        }
+
+        .product-card-vertical__bottom {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          align-items: center;
+          margin-top: auto;
+          gap: 8px;
+          min-width: 0;
+        }
+
+        .product-card-vertical__price {
+          min-width: 0;
+          line-height: 1.2;
+        }
+
+        .product-card-vertical__action {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          padding-right: 2px;
+        }
+
+        .cart-icon-button--sm,
+        .wishlist-icon-button--sm {
+          width: 22px;
+          height: 22px;
+          flex: 0 0 22px;
+
+          img {
+            width: 13px;
+            height: 13px;
+          }
+        }
       }
 
       &__add-button {
@@ -127,6 +202,8 @@
 
       &__button-container {
         display: flex;
+        align-items: center;
+        flex-shrink: 0;
         gap: 5px;
 
         .cart-add-button {
@@ -144,6 +221,101 @@
     }
   }
 }
+
+.wishlist-filter-option {
+  .wishlist-filter-option__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  p {
+    color: $color-sub-category-text;
+    font-size: $font-sm;
+    font-weight: $font-medium;
+  }
+
+  input:checked + p {
+    color: $color-text-main;
+    font-weight: $font-bold;
+  }
+}
+
+.wishlist-mobile-filter-modal {
+  .modal__title {
+    margin: 12px 0 16px;
+    font-size: $font-lg;
+  }
+}
+
+.wishlist-mobile-filter {
+  padding: 0 0 8px;
+
+  &__tabs {
+    @include flex(center, space-between);
+    padding-bottom: 14px;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+
+  &__tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  &__tab {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: $color-sub-category-text;
+    font-size: $font-md;
+    font-weight: $font-medium;
+  }
+
+  &__tab.is-active {
+    color: $color-text-main;
+    font-weight: $font-bold;
+  }
+
+  &__content {
+    min-height: 96px;
+    padding-top: 4px;
+  }
+
+  &__options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 18px;
+  }
+
+  &__options .wishlist-filter-option {
+    min-height: 24px;
+  }
+
+  &__actions {
+    display: flex;
+    margin-top: 18px;
+  }
+
+  &__reset {
+    @include button-reverse($bg: #ffffff, $color: $color-text-main, $radius: 12px);
+    @include flex(center, center);
+    width: 100%;
+    min-width: 0;
+    height: 40px;
+    padding: 0;
+    border-color: rgba(96, 96, 96, 0.2);
+    gap: 6px;
+
+    img {
+      display: block;
+      width: 14px;
+      height: 14px;
+    }
+  }
+}
+
 @include tablet-up {
   .list-wrap-wishlist {
     padding-top: $page-content-start-tablet;
@@ -159,16 +331,34 @@
       }
       .list-assembly {
         &__top {
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+
           .list-assembly__title {
+            width: auto;
             font-size: $font-xxl;
             span {
               font-size: $font-lg-2;
             }
           }
+
+          .filter-container {
+            width: auto;
+            display: flex;
+            justify-content: flex-end;
+            align-self: auto;
+            gap: 6px;
+          }
+
+          .filter-button {
+            width: auto;
+          }
         }
         &__content {
           .list-assembly__product-grid {
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: $space-md;
           }
         }
       }
@@ -275,12 +465,13 @@
             font-size: $font-xl;
           }
           .filter-container {
-            display: flex;
+            display: none;
           }
         }
         &__content {
           .list-assembly__product-grid {
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: $space-md;
           }
         }
       }
