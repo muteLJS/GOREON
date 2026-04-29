@@ -225,7 +225,7 @@
 
   &.is-active {
     // background: rgba($color-text-sub, 0.08);
-    img{
+    img {
       fill: $color-text-main;
     }
   }
@@ -238,6 +238,17 @@
   font-weight: $font-semibold;
   text-decoration: underline;
   text-underline-offset: 2px;
+
+  &.is-reported {
+    color: $color-text-main;
+    text-decoration: none;
+    cursor: default;
+  }
+}
+
+.review-card__report-actions {
+  @include flex(center, flex-end);
+  gap: 8px;
 }
 
 .review-card__manage-actions {

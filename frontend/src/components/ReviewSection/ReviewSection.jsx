@@ -7,6 +7,13 @@ import Rating from "../Rating/Rating";
 import ChevronDown from "../../assets/icons/chevron-down.svg";
 import ThumbsUp from "../../assets/icons/Thumbs_up.svg";
 import { lockPageScroll } from "@/utils/scrollLock";
+import { useToast } from "@/components/Toast/toastContext";
+import {
+  addReportedReviewId,
+  createReportedReviewId,
+  loadReportedReviewIds,
+  removeReportedReviewId,
+} from "@/utils/reportedReviews";
 
 function ReviewSection({
   rating,
@@ -19,11 +26,14 @@ function ReviewSection({
 }) {
   const REVIEW_PREVIEW_COUNT = 5;
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const userInfo = useSelector((state) => state.user.userInfo);
   const hasReviews = reviewCount > 0;
   const [isExpanded, setIsExpanded] = useState(false);
   const [lightbox, setLightbox] = useState(null);
   const [sortType, setSortType] = useState("popular");
+  const [reportedReviewIds, setReportedReviewIds] = useState(() => loadReportedReviewIds(userInfo));
   const [helpfulReviews, setHelpfulReviews] = useState(() =>
     reviews.reduce((acc, review) => {
       acc[review.id] = {
@@ -80,6 +90,10 @@ function ReviewSection({
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [lightbox]);
+
+  useEffect(() => {
+    setReportedReviewIds(loadReportedReviewIds(userInfo));
+  }, [userInfo]);
 
   useEffect(() => {
     setHelpfulReviews(
@@ -141,6 +155,25 @@ function ReviewSection({
     };
 
   const isMyReview = (review) => Boolean(review.isMine);
+
+  const getReviewReportId = (review) =>
+    createReportedReviewId(review._id, review.id, review.author, review.date, review.body);
+
+  const handleReportReview = (review) => {
+    const nextReportedIds = addReportedReviewId(userInfo, getReviewReportId(review));
+
+    setReportedReviewIds(nextReportedIds);
+    showToast("신고가 접수되었습니다.");
+  };
+
+  const handleReportCancel = (review) => {
+    const nextReportedIds = removeReportedReviewId(userInfo, getReviewReportId(review));
+
+    setReportedReviewIds(nextReportedIds);
+    showToast("신고가 취소되었습니다.");
+  };
+
+  const reportedReviewIdSet = new Set(reportedReviewIds);
 
   const sortedReviews = [...reviews].sort((a, b) => {
     if (sortType === "rating") {
@@ -317,6 +350,7 @@ function ReviewSection({
         {visibleReviews.map((review) => {
           const helpfulState = getHelpfulState(review);
           const canManageReview = isMyReview(review);
+          const isReported = reportedReviewIdSet.has(getReviewReportId(review));
 
           return (
             <article className="review-card" key={review.id}>
@@ -349,9 +383,34 @@ function ReviewSection({
                       </button>
                     </div>
                   ) : (
-                    <button type="button" className="review-card__report">
-                      신고하기
-                    </button>
+                    <div className="review-card__report-actions">
+                      {isReported ? (
+                        <>
+                          <button
+                            type="button"
+                            className="review-card__report is-reported"
+                            disabled
+                          >
+                            신고 완료
+                          </button>
+                          <button
+                            type="button"
+                            className="review-card__report"
+                            onClick={() => handleReportCancel(review)}
+                          >
+                            신고 취소
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          type="button"
+                          className="review-card__report"
+                          onClick={() => handleReportReview(review)}
+                        >
+                          신고하기
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>

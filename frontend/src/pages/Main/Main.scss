@@ -416,6 +416,13 @@
   .AI_box {
     @include flex(flex-start, center, column);
     gap: 6px;
+
+    .review_card_header {
+      width: 100%;
+      @include flex(center, space-between);
+      gap: 8px;
+    }
+
     .user_info {
       @include flex();
       gap: 8px;
@@ -428,6 +435,29 @@
         color: $color-category-text;
       }
     }
+
+    .review_report {
+      flex-shrink: 0;
+      color: $color-sub-category-text;
+      font-size: $font-xs;
+      font-weight: $font-medium;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+
+      &.is-reported {
+        color: $color-text-main;
+        font-weight: $font-bold;
+        text-decoration: none;
+        cursor: default;
+      }
+    }
+
+    .review_report_actions {
+      @include flex(center, flex-end);
+      flex-shrink: 0;
+      gap: 8px;
+    }
+
     .stars {
       @include flex(center, flex-start);
       gap: 2px;
@@ -1090,7 +1120,7 @@
 
     .AI_box {
       width: 100%;
-      @include flex(center, space-between);
+      @include flex(flex-start, center, column);
 
       .user_info {
         gap: 10px;
@@ -1809,6 +1839,31 @@
   color: $color-text-main;
 }
 
+.modal.main-spec-sheet-modal {
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -12px 28px rgba($color-black, 0.12);
+  animation: main-spec-sheet-slide-up 0.24s ease-out both;
+  will-change: transform, opacity;
+}
+
+@keyframes main-spec-sheet-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal.main-spec-sheet-modal {
+    animation: none;
+  }
+}
+
 .main-spec-modal__summary {
   display: grid;
   grid-template-columns: minmax(126px, 1fr) minmax(0, 1.18fr);
@@ -2233,7 +2288,7 @@
     gap: 48px;
     .AI_box {
       width: 100%;
-      @include flex(center, space-between);
+      @include flex(flex-start, center, column);
 
       .user_info {
         gap: 10px;
