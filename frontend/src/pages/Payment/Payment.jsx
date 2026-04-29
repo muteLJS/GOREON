@@ -47,6 +47,51 @@ const EMPTY_CARD_FORM = {
   saveCard: true,
 };
 
+const onlyDigits = (value) => String(value ?? "").replace(/\D/g, "");
+
+const formatCardNumber = (value) =>
+  onlyDigits(value)
+    .slice(0, 16)
+    .replace(/(\d{4})(?=\d)/g, "$1 ");
+
+const formatExpiryDate = (value) => {
+  const digits = onlyDigits(value).slice(0, 4);
+
+  if (digits.length <= 2) {
+    return digits;
+  }
+
+  return `${digits.slice(0, 2)} / ${digits.slice(2)}`;
+};
+
+const formatPhoneNumber = (value) => {
+  const digits = onlyDigits(value).slice(0, 11);
+
+  if (digits.startsWith("02")) {
+    if (digits.length <= 2) {
+      return digits;
+    }
+
+    if (digits.length <= 6) {
+      return `${digits.slice(0, 2)}-${digits.slice(2)}`;
+    }
+
+    return `${digits.slice(0, 2)}-${digits.slice(2, digits.length - 4)}-${digits.slice(-4)}`;
+  }
+
+  if (digits.length <= 3) {
+    return digits;
+  }
+
+  if (digits.length <= 7) {
+    return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  }
+
+  return `${digits.slice(0, 3)}-${digits.slice(3, digits.length - 4)}-${digits.slice(-4)}`;
+};
+
+const formatCvc = (value) => onlyDigits(value).slice(0, 3);
+
 function cx(...classNames) {
   return classNames.filter(Boolean).join(" ");
 }
@@ -140,10 +185,18 @@ export default function Payment() {
 
   const handleCardFieldChange = ({ target }) => {
     const { name, value, type, checked } = target;
+    const nextValue =
+      name === "cardNumber"
+        ? formatCardNumber(value)
+        : name === "expiryDate"
+          ? formatExpiryDate(value)
+          : name === "cvc"
+            ? formatCvc(value)
+            : value;
 
     setCardForm((prevCardForm) => ({
       ...prevCardForm,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox" ? checked : nextValue,
     }));
   };
 
@@ -152,7 +205,7 @@ export default function Payment() {
 
     setShippingForm((prevShippingForm) => ({
       ...prevShippingForm,
-      [name]: value,
+      [name]: name === "phone" ? formatPhoneNumber(value) : value,
     }));
   };
 
@@ -238,7 +291,6 @@ export default function Payment() {
     }
   };
 
-  
   return (
     <section className="payment-page">
       <div className="payment-page__header">
@@ -291,6 +343,9 @@ export default function Payment() {
                   value={cardForm.cardNumber}
                   onChange={handleCardFieldChange}
                   placeholder="1234 5678 0123 4567"
+                  inputMode="numeric"
+                  autoComplete="cc-number"
+                  maxLength={19}
                   icon={VisaIcon}
                   iconAlt="Visa"
                 />
@@ -303,6 +358,7 @@ export default function Payment() {
                   value={cardForm.cardHolder}
                   onChange={handleCardFieldChange}
                   placeholder="이름을 입력하세요."
+                  autoComplete="cc-name"
                   icon={UserIcon}
                 />
               </Field>
@@ -315,6 +371,9 @@ export default function Payment() {
                     value={cardForm.expiryDate}
                     onChange={handleCardFieldChange}
                     placeholder="00 / 00"
+                    inputMode="numeric"
+                    autoComplete="cc-exp"
+                    maxLength={7}
                   />
                 </Field>
 
@@ -325,6 +384,9 @@ export default function Payment() {
                     value={cardForm.cvc}
                     onChange={handleCardFieldChange}
                     placeholder="카드 뒷면 3자리"
+                    inputMode="numeric"
+                    autoComplete="cc-csc"
+                    maxLength={3}
                   />
                 </Field>
               </div>
@@ -364,6 +426,9 @@ export default function Payment() {
                   value={shippingForm.phone}
                   onChange={handleShippingFieldChange}
                   placeholder="010-0000-0000"
+                  inputMode="numeric"
+                  autoComplete="tel"
+                  maxLength={13}
                   className="payment-page__input--shipping"
                 />
               </Field>

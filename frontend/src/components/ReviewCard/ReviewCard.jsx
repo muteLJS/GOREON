@@ -1,10 +1,74 @@
-function ReviewCard({ userImage, userName, productName, description, rating = 5 }) {
+import { useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
+import { useToast } from "@/components/Toast/toastContext";
+import {
+  addReportedReviewId,
+  createReportedReviewId,
+  hasReportedReviewId,
+  removeReportedReviewId,
+} from "@/utils/reportedReviews";
+
+function ReviewCard({
+  reviewId,
+  userImage,
+  userName,
+  productName,
+  description,
+  rating = 5,
+  onReported,
+}) {
+  const { showToast } = useToast();
+  const userInfo = useSelector((state) => state.user.userInfo);
+  const reportId = useMemo(
+    () => createReportedReviewId(reviewId, userName, productName, description),
+    [description, productName, reviewId, userName],
+  );
+  const [isReported, setIsReported] = useState(() => hasReportedReviewId(userInfo, reportId));
+
+  useEffect(() => {
+    setIsReported(hasReportedReviewId(userInfo, reportId));
+  }, [reportId, userInfo]);
+
+  const handleReportClick = () => {
+    const nextReportedIds = addReportedReviewId(userInfo, reportId);
+
+    setIsReported(true);
+    showToast("신고가 접수되었습니다.");
+    onReported?.(reportId, nextReportedIds);
+  };
+
+  const handleReportCancelClick = () => {
+    const nextReportedIds = removeReportedReviewId(userInfo, reportId);
+
+    setIsReported(false);
+    showToast("신고가 취소되었습니다.");
+    onReported?.(reportId, nextReportedIds);
+  };
+
   return (
     <div className="review_main">
       <div className="AI_box">
-        <div className="user_info">
-          <img src={userImage} alt="review_user_img" />
-          <p className="user_name">{userName}</p>
+        <div className="review_card_header">
+          <div className="user_info">
+            <img src={userImage} alt="review_user_img" />
+            <p className="user_name">{userName}</p>
+          </div>
+          <div className="review_report_actions">
+            {isReported ? (
+              <>
+                <button type="button" className="review_report is-reported" disabled>
+                  신고 완료
+                </button>
+                <button type="button" className="review_report" onClick={handleReportCancelClick}>
+                  신고 취소
+                </button>
+              </>
+            ) : (
+              <button type="button" className="review_report" onClick={handleReportClick}>
+                신고하기
+              </button>
+            )}
+          </div>
         </div>
         <div className="stars" aria-label={`별점 ${rating}점`}>
           {[...Array(rating)].map((_, index) => (
