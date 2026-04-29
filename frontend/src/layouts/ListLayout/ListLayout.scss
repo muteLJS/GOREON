@@ -3,6 +3,9 @@
 
 $range-thumb-size: 18px;
 $range-thumb-half: 9px;
+$range-thumb-touch-size: 44px;
+$range-thumb-touch-margin-top: -19px;
+$range-thumb-touch-bg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Ccircle cx='22' cy='22' r='8' fill='%23ffffff' stroke='%230aa5a5' stroke-width='2'/%3E%3C/svg%3E");
 
 .list-wrap {
   width: 100%;
@@ -72,6 +75,7 @@ $range-thumb-half: 9px;
         border: 1px solid #60606024;
         border-radius: 999px;
         font-size: $font-xs-2;
+        font-weight: $font-medium;
         line-height: 1;
         gap: 6px;
         padding: 5px 10px;
@@ -509,6 +513,7 @@ $range-thumb-half: 9px;
   }
 
   .range-input::-webkit-slider-thumb {
+    position: relative;
     width: $range-thumb-size;
     height: $range-thumb-size;
     border: 2px solid $color-text-sub;
@@ -553,6 +558,7 @@ $range-thumb-half: 9px;
 .list-mobile-filter-modal,
 .list-mobile-sort-modal {
   .modal__title {
+    font-size: $font-lg;
     margin: 12px 0 16px;
   }
 }
@@ -562,7 +568,7 @@ $range-thumb-half: 9px;
 
   &__tabs {
     @include flex(center, space-between);
-    padding: 0 16px 14px  ;    
+    padding-bottom: 14px;    
     overflow-x: auto;    
     white-space: nowrap;
     scrollbar-width: none;
@@ -577,7 +583,7 @@ $range-thumb-half: 9px;
     border: 0;
     background: transparent;
     color: $color-sub-category-text;
-    font-size: $font-md;
+    font-size: $font-sm-2;
     font-weight: $font-medium;
   }
 
@@ -593,8 +599,7 @@ $range-thumb-half: 9px;
 
   &__options {
     display: flex;
-    flex-wrap: wrap;
-    padding: 0 16px;
+    flex-wrap: wrap;    
     gap: 12px 18px;
   }
 
@@ -605,6 +610,25 @@ $range-thumb-half: 9px;
   &__price {
     .range-slider {
       margin-top: 12px;
+    }
+
+    .range-input {
+      height: $range-thumb-touch-size;
+    }
+
+    .range-input::-webkit-slider-thumb {
+      width: $range-thumb-touch-size;
+      height: $range-thumb-touch-size;
+      border: 0;
+      background: $range-thumb-touch-bg center / $range-thumb-touch-size $range-thumb-touch-size no-repeat;
+      margin-top: $range-thumb-touch-margin-top;
+    }
+
+    .range-input::-moz-range-thumb {
+      width: $range-thumb-touch-size;
+      height: $range-thumb-touch-size;
+      border: 0;
+      background: $range-thumb-touch-bg center / $range-thumb-touch-size $range-thumb-touch-size no-repeat;
     }
 
     h3 {

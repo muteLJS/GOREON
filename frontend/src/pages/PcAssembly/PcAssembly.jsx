@@ -6,6 +6,7 @@ import banner1 from "@/assets/banner/banner-1.jpg";
 import ChevronDownIcon from "@/assets/icons/chevron-down.svg";
 import CheckIcon from "@/assets/icons/check.svg";
 import CloseIcon from "@/assets/event/close.svg";
+import resetIcon from "@/assets/icons/reset.svg";
 import Modal from "@/components/Modal/Modal";
 import ProductCardHorizontal from "@/components/ProductCard/ProductCardHorizontal";
 import ProductCardVertical from "@/components/ProductCard/ProductCardVertical";
@@ -130,18 +131,65 @@ function PcAssembly() {
     );
   };
 
-  const filterContent = (
-    <div className="pc-assembly__filter">
+  const resetFilters = () => {
+    setSelectedCategory(PC_ASSEMBLY_CATEGORIES[0] ?? "CPU");
+  };
+
+  const renderCategoryOptions = (idPrefix) => (
+    <ul className="pc-assembly-filter-options">
       {PC_ASSEMBLY_CATEGORIES.map((category) => (
-        <button
-          key={category}
-          type="button"
-          className={`pc-assembly__filter-category ${selectedCategory === category ? "is-active" : ""}`}
-          onClick={() => setSelectedCategory(category)}
-        >
-          {category}
-        </button>
+        <li key={category} className="pc-assembly-filter-option">
+          <label htmlFor={`${idPrefix}-${category}`} className="pc-assembly-filter-option__label">
+            <input
+              id={`${idPrefix}-${category}`}
+              checked={selectedCategory === category}
+              type="checkbox"
+              onChange={() => setSelectedCategory(category)}
+            />
+            <p>{category}</p>
+          </label>
+        </li>
       ))}
+    </ul>
+  );
+
+  const desktopFilterContent = (
+    <section className="pc-assembly-filter-panel" aria-label="PC 조립 필터">
+      <div className="pc-assembly-filter-panel__top">
+        <h2>필터</h2>
+        <div className="pc-assembly-filter-panel__reset">
+          <p>초기화</p>
+          <button type="button" onClick={resetFilters} aria-label="필터 초기화">
+            <img src={resetIcon} alt="" />
+          </button>
+        </div>
+      </div>
+      <div className="pc-assembly-filter-panel__body">
+        <div className="pc-assembly-filter-group">
+          <div className="pc-assembly-filter-group__title">
+            <h3>카테고리</h3>
+          </div>
+          {renderCategoryOptions("pc-assembly-desktop-category")}
+        </div>
+      </div>
+    </section>
+  );
+
+  const mobileFilterContent = (
+    <div className="pc-assembly-mobile-filter">
+      <div className="pc-assembly-mobile-filter__tabs">
+        <button type="button" className="pc-assembly-mobile-filter__tab is-active">
+          카테고리
+        </button>
+      </div>
+      <div className="pc-assembly-mobile-filter__content">
+        {renderCategoryOptions("pc-assembly-mobile-category")}
+      </div>
+      <div className="pc-assembly-mobile-filter__actions">
+        <button type="button" className="pc-assembly-mobile-filter__reset" onClick={resetFilters}>
+          초기화 <img src={resetIcon} alt="" />
+        </button>
+      </div>
     </div>
   );
 
@@ -179,7 +227,7 @@ function PcAssembly() {
 
       <section className="pc-assembly__top">
         <h2 className="pc-assembly__title">PC 조립</h2>
-        <button className="filter-button" onClick={() => setIsFilterOpen(true)}>
+        <button type="button" className="filter-button" onClick={() => setIsFilterOpen(true)}>
           필터 <img src={ChevronDownIcon} alt="down" />
         </button>
       </section>
@@ -213,12 +261,7 @@ function PcAssembly() {
       <section className="pc-assembly__desktop" ref={desktopSectionRef}>
         {renderSectionBar()}
 
-        <aside className="pc-assembly__sidebar">
-          <div className="pc-assembly__desktop-filter">
-            <div className="pc-assembly__desktop-filter-title">카테고리</div>
-            <div className="pc-assembly__desktop-filter-list">{filterContent}</div>
-          </div>
-        </aside>
+        <aside className="pc-assembly__sidebar">{desktopFilterContent}</aside>
 
         <div className="pc-assembly__main">
           <div className="pc-assembly__desktop-list">
@@ -246,8 +289,13 @@ function PcAssembly() {
       </section>
 
       {isFilterOpen && (
-        <Modal title="필터" onClose={() => setIsFilterOpen(false)} showCloseButton={false}>
-          {filterContent}
+        <Modal
+          title="필터"
+          onClose={() => setIsFilterOpen(false)}
+          className="pc-assembly-mobile-filter-modal"
+          showCloseButton={false}
+        >
+          {mobileFilterContent}
         </Modal>
       )}
 

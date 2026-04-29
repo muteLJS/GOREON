@@ -1,12 +1,8 @@
 import AICharacter from "../AICharacter/AICharacter";
 
-function ChatTriggerButton({ isOpen, isPreviewVisible, onToggle, onPreviewEnter, onPreviewLeave }) {
+function ChatTriggerButton({ isOpen, onToggle, onPreviewEnter, onPreviewLeave }) {
   return (
     <div className="chat-widget__trigger-wrap">
-      <div className={`chat-widget__tooltip ${isPreviewVisible ? "is-visible" : ""}`}>
-        <span>무엇을 찾고 계신가요?</span>
-      </div>
-
       <button
         type="button"
         className={`chat-widget__trigger ${isOpen ? "is-open" : ""}`}
