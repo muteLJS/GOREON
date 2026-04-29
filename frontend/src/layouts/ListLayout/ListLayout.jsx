@@ -572,8 +572,9 @@ export default function ListLayout({
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(DESKTOP_MEDIA_QUERY);
-    const syncSortSurfaceToViewport = (event = mediaQuery) => {
+    const syncResponsiveSurfacesToViewport = (event = mediaQuery) => {
       if (event.matches) {
+        setIsFilterModalOpen(false);
         setIsMobileSortModalOpen(false);
         return;
       }
@@ -581,11 +582,11 @@ export default function ListLayout({
       setIsDesktopSortMenuOpen(false);
     };
 
-    syncSortSurfaceToViewport();
-    mediaQuery.addEventListener("change", syncSortSurfaceToViewport);
+    syncResponsiveSurfacesToViewport();
+    mediaQuery.addEventListener("change", syncResponsiveSurfacesToViewport);
 
     return () => {
-      mediaQuery.removeEventListener("change", syncSortSurfaceToViewport);
+      mediaQuery.removeEventListener("change", syncResponsiveSurfacesToViewport);
     };
   }, []);
 
