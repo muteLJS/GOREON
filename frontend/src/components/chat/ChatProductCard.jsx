@@ -25,9 +25,25 @@ function ChatProductCard({ product, onViewDetails }) {
         />
 
         <div className="chat-widget__product-actions">
-          <CartIconButton product={product} className="chat-widget__icon-button" />
+          <CartIconButton
+            product={product}
+            className="chat-widget__icon-button"
+            analyticsContext={{
+              behavior: "guided",
+              signal: "ai_chat_recommendation_add_to_cart",
+              source: "floating_chat",
+            }}
+          />
 
-          <WishlistIconButton product={product} className="chat-widget__favorite-button" />
+          <WishlistIconButton
+            product={product}
+            className="chat-widget__favorite-button"
+            analyticsContext={{
+              behavior: "guided",
+              signal: "ai_chat_recommendation_wishlist",
+              source: "floating_chat",
+            }}
+          />
         </div>
       </div>
 

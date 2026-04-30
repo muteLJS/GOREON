@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { trackSelfDiscoveryShopping } from "@/utils/analytics";
 import { lockPageScroll } from "@/utils/scrollLock";
 
 import banner1 from "@/assets/banner/banner-1.jpg";
@@ -117,6 +118,15 @@ function PcAssembly() {
   const handleAddQuoteItem = (product, event) => {
     event?.stopPropagation();
 
+    trackSelfDiscoveryShopping({
+      signal: "pc_assembly_add_quote_item",
+      source: "pc_assembly",
+      label: product.name,
+      params: {
+        product_category: product.category,
+      },
+    });
+
     dispatch(
       addQuoteItem({
         id: `${product.category}-${product._id}`,
@@ -137,7 +147,23 @@ function PcAssembly() {
   };
 
   const resetFilters = () => {
+    trackSelfDiscoveryShopping({
+      signal: "pc_assembly_filter_reset",
+      source: "pc_assembly",
+    });
     setSelectedCategory(PC_ASSEMBLY_CATEGORIES[0] ?? "CPU");
+  };
+
+  const handleCategoryChange = (category) => {
+    trackSelfDiscoveryShopping({
+      signal: "pc_assembly_category_filter",
+      source: "pc_assembly",
+      label: category,
+      params: {
+        product_category: category,
+      },
+    });
+    setSelectedCategory(category);
   };
 
   const renderCategoryOptions = (idPrefix) => (
@@ -149,7 +175,7 @@ function PcAssembly() {
               id={`${idPrefix}-${category}`}
               checked={selectedCategory === category}
               type="checkbox"
-              onChange={() => setSelectedCategory(category)}
+              onChange={() => handleCategoryChange(category)}
             />
             <p>{category}</p>
           </label>
@@ -216,7 +242,17 @@ function PcAssembly() {
         <button
           type="button"
           className="pc-assembly__list-button"
-          onClick={() => setIsQuoteOpen(true)}
+          onClick={() => {
+            trackSelfDiscoveryShopping({
+              signal: "pc_assembly_quote_open",
+              source: "pc_assembly",
+              value: quoteItemCount,
+              params: {
+                item_count: quoteItemCount,
+              },
+            });
+            setIsQuoteOpen(true);
+          }}
         >
           견적 리스트
         </button>

@@ -10,7 +10,7 @@ import CartIcon from "@/assets/icons/cart-straight.svg";
 import { useToast } from "@/components/Toast/toastContext";
 import { addToCart } from "@/store/slices/cartSlice";
 import { addToWishlist, removeFromWishlist } from "@/store/slices/wishlistSlice";
-import { trackAddToCart } from "@/utils/analytics";
+import { trackAddToCart, trackGuidedShopping } from "@/utils/analytics";
 import { buildProductDetailPath, getProductObjectId } from "@/utils/productIdentity";
 
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
@@ -105,6 +105,15 @@ function PackageCard({
     });
 
     if (addedCount > 0) {
+      trackGuidedShopping({
+        signal: "package_add_to_cart",
+        source: "recommendation_package",
+        label: title ?? "추천 조합",
+        value: addedCount,
+        params: {
+          item_count: addedCount,
+        },
+      });
       trackAddToCart(title ?? "추천 조합");
       showToast("추천 조합 상품을 장바구니에 담았습니다.");
     }
@@ -120,6 +129,16 @@ function PackageCard({
 
   const handlePackageWishlistClick = (event) => {
     event.stopPropagation();
+
+    trackGuidedShopping({
+      signal: allPackageItemsWishlisted ? "package_wishlist_remove" : "package_wishlist_add",
+      source: "recommendation_package",
+      label: title ?? "추천 조합",
+      value: packageProducts.length,
+      params: {
+        item_count: packageProducts.length,
+      },
+    });
 
     if (allPackageItemsWishlisted) {
       packageProducts.forEach((item) => {
@@ -156,6 +175,11 @@ function PackageCard({
     const detailPath = buildProductDetailPath(item.product);
 
     if (detailPath) {
+      trackGuidedShopping({
+        signal: "package_product_click",
+        source: "recommendation_package",
+        label: item.title ?? item.product?.name,
+      });
       navigate(detailPath);
     }
   };
