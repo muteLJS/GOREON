@@ -1,4 +1,4 @@
-﻿import "./Main.scss";
+import "./Main.scss";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -26,6 +26,7 @@ import { findProductByName } from "@/api/products";
 import useProductCatalog from "@/hooks/useProductCatalog";
 import { addAiRecommendationHistory } from "@/store/slices/aiRecommendationHistory";
 import api from "@/utils/api";
+import { trackGuidedShopping, trackSelfDiscoveryShopping } from "@/utils/analytics";
 import { getProductListKey, getProductObjectId } from "@/utils/productIdentity";
 import { fetchAiRecommendations } from "@/utils/recommendations";
 import {
@@ -557,7 +558,16 @@ function Main() {
     const promptWithoutEmoji = String(prompt)
       .replace(/^[^\p{L}\p{N}]+/u, "")
       .trim();
-    setAiQuery(promptWithoutEmoji || prompt);
+    const selectedPrompt = promptWithoutEmoji || prompt;
+
+    trackGuidedShopping({
+      signal: "main_ai_prompt_select",
+      source: "main_ai_section",
+      params: {
+        query_length: selectedPrompt.length,
+      },
+    });
+    setAiQuery(selectedPrompt);
     setIsAiInputEmptyError(false);
   };
 
@@ -628,6 +638,14 @@ function Main() {
 
     setIsAiInputEmptyError(false);
 
+    trackGuidedShopping({
+      signal: "main_ai_submit",
+      source: "main_ai_section",
+      params: {
+        query_length: query.length,
+      },
+    });
+
     if (aiRequestAbortRef.current) {
       aiRequestAbortRef.current.abort();
     }
@@ -663,6 +681,15 @@ function Main() {
       setAiMessage(nextMessage);
       setAiStatus(nextResults.length > 0 ? "success" : "empty");
       setAiReviewStatus(nextResults.length > 0 ? "loading" : "idle");
+
+      trackGuidedShopping({
+        signal: "main_ai_recommendation_result_view",
+        source: "main_ai_section",
+        value: nextResults.length,
+        params: {
+          result_count: nextResults.length,
+        },
+      });
 
       if (nextResults.length === 0) {
         return;
@@ -730,11 +757,27 @@ function Main() {
     handleAiSubmit(e);
   };
 
-  const navigateToProduct = (product) => {
+  const navigateToProduct = (product, analyticsContext) => {
     const productId =
       typeof product === "object" && product !== null ? getProductRouteId(product) : product;
 
     if (productId !== undefined && productId !== null) {
+      if (analyticsContext?.behavior === "guided") {
+        trackGuidedShopping({
+          signal: analyticsContext.signal ?? "guided_product_click",
+          source: analyticsContext.source ?? "main_page",
+          label: typeof product === "object" && product !== null ? product.name : undefined,
+        });
+      }
+
+      if (analyticsContext?.behavior === "self_discovery") {
+        trackSelfDiscoveryShopping({
+          signal: analyticsContext.signal ?? "self_discovery_product_click",
+          source: analyticsContext.source ?? "main_page",
+          label: typeof product === "object" && product !== null ? product.name : undefined,
+        });
+      }
+
       navigate(`/product/${productId}`);
     }
   };
@@ -1407,11 +1450,21 @@ function Main() {
                   className="recommend"
                   role="button"
                   tabIndex={0}
-                  onClick={() => navigateToProduct(item)}
+                  onClick={() =>
+                    navigateToProduct(item, {
+                      behavior: "guided",
+                      signal: "main_ai_recommendation_product_click",
+                      source: "main_ai_section",
+                    })
+                  }
                   onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
                       event.preventDefault();
-                      navigateToProduct(item);
+                      navigateToProduct(item, {
+                        behavior: "guided",
+                        signal: "main_ai_recommendation_product_click",
+                        source: "main_ai_section",
+                      });
                     }
                   }}
                 >
@@ -1428,7 +1481,11 @@ function Main() {
                       aria-label={`${item.name} 상세페이지로 이동`}
                       onClick={(event) => {
                         event.stopPropagation();
-                        navigateToProduct(item);
+                        navigateToProduct(item, {
+                          behavior: "guided",
+                          signal: "main_ai_recommendation_product_click",
+                          source: "main_ai_section",
+                        });
                       }}
                     >
                       <svg viewBox="0 0 24 12">
@@ -1532,7 +1589,14 @@ function Main() {
                   key={section.id}
                   type="button"
                   className={`category ${isActive ? "is-active" : ""}`.trim()}
-                  onClick={() => setSelectedCategory(section.id)}
+                  onClick={() => {
+                    trackSelfDiscoveryShopping({
+                      signal: "main_purpose_category_select",
+                      source: "main_purpose_category",
+                      label: section.label,
+                    });
+                    setSelectedCategory(section.id);
+                  }}
                   aria-pressed={isActive}
                 >
                   <img src={section.icon} alt="" aria-hidden="true" />

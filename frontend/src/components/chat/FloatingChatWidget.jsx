@@ -13,6 +13,7 @@ import {
   createTextMessage,
 } from "./chatData";
 import { addAiRecommendationHistory } from "@/store/slices/aiRecommendationHistory";
+import { trackGuidedShopping } from "@/utils/analytics";
 import { fetchAiRecommendations } from "@/utils/recommendations";
 import {
   createAiRecommendationHistoryEntry,
@@ -303,6 +304,10 @@ function FloatingChatWidget() {
       return;
     }
 
+    trackGuidedShopping({
+      signal: "ai_chat_open",
+      source: "floating_chat",
+    });
     setHasOpenedOnce(true);
     setMode(hasChatHistory ? CHAT_MODE.CHATTING : CHAT_MODE.INITIAL);
   };
@@ -335,6 +340,10 @@ function FloatingChatWidget() {
   };
 
   const handleProductDetailClick = () => {
+    trackGuidedShopping({
+      signal: "ai_chat_recommendation_product_click",
+      source: "floating_chat",
+    });
     cancelPendingAssistantResponse();
     setMode(CHAT_MODE.IDLE);
   };
@@ -437,6 +446,14 @@ function FloatingChatWidget() {
       return;
     }
 
+    trackGuidedShopping({
+      signal: "ai_chat_message_submit",
+      source: "floating_chat",
+      params: {
+        query_length: trimmedQuestion.length,
+      },
+    });
+
     clearResponseTimers();
     abortRecommendationRequest();
 
@@ -485,6 +502,15 @@ function FloatingChatWidget() {
           ? "현재 상품 데이터 기준으로 조건에 가까운 제품을 골랐어요."
           : "조건에 맞는 상품을 찾지 못했어요. 조건을 조금 더 넓혀볼까요?");
       const chatProducts = normalizedProducts.map(toChatRecommendationProduct);
+
+      trackGuidedShopping({
+        signal: "ai_chat_recommendation_result_view",
+        source: "floating_chat",
+        value: normalizedProducts.length,
+        params: {
+          result_count: normalizedProducts.length,
+        },
+      });
 
       if (normalizedProducts.length > 0) {
         dispatch(
@@ -563,7 +589,16 @@ function FloatingChatWidget() {
           error={status.error}
           onDraftChange={setDraft}
           onSendMessage={handleSendMessage}
-          onSuggestionClick={handleSendMessage}
+          onSuggestionClick={(suggestion) => {
+            trackGuidedShopping({
+              signal: "ai_chat_suggestion_click",
+              source: "floating_chat",
+              params: {
+                query_length: suggestion.length,
+              },
+            });
+            handleSendMessage(suggestion);
+          }}
           onProductDetailClick={handleProductDetailClick}
           onBack={handleBack}
           onClose={handleClose}

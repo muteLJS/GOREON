@@ -2,6 +2,7 @@ import ListLayout from "@/layouts/ListLayout/ListLayout";
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "@/utils/api";
+import { trackSelfDiscoveryShopping } from "@/utils/analytics";
 
 const Search = () => {
   const [searchParams] = useSearchParams();
@@ -29,6 +30,13 @@ const Search = () => {
       }
     };
     if (query) {
+      trackSelfDiscoveryShopping({
+        signal: "search_results_view",
+        source: "search_page",
+        params: {
+          query_length: query.length,
+        },
+      });
       fetchData();
     } else {
       setProducts([]);

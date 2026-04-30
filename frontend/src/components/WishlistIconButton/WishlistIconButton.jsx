@@ -6,11 +6,11 @@ import { useToast } from "@/components/Toast/toastContext";
 import { addToWishlist, removeFromWishlist } from "@/store/slices/wishlistSlice";
 import { getProductObjectId } from "@/utils/productIdentity";
 import "./WishlistIconButton.scss";
-import { trackWishlist } from "@/utils/analytics";
+import { trackGuidedShopping, trackSelfDiscoveryShopping, trackWishlist } from "@/utils/analytics";
 
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
 
-function WishlistIconButton({ product, className = "", iconClassName = "", size = "md" }) {
+function WishlistIconButton({ product, className = "", iconClassName = "", size = "md", analyticsContext }) {
   const dispatch = useDispatch();
   const { showToast } = useToast();
   const wishlistItems = useSelector((state) => state.wishlist.items);
@@ -46,7 +46,25 @@ function WishlistIconButton({ product, className = "", iconClassName = "", size 
   };
 
   const handleWishlist = () => {
-    trackWishlist(product?.name ?? product?.title ?? "상품명");
+    const productName = product?.name ?? product?.title ?? "상품명";
+
+    if (analyticsContext?.behavior === "guided") {
+      trackGuidedShopping({
+        signal: analyticsContext.signal ?? "click_wishlist",
+        source: analyticsContext.source,
+        label: productName,
+      });
+    }
+
+    if (analyticsContext?.behavior === "self_discovery") {
+      trackSelfDiscoveryShopping({
+        signal: analyticsContext.signal ?? "click_wishlist",
+        source: analyticsContext.source,
+        label: productName,
+      });
+    }
+
+    trackWishlist(productName);
   };
 
   return (

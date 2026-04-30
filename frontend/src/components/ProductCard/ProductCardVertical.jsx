@@ -6,7 +6,7 @@ import ProductHeroImage from "@/assets/img/intel-core-ultra5-250kf-plus-product-
 import { normalizeImageUrl } from "@/utils/image";
 import { buildProductDetailPath } from "@/utils/productIdentity";
 
-function ProductCardVertical({ product, action }) {
+function ProductCardVertical({ product, action, onProductClick }) {
   const navigate = useNavigate();
   const detailPath = buildProductDetailPath(product);
   const imageSrc = normalizeImageUrl(product.image) || ProductHeroImage;
@@ -16,6 +16,7 @@ function ProductCardVertical({ product, action }) {
       className="product-card-vertical"
       onClick={() => {
         if (detailPath) {
+          onProductClick?.(product);
           navigate(detailPath);
         }
       }}

@@ -5,12 +5,12 @@ import { useToast } from "@/components/Toast/toastContext";
 import { addToCart } from "@/store/slices/cartSlice";
 import { getProductObjectId } from "@/utils/productIdentity";
 import "./CartIconButton.scss";
-import { trackAddToCart } from "@/utils/analytics";
+import { trackAddToCart, trackGuidedShopping, trackSelfDiscoveryShopping } from "@/utils/analytics";
 
 const parsePrice = (value) => Number(String(value ?? "0").replace(/[^0-9]/g, "")) || 0;
 const buildCartItemId = (productId, optionKey) => `${productId}::${optionKey || "default"}`;
 
-function CartIconButton({ product, className = "", size = "md" }) {
+function CartIconButton({ product, className = "", size = "md", analyticsContext }) {
   const dispatch = useDispatch();
   const { showToast } = useToast();
   const cartItems = useSelector((state) => state.cart.items);
@@ -46,7 +46,25 @@ function CartIconButton({ product, className = "", size = "md" }) {
   };
 
   const handleAddToCart = () => {
-    trackAddToCart(product?.name ?? product?.title ?? "상품명");
+    const productName = product?.name ?? product?.title ?? "상품명";
+
+    if (analyticsContext?.behavior === "guided") {
+      trackGuidedShopping({
+        signal: analyticsContext.signal ?? "add_to_cart",
+        source: analyticsContext.source,
+        label: productName,
+      });
+    }
+
+    if (analyticsContext?.behavior === "self_discovery") {
+      trackSelfDiscoveryShopping({
+        signal: analyticsContext.signal ?? "add_to_cart",
+        source: analyticsContext.source,
+        label: productName,
+      });
+    }
+
+    trackAddToCart(productName);
   };
 
   return (
