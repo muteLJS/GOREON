@@ -36,8 +36,8 @@ const withReviewCounts = async (products) => {
 
 const getProducts = async (req, res, next) => {
   try {
-    const { category, keyword, type } = req.query;
-    const query = buildProductQuery({ category, keyword, type });
+    const { category, group, keyword, type } = req.query;
+    const query = buildProductQuery({ category, group, keyword, type });
     const products = await Product.find(query).sort({ _id: 1 }).lean();
 
     res.json({ data: await withReviewCounts(products) });
