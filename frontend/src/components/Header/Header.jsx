@@ -29,6 +29,7 @@ import {
 } from "@/data/navigation";
 import { logout } from "@/store/slices/userSlice";
 import api from "@/utils/api";
+import { trackSelfDiscoveryShopping } from "@/utils/analytics";
 
 const DESKTOP_BREAKPOINT = 1024;
 
@@ -351,6 +352,15 @@ function Header() {
   const submitSearch = (keyword = searchQuery) => {
     const nextQuery = keyword.trim();
 
+    trackSelfDiscoveryShopping({
+      signal: "search_submit",
+      source: "header_search",
+      params: {
+        has_query: nextQuery ? "yes" : "no",
+        query_length: nextQuery.length,
+      },
+    });
+
     navigate(nextQuery ? `/search?q=${encodeURIComponent(nextQuery)}` : "/search");
     setSearchQuery(nextQuery);
     closeSearch();
@@ -364,6 +374,17 @@ function Header() {
   const handleMobileMenuLinkClick = () => {
     setIsMobileMenuOpen(false);
   };
+  const trackMenuNavigation = ({ signal, source, label }) => {
+    trackSelfDiscoveryShopping({
+      signal,
+      source,
+      label,
+      params: {
+        menu_label: label,
+      },
+    });
+  };
+
 
   const activeMobileSections = MOBILE_MENU_SECTIONS[activeMobileTab];
   const isBrandTab = activeMobileTab === "brand";
@@ -496,7 +517,17 @@ function Header() {
                   key={item.key}
                   onMouseEnter={() => openDesktopMenu(item.key)}
                 >
-                  <Link to={item.to} className="gnb__link">
+                  <Link
+                    to={item.to}
+                    className="gnb__link"
+                    onClick={() =>
+                      trackMenuNavigation({
+                        signal: "pc_assembly_nav_click",
+                        source: "desktop_nav",
+                        label: item.label,
+                      })
+                    }
+                  >
                     {item.label}
                   </Link>
                 </li>
@@ -532,12 +563,32 @@ function Header() {
                       {item.sections.map((section) => (
                         <div className="dropdown__column" key={section.key}>
                           <div className="dropdown__title">
-                            <Link to={`/list?group=${section.key}`}>{section.title}</Link>
+                            <Link
+                              to={`/list?group=${section.key}`}
+                              onClick={() =>
+                                trackMenuNavigation({
+                                  signal: `${item.variant}_group_click`,
+                                  source: "desktop_nav",
+                                  label: section.title,
+                                })
+                              }
+                            >
+                              {section.title}
+                            </Link>
                           </div>
                           <ul className="dropdown__list">
                             {section.items.map((menuItem) => (
                               <li className={listItemClassName} key={menuItem.type}>
-                                <Link to={`/list?type=${menuItem.type}`}>
+                                <Link
+                                  to={`/list?type=${menuItem.type}`}
+                                  onClick={() =>
+                                    trackMenuNavigation({
+                                      signal: `${item.variant}_item_click`,
+                                      source: "desktop_nav",
+                                      label: menuItem.label,
+                                    })
+                                  }
+                                >
                                   {item.variant === "brand" ? (
                                     <BrandMenuLabel
                                       item={menuItem}
@@ -622,7 +673,17 @@ function Header() {
                   >
                     {section.items.map((item) => (
                       <li key={item.type} className="mobile-menu__list-item">
-                        <Link to={`/list?type=${item.type}`} onClick={handleMobileMenuLinkClick}>
+                        <Link
+                          to={`/list?type=${item.type}`}
+                          onClick={() => {
+                            trackMenuNavigation({
+                              signal: `${activeMobileTab}_item_click`,
+                              source: "mobile_nav",
+                              label: item.label,
+                            });
+                            handleMobileMenuLinkClick();
+                          }}
+                        >
                           {isBrandTab ? (
                             <BrandMenuLabel item={item} iconClassName="brand-menu__icon--mobile" />
                           ) : (
@@ -644,7 +705,14 @@ function Header() {
               <Link
                 to="/pc-assembly"
                 className="mobile-menu__cta-link"
-                onClick={handleMobileMenuLinkClick}
+                onClick={() => {
+                  trackMenuNavigation({
+                    signal: "pc_assembly_nav_click",
+                    source: "mobile_nav",
+                    label: "PC 조립",
+                  });
+                  handleMobileMenuLinkClick();
+                }}
               >
                 PC 조립 페이지로 이동
               </Link>

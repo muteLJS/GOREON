@@ -13,6 +13,7 @@ import RouteLoading from "@/components/RouteLoading/RouteLoading";
 import WishlistIconButton from "@/components/WishlistIconButton/WishlistIconButton";
 
 import resetIcon from "@/assets/icons/reset.svg";
+import { trackSelfDiscoveryShopping } from "@/utils/analytics";
 import { compareProductsByNewest, getProductListKey } from "@/utils/productIdentity";
 import { useSearchParams } from "react-router-dom";
 
@@ -406,6 +407,8 @@ const PriceFilterBox = ({
   priceRangePercent,
   onMinChange,
   onMaxChange,
+  onMinChangeEnd,
+  onMaxChangeEnd,
 }) => {
   const isDisabled = minPrice === maxPrice;
 
@@ -431,6 +434,8 @@ const PriceFilterBox = ({
           step={1}
           value={minValue}
           onChange={onMinChange}
+          onMouseUp={onMinChangeEnd}
+          onTouchEnd={onMinChangeEnd}
           className="range-input range-input--min"
           disabled={isDisabled}
           aria-label="최소 가격"
@@ -443,6 +448,8 @@ const PriceFilterBox = ({
           step={1}
           value={maxValue}
           onChange={onMaxChange}
+          onMouseUp={onMaxChangeEnd}
+          onTouchEnd={onMaxChangeEnd}
           className="range-input range-input--max"
           disabled={isDisabled}
           aria-label="최대 가격"
@@ -518,6 +525,17 @@ export default function ListLayout({
     mobileFilterGroups[0] ??
     null;
 
+  const trackPriceFilterChange = (rangeTarget) => {
+    trackSelfDiscoveryShopping({
+      signal: "price_filter_change",
+      source: "list_layout",
+      params: {
+        range_target: rangeTarget,
+        selected_type: type || "all",
+      },
+    });
+  };
+
   const handleMinChange = (event) => {
     const nextValue = Number(event.target.value);
 
@@ -530,13 +548,34 @@ export default function ListLayout({
     setMaxValue(Math.max(nextValue, minValue));
   };
 
+  const handleMinChangeEnd = () => {
+    trackPriceFilterChange("min");
+  };
+
+  const handleMaxChangeEnd = () => {
+    trackPriceFilterChange("max");
+  };
+
   const handleFilterToggle = (title, item) => {
     setSelectedFilters((currentFilters) => {
       const currentValues = currentFilters[title] ?? [];
-      const nextValues = currentValues.includes(item)
+      const isSelected = currentValues.includes(item);
+      const nextValues = isSelected
         ? currentValues.filter((value) => value !== item)
         : [...currentValues, item];
       const nextFilters = { ...currentFilters };
+
+      trackSelfDiscoveryShopping({
+        signal: "filter_toggle",
+        source: "list_layout",
+        label: title,
+        params: {
+          filter_group: title,
+          filter_value: item,
+          filter_selected: isSelected ? "no" : "yes",
+          selected_type: type || "all",
+        },
+      });
 
       if (nextValues.length > 0) {
         nextFilters[title] = nextValues;
@@ -548,16 +587,52 @@ export default function ListLayout({
     });
   };
 
+  const trackFilterReset = (source) => {
+    trackSelfDiscoveryShopping({
+      signal: "filter_reset",
+      source,
+      params: {
+        selected_type: type || "all",
+      },
+    });
+  };
+
   const resetFilters = () => {
+    trackFilterReset("list_layout_desktop_filter");
     setSelectedFilters({});
     setMinValue(priceBounds.min);
     setMaxValue(priceBounds.max);
   };
 
   const resetMobileFilterConditions = () => {
+    trackFilterReset("list_layout_mobile_filter");
     setSelectedFilters({});
     setMinValue(priceBounds.min);
     setMaxValue(priceBounds.max);
+  };
+
+  const handleSortSelect = (option, source) => {
+    trackSelfDiscoveryShopping({
+      signal: "sort_select",
+      source,
+      label: option,
+      params: {
+        sort_option: option,
+        selected_type: type || "all",
+      },
+    });
+    setSelectedSort(option);
+  };
+
+  const handleProductListClick = (product) => {
+    trackSelfDiscoveryShopping({
+      signal: "product_list_click",
+      source: "list_layout",
+      label: product?.name,
+      params: {
+        selected_type: type || "all",
+      },
+    });
   };
 
   useEffect(() => {
@@ -649,6 +724,8 @@ export default function ListLayout({
                 priceRangePercent={priceRangePercent}
                 onMinChange={handleMinChange}
                 onMaxChange={handleMaxChange}
+                onMinChangeEnd={handleMinChangeEnd}
+                onMaxChangeEnd={handleMaxChangeEnd}
               />
             </div>
           </section>
@@ -668,14 +745,28 @@ export default function ListLayout({
                 <button
                   type="button"
                   className="filter-button"
-                  onClick={() => setIsFilterModalOpen(true)}
+                  onClick={() => {
+                    trackSelfDiscoveryShopping({
+                      signal: "filter_open",
+                      source: "list_layout_mobile_filter",
+                      params: { selected_type: type || "all" },
+                    });
+                    setIsFilterModalOpen(true);
+                  }}
                 >
                   필터 <img src={ChevronDownIcon} alt="down" />
                 </button>
                 <button
                   type="button"
                   className="filter-button"
-                  onClick={() => setIsMobileSortModalOpen(true)}
+                  onClick={() => {
+                    trackSelfDiscoveryShopping({
+                      signal: "sort_open",
+                      source: "list_layout_mobile_sort",
+                      params: { selected_type: type || "all" },
+                    });
+                    setIsMobileSortModalOpen(true);
+                  }}
                 >
                   {selectedSort}순 <img src={ChevronDownIcon} alt="down" />
                 </button>
@@ -684,7 +775,14 @@ export default function ListLayout({
                 <button
                   type="button"
                   className="list-assembly__desktop-sort-button"
-                  onClick={() => setIsDesktopSortMenuOpen((isOpen) => !isOpen)}
+                  onClick={() => {
+                    trackSelfDiscoveryShopping({
+                      signal: "sort_open",
+                      source: "list_layout_desktop_sort",
+                      params: { selected_type: type || "all" },
+                    });
+                    setIsDesktopSortMenuOpen((isOpen) => !isOpen);
+                  }}
                   aria-haspopup="listbox"
                   aria-expanded={isDesktopSortMenuOpen}
                 >
@@ -704,7 +802,7 @@ export default function ListLayout({
                           selectedSort === option ? "is-active" : ""
                         }`}
                         onClick={() => {
-                          setSelectedSort(option);
+                          handleSortSelect(option, "list_layout_desktop_sort");
                           setIsDesktopSortMenuOpen(false);
                         }}
                         role="option"
@@ -731,10 +829,27 @@ export default function ListLayout({
                     <ProductCardVertical
                       key={getProductListKey(product)}
                       product={product}
+                      onProductClick={handleProductListClick}
                       action={
                         <div className="list-assembly__button-container">
-                          <CartIconButton product={product} size="sm" />
-                          <WishlistIconButton product={product} size="sm" />
+                          <CartIconButton
+                            product={product}
+                            size="sm"
+                            analyticsContext={{
+                              behavior: "self_discovery",
+                              signal: "product_list_add_to_cart",
+                              source: "list_layout",
+                            }}
+                          />
+                          <WishlistIconButton
+                            product={product}
+                            size="sm"
+                            analyticsContext={{
+                              behavior: "self_discovery",
+                              signal: "product_list_wishlist",
+                              source: "list_layout",
+                            }}
+                          />
                         </div>
                       }
                     />
@@ -788,6 +903,8 @@ export default function ListLayout({
                   priceRangePercent={priceRangePercent}
                   onMinChange={handleMinChange}
                   onMaxChange={handleMaxChange}
+                  onMinChangeEnd={handleMinChangeEnd}
+                  onMaxChangeEnd={handleMaxChangeEnd}
                 />
               ) : (
                 <ul className="list-mobile-filter__options">
@@ -836,7 +953,7 @@ export default function ListLayout({
                     selectedSort === option ? "is-active" : ""
                   }`}
                   onClick={() => {
-                    setSelectedSort(option);
+                    handleSortSelect(option, "list_layout_mobile_sort");
                     setIsMobileSortModalOpen(false);
                   }}
                 >

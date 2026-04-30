@@ -18,6 +18,7 @@ import {
   getPcAssemblyPerformanceChecks,
   getPcAssemblyRecommendations,
 } from "@/utils/pcAssemblyProducts";
+import { trackAddToCart, trackGuidedShopping, trackSelfDiscoveryShopping } from "@/utils/analytics";
 import { normalizeImageUrl } from "@/utils/image";
 import "./PcAssemblyQuote.scss";
 
@@ -119,6 +120,14 @@ function PcAssemblyQuote({ isModal = false }) {
   };
 
   const handleCompatibilityCheck = () => {
+    trackGuidedShopping({
+      signal: "pc_assembly_compatibility_check",
+      source: "pc_assembly_quote",
+      value: selectedIds.length,
+      params: {
+        item_count: selectedIds.length,
+      },
+    });
     setAnalysisIds(selectedIds);
   };
 
@@ -144,6 +153,15 @@ function PcAssemblyQuote({ isModal = false }) {
       );
     });
 
+    trackSelfDiscoveryShopping({
+      signal: "pc_assembly_quote_add_to_cart",
+      source: "pc_assembly_quote",
+      value: items.length,
+      params: {
+        item_count: items.length,
+      },
+    });
+    trackAddToCart("PC 조립 견적");
     showToast(`장바구니에 ${items.length}개 상품을 담았습니다.`);
   };
 
@@ -156,6 +174,10 @@ function PcAssemblyQuote({ isModal = false }) {
   };
 
   const handleRecommendClick = (productId) => {
+    trackGuidedShopping({
+      signal: "pc_assembly_upgrade_recommendation_click",
+      source: "pc_assembly_quote",
+    });
     navigate(`/product/${productId}`);
   };
 
@@ -170,6 +192,15 @@ function PcAssemblyQuote({ isModal = false }) {
 
   const handleRecommendAdd = (product, event) => {
     event?.stopPropagation();
+
+    trackGuidedShopping({
+      signal: "pc_assembly_upgrade_recommendation_add",
+      source: "pc_assembly_quote",
+      label: product.name,
+      params: {
+        product_category: product.category,
+      },
+    });
 
     dispatch(
       addQuoteItem({

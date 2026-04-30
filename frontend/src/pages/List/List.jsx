@@ -1,5 +1,6 @@
-﻿import ListLayout from "@/layouts/ListLayout/ListLayout";
+import ListLayout from "@/layouts/ListLayout/ListLayout";
 import api from "@/utils/api";
+import { trackSelfDiscoveryShopping } from "@/utils/analytics";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 const GROUP_LABEL_MAP = {
@@ -74,6 +75,15 @@ const List = () => {
       }
     };
     if (type || group) {
+      trackSelfDiscoveryShopping({
+        signal: group ? "category_group_results_view" : "category_type_results_view",
+        source: "list_page",
+        label: selectedTypeLabel,
+        params: {
+          selected_type: type || "",
+          selected_group: group || "",
+        },
+      });
       fetchData();
     } else {
       setProducts([]);
@@ -81,7 +91,7 @@ const List = () => {
     }
 
     return () => controller.abort();
-  }, [group, type]);
+  }, [group, selectedTypeLabel, type]);
 
   return (
     <div>
