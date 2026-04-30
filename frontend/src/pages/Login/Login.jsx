@@ -11,6 +11,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { login } from "../../store/slices/userSlice";
 import api, { ACCESS_TOKEN_STORAGE_KEY } from "../../utils/api";
+import { formatPhoneNumber } from "../../utils/phoneNumber";
 
 const defaultLoginForm = {
   email: "",
@@ -156,6 +157,13 @@ const validateRegisterForm = (form) => {
   }
 
   return "";
+};
+
+const updateRegisterFormField = (setRegisterForm, fieldName) => (event) => {
+  const nextValue =
+    fieldName === "phone" ? formatPhoneNumber(event.target.value) : event.target.value;
+
+  setRegisterForm((prev) => ({ ...prev, [fieldName]: nextValue }));
 };
 
 const useAuthActions = () => {
@@ -343,9 +351,8 @@ const MobileRegister = ({
                 placeholder="이메일을 입력해주세요"
                 name="email"
                 value={registerForm.email}
-                onChange={(event) =>
-                  setRegisterForm((prev) => ({ ...prev, email: event.target.value }))
-                }
+                onChange={updateRegisterFormField(setRegisterForm, "email")}
+                autoComplete="email"
               />
             </div>
             <div className="inputBox">
@@ -355,9 +362,8 @@ const MobileRegister = ({
                 placeholder="비밀번호를 입력하세요"
                 name="password"
                 value={registerForm.password}
-                onChange={(event) =>
-                  setRegisterForm((prev) => ({ ...prev, password: event.target.value }))
-                }
+                onChange={updateRegisterFormField(setRegisterForm, "password")}
+                autoComplete="new-password"
               />
             </div>
             <div className="inputBox">
@@ -367,9 +373,8 @@ const MobileRegister = ({
                 placeholder="비밀번호를 다시 입력하세요"
                 name="passwordCheck"
                 value={registerForm.passwordCheck}
-                onChange={(event) =>
-                  setRegisterForm((prev) => ({ ...prev, passwordCheck: event.target.value }))
-                }
+                onChange={updateRegisterFormField(setRegisterForm, "passwordCheck")}
+                autoComplete="new-password"
               />
             </div>
             <div className="inputBox">
@@ -379,21 +384,21 @@ const MobileRegister = ({
                 placeholder="닉네임을 입력하세요"
                 name="nickname"
                 value={registerForm.nickname}
-                onChange={(event) =>
-                  setRegisterForm((prev) => ({ ...prev, nickname: event.target.value }))
-                }
+                onChange={updateRegisterFormField(setRegisterForm, "nickname")}
+                autoComplete="nickname"
               />
             </div>
             <div className="inputBox">
               <img src={lock} alt="icon" />
               <input
-                type="text"
+                type="tel"
                 placeholder="전화번호를 입력하세요"
                 name="phone"
                 value={registerForm.phone}
-                onChange={(event) =>
-                  setRegisterForm((prev) => ({ ...prev, phone: event.target.value }))
-                }
+                onChange={updateRegisterFormField(setRegisterForm, "phone")}
+                inputMode="numeric"
+                autoComplete="tel"
+                maxLength={13}
               />
             </div>
           </div>
@@ -452,9 +457,8 @@ const PcLogin = ({ initialMode = "login" }) => {
                   placeholder="이메일을 입력해주세요"
                   name="email"
                   value={registerForm.email}
-                  onChange={(event) =>
-                    setRegisterForm((prev) => ({ ...prev, email: event.target.value }))
-                  }
+                  onChange={updateRegisterFormField(setRegisterForm, "email")}
+                  autoComplete="email"
                 />
               </div>
               <div className="inputBox">
@@ -464,9 +468,8 @@ const PcLogin = ({ initialMode = "login" }) => {
                   placeholder="비밀번호를 입력하세요"
                   name="password"
                   value={registerForm.password}
-                  onChange={(event) =>
-                    setRegisterForm((prev) => ({ ...prev, password: event.target.value }))
-                  }
+                  onChange={updateRegisterFormField(setRegisterForm, "password")}
+                  autoComplete="new-password"
                 />
               </div>
               <div className="inputBox">
@@ -476,12 +479,8 @@ const PcLogin = ({ initialMode = "login" }) => {
                   placeholder="비밀번호를 다시 입력하세요"
                   name="passwordCheck"
                   value={registerForm.passwordCheck}
-                  onChange={(event) =>
-                    setRegisterForm((prev) => ({
-                      ...prev,
-                      passwordCheck: event.target.value,
-                    }))
-                  }
+                  onChange={updateRegisterFormField(setRegisterForm, "passwordCheck")}
+                  autoComplete="new-password"
                 />
               </div>
               <div className="inputBox">
@@ -491,21 +490,21 @@ const PcLogin = ({ initialMode = "login" }) => {
                   placeholder="닉네임을 입력하세요"
                   name="nickname"
                   value={registerForm.nickname}
-                  onChange={(event) =>
-                    setRegisterForm((prev) => ({ ...prev, nickname: event.target.value }))
-                  }
+                  onChange={updateRegisterFormField(setRegisterForm, "nickname")}
+                  autoComplete="nickname"
                 />
               </div>
               <div className="inputBox">
                 <img src={lock} alt="icon" />
                 <input
-                  type="text"
+                  type="tel"
                   placeholder="전화번호를 입력하세요"
                   name="phone"
                   value={registerForm.phone}
-                  onChange={(event) =>
-                    setRegisterForm((prev) => ({ ...prev, phone: event.target.value }))
-                  }
+                  onChange={updateRegisterFormField(setRegisterForm, "phone")}
+                  inputMode="numeric"
+                  autoComplete="tel"
+                  maxLength={13}
                 />
               </div>
             </div>

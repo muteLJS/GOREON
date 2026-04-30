@@ -82,6 +82,35 @@ const TYPE_FILTER_MAP = {
   "power-supply": [KO.powerSupply],
 };
 
+const GROUP_FILTER_TYPE_MAP = {
+  pc: [
+    "notebook",
+    "desktop",
+    "monitor",
+    "keyboard",
+    "mouse",
+    "pc-accessory",
+    "pc-parts",
+  ],
+  mobile: ["smartphone", "smartwatch", "earphone"],
+  tablet: ["tablet", "tablet-accessory", "pencil", "keyboard-case"],
+  home: ["printer", "router", "speaker", "power-bank"],
+  premium: ["apple", "samsung", "lg"],
+  value: ["hp", "lenovo", "dell"],
+  gaming: ["msi", "asus", "acer"],
+};
+
+const GROUP_ALIAS_MAP = {
+  PC: "pc",
+  pc: "pc",
+  모바일: "mobile",
+  태블릿: "tablet",
+  생활가전: "home",
+  프리미엄: "premium",
+  가성비: "value",
+  게이밍: "gaming",
+};
+
 const SEARCH_STOP_WORDS = new Set([
   "용",
   "용도",
@@ -129,6 +158,16 @@ const normalizeType = (type) =>
 
 const getTypeTags = (type) => TYPE_FILTER_MAP[normalizeType(type)] ?? [];
 
+const normalizeGroup = (group) => {
+  const trimmedGroup = String(group || "").trim();
+  return GROUP_ALIAS_MAP[trimmedGroup] ?? trimmedGroup.toLowerCase();
+};
+
+const getGroupTags = (group) =>
+  (GROUP_FILTER_TYPE_MAP[normalizeGroup(group)] ?? []).flatMap((type) =>
+    getTypeTags(type),
+  );
+
 const createProductSearchConditions = (regex) => [
   { name: regex },
   { tag: regex },
@@ -149,10 +188,15 @@ const createKeywordConditions = (keyword) => {
     : createProductSearchConditions(createLooseRegex(keyword));
 };
 
-const buildProductQuery = ({ category, keyword, type } = {}) => {
+const buildProductQuery = ({ category, group, keyword, type } = {}) => {
   const query = {};
   const andConditions = [];
+  const groupTags = getGroupTags(group);
   const typeTags = getTypeTags(type);
+
+  if (groupTags.length) {
+    andConditions.push({ $or: createTagConditions(groupTags) });
+  }
 
   if (typeTags.length) {
     andConditions.push({ $or: createTagConditions(typeTags) });
@@ -186,6 +230,7 @@ module.exports = {
   createLooseRegex,
   createProductSearchConditions,
   createTagConditions,
+  getGroupTags,
   getTypeTags,
   parsePriceNumber,
   tokenizeKeyword,
