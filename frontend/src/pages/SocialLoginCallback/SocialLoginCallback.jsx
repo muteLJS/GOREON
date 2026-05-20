@@ -4,9 +4,18 @@ import { useNavigate } from "react-router-dom";
 
 import RouteLoading from "@/components/RouteLoading/RouteLoading";
 import { login } from "@/store/slices/userSlice";
-import api, { ACCESS_TOKEN_STORAGE_KEY } from "@/utils/api";
+import api from "@/utils/api";
 
-const getHashParams = () => new URLSearchParams(window.location.hash.replace(/^#/, ""));
+const getCallbackParams = () => {
+  const searchParams = new URLSearchParams(window.location.search);
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+
+  return {
+    success: searchParams.get("success") || hashParams.get("success"),
+    error: searchParams.get("error") || hashParams.get("error"),
+    provider: searchParams.get("provider") || hashParams.get("provider"),
+  };
+};
 
 const normalizeUser = (user) => ({
   id: user.id || user._id,
@@ -32,29 +41,30 @@ function SocialLoginCallback() {
     hasStartedRef.current = true;
 
     const completeSocialLogin = async () => {
-      const params = getHashParams();
-      const error = params.get("error");
-      const success = params.get("success");
-      const provider = params.get("provider") || "unknown";
-      const accessToken = params.get("accessToken");
+      const { error, success, provider } = getCallbackParams();
 
       if (error || success !== "1") {
-        console.error("[auth][social] callback failed before session restore", {
+        console.error("[auth][social-callback] login failed", {
           provider,
-          success,
           error,
+          success,
+          search: window.location.search,
+          hash: window.location.hash,
         });
+
         setMessage("소셜 로그인에 실패했습니다.");
-        navigate("/login", { replace: true, state: { authError: error, authProvider: provider } });
+        navigate("/login", {
+          replace: true,
+          state: {
+            authError: error || "social_login_failed",
+            authProvider: provider,
+          },
+        });
         return;
       }
 
       try {
-        if (accessToken) {
-          localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, accessToken);
-        }
-
-        window.history.replaceState(null, "", window.location.pathname);
+        localStorage.removeItem("authToken");
 
         const response = await api.get("/users/me");
         const user = normalizeUser(response.data?.data || response.data);
@@ -64,6 +74,7 @@ function SocialLoginCallback() {
         navigate("/", { replace: true });
       } catch (requestError) {
         const status = requestError.response?.status;
+
         console.error("[auth][social] session restore failed after callback", {
           provider,
           status,
@@ -71,8 +82,9 @@ function SocialLoginCallback() {
           data: requestError.response?.data,
         });
 
+        localStorage.removeItem("authToken");
         localStorage.removeItem("userInfo");
-        localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+
         setMessage("소셜 로그인 정보를 가져오지 못했습니다.");
         navigate("/login", {
           replace: true,
