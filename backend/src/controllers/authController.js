@@ -86,19 +86,22 @@ const startSocialOAuth = async (req, res, next) => {
 };
 
 const socialOAuthCallback = async (req, res) => {
+  const provider = req.params.provider?.trim().toLowerCase();
+
   try {
-    const result = await handleSocialCallback(req.params.provider, req.query);
+    const result = await handleSocialCallback(provider, req.query);
     setAuthCookies(res, result);
     res.redirect(
       getClientSocialCallbackUrl({
         success: "1",
-        accessToken: result.accessToken,
+        provider,
       }),
     );
   } catch (error) {
-    const message = error.statusCode === 500 ? "social_login_failed" : error.message;
+    const message =
+      error.statusCode === 500 || error.code === 11000 ? "social_login_failed" : error.message;
     console.error("[auth][social-oauth-callback] failed", {
-      provider: req.params.provider,
+      provider,
       path: req.originalUrl,
       query: req.query,
       statusCode: error.statusCode || 500,
@@ -108,7 +111,7 @@ const socialOAuthCallback = async (req, res) => {
     res.redirect(
       getClientSocialCallbackUrl({
         error: message || "social_login_failed",
-        provider: req.params.provider,
+        provider,
       }),
     );
   }
