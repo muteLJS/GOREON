@@ -19,6 +19,8 @@ const sanitizeUser = (user) => ({
   profileImage: user.profileImage,
 });
 
+const SOCIAL_PROVIDERS = ["google", "kakao", "naver"];
+
 const createAuthResult = (user) => ({
   user: sanitizeUser(user),
   accessToken: generateToken(
@@ -131,55 +133,114 @@ const logoutUser = async (refreshToken) => {
   }
 };
 
+const findUserBySocialIdentity = (provider, providerId) =>
+  User.findOne({
+    $or: [
+      { provider, providerId },
+      {
+        socialProviders: {
+          $elemMatch: { provider, providerId },
+        },
+      },
+    ],
+  });
+
+const applySocialProvider = (user, { provider, providerId, profileImage }) => {
+  const now = new Date();
+  const socialProviders = Array.isArray(user.socialProviders) ? user.socialProviders : [];
+  const linkedProvider = socialProviders.find(
+    (item) => item.provider === provider && item.providerId === providerId,
+  );
+
+  if (linkedProvider) {
+    linkedProvider.lastLoginAt = now;
+
+    if (profileImage) {
+      linkedProvider.profileImage = profileImage;
+    }
+
+    return;
+  }
+
+  socialProviders.push({
+    provider,
+    providerId,
+    profileImage: profileImage || "",
+    linkedAt: now,
+    lastLoginAt: now,
+  });
+  user.socialProviders = socialProviders;
+};
+
+const updateSocialUser = async (user, { provider, providerId, email, profileImage }) => {
+  applySocialProvider(user, { provider, providerId, profileImage });
+
+  if (!user.providerId && user.provider === provider) {
+    user.providerId = providerId;
+  }
+
+  if (!user.email && email) {
+    user.email = email;
+  }
+
+  await user.save();
+  return user;
+};
+
+const createSocialUser = async ({ provider, providerId, email, name, profileImage }) =>
+  User.create({
+    name: name || `${provider} user`,
+    email,
+    provider,
+    providerId,
+    socialProviders: [
+      {
+        provider,
+        providerId,
+        profileImage: profileImage || "",
+      },
+    ],
+    profileImage: profileImage || "",
+  });
+
 const socialLogin = async ({ provider, providerId, email, name, profileImage }) => {
   const normalizedProvider = provider?.trim().toLowerCase();
   const normalizedProviderId = String(providerId ?? "").trim();
   const normalizedEmail = email?.trim().toLowerCase();
 
-  if (!["google", "kakao", "naver"].includes(normalizedProvider) || !normalizedProviderId) {
+  if (!SOCIAL_PROVIDERS.includes(normalizedProvider) || !normalizedProviderId) {
     throw new ApiError(400, "Invalid social login payload");
   }
 
-  let user = await User.findOne({
+  const socialPayload = {
     provider: normalizedProvider,
     providerId: normalizedProviderId,
-  });
+    email: normalizedEmail,
+    name,
+    profileImage,
+  };
 
-  if (!user && normalizedEmail) {
-    user = await User.findOne({ email: normalizedEmail });
-  }
+  let user = normalizedEmail ? await User.findOne({ email: normalizedEmail }) : null;
+  user = user || (await findUserBySocialIdentity(normalizedProvider, normalizedProviderId));
 
   if (!user) {
-    user = await User.create({
-      name: name || `${normalizedProvider} user`,
-      email: normalizedEmail,
-      provider: normalizedProvider,
-      providerId: normalizedProviderId,
-      profileImage: profileImage || "",
-    });
+    try {
+      user = await createSocialUser(socialPayload);
+    } catch (error) {
+      if (error?.code !== 11000 || !normalizedEmail) {
+        throw error;
+      }
+
+      user = await User.findOne({ email: normalizedEmail });
+
+      if (!user) {
+        throw error;
+      }
+
+      user = await updateSocialUser(user, socialPayload);
+    }
   } else {
-    const updates = {};
-
-    if (!user.providerId && user.provider !== "local") {
-      updates.providerId = normalizedProviderId;
-    }
-
-    if (!user.email && normalizedEmail) {
-      updates.email = normalizedEmail;
-    }
-
-    if (name && user.name !== name) {
-      updates.name = name;
-    }
-
-    if (profileImage && user.profileImage !== profileImage) {
-      updates.profileImage = profileImage;
-    }
-
-    if (Object.keys(updates).length > 0) {
-      user.set(updates);
-      await user.save();
-    }
+    user = await updateSocialUser(user, socialPayload);
   }
 
   return createAuthResult(user);
